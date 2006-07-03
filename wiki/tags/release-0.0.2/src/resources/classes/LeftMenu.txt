@@ -1,0 +1,14 @@
+* [[StartingPoints|StartingPoints]]
+* [[Special:RecentChanges|Recent Changes]]
+* [[Special:Search|Search]]
+----
+* [[Special:AllTopics|All Topics]]
+* [[Special:OrphanedTopics|Orphaned Topics]]
+* [[Special:ToDoTopics|To Do Topics]]
+* [[Special:LockList|Lock List]]
+* [[Special:RSS|RSS]]
+* [[Special:SetUsername|Set Username]]
+* [[AdminOnlyTopics]]
+----
+* [http://jamwiki.org/ JAMWiki]
+* [http://mediawiki.org/ MediaWiki]
