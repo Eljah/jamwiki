@@ -1,0 +1,14 @@
+* [[StartingPoints|StartingPoints]]
+* [[Special:RecentChanges|Recent Changes]]
+* [[Special:Search|Search]]
+----
+* [[Special:AllTopics|All Topics]]
+* [[Special:OrphanedTopics|Orphaned Topics]]
+* [[Special:ToDoTopics|To Do Topics]]
+* [[Special:LockList|Lock List]]
+* [[Special:Upload|Upload File]]
+* [[AdminOnlyTopics]]
+----
+* [http://jamwiki.org/ JAMWiki]
+* [http://sourceforge.net/projects/jamwiki/ Sourceforge Page]
+* [http://mediawiki.org/ MediaWiki]
