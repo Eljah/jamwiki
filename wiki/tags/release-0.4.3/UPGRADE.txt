@@ -1,0 +1,239 @@
+INTRODUCTION
+============
+
+This document provides information for upgrading JAMWiki.  In most cases the
+JAMWiki upgrade process can be completed automatically by following the steps
+below, but in the case of errors manual upgrade steps may need to be followed.
+
+
+AUTOMATIC UPGRADES
+==================
+
+In most cases the JAMWiki process can be handled automatically by following
+these steps:
+
+  1. Download the latest JAMWiki WAR file.
+  2. Back up all database and/or file data prior to upgrading.
+  3. Back up the jamwiki.properties file and the logging.properties file that
+     can be found in the /WEB-INF/classes directory.
+  4. If you have created any virtual wikis, back up the web.xml file that can
+     be found in the /WEB-INF directory.
+  5. Remove the old JAMWiki installation.
+  6. Install the new JAMWiki WAR file.  See your web application server's
+     documentation for instructions.
+  7. Copy the files backed up in steps three and four back into their old
+     locations, overwriting any new files.  Be sure that permissions are set
+     so that JAMWiki has read and write access to all files in the
+     installation.
+  8. View any page on the Wiki.  You will be redirected to the upgrade page
+     and any required upgrade steps will be automatically performed.
+
+Note that some users have reported upgrade failures, but the problem was
+actually due to old pages being cached by the application server.  This
+problem is particularly common with Tomcat, and can be resolved by clearing
+the application server's page cache.
+
+
+MANUAL UPGRADES
+===============
+
+Manual upgrades should only be performed if an error occurs while upgrading
+JAMWiki automatically.  When upgrading manually, you should perform all
+upgrade steps sequentially for each version that is being upgraded,  unless
+otherwise noted.  For example, if upgrading from version 0.3.0 to version
+0.3.3, you should apply the upgrade steps for 0.3.1, followed by 0.3.2,
+followed by 0.3.3.
+
+
+  JAMWiki 0.4.3
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.4.3".
+
+
+  JAMWiki 0.4.2
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.4.2".
+  2. Update the database schema by executing the following SQL statements:
+       a) Create the jam_watchlist table.
+              CREATE TABLE jam_watchlist (
+                   wiki_user_id INTEGER NOT NULL,
+                   topic_name VARCHAR(200),
+                   virtual_wiki_id INTEGER NOT NULL,
+                   CONSTRAINT jam_pk_watchlist PRIMARY KEY
+                        (wiki_user_id, topic_name, virtual_wiki_id),
+                   CONSTRAINT jam_fk_watchlist_user_id FOREIGN KEY
+                        (wiki_user_id)
+                        REFERENCES jam_wiki_user(wiki_user_id),
+                   CONSTRAINT jam_fk_watchlist_vwiki FOREIGN KEY
+                        (virtual_wiki_id)
+                        REFERENCES jam_virtual_wiki(virtual_wiki_id) 
+              );
+       b) Update the jam_topic table.
+              alter table jam_topic drop column topic_content;
+              alter table jam_topic add column current_version_id INTEGER;
+              alter table jam_topic add constraint jam_fk_topic_topic_ver
+                   FOREIGN KEY (current_version_id)
+                   REFERENCES jam_topic_version(topic_version_id);
+       c) Update existing jam_topic records.
+              update jam_topic set current_version_id = (
+                   select max(topic_version_id) from jam_topic_version
+                   where jam_topic_version.topic_id = jam_topic.topic_id
+              );
+  3. The #change CSS style should be modified to remove the font-weight
+     property.  An up-to-date version of the default the StyleSheet topic can
+     be found in the /WEB-INF/classes/pages/StyleSheet file.  Note that the
+     StyleSheet topic can only be edited AFTER all other upgrade steps have
+     been completed.
+
+
+  JAMWiki 0.4.1
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.4.1".
+
+
+  JAMWiki 0.4.0
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.4.0".
+  2. The default JAMWiki parser has changed.  To continue using the default
+     parser, modify the /WEB-INF/classes/jamwiki.properties file and change
+     the "parser" value to "parser=org.jamwiki.parser.jflex.JFlexParser".        
+  3. FILE PERSISTENCY MODE ONLY: convert existing content to use the HSQL
+     database by doing the following:
+       a) From Special:Admin change the Persistence setting to "Internal
+          Database".
+       b) From Special:Convert choose the option to convert file content to
+          database content.
+  
+
+  JAMWiki 0.3.6
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.6".
+  
+
+  JAMWiki 0.3.5
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.5".
+  2. A new CSS style, "a.interwiki:after", should be added to the JAMWiki
+     StyleSheet topic.  An up-to-date version of the default the StyleSheet
+     topic can be found in the /WEB-INF/classes/pages/StyleSheet file.  Note
+     that the StyleSheet topic can only be edited AFTER all other upgrade
+     steps have been completed.
+
+
+  JAMWiki 0.3.4
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.4".
+  2. Update the /WEB-INF/classes/logging.properties file with appropriate
+     values for your setup.  See the comments within that file for
+     descriptions of what each value specifies.
+
+
+  JAMWiki 0.3.3
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.3".
+
+
+  JAMWiki 0.3.2
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.2".
+
+
+  JAMWiki 0.3.1
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.1".
+  2. DATABASE PERSISTENCY MODE ONLY: execute the following SQL statements
+     to update the database schema:
+       a) Add a redirect column to jam_topic.
+              alter table jam_topic add column redirect_to VARCHAR(200);
+       b) Add a delete_date column to jam_topic and jam_file.
+            MySql and MS SQL:
+              alter table jam_topic add column delete_date DATETIME;
+              alter table jam_file add column delete_date DATETIME;
+            Other databases:
+              alter table jam_topic add column delete_date TIMESTAMP;
+              alter table jam_file add column delete_date TIMESTAMP;
+       c) Update the unique constraint for topic names.
+            MySql:
+              alter table jam_topic drop index jam_unique_topic_name_vwiki;
+              create unique index jam_unique_topic_name_vwiki
+                   on jam_topic (topic_name, virtual_wiki_id, delete_date);
+            Other databases:
+              alter table jam_topic drop constraint jam_unique_topic_name_vwiki;
+              alter table jam_topic add constraint jam_unique_topic_name_vwiki
+                   UNIQUE (topic_name, virtual_wiki_id, delete_date);
+       d) Set the delete_date field for all topics and files.
+            MS SQL:
+              update jam_topic set delete_date = GETDATE()
+                   where topic_deleted = '1';
+              update jam_file set delete_date = GETDATE()
+                   where file_deleted = '1';
+            Oracle:
+              update jam_topic set delete_date = SYSTIMESTAMP
+                   where topic_deleted = '1';
+              update jam_file set delete_date = SYSTIMESTAMP
+                   where file_deleted = '1';
+            Other databases:
+              update jam_topic set delete_date = CURRENT_TIMESTAMP
+                   where topic_deleted = '1';
+              update jam_file set delete_date = CURRENT_TIMESTAMP
+                   where file_deleted = '1';
+       e) Drop the unused topic_deleted columns.
+              alter table jam_topic drop column topic_deleted;
+              alter table jam_file drop column file_deleted;
+       f) Drop the old user login uniqueness constraint.
+            MySql:
+              alter table jam_wiki_user drop constraint jam_unique_wiki_user_login;
+            Other databases:
+              alter table jam_wiki_user drop index jam_unique_wiki_user_login;
+       g) Create a new user login uniqueness constraint.
+            DB2, DB2/400, HSQL, MS SQL and MySQL:
+              create unique index jam_unique_wiki_user_login
+                   on jam_wiki_user (login);
+            Other databases:
+              create unique index jam_unique_wiki_user_login
+                   on jam_wiki_user (lower(login));
+  3. Update the JAMWiki StyleSheet topic to match the content of the
+     /WEB-INF/classes/pages/StyleSheet file.  Note that the StyleSheet topic
+     can only be edited AFTER all other upgrade steps have been completed.
+
+
+  JAMWiki 0.3.0
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.3.0".
+  2. DATABASE PERSISTENCY MODE ONLY: execute the following SQL statements
+     to update the database schema:
+       a) Drop the jam_image table.
+              drop table jam_image;
+       b) Create the jam_category table.
+              create table jam_category (
+                child_topic_id INTEGER NOT NULL, 
+                category_name VARCHAR(200) NOT NULL, 
+                sort_key VARCHAR(200), 
+                CONSTRAINT jam_pk_category PRIMARY KEY (child_topic_id, category_name), 
+                CONSTRAINT jam_fk_category_child_id FOREIGN KEY (child_topic_id) REFERENCES jam_topic(topic_id) 
+              );
+  3. Update the JAMWiki StyleSheet topic to match the content of the
+     /WEB-INF/classes/pages/StyleSheet file.  Note that the StyleSheet topic
+     can only be edited AFTER all other upgrade steps have been completed.
