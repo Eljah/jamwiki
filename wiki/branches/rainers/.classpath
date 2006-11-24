@@ -28,5 +28,6 @@
 	<classpathentry kind="lib" path="lib/spring-web-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/spring-webmvc-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/standard-1.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/acegi-security-1.0.3.jar" sourcepath="lib-src/acegi-security-1.0.3-src.zip"/>
 	<classpathentry kind="output" path="src/webapp/WEB-INF/classes"/>
 </classpath>
