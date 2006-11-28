@@ -35,7 +35,7 @@
 			<ref bean="authenticationManager" />
 		</property>
 		<property name="authenticationFailureUrl">
-			<value>/en/Special:Login?error=1</value>
+			<value>/en/Special:Login?errorMessage=error.login</value>
 		</property>
 		<property name="defaultTargetUrl">
 			<value>/</value>

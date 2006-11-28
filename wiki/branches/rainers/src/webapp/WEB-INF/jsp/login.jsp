@@ -22,7 +22,8 @@
 
 <%@ include file="page-init.jsp" %>
 
-<c:if test="${!empty errorMessage}"><p class="red"><f:message key="${errorMessage.key}"><f:param value="${errorMessage.params[0]}" /></f:message></p></c:if>
+<c:set var="errorMessage" value="${param['errorMessage']}"/>
+<c:if test="${!empty errorMessage}"><p class="red"><f:message key='${errorMessage}'>/></f:message></p></c:if>
 
 <form method="post" action="<%= response.encodeURL("j_acegi_security_check") %>">
 <input type="hidden" name="redirect" value="<c:out value="${redirect}"/>" />
