@@ -37,6 +37,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
+import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.UserHandler;
 import org.jamwiki.WikiBase;
@@ -172,7 +173,7 @@ public class Utilities {
 		String login = tokens.nextToken();
 		String rememberKey = tokens.nextToken();
 		try {
-			user = WikiBase.getHandler().lookupWikiUser(login);
+			user = WikiBase.getDataHandler().lookupWikiUser(login, null);
 		} catch (Exception e) {
 			// FIXME - safe to ignore?
 		}
@@ -203,9 +204,26 @@ public class Utilities {
 			return watchlist;
 		}
 		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		watchlist = WikiBase.getHandler().getWatchlist(virtualWiki, user.getUserId());
+		watchlist = WikiBase.getDataHandler().getWatchlist(virtualWiki, user.getUserId());
 		request.getSession().setAttribute(ServletUtil.PARAMETER_WATCHLIST, watchlist);
         return watchlist;
+	}
+
+	/**
+	 * Utility method to retrieve an instance of the current data handler.
+	 *
+	 * @return An instance of the current data handler.
+	 * @throws Exception Thrown if a data handler instance can not be
+	 *  instantiated.
+	 */
+	public static DataHandler dataHandlerInstance() throws Exception {
+		String dataHandlerClass = Environment.getValue(Environment.PROP_DB_TYPE);
+		logger.fine("Using data handler: " + dataHandlerClass);
+		Class clazz = Class.forName(dataHandlerClass, true, Thread.currentThread().getContextClassLoader());
+		Class[] parameterTypes = new Class[0];
+		Constructor constructor = clazz.getConstructor(parameterTypes);
+		Object[] initArgs = new Object[0];
+		return (DataHandler)constructor.newInstance(initArgs);
 	}
 
 	/**
@@ -377,7 +395,7 @@ public class Utilities {
 			throw new WikiException(new WikiMessage("topic.redirect.infinite"));
 		}
 		// get the topic that is being redirected to
-		Topic child = WikiBase.getHandler().lookupTopic(parent.getVirtualWiki(), parent.getRedirectTo());
+		Topic child = WikiBase.getDataHandler().lookupTopic(parent.getVirtualWiki(), parent.getRedirectTo(), false, null);
 		if (child == null) {
 			// child being redirected to doesn't exist, return parent
 			return parent;
@@ -386,7 +404,7 @@ public class Utilities {
 			// found a topic that is not a redirect, return
 			return child;
 		}
-		if (WikiBase.getHandler().lookupTopic(child.getVirtualWiki(), child.getRedirectTo()) == null) {
+		if (WikiBase.getDataHandler().lookupTopic(child.getVirtualWiki(), child.getRedirectTo(), false, null) == null) {
 			// child is a redirect, but its target does not exist
 			return child;
 		}
@@ -677,7 +695,7 @@ public class Utilities {
 		request.getSession().setAttribute(ServletUtil.PARAMETER_USER, user);
 		// add user's watchlist to session
 		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		Watchlist watchlist = WikiBase.getHandler().getWatchlist(virtualWiki, user.getUserId());
+		Watchlist watchlist = WikiBase.getDataHandler().getWatchlist(virtualWiki, user.getUserId());
 		request.getSession().setAttribute(ServletUtil.PARAMETER_WATCHLIST, watchlist);
 		if (setCookie) {
 			if (response == null) {
@@ -816,7 +834,7 @@ public class Utilities {
 	 * @throws Exception Thrown if a parser error occurs.
 	 */
 	public static ParserDocument parseSlice(HttpServletRequest request, String virtualWiki, String topicName, int targetSection) throws Exception {
-		Topic topic = WikiBase.getHandler().lookupTopic(virtualWiki, topicName);
+		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
 		if (topic == null || topic.getTopicContent() == null) {
 			return null;
 		}
@@ -844,7 +862,7 @@ public class Utilities {
 	 * @throws Exception Thrown if a parser error occurs.
 	 */
 	public static ParserDocument parseSplice(HttpServletRequest request, String virtualWiki, String topicName, int targetSection, String replacementText) throws Exception {
-		Topic topic = WikiBase.getHandler().lookupTopic(virtualWiki, topicName);
+		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
 		if (topic == null || topic.getTopicContent() == null) {
 			return null;
 		}

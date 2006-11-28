@@ -18,6 +18,8 @@ package org.jamwiki.db;
 
 import java.sql.Connection;
 import org.jamwiki.UserHandler;
+import org.jamwiki.WikiBase;
+import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserInfo;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
@@ -35,28 +37,24 @@ public class DatabaseUserHandler implements UserHandler {
 	public void addWikiUserInfo(WikiUserInfo userInfo, Object transactionObject) throws Exception {
 		Connection conn = null;
 		try {
-			conn = WikiDatabase.getConnection();
-			if (transactionObject instanceof Connection) {
-				WikiDatabase.getQueryHandler().insertWikiUserInfo(userInfo, (Connection)transactionObject);
-			} else {
-				WikiDatabase.getQueryHandler().insertWikiUserInfo(userInfo, conn);
-			}
+			conn = WikiDatabase.getConnection(transactionObject);
+			WikiDatabase.getQueryHandler().insertWikiUserInfo(userInfo, conn);
 		} catch (Exception e) {
 			DatabaseConnection.handleErrors(conn);
 			throw e;
 		} finally {
-			WikiDatabase.releaseParams(conn);
+			WikiDatabase.releaseConnection(conn, transactionObject);
 		}
 	}
 
 	/**
 	 *
 	 */
-	public boolean authenticate(String login, String password) throws Exception{
+	public boolean authenticate(String login, String password) throws Exception {
 		// password is stored encrypted, so encrypt password
 		String encryptedPassword = Encryption.encrypt(password);
-		WikiResultSet rs = WikiDatabase.getQueryHandler().lookupWikiUser(login, encryptedPassword);
-		return (rs.size() > 0);
+		WikiUser user = WikiBase.getDataHandler().lookupWikiUser(login, encryptedPassword);
+		return (user != null);
 	}
 
 	/**
@@ -95,17 +93,13 @@ public class DatabaseUserHandler implements UserHandler {
 	public void updateWikiUserInfo(WikiUserInfo userInfo, Object transactionObject) throws Exception {
 		Connection conn = null;
 		try {
-			conn = WikiDatabase.getConnection();
-			if (transactionObject instanceof Connection) {
-				WikiDatabase.getQueryHandler().updateWikiUserInfo(userInfo, (Connection)transactionObject);
-			} else {
-				WikiDatabase.getQueryHandler().updateWikiUserInfo(userInfo, conn);
-			}
+			conn = WikiDatabase.getConnection(transactionObject);
+			WikiDatabase.getQueryHandler().updateWikiUserInfo(userInfo, conn);
 		} catch (Exception e) {
 			DatabaseConnection.handleErrors(conn);
 			throw e;
 		} finally {
-			WikiDatabase.releaseParams(conn);
+			WikiDatabase.releaseConnection(conn, transactionObject);
 		}
 	}
 }

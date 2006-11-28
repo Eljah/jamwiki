@@ -405,8 +405,6 @@ public interface QueryHandler {
 	 * @param topicName The name of the topic being retrieved.
 	 * @param caseSensitive Set to <code>true</code> if the topic name should be
 	 *  searched for in a case-sensitive manner.
-	 * @param deleteOK Set to <code>true</code> if deleted topics should be searched,
-	 *  otherwise deleted topics will not be included in the result set.
 	 * @param conn A database connection to use when connecting to the database
 	 *  from this method.
 	 * @return A WikiResultSet containing all topic information for the given topic
@@ -414,7 +412,7 @@ public interface QueryHandler {
 	 *  returned.
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
-	public WikiResultSet lookupTopic(int virtualWikiId, String topicName, boolean caseSensitive, boolean deleteOK, Connection conn) throws Exception;
+	public WikiResultSet lookupTopic(int virtualWikiId, String topicName, boolean caseSensitive, Connection conn) throws Exception;
 
 	/**
 	 * Retrieve a result set of all topics of a given type within a virtual wiki.
@@ -479,16 +477,6 @@ public interface QueryHandler {
 	 * Retrieve a result set containing all user information for a given WikiUser.
 	 *
 	 * @param userId The id of the user record being retrieved.
-	 * @return A WikiResultSet containing all information for the given user, or
-	 *  an empty result set if no matching user exists.
-	 * @throws Exception Thrown if any error occurs during method execution.
-	 */
-	public WikiResultSet lookupWikiUser(int userId) throws Exception;
-
-	/**
-	 * Retrieve a result set containing all user information for a given WikiUser.
-	 *
-	 * @param userId The id of the user record being retrieved.
 	 * @param conn A database connection to use when connecting to the database
 	 *  from this method.
 	 * @return A WikiResultSet containing all information for the given user, or
@@ -501,11 +489,13 @@ public interface QueryHandler {
 	 * Retrieve a result set containing all user information for a given WikiUser.
 	 *
 	 * @param login The login of the user record being retrieved.
+	 * @param conn A database connection to use when connecting to the database
+	 *  from this method.
 	 * @return A WikiResultSet containing all information for the given user, or
 	 *  an empty result set if no matching user exists.
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
-	public WikiResultSet lookupWikiUser(String login) throws Exception;
+	public WikiResultSet lookupWikiUser(String login, Connection conn) throws Exception;
 
 	/**
 	 * Retrieve a result set containing all user information for a given WikiUser.

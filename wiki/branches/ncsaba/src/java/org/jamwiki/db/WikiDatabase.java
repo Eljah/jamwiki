@@ -43,6 +43,7 @@ public class WikiDatabase {
 	public static final String DB_TYPE_DB2 = "db2";
 	public static final String DB_TYPE_DB2_400 = "db2/400";
 	public static final String DB_TYPE_HSQL = "hsql";
+    public static final String DB_TYPE_H2 = "h2db";
 	public static final String DB_TYPE_MSSQL = "mssql";
 	public static final String DB_TYPE_MYSQL = "mysql";
 	public static final String DB_TYPE_ORACLE = "oracle";
@@ -64,6 +65,16 @@ public class WikiDatabase {
 		Connection conn = DatabaseConnection.getConnection();
 		conn.setAutoCommit(false);
 		return conn;
+	}
+
+	/**
+	 *
+	 */
+	protected static Connection getConnection(Object transactionObject) throws Exception {
+		if (transactionObject != null && transactionObject instanceof Connection) {
+			return (Connection)transactionObject;
+		}
+		return WikiDatabase.getConnection();
 	}
 
 	/**
@@ -98,7 +109,9 @@ public class WikiDatabase {
 		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DB_TYPE_MSSQL)) {
 			WikiDatabase.queryHandler = new MSSqlQueryHandler();
 		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DB_TYPE_HSQL)) {
-			WikiDatabase.queryHandler = new HSQLQueryHandler();
+			WikiDatabase.queryHandler = new HSqlQueryHandler();
+ 		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DB_TYPE_H2)) {
+ 			WikiDatabase.queryHandler = new H2QueryHandler();
 		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DB_TYPE_MYSQL)) {
 			WikiDatabase.queryHandler = new MySqlQueryHandler();
 		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DB_TYPE_ORACLE)) {
@@ -106,7 +119,7 @@ public class WikiDatabase {
 		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DB_TYPE_POSTGRES)) {
 			WikiDatabase.queryHandler = new PostgresQueryHandler();
 		} else {
-			WikiDatabase.queryHandler = new DefaultQueryHandler();
+			WikiDatabase.queryHandler = new AnsiQueryHandler();
 		}
 		WikiDatabase.CONNECTION_VALIDATION_QUERY = WikiDatabase.queryHandler.connectionValidationQuery();
 		WikiDatabase.EXISTENCE_VALIDATION_QUERY = WikiDatabase.queryHandler.existenceValidationQuery();
@@ -135,7 +148,17 @@ public class WikiDatabase {
 	/**
 	 *
 	 */
-	protected static void releaseParams(Connection conn) throws Exception {
+	protected static void releaseConnection(Connection conn, Object transactionObject) throws Exception {
+		if (transactionObject != null && transactionObject instanceof Connection) {
+			return;
+		}
+		WikiDatabase.releaseConnection(conn);
+	}
+
+	/**
+	 *
+	 */
+	protected static void releaseConnection(Connection conn) throws Exception {
 		if (conn == null) return;
 		try {
 			conn.commit();
@@ -169,7 +192,7 @@ public class WikiDatabase {
 				throw e;
 			}
 		} finally {
-			WikiDatabase.releaseParams(conn);
+			WikiDatabase.releaseConnection(conn);
 		}
 	}
 
@@ -180,17 +203,17 @@ public class WikiDatabase {
 		if (user == null) {
 			throw new Exception("Admin user not specified");
 		}
-		if (WikiBase.getHandler().lookupWikiUser(user.getUserId(), conn) != null) {
+		if (WikiBase.getDataHandler().lookupWikiUser(user.getUserId(), conn) != null) {
 			logger.warning("Admin user already exists");
 		}
-		WikiBase.getHandler().addWikiUser(user, conn);
+		WikiUserInfo userInfo = null;
 		if (WikiBase.getUserHandler().isWriteable()) {
-			WikiUserInfo userInfo = new WikiUserInfo();
+			userInfo = new WikiUserInfo();
 			userInfo.setEncodedPassword(user.getRememberKey());
 			userInfo.setLogin(user.getLogin());
 			userInfo.setUserId(user.getUserId());
-			WikiBase.getUserHandler().addWikiUserInfo(userInfo, conn);
 		}
+		WikiBase.getDataHandler().writeWikiUser(user, userInfo, conn);
 	}
 
 	/**
@@ -217,7 +240,7 @@ public class WikiDatabase {
 		VirtualWiki virtualWiki = new VirtualWiki();
 		virtualWiki.setName(WikiBase.DEFAULT_VWIKI);
 		virtualWiki.setDefaultTopicName(Environment.getValue(Environment.PROP_BASE_DEFAULT_TOPIC));
-		WikiBase.getHandler().writeVirtualWiki(virtualWiki, conn);
+		WikiBase.getDataHandler().writeVirtualWiki(virtualWiki, conn);
 	}
 
 	/**
@@ -233,14 +256,14 @@ public class WikiDatabase {
 		topic.setAdminOnly(adminOnly);
 		// FIXME - hard coding
 		TopicVersion topicVersion = new TopicVersion(user, user.getLastLoginIpAddress(), "Automatically created by system setup", contents);
-		WikiBase.getHandler().writeTopic(topic, topicVersion, Utilities.parserDocument(topic.getTopicContent(), virtualWiki, topicName), conn, true);
+		WikiBase.getDataHandler().writeTopic(topic, topicVersion, Utilities.parserDocument(topic.getTopicContent(), virtualWiki, topicName), true, conn);
 	}
 
 	/**
 	 *
 	 */
 	private static void setupSpecialPages(Locale locale, WikiUser user, Connection conn) throws Exception {
-		Collection all = WikiBase.getHandler().getVirtualWikiList();
+		Collection all = WikiBase.getDataHandler().getVirtualWikiList();
 		for (Iterator iterator = all.iterator(); iterator.hasNext();) {
 			VirtualWiki virtualWiki = (VirtualWiki)iterator.next();
 			// create the default topics

@@ -95,6 +95,10 @@ public class WikiResultSet {
 					if (value != null && value.length() > 0) character = value.charAt(0);
 					column.put(columnName.toLowerCase(), new Character(character));
 					break;
+				case java.sql.Types.VARBINARY:
+					byte[] bytes = rs.getBytes(columnName);
+					column.put(columnName.toLowerCase(), bytes);
+					break;
 				default:
 					Object object = rs.getObject(columnName);
 					column.put(columnName.toLowerCase(), object);
@@ -335,6 +339,25 @@ public class WikiResultSet {
 	public Timestamp getTimestamp(String columnName) throws SQLException {
 		this.verifyColumn(columnName);
 		return (Timestamp)this.currentRow.get(columnName.toLowerCase());
+	}
+
+	/**
+	 * <p>Retrieves the value of the designated column in the current row of this
+	 * <code>WikiResultSet</code> object as a <code>byte[]</code> object in
+	 * the Java programming language.</p>
+	 *
+	 * <p>This method duplicates the
+	 * {@link java.sql.ResultSet#getBytes ResultSet.getBytes(String columnName)} method.</p>
+	 *
+	 * @param columnName The SQL name of the column.
+	 * @return The column value; if the value is SQL <code>NULL</code>, the value
+	 *  returned is <code>null</code>.
+	 * @throws SQLException If the cursor position is invalid or if the column name does
+	 *  not exist in the result set.
+	 */
+	public byte[] getBytes(String columnName) throws SQLException {
+		this.verifyColumn(columnName);
+		return (byte[])this.currentRow.get(columnName.toLowerCase());
 	}
 
 	/**

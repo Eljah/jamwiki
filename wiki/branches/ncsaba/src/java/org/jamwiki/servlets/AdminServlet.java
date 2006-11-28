@@ -84,8 +84,8 @@ public class AdminServlet extends JAMWikiServlet {
 			}
 			virtualWiki.setName(request.getParameter("name"));
 			virtualWiki.setDefaultTopicName(request.getParameter("defaultTopicName"));
-			WikiBase.getHandler().writeVirtualWiki(virtualWiki);
-			WikiBase.getHandler().setupSpecialPages(request.getLocale(), user, virtualWiki);
+			WikiBase.getDataHandler().writeVirtualWiki(virtualWiki, null);
+			WikiBase.getDataHandler().setupSpecialPages(request.getLocale(), user, virtualWiki);
 			next.addObject("message", new WikiMessage("admin.message.virtualwikiadded"));
 		} catch (Exception e) {
 			logger.severe("Failure while adding virtual wiki", e);
@@ -109,6 +109,7 @@ public class AdminServlet extends JAMWikiServlet {
 			setProperty(props, request, Environment.PROP_IMAGE_RESIZE_INCREMENT);
 			setProperty(props, request, Environment.PROP_RECENT_CHANGES_NUM);
 			setBooleanProperty(props, request, Environment.PROP_TOPIC_USE_PREVIEW);
+            setBooleanProperty(props, request, Environment.PROP_TOPIC_COMPRESSION_ON);
 			setProperty(props, request, Environment.PROP_PARSER_CLASS);
 			setBooleanProperty(props, request, Environment.PROP_PARSER_TOC);
 			setProperty(props, request, Environment.PROP_PARSER_TOC_DEPTH);
@@ -164,6 +165,10 @@ public class AdminServlet extends JAMWikiServlet {
 			setPassword(props, request, next, Environment.PROP_LDAP_PASSWORD, "ldapPassword");
 			setProperty(props, request, Environment.PROP_LDAP_SECURITY_AUTHENTICATION);
 			setProperty(props, request, Environment.PROP_LDAP_URL);
+			setProperty(props, request, Environment.PROP_CACHE_INDIVIDUAL_SIZE);
+			setProperty(props, request, Environment.PROP_CACHE_MAX_AGE);
+			setProperty(props, request, Environment.PROP_CACHE_MAX_IDLE_AGE);
+			setProperty(props, request, Environment.PROP_CACHE_TOTAL_SIZE);
 			Vector errors = Utilities.validateSystemSettings(props);
 			if (errors.size() > 0) {
 				next.addObject("errors", errors);
@@ -193,7 +198,7 @@ public class AdminServlet extends JAMWikiServlet {
 	 */
 	private void recentChanges(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		try {
-			WikiBase.getHandler().reloadRecentChanges();
+			WikiBase.getDataHandler().reloadRecentChanges();
 			next.addObject("message", new WikiMessage("admin.message.recentchanges"));
 		} catch (Exception e) {
 			logger.severe("Failure while loading recent changes", e);
@@ -252,11 +257,14 @@ public class AdminServlet extends JAMWikiServlet {
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, Properties props) throws Exception {
 		pageInfo.setAction(WikiPageInfo.ACTION_ADMIN);
 		pageInfo.setAdmin(true);
+		pageInfo.setSpecial(true);
 		pageInfo.setPageTitle(new WikiMessage("admin.title"));
-		Collection virtualWikiList = WikiBase.getHandler().getVirtualWikiList();
+		Collection virtualWikiList = WikiBase.getDataHandler().getVirtualWikiList();
 		next.addObject("wikis", virtualWikiList);
 		Collection userHandlers = WikiConfiguration.getUserHandlers();
 		next.addObject("userHandlers", userHandlers);
+		Collection dataHandlers = WikiConfiguration.getDataHandlers();
+		next.addObject("dataHandlers", dataHandlers);
 		Collection parsers = WikiConfiguration.getParsers();
 		next.addObject("parsers", parsers);
 		if (props == null) {

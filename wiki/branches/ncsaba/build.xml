@@ -4,6 +4,7 @@
 	
 	<!-- build a list all jar files needed for compiling -->
 	<path id="jamwiki.lib.classpath">
+		<pathelement path="${dir.lib}/bliki.jar" />
 		<pathelement path="${dir.lib}/commons-codec.jar" />
 		<pathelement path="${dir.lib}/commons-dbcp-1.2.1.jar" />
 		<pathelement path="${dir.lib}/commons-fileupload-1.1.1.jar" />
@@ -81,6 +82,52 @@
 			<zipfileset file="${basedir}/LICENSE.txt" prefix="" />
 			<zipfileset file="${basedir}/CREDITS.txt" prefix="" />
 		</war>
+	</target>
+
+	<target name="deploy-wikipedia" depends="compile" description="Deploy the application to the wikipedia project.">
+        <copy todir="${dir.deploy}">
+            <fileset dir="${dir.src.resources}">
+                <include name="images/**"/>
+                <include name="js/**"/>
+            </fileset>
+            <fileset dir="${basedir}">
+                <include name="README.txt"/>
+                <include name="CHANGELOG.txt"/>
+                <include name="LICENSE.txt"/>
+                <include name="CREDITS.txt"/>
+            </fileset>
+            <fileset file="${dir.src.jsp}/index.jsp"/>
+        </copy>
+        <copy todir="${dir.deploy}/WEB-INF/classes">
+            <fileset dir="${dir.build.classes}">
+                <include name="org/jamwiki/**"/>
+            </fileset>
+            <fileset dir="${dir.src.properties}">
+                <include name="**"/>
+            </fileset>
+        </copy>
+        <copy todir="${dir.deploy}/WEB-INF/lib">
+            <fileset dir="${dir.lib}">
+                <include name="*.jar"/>
+                <include name="*.txt"/>
+                <exclude name="servlet.jar"/>
+                <exclude name="jflex-1.4.1.jar"/>
+                <exclude name="junit-*"/>
+            </fileset>
+        </copy>
+        <copy todir="${dir.deploy}/WEB-INF">
+            <fileset dir="${dir.src.webapp}/WEB-INF">
+                <exclude name="**/index.jsp"/>
+            </fileset>
+        </copy>
+	</target>
+
+	<target name="d-w">
+        <copy todir="${dir.deploy}/WEB-INF/classes">
+            <fileset dir="${dir.src.properties}">
+                <include name="**"/>
+            </fileset>
+        </copy>
 	</target>
 
 	<target name="war-local" depends="war" description="Construct the war file using local property files.">

@@ -115,6 +115,7 @@ function onPersistenceType() {
 		<select name="<%= Environment.PROP_DB_TYPE %>" id="<%= Environment.PROP_DB_TYPE %>">
 		<option value="<%= WikiDatabase.DB_TYPE_ANSI %>"<%= Environment.getValue(Environment.PROP_DB_TYPE).equals(WikiDatabase.DB_TYPE_ANSI) ? " selected" : "" %>><%= WikiDatabase.DB_TYPE_ANSI %></option>
 		<option value="<%= WikiDatabase.DB_TYPE_HSQL %>"<%= Environment.getValue(Environment.PROP_DB_TYPE).equals(WikiDatabase.DB_TYPE_HSQL) ? " selected" : "" %>><%= WikiDatabase.DB_TYPE_HSQL %></option>
+        <option value="<%= WikiDatabase.DB_TYPE_H2 %>"<%= Environment.getValue(Environment.PROP_DB_TYPE).equals(WikiDatabase.DB_TYPE_H2) ? " selected" : "" %>><%= WikiDatabase.DB_TYPE_H2 %></option>    
 		<option value="<%= WikiDatabase.DB_TYPE_MSSQL %>"<%= Environment.getValue(Environment.PROP_DB_TYPE).equals(WikiDatabase.DB_TYPE_MSSQL) ? " selected" : "" %>><%= WikiDatabase.DB_TYPE_MSSQL %></option>
 		<option value="<%= WikiDatabase.DB_TYPE_MYSQL %>"<%= Environment.getValue(Environment.PROP_DB_TYPE).equals(WikiDatabase.DB_TYPE_MYSQL) ? " selected" : "" %>><%= WikiDatabase.DB_TYPE_MYSQL %></option>
 		<option value="<%= WikiDatabase.DB_TYPE_ORACLE %>"<%= Environment.getValue(Environment.PROP_DB_TYPE).equals(WikiDatabase.DB_TYPE_ORACLE) ? " selected" : "" %>><%= WikiDatabase.DB_TYPE_ORACLE %></option>

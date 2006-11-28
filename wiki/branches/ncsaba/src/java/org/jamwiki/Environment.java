@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Properties;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.jamwiki.db.WikiDatabase;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -45,6 +44,10 @@ public class Environment {
 	public static final String PROP_BASE_PERSISTENCE_TYPE = "persistenceType";
 	public static final String PROP_BASE_USER_HANDLER = "user-handler";
 	public static final String PROP_BASE_WIKI_VERSION = "wiki-version";
+	public static final String PROP_CACHE_INDIVIDUAL_SIZE = "cache-individual-size";
+	public static final String PROP_CACHE_MAX_AGE = "cache-max-age";
+	public static final String PROP_CACHE_MAX_IDLE_AGE = "cache-max-idle-age";
+	public static final String PROP_CACHE_TOTAL_SIZE = "cache-total-size";
 	public static final String PROP_DB_DRIVER= "driver";
 	public static final String PROP_DB_PASSWORD = "db-password";
 	public static final String PROP_DB_TYPE = "database-type";
@@ -91,6 +94,7 @@ public class Environment {
 	public static final String PROP_TOPIC_NON_ADMIN_TOPIC_MOVE = "non-admin-redirect";
 	public static final String PROP_TOPIC_FORCE_USERNAME = "force-username";
 	public static final String PROP_TOPIC_USE_PREVIEW = "use-preview";
+    public static final String PROP_TOPIC_COMPRESSION_ON = "compressionOn";
 	private static final String PROPERTY_FILE_NAME = "jamwiki.properties";
 
 	private static Properties defaults = null;
@@ -155,9 +159,13 @@ public class Environment {
 		defaults.setProperty(PROP_BASE_PERSISTENCE_TYPE, "INTERNAL");
 		defaults.setProperty(PROP_BASE_USER_HANDLER, WikiBase.USER_HANDLER_DATABASE);
 		defaults.setProperty(PROP_BASE_WIKI_VERSION, "0.0.0");
+		defaults.setProperty(PROP_CACHE_INDIVIDUAL_SIZE, "500");
+		defaults.setProperty(PROP_CACHE_MAX_AGE, "300");
+		defaults.setProperty(PROP_CACHE_MAX_IDLE_AGE, "150");
+		defaults.setProperty(PROP_CACHE_TOTAL_SIZE, "1000");
 		defaults.setProperty(PROP_DB_DRIVER, "org.postgresql.Driver");
 		defaults.setProperty(PROP_DB_PASSWORD, "");
-		defaults.setProperty(PROP_DB_TYPE, WikiDatabase.DB_TYPE_POSTGRES);
+		defaults.setProperty(PROP_DB_TYPE, WikiBase.DATA_HANDLER_ANSI);
 		defaults.setProperty(PROP_DB_URL, "jdbc:postgresql://localhost:5432/database");
 		defaults.setProperty(PROP_DB_USERNAME, "");
 		defaults.setProperty(PROP_DBCP_MAX_ACTIVE, "10");
@@ -202,6 +210,7 @@ public class Environment {
 		defaults.setProperty(PROP_TOPIC_NON_ADMIN_TOPIC_MOVE, "true");
 		defaults.setProperty(PROP_TOPIC_FORCE_USERNAME, "false");
 		defaults.setProperty(PROP_TOPIC_USE_PREVIEW, "true");
+        defaults.setProperty(PROP_TOPIC_COMPRESSION_ON, "false");
 	}
 
 	/**

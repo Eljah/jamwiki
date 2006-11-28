@@ -142,6 +142,9 @@ public class WikiPreparedStatement {
 			} else if (paramTypes[i] == Types.VARCHAR) {
 				String value = (String)params[i];
 				this.statement.setString(i+1, value);
+			} else if (paramTypes[i] == Types.VARBINARY) {
+				byte[] value = (byte[])params[i];
+				this.statement.setBytes(i+1, value);
 			}
 		}
 	}
@@ -231,6 +234,21 @@ public class WikiPreparedStatement {
 	public void setTimestamp(int parameterIndex, Timestamp x) throws Exception {
 		this.verifyParams(parameterIndex, x);
 		this.paramTypes[parameterIndex - 1] = Types.TIMESTAMP;
+		this.params[parameterIndex - 1] = x;
+	}
+
+	/**
+	 * Sets the designated parameter to the given byte[] value. The
+	 * driver converts this to an SQL VARBINARY value when it sends 
+     * it to the database.
+	 *
+	 * @param parameterIndex The first parameter is 1, the second is 2, ...
+	 * @param x The parameter value.
+	 * @throws Exception If a parameter is invalid.
+	 */
+	public void setBytes(int parameterIndex, byte[] x) throws Exception {
+		this.verifyParams(parameterIndex, x);
+		this.paramTypes[parameterIndex - 1] = Types.VARBINARY;
 		this.params[parameterIndex - 1] = x;
 	}
 

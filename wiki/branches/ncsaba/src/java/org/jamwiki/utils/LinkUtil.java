@@ -80,19 +80,19 @@ public class LinkUtil {
 		// FIXME - hard coding
 		wikiLink.setDestination("Special:Edit");
 		wikiLink.setQuery(query);
-		return LinkUtil.buildInternalLinkUrl(context, virtualWiki, wikiLink);
+		return LinkUtil.buildInternalLinkUrl(context, virtualWiki, wikiLink, null);
 	}
 
 	/**
 	 *
 	 */
 	public static String buildImageLinkHtml(String context, String virtualWiki, String topicName, boolean frame, boolean thumb, String align, String caption, int maxDimension, boolean suppressLink, String style, boolean escapeHtml) throws Exception {
-		Topic topic = WikiBase.getHandler().lookupTopic(virtualWiki, topicName, false);
+		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
 		if (topic == null) {
 			WikiLink uploadLink = LinkUtil.parseWikiLink("Special:Upload");
 			return LinkUtil.buildInternalLinkHtml(context, virtualWiki, uploadLink, topicName, "edit", true);
 		}
-		WikiFile wikiFile = WikiBase.getHandler().lookupWikiFile(virtualWiki, topicName);
+		WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(virtualWiki, topicName);
 		if (topic.getTopicType() == Topic.TYPE_FILE) {
 			// file, not an image
 			if (!StringUtils.hasText(caption)) {
@@ -157,7 +157,7 @@ public class LinkUtil {
 	 *
 	 */
 	public static String buildInternalLinkHtml(String context, String virtualWiki, WikiLink wikiLink, String text, String style, boolean escapeHtml) throws Exception {
-		String url = LinkUtil.buildInternalLinkUrl(context, virtualWiki, wikiLink);
+		String url = LinkUtil.buildInternalLinkUrl(context, virtualWiki, wikiLink, null);
 		String topic = wikiLink.getDestination();
 		if (!StringUtils.hasText(text)) text = topic;
 		if (StringUtils.hasText(topic) && !StringUtils.hasText(style)) {
@@ -190,7 +190,7 @@ public class LinkUtil {
 			return null;
 		}
 		WikiLink wikiLink = LinkUtil.parseWikiLink(topic);
-		return LinkUtil.buildInternalLinkUrl(context, virtualWiki, wikiLink);
+		return LinkUtil.buildInternalLinkUrl(context, virtualWiki, wikiLink, null);
 	}
 
 	/**
@@ -199,12 +199,11 @@ public class LinkUtil {
 	 *  <code>null</code> then the resulting URL will NOT include context path,
 	 *  which breaks HTML links but is useful for servlet redirection URLs.
 	 */
-	public static String buildInternalLinkUrl(String context, String virtualWiki, WikiLink wikiLink) throws Exception {
+	public static String buildInternalLinkUrl(String context, String virtualWiki, WikiLink wikiLink, String sessionId) throws Exception {
 		String topic = wikiLink.getDestination();
 		String section = wikiLink.getSection();
 		String query = wikiLink.getQuery();
 		if (!StringUtils.hasText(topic) && StringUtils.hasText(section)) {
-			String url = "";
 			return "#" + Utilities.encodeForURL(section);
 		}
 		if (!WikiBase.exists(virtualWiki, topic)) {
@@ -224,6 +223,10 @@ public class LinkUtil {
 			if (!section.startsWith("#")) url += "#";
 			url += Utilities.encodeForURL(section);
 		}
+        if (StringUtils.hasText(sessionId)) {
+            url += ";jsessionid=";
+            url += sessionId;
+        }
 		if (StringUtils.hasText(query)) {
 			if (!query.startsWith("?")) url += "?";
 			url += query;
