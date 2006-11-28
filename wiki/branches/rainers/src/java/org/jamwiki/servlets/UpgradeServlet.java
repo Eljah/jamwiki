@@ -90,6 +90,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			user = DatabaseUpgrades.login(username, password, false);
 		}
 		if (user != null) {
+            //FIXME - login via Acegi Security
 			request.getSession().setAttribute(ServletUtil.PARAMETER_USER, user);
 			return true;
 		}
@@ -178,6 +179,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			next.addObject("message", wm);
 			// re-login now that everything is up-to-date
 			WikiUser user = Utilities.currentUser(request);
+			// FIXME - login via Acegi Security
 			Utilities.login(request, null, user, false);
 		} else {
 			next.addObject("error", new WikiMessage("upgrade.caption.upgradefailed"));

@@ -73,6 +73,7 @@ public class RegisterServlet extends JAMWikiServlet {
 			if (confirmPassword != null) next.addObject("confirmPassword", confirmPassword);
 		} else {
 			WikiBase.getHandler().writeWikiUser(user, userInfo);
+			// FIXME - login via Acegi Security
 			Utilities.login(request, null, user, false);
 			VirtualWiki virtualWiki = WikiBase.getHandler().lookupVirtualWiki(virtualWikiName);
 			String topic = virtualWiki.getDefaultTopicName();
