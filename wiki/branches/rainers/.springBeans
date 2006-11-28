@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<configExtensions>
+		<configExtension>xml</configExtension>
+	</configExtensions>
+	<configs>
+		<config>src/webapp/WEB-INF/jamwiki-servlet.xml</config>
+		<config>src/webapp/WEB-INF/applicationContext-acegi-security-formLogin.xml</config>
+	</configs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

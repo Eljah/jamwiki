@@ -24,16 +24,16 @@
 
 <c:if test="${!empty errorMessage}"><p class="red"><f:message key="${errorMessage.key}"><f:param value="${errorMessage.params[0]}" /></f:message></p></c:if>
 
-<form method="post" action="<jamwiki:link value="Special:Login" />">
+<form method="post" action="<%= response.encodeURL("j_acegi_security_check") %>">
 <input type="hidden" name="redirect" value="<c:out value="${redirect}"/>" />
 <table>
 <tr>
 	<td><label for="loginUsername"><f:message key="login.username"/></label></td>
-	<td><input type="text" name="username" value="<c:out value="${param.username}" />" id="loginUsername" /></td>
+	<td><input type="text" name="j_username" value="<c:out value="${param.username}" />" id="loginUsername" /></td>
 </tr>
 <tr>
 	<td><label for="loginPassword"><f:message key="login.password"/></label></td>
-	<td><input type="password" name="password" id="loginPassword" /></td>
+	<td><input type="password" name="j_password" id="loginPassword" /></td>
 </tr>
 <tr>
 	<td>&#160;</td>

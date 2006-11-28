@@ -22,12 +22,14 @@
 	<classpathentry kind="lib" path="lib/lucene-highlighter-2.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/servlet.jar"/>
-	<classpathentry kind="lib" path="lib/spring-beans-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/spring-context-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/spring-core-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/spring-web-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/spring-webmvc-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/spring-beans-2.0.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
+	<classpathentry kind="lib" path="lib/spring-context-2.0.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
+	<classpathentry kind="lib" path="lib/spring-core-2.0.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
+	<classpathentry kind="lib" path="lib/spring-web-2.0.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
+	<classpathentry kind="lib" path="lib/spring-webmvc-2.0.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
 	<classpathentry kind="lib" path="lib/standard-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/acegi-security-1.0.3.jar" sourcepath="lib-src/acegi-security-1.0.3-src.zip"/>
+	<classpathentry kind="lib" path="lib/spring-dao-2.0.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
+	<classpathentry kind="lib" path="lib/oro.jar"/>
 	<classpathentry kind="output" path="src/webapp/WEB-INF/classes"/>
 </classpath>
