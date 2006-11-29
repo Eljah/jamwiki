@@ -179,7 +179,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			next.addObject("message", wm);
 			// re-login now that everything is up-to-date
 			WikiUser user = Utilities.currentUser(request);
-			// FIXME - login via Acegi Security
+            // FIXME - What's that for? If Utilities.currentUser returns a user, he is logged. If not, no login is possible.
 			Utilities.login(request, null, user, false);
 		} else {
 			next.addObject("error", new WikiMessage("upgrade.caption.upgradefailed"));
