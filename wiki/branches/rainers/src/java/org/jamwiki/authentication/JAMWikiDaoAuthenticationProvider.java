@@ -38,7 +38,6 @@ import org.jamwiki.WikiBase;
  */
 public class JAMWikiDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
-    @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails,
             UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
 
