@@ -967,6 +967,14 @@ public class DatabaseHandler {
 		return lookupWikiUser(userId);
 	}
 
+    // Added for Acegi Security to insert user password in WikiUser.
+    public String lookupWikiUserPassword(String login) throws Exception {
+        // FIXME - integrate in lookupWikiUser? Only single db operation?
+        WikiResultSet rs = WikiDatabase.getQueryHandler().lookupWikiUserInfo(login);
+        if (rs.size() == 0) return null;
+        return rs.getString("encoded_password");
+    }
+
 	/**
 	 * Return a count of all wiki users.
 	 */

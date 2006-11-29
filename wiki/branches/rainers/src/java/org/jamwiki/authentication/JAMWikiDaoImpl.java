@@ -20,6 +20,7 @@ import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UserDetailsService;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.jamwiki.WikiBase;
+import org.jamwiki.model.WikiUser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -41,11 +42,15 @@ public class JAMWikiDaoImpl implements UserDetailsService {
         UserDetails loadedUser;
         try {
             loadedUser = WikiBase.getHandler().lookupWikiUser(username);
+            if (loadedUser != null) {
+                // Acegi Security needs password in UserDetails (e.g. for
+                // RememberMe service)
+                ((WikiUser)loadedUser).setPassword(WikiBase.getHandler().lookupWikiUserPassword(username));
+            } else {
+                throw new UsernameNotFoundException("User with name '" + username + "' not found in JAMWiki database.");
+            }
         } catch (Exception e) {
             throw new DataAccessResourceFailureException(e.getMessage(), e);
-        }
-        if (loadedUser == null) {
-            throw new UsernameNotFoundException("User with name '" + username + "' not found in JAMWiki database.");
         }
         return loadedUser;
     }

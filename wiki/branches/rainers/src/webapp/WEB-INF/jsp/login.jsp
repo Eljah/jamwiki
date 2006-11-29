@@ -38,7 +38,7 @@
 </tr>
 <tr>
 	<td>&#160;</td>
-	<td><input type="checkbox" value="true" name="remember" id="loginRemember"<c:if test="${remember}"> checked</c:if> />&#160;<label for="loginRemember"><f:message key="login.rememberme" /></label></td>
+	<td><input type="checkbox" value="true" name="_acegi_security_remember_me" id="loginRemember" />&#160;<label for="loginRemember"><f:message key="login.rememberme" /></label></td>
 </tr>
 <tr>
 	<td>&nbsp;</td>
