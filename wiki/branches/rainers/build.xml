@@ -20,13 +20,13 @@
 		<pathelement path="${dir.lib}/mail.jar" />
 		<pathelement path="${dir.lib}/oro.jar" />
 		<pathelement path="${dir.lib}/servlet.jar" />
-		<pathelement path="${dir.lib}/spring-beans-2.0.jar" />
-		<pathelement path="${dir.lib}/spring-context-2.0.jar" />
-		<pathelement path="${dir.lib}/spring-core-2.0.jar" />
-		<pathelement path="${dir.lib}/spring-dao-2.0.jar" />
-		<pathelement path="${dir.lib}/spring-support-2.0.jar" />
-		<pathelement path="${dir.lib}/spring-web-2.0.jar" />
-		<pathelement path="${dir.lib}/spring-webmvc-2.0.jar" />
+		<pathelement path="${dir.lib}/spring-beans-2.0.1.jar" />
+		<pathelement path="${dir.lib}/spring-context-2.0.1.jar" />
+		<pathelement path="${dir.lib}/spring-core-2.0.1.jar" />
+		<pathelement path="${dir.lib}/spring-dao-2.0.1.jar" />
+		<pathelement path="${dir.lib}/spring-support-2.0.1.jar" />
+		<pathelement path="${dir.lib}/spring-web-2.0.1.jar" />
+		<pathelement path="${dir.lib}/spring-webmvc-2.0.1.jar" />
 		<pathelement path="${dir.lib}/standard-1.0.6.jar" />
 	</path>
 
