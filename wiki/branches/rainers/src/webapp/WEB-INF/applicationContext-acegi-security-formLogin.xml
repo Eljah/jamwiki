@@ -9,7 +9,7 @@
 			<value>
 				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
 				PATTERN_TYPE_APACHE_ANT
-				/**=httpSessionContextIntegrationFilter,logoutFilter,authenticationProcessingFilter,rememberMeProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
+				/**=httpSessionContextIntegrationFilter,logoutFilter,authenticationProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
 			</value>
 		</property>
 	</bean>
@@ -36,7 +36,7 @@
 			<value>/en/Special:Login?errorMessage=error.login</value>
 		</property>
 		<property name="defaultTargetUrl">
-			<value>/</value>
+			<value>/en/StartingPoints</value>
 		</property>
 		<property name="filterProcessesUrl">
 			<value>/en/j_acegi_security_check</value>
@@ -50,10 +50,14 @@
 		<property name="providers">
 			<list>
 				<ref local="daoAuthenticationProvider" />
+				<ref local="anonymousAuthenticationProvider" />
 				<ref local="rememberMeAuthenticationProvider" />
 			</list>
 		</property>
 	</bean>
+
+   <!-- Automatically receives AuthenticationEvent messages -->
+   <bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener"/>
 
 	<!-- +++++++++ Authenticate from JAMWiki database +++++++++ -->
 
@@ -84,6 +88,19 @@
 	</bean>
 
 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+
+	<!-- +++++++++ Anonymous authentication +++++++++ -->
+	<!-- Anonymous users are assigned ROLE_ANONYMOUS to be able to allow exceptions to general access rules -->
+
+	<bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+		<property name="key" value="jam35Wiki"/>
+		<property name="userAttribute" value="anonymousUser,ROLE_ANONYMOUS"/>
+	</bean>
+
+	<bean id="anonymousAuthenticationProvider"
+		class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
+		<property name="key" value="jam35Wiki"/>
+	</bean>
 
 	<!-- +++++++++ RememberMe service +++++++++ -->
 
@@ -116,7 +133,7 @@
 				<bean class="org.acegisecurity.ui.logout.SecurityContextLogoutHandler" />
 			</list>
 		</constructor-arg>
-		<property name="filterProcessesUrl" value="/en/Special:Logout"/>
+		<property name="filterProcessesUrl" value="/en/Special:Logout" />
 	</bean>
 
 	<!-- ======================== Authorization ======================== -->
@@ -125,7 +142,7 @@
 
 	<bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter" />
 
-	<bean id="accessDecisionManager" class="org.acegisecurity.vote.UnanimousBased">
+	<bean id="accessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
 		<property name="allowIfAllAbstainDecisions">
 			<value>false</value>
 		</property>
@@ -151,7 +168,16 @@
 		<property name="forceHttps" value="false" />
 	</bean>
 
-	<!-- Intercept access to specified URLs and enforce security -->
+	<!-- Intercept access to specified URLs and enforce security
+			 Change URL to role mapping to change authentication rules.
+			 Examples:
+				Add
+					/**/Special:Edit=ROLE_USER
+				to require login to edit pages
+				Add
+					/**=ROLE_USER
+				to require login to view or edit pages (menus are still visible)
+	-->
 	<bean id="filterInvocationInterceptor" class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
 		<property name="authenticationManager">
 			<ref local="authenticationManager" />
@@ -161,8 +187,11 @@
 		</property>
 		<property name="objectDefinitionSource">
 			<value>
-				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-				\A/en/acegilogin=ROLE_USER
+				PATTERN_TYPE_APACHE_ANT
+				/**/Special:Login=ROLE_ANONYMOUS,ROLE_USER
+				/**/Special:Account=ROLE_ANONYMOUS,ROLE_USER
+				/**/jamwiki.css=ROLE_ANONYMOUS,ROLE_USER
+				/images/*.gif=ROLE_ANONYMOUS,ROLE_USER
 			</value>
 		</property>
 	</bean>

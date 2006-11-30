@@ -168,7 +168,7 @@ public class Utilities {
         SecurityContext ctx = SecurityContextHolder.getContext();
         if (ctx != null) {
             Authentication auth = ctx.getAuthentication();
-            return auth == null ? null : (WikiUser)auth.getPrincipal();
+            return ((auth == null) || "anonymousUser".equals(auth.getPrincipal())) ? null : (WikiUser)auth.getPrincipal();
         }
         return null;
      }
