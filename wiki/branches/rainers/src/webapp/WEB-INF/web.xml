@@ -17,14 +17,6 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>/WEB-INF/applicationContext-acegi-security-formLogin.xml</param-value>
 	</context-param>
-	<context-param>
-		<param-name>log4jConfigLocation</param-name>
-		<param-value>/WEB-INF/log4j.properties</param-value>
-	</context-param>
-	<context-param>
-		<param-name>log4jRefreshInterval</param-name>
-		<param-value>1000</param-value>
-	</context-param>
 
 	<!-- set encoding, cache headers, etc. -->
 	<filter>
@@ -54,9 +46,6 @@
 
 	<listener>
 		<listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
