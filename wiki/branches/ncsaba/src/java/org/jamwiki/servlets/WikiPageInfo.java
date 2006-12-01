@@ -50,21 +50,23 @@ public class WikiPageInfo {
 	public static final int ACTION_EDIT_RESOLVE = 11;
 	public static final int ACTION_ERROR = 12;
 	public static final int ACTION_EXPORT = 13;
-	public static final int ACTION_HISTORY = 14;
-	public static final int ACTION_IMPORT = 15;
-	public static final int ACTION_LINK_TO = 16;
-	public static final int ACTION_LOGIN = 17;
-	public static final int ACTION_MOVE = 18;
-	public static final int ACTION_RECENT_CHANGES = 19;
-	public static final int ACTION_REGISTER = 20;
-	public static final int ACTION_SEARCH = 21;
-	public static final int ACTION_SEARCH_RESULTS = 22;
-	public static final int ACTION_SETUP = 23;
-	public static final int ACTION_SPECIAL_PAGES = 24;
-	public static final int ACTION_TOPICS_ADMIN = 25;
-	public static final int ACTION_UPGRADE = 26;
-	public static final int ACTION_UPLOAD = 27;
-	public static final int ACTION_WATCHLIST = 28;
+	public static final int ACTION_FILES = 14;
+	public static final int ACTION_HISTORY = 15;
+	public static final int ACTION_IMAGES = 16;
+	public static final int ACTION_IMPORT = 17;
+	public static final int ACTION_LINK_TO = 18;
+	public static final int ACTION_LOGIN = 19;
+	public static final int ACTION_MOVE = 20;
+	public static final int ACTION_RECENT_CHANGES = 21;
+	public static final int ACTION_REGISTER = 22;
+	public static final int ACTION_SEARCH = 23;
+	public static final int ACTION_SEARCH_RESULTS = 24;
+	public static final int ACTION_SETUP = 25;
+	public static final int ACTION_SPECIAL_PAGES = 26;
+	public static final int ACTION_TOPICS_ADMIN = 27;
+	public static final int ACTION_UPGRADE = 28;
+	public static final int ACTION_UPLOAD = 29;
+	public static final int ACTION_WATCHLIST = 30;
 
 	/**
 	 *
@@ -180,8 +182,22 @@ public class WikiPageInfo {
 	/**
 	 *
 	 */
+	public boolean getActionFiles() {
+		return (this.action == ACTION_FILES);
+	}
+
+	/**
+	 *
+	 */
 	public boolean getActionHistory() {
 		return (this.action == ACTION_HISTORY);
+	}
+
+	/**
+	 *
+	 */
+	public boolean getActionImages() {
+		return (this.action == ACTION_IMAGES);
 	}
 
 	/**

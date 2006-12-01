@@ -216,7 +216,13 @@
 		<name>Special:Export</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Filelist</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:History</name>
+	</pseudotopic>
+	<pseudotopic>
+		<name>Special:Imagelist</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:Import</name>

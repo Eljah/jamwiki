@@ -16,23 +16,24 @@
  */
 package org.jamwiki.servlets;
 
-import java.util.Vector;
+import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.db.AnsiDataHandler;
-import org.jamwiki.file.FileHandler;
+import org.jamwiki.model.Topic;
+import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- *
+ * This servlet provides the ability to generate a list of admin-only topics
+ * for display.
  */
-public class PersistencyServlet extends JAMWikiServlet {
+public class FilesServlet extends JAMWikiServlet {
 
-	private static WikiLogger logger = WikiLogger.getLogger(PersistencyServlet.class.getName());
+	private static WikiLogger logger = WikiLogger.getLogger(FilesServlet.class.getName());
 
 	/**
 	 * This method handles the request after its parent class receives control.
@@ -42,41 +43,21 @@ public class PersistencyServlet extends JAMWikiServlet {
 	 * @return A <code>ModelAndView</code> object to be handled by the rest of the Spring framework.
 	 */
 	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		if (!Utilities.isAdmin(request)) {
-			WikiMessage errorMessage = new WikiMessage("admin.message.loginrequired");
-			return ServletUtil.viewLogin(request, pageInfo, "Special:Convert", errorMessage);
-		}
-		if (StringUtils.hasText(request.getParameter("todatabase"))) {
-			convertToDatabase(request, next, pageInfo);
-		} else {
-			view(request, next, pageInfo);
-		}
+		this.view(request, next, pageInfo);
 		return next;
 	}
 
 	/**
 	 *
 	 */
-	private void convertToDatabase(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		try {
-			FileHandler fromHandler = new FileHandler();
-			AnsiDataHandler toHandler = new AnsiDataHandler();
-			Vector messages = AnsiDataHandler.convertFromFile(Utilities.currentUser(request), request.getLocale(), fromHandler, toHandler, null);
-			next.addObject("message", new WikiMessage("convert.database.success"));
-			next.addObject("messages", messages);
-		} catch (Exception e) {
-			logger.severe("Failure while executing database-to-file conversion", e);
-			next.addObject("errorMessage", new WikiMessage("convert.database.failure", e.getMessage()));
-		}
-		view(request, next, pageInfo);
-	}
-
-	/**
-	 *
-	 */
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		pageInfo.setAction(WikiPageInfo.ACTION_ADMIN_CONVERT);
-		pageInfo.setAdmin(true);
-		pageInfo.setPageTitle(new WikiMessage("convert.title"));
+		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+		Pagination pagination = Utilities.buildPagination(request, next);
+		Collection files = WikiBase.getDataHandler().lookupTopicByType(virtualWiki, Topic.TYPE_FILE, pagination);
+		next.addObject("fileCount", new Integer(files.size()));
+		next.addObject("files", files);
+		pageInfo.setPageTitle(new WikiMessage("allfiles.title"));
+		pageInfo.setAction(WikiPageInfo.ACTION_FILES);
+		pageInfo.setSpecial(true);
 	}
 }

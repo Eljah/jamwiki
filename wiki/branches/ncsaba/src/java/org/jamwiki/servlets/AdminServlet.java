@@ -85,7 +85,7 @@ public class AdminServlet extends JAMWikiServlet {
 			virtualWiki.setName(request.getParameter("name"));
 			virtualWiki.setDefaultTopicName(request.getParameter("defaultTopicName"));
 			WikiBase.getDataHandler().writeVirtualWiki(virtualWiki, null);
-			WikiBase.getDataHandler().setupSpecialPages(request.getLocale(), user, virtualWiki);
+			WikiBase.getDataHandler().setupSpecialPages(request.getLocale(), user, virtualWiki, null);
 			next.addObject("message", new WikiMessage("admin.message.virtualwikiadded"));
 		} catch (Exception e) {
 			logger.severe("Failure while adding virtual wiki", e);
@@ -106,6 +106,7 @@ public class AdminServlet extends JAMWikiServlet {
 			setProperty(props, request, Environment.PROP_BASE_META_DESCRIPTION);
 			setBooleanProperty(props, request, Environment.PROP_TOPIC_NON_ADMIN_TOPIC_MOVE);
 			setBooleanProperty(props, request, Environment.PROP_TOPIC_FORCE_USERNAME);
+			setBooleanProperty(props, request, Environment.PROP_TOPIC_WYSIWYG);
 			setProperty(props, request, Environment.PROP_IMAGE_RESIZE_INCREMENT);
 			setProperty(props, request, Environment.PROP_RECENT_CHANGES_NUM);
 			setBooleanProperty(props, request, Environment.PROP_TOPIC_USE_PREVIEW);
@@ -198,7 +199,7 @@ public class AdminServlet extends JAMWikiServlet {
 	 */
 	private void recentChanges(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		try {
-			WikiBase.getDataHandler().reloadRecentChanges();
+			WikiBase.getDataHandler().reloadRecentChanges(null);
 			next.addObject("message", new WikiMessage("admin.message.recentchanges"));
 		} catch (Exception e) {
 			logger.severe("Failure while loading recent changes", e);
@@ -259,7 +260,7 @@ public class AdminServlet extends JAMWikiServlet {
 		pageInfo.setAdmin(true);
 		pageInfo.setSpecial(true);
 		pageInfo.setPageTitle(new WikiMessage("admin.title"));
-		Collection virtualWikiList = WikiBase.getDataHandler().getVirtualWikiList();
+		Collection virtualWikiList = WikiBase.getDataHandler().getVirtualWikiList(null);
 		next.addObject("wikis", virtualWikiList);
 		Collection userHandlers = WikiConfiguration.getUserHandlers();
 		next.addObject("userHandlers", userHandlers);

@@ -51,16 +51,6 @@ public interface DataHandler {
 	public Collection diff(String topicName, int topicVersionId1, int topicVersionId2) throws Exception;
 
 	/**
-	 * See if a topic exists and if it has not been deleted.
-	 *
-	 * @param virtualWiki The virtual wiki for the topic being checked.
-	 * @param topicName The name of the topic that is being checked.
-	 * @return <code>true</code> if the topic exists.
-	 * @throws Exception Thrown if any error occurs during lookup.
-	 */
-	public boolean exists(String virtualWiki, String topicName) throws Exception;
-
-	/**
 	 *
 	 */
 	public Collection getAllCategories(String virtualWiki, Pagination pagination) throws Exception;
@@ -98,7 +88,7 @@ public interface DataHandler {
 	/**
 	 * Return a collection of all VirtualWiki objects that exist for the Wiki.
 	 */
-	public Collection getVirtualWikiList() throws Exception;
+	public Collection getVirtualWikiList(Object transactionObject) throws Exception;
 
 	/**
 	 * Retrieve a watchlist containing a Collection of topic ids and topic
@@ -140,22 +130,12 @@ public interface DataHandler {
 	/**
 	 *
 	 */
-	public TopicVersion lookupTopicVersion(String topicName, int topicVersionId) throws Exception;
+	public TopicVersion lookupTopicVersion(String topicName, int topicVersionId, Object transactionObject) throws Exception;
 
 	/**
 	 *
 	 */
 	public VirtualWiki lookupVirtualWiki(String virtualWikiName) throws Exception;
-
-	/**
-	 *
-	 */
-	public int lookupVirtualWikiId(String virtualWikiName) throws Exception;
-
-	/**
-	 *
-	 */
-	public String lookupVirtualWikiName(int virtualWikiId) throws Exception;
 
 	/**
 	 *
@@ -188,12 +168,12 @@ public interface DataHandler {
 	/**
 	 *
 	 */
-	public void moveTopic(Topic fromTopic, TopicVersion fromVersion, String destination) throws Exception;
+	public void moveTopic(Topic fromTopic, TopicVersion fromVersion, String destination, Object transactionObject) throws Exception;
 
 	/**
 	 *
 	 */
-	public void reloadRecentChanges() throws Exception;
+	public void reloadRecentChanges(Object transactionObject) throws Exception;
 
 	/**
 	 *
@@ -203,17 +183,19 @@ public interface DataHandler {
 	/**
 	 *
 	 */
-	public void setupSpecialPages(Locale locale, WikiUser user, VirtualWiki virtualWiki) throws Exception;
+	// FIXME - move this to another location
+	public void setupSpecialPages(Locale locale, WikiUser user, VirtualWiki virtualWiki, Object transactionObject) throws Exception;
 
 	/**
 	 *
 	 */
-	public void undeleteTopic(Topic topic, TopicVersion topicVersion, boolean userVisible) throws Exception;
+	public void undeleteTopic(Topic topic, TopicVersion topicVersion, boolean userVisible, Object transactionObject) throws Exception;
 
 	/**
 	 *
 	 */
-	public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, WikiUser user, String ipAddress) throws Exception;
+	// FIXME - move this to another location
+	public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, WikiUser user, String ipAddress, Object transactionObject) throws Exception;
 
 	/**
 	 *
@@ -223,6 +205,7 @@ public interface DataHandler {
 	/**
 	 *
 	 */
+	// FIXME - should not need ParserDocument here
 	public void writeTopic(Topic topic, TopicVersion topicVersion, ParserDocument parserDocument, boolean userVisible, Object transactionObject) throws Exception;
 
 	/**

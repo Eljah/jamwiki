@@ -95,6 +95,7 @@ public class Environment {
 	public static final String PROP_TOPIC_FORCE_USERNAME = "force-username";
 	public static final String PROP_TOPIC_USE_PREVIEW = "use-preview";
     public static final String PROP_TOPIC_COMPRESSION_ON = "compressionOn";
+	public static final String PROP_TOPIC_WYSIWYG = "wysiwyg-editor";
 	private static final String PROPERTY_FILE_NAME = "jamwiki.properties";
 
 	private static Properties defaults = null;
@@ -210,6 +211,7 @@ public class Environment {
 		defaults.setProperty(PROP_TOPIC_NON_ADMIN_TOPIC_MOVE, "true");
 		defaults.setProperty(PROP_TOPIC_FORCE_USERNAME, "false");
 		defaults.setProperty(PROP_TOPIC_USE_PREVIEW, "true");
+        defaults.setProperty(PROP_TOPIC_WYSIWYG, "true");
         defaults.setProperty(PROP_TOPIC_COMPRESSION_ON, "false");
 	}
 

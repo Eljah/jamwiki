@@ -17,6 +17,7 @@
 package org.jamwiki;
 
 import java.util.Locale;
+import org.jamwiki.model.Topic;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.search.LuceneSearchEngine;
 import org.jamwiki.search.SearchEngine;
@@ -52,6 +53,20 @@ public class WikiBase {
 	public static final int PERSISTENCE_EXTERNAL_DB = 1;
 	/** Ansi data handler class */
 	public static final String DATA_HANDLER_ANSI = "org.jamwiki.db.AnsiDataHandler";
+	/** DB2 data handler class */
+	public static final String DATA_HANDLER_DB2 = "org.jamwiki.db.DB2DataHandler";
+	/** DB2/400 data handler class */
+	public static final String DATA_HANDLER_DB2400 = "org.jamwiki.db.DB2400DataHandler";
+	/** HSql data handler class */
+	public static final String DATA_HANDLER_HSQL = "org.jamwiki.db.HSqlDataHandler";
+	/** MSSql data handler class */
+	public static final String DATA_HANDLER_MSSQL = "org.jamwiki.db.MSSqlDataHandler";
+	/** MySql data handler class */
+	public static final String DATA_HANDLER_MYSQL = "org.jamwiki.db.MySqlDataHandler";
+	/** Oracle data handler class */
+	public static final String DATA_HANDLER_ORACLE = "org.jamwiki.db.OracleDataHandler";
+	/** Postgres data handler class */
+	public static final String DATA_HANDLER_POSTGRES = "org.jamwiki.db.PostgresDataHandler";
 	/** Name of the default wiki */
 	public static final String DEFAULT_VWIKI = "en";
 	/** Root directory within the WAR distribution that contains the default topic pages. */
@@ -102,6 +117,9 @@ public class WikiBase {
 	 * @throws Exception Thrown if any error occurs during lookup.
 	 */
 	public static boolean exists(String virtualWiki, String topicName) throws Exception {
+		if (!StringUtils.hasText(virtualWiki) || !StringUtils.hasText(topicName)) {
+			return false;
+		}
 		if (PseudoTopicHandler.isPseudoTopic(topicName)) {
 			return true;
 		}
@@ -112,7 +130,8 @@ public class WikiBase {
 			// not initialized yet
 			return false;
 		}
-		return WikiBase.dataHandler.exists(virtualWiki, topicName);
+		Topic topic = WikiBase.dataHandler.lookupTopic(virtualWiki, topicName, false, null);
+		return (topic != null);
 	}
 
 	/**

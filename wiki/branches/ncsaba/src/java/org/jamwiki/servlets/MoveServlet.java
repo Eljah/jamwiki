@@ -112,7 +112,7 @@ public class MoveServlet extends JAMWikiServlet {
 		}
 		TopicVersion topicVersion = new TopicVersion(Utilities.currentUser(request), request.getRemoteAddr(), moveComment, fromTopic.getTopicContent());
 		topicVersion.setEditType(TopicVersion.EDIT_MOVE);
-		WikiBase.getDataHandler().moveTopic(fromTopic, topicVersion, moveDestination);
+		WikiBase.getDataHandler().moveTopic(fromTopic, topicVersion, moveDestination, null);
 		return true;
 	}
 
@@ -130,7 +130,8 @@ public class MoveServlet extends JAMWikiServlet {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
 		String commentsPage = Utilities.extractCommentsLink(topicName);
-		if (commentsPage != null && !topicName.equals(commentsPage) && WikiBase.getDataHandler().exists(virtualWiki, commentsPage)) {
+		Topic commentsTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, commentsPage, false, null);
+		if (commentsTopic != null) {
 			// add option to also move comments page
 			next.addObject("moveCommentsPage", commentsPage);
 		}
