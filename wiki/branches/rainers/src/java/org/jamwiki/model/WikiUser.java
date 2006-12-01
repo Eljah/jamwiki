@@ -16,7 +16,6 @@
  */
 package org.jamwiki.model;
 
-import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
@@ -30,6 +29,8 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class WikiUser implements UserDetails {
 
+    private static final long serialVersionUID = 8081925283274124743L;
+
     private final GrantedAuthority ROLE_USER = new GrantedAuthorityImpl("ROLE_USER");
     private final GrantedAuthority ROLE_ADMIN = new GrantedAuthorityImpl("ROLE_ADMIN");
 
@@ -38,8 +39,7 @@ public class WikiUser implements UserDetails {
 	private String displayName = null;
 	private Timestamp lastLoginDate = new Timestamp(System.currentTimeMillis());
 	private String lastLoginIpAddress = null;
-	private String login = null;
-	private String rememberKey = null;
+	private String username = null;
 	private int userId = -1;
 
     // FIXME - consider making this an ACL (more flexible)
@@ -151,33 +151,31 @@ public class WikiUser implements UserDetails {
 	}
 
 	/**
-	 *
+	 * @deprecated use getUsername() instead.
 	 */
 	public String getLogin() {
-        // TODO use Username instead
-		return this.login;
+        return getUsername();
 	}
 
 	/**
-	 *
+	 * @deprecated use setUsername(login) instead
 	 */
 	public void setLogin(String login) {
-        // TODO use Username instead
-		this.login = login;
+        setUsername(login);
 	}
 
 	/**
-	 *
+	 * @deprecated use getPassword() instead.
 	 */
 	public String getRememberKey() {
-		return this.rememberKey;
+		return getPassword();
 	}
 
 	/**
-	 *
+	 * @deprecated use setPassword(rememberKey) instead.
 	 */
 	public void setRememberKey(String rememberKey) {
-		this.rememberKey = rememberKey;
+        setPassword(rememberKey);
 	}
 
 	/**
@@ -209,7 +207,11 @@ public class WikiUser implements UserDetails {
     }
 
     public String getUsername() {
-        return login;
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public boolean isAccountNonExpired() {
