@@ -56,8 +56,8 @@
 		</property>
 	</bean>
 
-   <!-- Automatically receives AuthenticationEvent messages -->
-   <bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener"/>
+	<!-- Automatically receives AuthenticationEvent messages -->
+	<bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener" />
 
 	<!-- +++++++++ Authenticate from JAMWiki database +++++++++ -->
 
@@ -93,13 +93,13 @@
 	<!-- Anonymous users are assigned ROLE_ANONYMOUS to be able to allow exceptions to general access rules -->
 
 	<bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
-		<property name="key" value="jam35Wiki"/>
-		<property name="userAttribute" value="anonymousUser,ROLE_ANONYMOUS"/>
+		<property name="key" value="jam35Wiki" />
+		<property name="userAttribute" value="anonymousUser,ROLE_ANONYMOUS" />
 	</bean>
 
 	<bean id="anonymousAuthenticationProvider"
 		class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
-		<property name="key" value="jam35Wiki"/>
+		<property name="key" value="jam35Wiki" />
 	</bean>
 
 	<!-- +++++++++ RememberMe service +++++++++ -->
@@ -159,6 +159,11 @@
 		<property name="authenticationEntryPoint">
 			<ref bean="authenticationEntryPoint" />
 		</property>
+		<property name="accessDeniedHandler">
+			<bean class="org.acegisecurity.ui.AccessDeniedHandlerImpl">
+				<property name="errorPage" value="/en/Special:Login" />
+			</bean>
+		</property>
 	</bean>
 
 	<!-- Redirection of user login -->
@@ -169,14 +174,14 @@
 	</bean>
 
 	<!-- Intercept access to specified URLs and enforce security
-			 Change URL to role mapping to change authentication rules.
-			 Examples:
-				Add
-					/**/Special:Edit=ROLE_USER
-				to require login to edit pages
-				Add
-					/**=ROLE_USER
-				to require login to view or edit pages (menus are still visible)
+		Change URL to role mapping to change authentication rules.
+		Examples:
+		Add
+		/**/Special:Edit=ROLE_USER
+		to require login to edit pages
+		Add
+		/**=ROLE_USER
+		to require login to view or edit pages (menus are still visible)
 	-->
 	<bean id="filterInvocationInterceptor" class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
 		<property name="authenticationManager">
@@ -192,6 +197,7 @@
 				/**/Special:Account=ROLE_ANONYMOUS,ROLE_USER
 				/**/jamwiki.css=ROLE_ANONYMOUS,ROLE_USER
 				/images/*.gif=ROLE_ANONYMOUS,ROLE_USER
+				/**/Special:Admin=ROLE_ADMIN
 			</value>
 		</property>
 	</bean>

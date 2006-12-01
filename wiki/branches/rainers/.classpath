@@ -30,7 +30,7 @@
 	<classpathentry kind="lib" path="lib/spring-core-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/spring-dao-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/spring-support-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/spring-web-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/spring-web-2.0.1.jar" sourcepath="/abasPortal/lib-src/spring-src.zip"/>
 	<classpathentry kind="lib" path="lib/spring-webmvc-2.0.1.jar"/>
 	<classpathentry kind="output" path="src/webapp/WEB-INF/classes"/>
 </classpath>
