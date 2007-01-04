@@ -1,0 +1,58 @@
+
+CREDITS
+=======
+
+
+JAMWiki Contributors
+====================
+
+  Developers:               Ryan Holliday (wrh2)
+                            Scott Croco (scroco)
+                            Axel Kramer (axelclk)
+                            Robert Matyja (dlpa)
+                            Rainer Schmitz (swift)
+                            Volodymyr Vlad (gutsul)
+  Translations:
+     Chinese (simplified):  Jiading (ewen0930)
+                            Feilong Huang (hfl)
+     Chinese (traditional): Jiading (ewen0930)
+     Danish:                Anders Monrad (g9adm)
+     Dutch:                 Tarik Menbhi & Wim Borghs (Angel)
+     French:                Henri Gomez (hgomez)
+     German:                Axel Kramer (axelclk)
+                            Rainer Schmitz (swift)
+     Hungarian:             Daniel Tar (bDaneE)
+     Polish:                Robert Matyja (dlpa)
+     Ukranian:              Volodymyr Vlad (gutsul)
+  Graphic Design:           AleXey "lexis" Rumyantsev (lexis@mail.ru)
+                            Oliver (okohll)
+
+
+Very Quick Wiki Contributors
+============================
+
+JAMWiki was originally created as a fork of the Very Quick Wiki project
+(http://vqwiki.org/).  Individuals who contributed to that project include:
+
+  Project Lead:             Martijn van der Kleijn (mvdkleijn)
+  Developers:               Martijn van der Kleijn (mvdkleijn)
+                            Andreas Studer (studer)
+                            Colin Jacobs (coljac)
+                            Tobias Schulz-Hess (mrgadget4711)
+                            Fritz Freiheit (fritz_freiheit)
+                            Gareth Cronin (garethc)
+                            HongLiang Bi (redragon4679)
+                            Ryan Holliday (wrh2)
+  Documentation:            Tim Howland (thowland)
+  Translations:
+     Italian:               Marcello Teodori (teodori)
+     Spanish:               Zapo (erzapo)
+     German:                Nico Jabin (nicojabin)
+     Swedish:               Johan Lindell (lindelj)
+     Norwegian:             Erik (xan-)
+     Serbian:               Sasha Kotlo (kotlo_sasha)
+     Polish:                Michael (mindweb)
+     Dutch:                 Martijn van der Kleijn (mvdkleijn)
+     English:               Martijn van der Kleijn (mvdkleijn)
+  Non-project contributors: Fabrizio Zellini, Fritz Kunstler, Steve Pugh
+  
