@@ -377,14 +377,6 @@
 				<artifactId>maven-jetty-plugin</artifactId>
 			</plugin>
 			
-			<plugin>
-				<groupId>org.jamwiki</groupId>
-		        <artifactId>maven-warlocal-plugin</artifactId>
-                <configuration>
-        	  		<goalPrefix>war-local</goalPrefix>
-	        	</configuration>
-    		 </plugin>
-    		
     		 <plugin>
     		 	<artifactId>maven-source-plugin</artifactId>
     		 </plugin>
