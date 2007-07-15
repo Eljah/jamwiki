@@ -7,16 +7,19 @@
 	<description>
 		This Ant script needs Ant 1.7 or above for target war-local
 	</description>	
-		
-	<target name="install" description="adds bliki to local repository">
+
+	<target name="install-bliki" description="adds bliki to ${basedir}/repository. Please set library location with -Dfile">
 		<exec executable="mvn">
 			<arg value="install:install-file"/>
-			<arg value="-Dfile=lib/bliki.jar"/>
+			<arg value="-Dfile=${file}"/>
 	    	<arg value="-DgroupId=bliki"/>
     		<arg value="-DartifactId=bliki"/>
     		<arg value="-Dversion=1.0-SNAPSHOT"/>
 			<arg value="-Dpackaging=jar"/>
 			<arg value="-DgeneratePom=true"/>
+			<arg value="-DcreateChecksum=true"/>
+			<arg value="-DlocalRepositoryPath=repository"/>
+			<arg value="-DlocalRepositoryId=jamwiki"/>
 		</exec>
   </target>
 	

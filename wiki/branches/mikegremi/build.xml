@@ -231,4 +231,18 @@ junit     - Run a series of JUnit tests on the current code.
 pmd       - Run a series of static code analysis tests using pmd.  The pmd
             tool can be downloaded from http://pmd.sourceforge.net/.</echo>
 	</target>
+	
+	<target name="install-bliki" description="adds bliki to ${basedir}/repository. Please set -Dfile">
+		<exec executable="mvn">
+			<arg value="install:install-file"/>
+	    	<arg value="-DgroupId=bliki"/>
+    		<arg value="-DartifactId=bliki"/>
+    		<arg value="-Dversion=1.0-SNAPSHOT"/>
+			<arg value="-Dpackaging=jar"/>
+			<arg value="-DgeneratePom=true"/>
+			<arg value="-DcreateChecksum=true"/>
+			<arg value="-DlocalRepositoryPath=repository"/>
+			<arg value="-DlocalRepositoryId=jamwiki"/>
+		</exec>
+  </target>
 </project>
