@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.util.Vector;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.model.Role;
+import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.WikiLogger;
 
@@ -45,7 +47,7 @@ public class DatabaseUpgrades {
 	public static WikiUser getWikiUser(String username) throws Exception {
 		// prior to JAMWiki 0.5.0 the remember_key column did not exist.  once
 		// the ability to upgrade to JAMWiki 0.5.0 is removed this code can be
-		// replaced with the method (below) that has been commented out
+		// replaced with the method (below) that has been commented out.
 //		user = WikiBase.getDataHandler().lookupWikiUser(username, password, false);
 		Connection conn = null;
 		try {
@@ -67,7 +69,6 @@ public class DatabaseUpgrades {
 			user.setLastLoginDate(rs.getTimestamp("last_login_date"));
 			user.setCreateIpAddress(rs.getString("create_ip_address"));
 			user.setLastLoginIpAddress(rs.getString("last_login_ip_address"));
-			user.setAdmin(rs.getInt("is_admin") != 0);
 			return user;
 		} catch (Exception e) {
 			DatabaseConnection.handleErrors(conn);
@@ -179,18 +180,44 @@ public class DatabaseUpgrades {
 			// create jam_group table
 			DatabaseConnection.executeUpdate(AnsiQueryHandler.STATEMENT_CREATE_GROUP_TABLE, conn);
 			messages.add("Added jam_group table");
-			// setup basic groups
-			WikiDatabase.setupGroups(conn);
-			messages.add("Added basic wiki groups.");
 			// create jam_role table
 			DatabaseConnection.executeUpdate(AnsiQueryHandler.STATEMENT_CREATE_ROLE_TABLE, conn);
 			messages.add("Added jam_role table");
-			// setup basic roles
-			WikiDatabase.setupRoles(conn);
-			messages.add("Added basic wiki roles.");
 			// create jam_role_map table
 			DatabaseConnection.executeUpdate(AnsiQueryHandler.STATEMENT_CREATE_ROLE_MAP_TABLE, conn);
 			messages.add("Added jam_role_map table");
+			// setup basic roles
+			WikiDatabase.setupRoles(conn);
+			messages.add("Added basic wiki roles.");
+			// setup basic groups
+			WikiDatabase.setupGroups(conn);
+			messages.add("Added basic wiki groups.");
+			// convert old-style admins to new
+			String sql = null;
+			// assign admins all permissions during upgrades just to be safe.  for
+			// new installs it is sufficient just to give them the basics
+			Role[] adminRoles = {Role.ROLE_ADMIN, Role.ROLE_DELETE, Role.ROLE_EDIT_EXISTING, Role.ROLE_EDIT_NEW, Role.ROLE_MOVE, Role.ROLE_TRANSLATE, Role.ROLE_UPLOAD, Role.ROLE_VIEW};
+			for (int i=0; i < adminRoles.length; i++) {
+				Role adminRole = adminRoles[i];
+				sql = "insert into jam_role_map ( "
+					+ "  role_name, wiki_user_id "
+					+ ") "
+					+ "select '" + adminRole.getAuthority() + "', wiki_user_id "
+					+ "from jam_wiki_user where is_admin = 1 ";
+				DatabaseConnection.executeUpdate(sql, conn);
+			}
+			if (!Environment.getBooleanValue(Environment.PROP_TOPIC_NON_ADMIN_TOPIC_MOVE)) {
+			    sql = "delete from jam_role_map "
+			        + "where role_name = ? "
+			        + "and group_id = (select group_id from jam_group where group_name = ?) ";
+			    WikiPreparedStatement stmt = new WikiPreparedStatement(sql);
+			    stmt.setString(1, Role.ROLE_MOVE.getAuthority());
+			    stmt.setString(2, WikiGroup.GROUP_REGISTERED_USER);
+			    stmt.executeUpdate(conn);
+			}
+			sql = "alter table jam_wiki_user drop column is_admin ";
+			DatabaseConnection.executeUpdate(sql, conn);
+			messages.add("Converted admin users to new role structure.");
 			conn.commit();
 		} catch (Exception e) {
 			DatabaseConnection.handleErrors(conn);

@@ -36,12 +36,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.acegisecurity.Authentication;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.ui.WebAuthenticationDetails;
 import org.apache.commons.io.FileUtils;
 import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
@@ -63,7 +59,6 @@ import org.springframework.beans.propertyeditors.LocaleEditor;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 /**
  * This class provides a variety of utility methods.
@@ -681,7 +676,7 @@ public class Utilities {
 	 */
 	public static boolean isAdmin(HttpServletRequest request) throws Exception {
 		WikiUser user = currentUser(request);
-		return (user != null && user.getAdmin());
+		return (user != null && user.hasRole(Role.ROLE_ADMIN));
 	}
 
 	/**
@@ -777,30 +772,6 @@ public class Utilities {
 		}
 		// all tests passed, it's an IP address
 		return true;
-	}
-
-	/**
-	 * Login the current user.  Used when the should be logged in
-	 * automatically, e.g. after registration.
-	 *
-	 * @param request The servlet request object.
-	 * @param user The WikiUser being logged in.
-	 */
-	public static void login(HttpServletRequest request, WikiUser user) throws Exception {
-		if (user == null) {
-			return;
-		}
-		GrantedAuthority[] grantedAuthorities = new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_USER") };
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), grantedAuthorities);
-		authentication.setDetails(new WebAuthenticationDetails(request));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		Watchlist watchlist = WikiBase.getDataHandler().getWatchlist(virtualWiki, user.getUserId());
-		request.getSession().setAttribute(ServletUtil.PARAMETER_WATCHLIST, watchlist);
-		if (StringUtils.hasText(user.getDefaultLocale())) {
-			Locale locale = Utilities.buildLocale(user.getDefaultLocale());
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
-		}
 	}
 
 	/**

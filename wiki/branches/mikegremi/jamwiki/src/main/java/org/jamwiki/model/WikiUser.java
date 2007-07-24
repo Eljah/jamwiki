@@ -23,6 +23,7 @@ import java.util.Set;
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.userdetails.UserDetails;
 import org.jamwiki.WikiBase;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -50,7 +51,7 @@ public class WikiUser implements UserDetails {
 	 * (roles). A logged user always has ROLE_USER and may have other roles,
 	 * e.g. ROLE_ADMIN.
 	 */
-	private GrantedAuthority[] authorities = new GrantedAuthority[0];
+	private GrantedAuthority[] authorities = {Role.ROLE_USER};
 	private String password = null;
 
 	/**
@@ -58,6 +59,9 @@ public class WikiUser implements UserDetails {
 	 */
 	public WikiUser(String username) throws Exception {
 		this.username = username;
+		if (Utilities.isFirstUse() || Utilities.isUpgrade()) {
+			return;
+		}
 		this.addGroupRoles();
 		this.addUserRoles();
 	}
@@ -101,26 +105,6 @@ public class WikiUser implements UserDetails {
 		this.addRoles(authorities);
 		this.addGroupRoles();
 		this.addUserRoles();
-	}
-
-	/**
-	 *
-	 */
-	public boolean getAdmin() {
-		return Arrays.asList(authorities).contains(Role.ROLE_ADMIN);
-	}
-
-	/**
-	 * @deprecated Assign ROLE_ADMIN in the database instead.
-	 */
-	public void setAdmin(boolean admin) {
-		Set authoritiesSet = new HashSet(Arrays.asList(authorities));
-		if (admin) {
-			authoritiesSet.add(Role.ROLE_ADMIN);
-		} else {
-			authoritiesSet.remove(Role.ROLE_ADMIN);
-		}
-		setAuthorities((GrantedAuthority[])authoritiesSet.toArray(authorities));
 	}
 
 	/**
@@ -341,5 +325,22 @@ public class WikiUser implements UserDetails {
 			logger.severe("Unable to retrieve default roles for " + username, e);
 		}
 		this.addRoles(userRoles);
+	}
+
+	/**
+	 * Convenience method for determining if a user has been assigned a role
+	 * without the need to examine an array of Role objects.
+	 *
+	 * @param role If the user has been assigned this role then the method will
+	 *  return <code>true</code>.
+	 * @return <code>true</code> if the user has been assigned the specified
+	 *  role, <code>false</code> otherwise.
+	 */
+	public boolean hasRole(Role role) {
+		if (this.authorities == null) {
+			logger.warning("No roles assigned for user " + this.username);
+			return false;
+		}
+		return Arrays.asList(authorities).contains(role);
 	}
 }
