@@ -40,6 +40,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-parser</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.acegisecurity</groupId>
 			<artifactId>acegi-security</artifactId>
 			<version>1.0.4</version>

@@ -32,6 +32,7 @@
 	<modules>
 		<module>../javadiff</module>
 		<module>../jamwiki-parser-api</module>
+		<module>../jamwiki-commons</module>
 		<module>../jamwiki-parser</module>
 		<module>../jamwiki</module>
 	</modules>

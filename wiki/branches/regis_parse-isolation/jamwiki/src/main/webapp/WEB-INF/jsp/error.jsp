@@ -23,9 +23,7 @@ errors should be caught by the servlet and handled more cleanly.  If this page i
 called it means that a catastrophic error has occurred.
 --%>
 
-<%@ page import="
-        org.jamwiki.utils.WikiLogger
-    "
+<%@ page import="org.jamwiki.utils.WikiLogger"
     isErrorPage="true"
     contentType="text/html; charset=utf-8"
 %>

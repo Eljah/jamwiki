@@ -94,7 +94,11 @@
 			<artifactId>jamwiki-parser-api</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-commons</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jflex.output>
