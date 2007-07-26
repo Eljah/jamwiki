@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jamwiki</groupId>
+  <artifactId>jamwiki-parser</artifactId>
+  <version>0.1</version>
+  <description>The default parser that follow Mediawiki syntax.</description>
+</project>
+
