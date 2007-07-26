@@ -30,7 +30,9 @@
 	<!-- TODO: split parent (inheritance of properties) 
 	from agregator (multiple modules called from one agregator project)-->	
 	<modules>
-		<module>../jamwiki</module>
 		<module>../javadiff</module>
+		<module>../jamwiki-parser-api</module>
+		<module>../jamwiki-parser</module>
+		<module>../jamwiki</module>
 	</modules>
 </project>
