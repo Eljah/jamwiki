@@ -34,15 +34,13 @@ public class JFlexMojoTest extends TestCase {
 	protected static final String OUTPUT_DIRECTORY = "target/test/generated";
 	
 	JFlexMojo mojo;
-	FilePair preprocessorLex;
+	File preprocessorLex;
 
 	@Override
 	protected void setUp() throws Exception {
 		mojo = new JFlexMojo();
 		mojo.setOutputDirectory(new File(OUTPUT_DIRECTORY));
-		// in a standard execution, the Mojo sets this:
-		preprocessorLex = new FilePair(SRC_TEST_RESOURCES_FLEX,
-				OUTPUT_DIRECTORY);
+		preprocessorLex=new File(SRC_TEST_RESOURCES_FLEX);
 	}
 
 	public void testInit() {
@@ -56,7 +54,7 @@ public class JFlexMojoTest extends TestCase {
 	 */
 	public void testGenerate() throws MojoExecutionException,
 			MojoFailureException {
-		FilePair[] lexFiles = { preprocessorLex };
+		File[] lexFiles = { preprocessorLex };
 		mojo.setLexFiles(lexFiles);
 
 		mojo.execute();
@@ -75,7 +73,4 @@ public class JFlexMojoTest extends TestCase {
 		produced.delete();
 	}
 	
-	public void testGuessDirectory() {
-		
-	}
 }

@@ -21,27 +21,16 @@ package de.flex.maven.plugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
-import JFlex.DFA;
-import JFlex.Emitter;
-import JFlex.ErrorMessages;
-import JFlex.LexParse;
-import JFlex.LexScan;
 import JFlex.Main;
-import JFlex.NFA;
 import JFlex.Options;
-import JFlex.Out;
-import JFlex.Timer;
 
 /**
  * @goal generate
@@ -60,8 +49,7 @@ public class JFlexMojo extends AbstractMojo {
 	 * @parameter
 	 * @required
 	 */
-	private FilePair[] filePairs;
-	
+	private File[] lexFiles;
 
 	private Log log = getLog();
 
@@ -93,26 +81,27 @@ public class JFlexMojo extends AbstractMojo {
 	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		for (int i = 0; i < filePairs.length; i++) {
+		for (int i = 0; i < lexFiles.length; i++) {
 			// set default output directory.
-			filePairs[i].setOutputDirectory(outputDirectory);
+			// lexFiles[i].setTargetDirectory(outputDirectory);
 
-			File lexFile = filePairs[i].getLexFile();
+			File lexFile = lexFiles[i];
+			ClassInfo classInfo;
+			try {
+				classInfo = LexSimpleAnalyzer.guessPackageAndClass(lexFile);
+			} catch (FileNotFoundException e1) {
+				throw new MojoFailureException(e1.getMessage());
+			} catch (IOException e3) {
+				classInfo = new ClassInfo();
+				classInfo.className = LexSimpleAnalyzer.DEFAULT_NAME;
+				classInfo.packageName = null;
+			}
 
 			checkParameters(lexFile);
 
 			/* set destination directory */
-			File generatedFile;
-			try {
-				generatedFile = filePairs[i].getOutputFile();
-			} catch (FileNotFoundException e1) {
-				throw new MojoFailureException(e1.getMessage());
-			} catch (IOException e2) {
-				log.warn("Cannot guess name of the Java code to generate");
-				// e1.printStackTrace();
-				generatedFile = new File(outputDirectory + FilePair.DEFAULT_NAME
-						+ ".java");
-			}
+			File generatedFile = new File(outputDirectory
+					+ classInfo.getOutputFilename());
 
 			/* Generate only if needs to */
 			if (lexFile.lastModified() < generatedFile.lastModified()) {
@@ -171,20 +160,17 @@ public class JFlexMojo extends AbstractMojo {
 		}
 	}
 
-	public FilePair[] getLexFiles() {
-		return filePairs;
-	}
-
 	public File getOutputDirectory() {
 		return outputDirectory;
 	}
 
-	public void setLexFiles(FilePair[] lexFiles) {
-		this.filePairs = lexFiles;
-	}
-
 	public void setOutputDirectory(File outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+
+	public void setLexFiles(File[] lexFiles) {
+		this.lexFiles=lexFiles;
+		
 	}
 
 }
