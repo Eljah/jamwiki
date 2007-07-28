@@ -106,7 +106,7 @@ public class JFlexMojo extends AbstractMojo {
 			/* Generate only if needs to */
 			if (lexFile.lastModified() < generatedFile.lastModified()) {
 				log.info(generatedFile.getName() + " is up to date.");
-				break;
+				continue;
 			}
 
 			/*
