@@ -1,60 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.jflex.maven.plugin</groupId>
-  <artifactId>maven-jflex-plugin</artifactId>
-  <packaging>maven-plugin</packaging>
-  <name>Maven JFlex Plugin</name>
-  <version>0.1</version>
-  <description>This is a Maven 2 plugin to generate a parser in Java code from
-		a Lexer definition, using Jflex.de.</description>
-  <prerequisites />
-  <inceptionYear>2007</inceptionYear>
-  <developers>
-    <developer>
-      <id>decamps</id>
-      <name>Régis Décamps</name>
-      <email>decamps@users.sf.net</email>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.jflex</groupId>
-      <artifactId>jflex</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.2</version>
-    </dependency>
-  </dependencies>
-  <build>
-  <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-         </configuration>
-     </plugin>
-  </plugins>
-  </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.jflex.maven.plugin</groupId>
+	<artifactId>maven-jflex-plugin</artifactId>
+	<packaging>maven-plugin</packaging>
+	<name>Maven JFlex Plugin</name>
+	<!-- TODO change parent when I know what to do from this plugin -->
+	<parent>
+		<groupId>org.jamwiki</groupId>
+		<artifactId>jamwiki-parent</artifactId>
+		<version>0.2-SNAPSHOT</version>
+		<relativePath>../jamwiki-parent</relativePath>
+	</parent>
+	<licenses>
+		<license>
+			<name>LGPL</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<version>0.1</version>
+	<description>
+		This is a Maven 2 plugin to generate a parser in Java code from
+		a Lexer definition, using Jflex.de.
+	</description>
+	<prerequisites />
+	<inceptionYear>2007</inceptionYear>
+	<developers>
+		<developer>
+			<id>decamps</id>
+			<name>Régis Décamps</name>
+			<email>decamps@users.sf.net</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.jflex</groupId>
+			<artifactId>jflex</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.2</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>2.3</version>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
-
