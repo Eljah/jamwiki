@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>maven-plugins</artifactId>
-    <groupId>org.apache.maven.plugins</groupId>
-    <version>8</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.jflex.maven.plugin</groupId>
   <artifactId>maven-jflex-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
   <name>Maven JFlex Plugin</name>
   <version>0.1</version>
   <description>This is a Maven 2 plugin to generate a parser in Java code from
@@ -17,7 +13,7 @@
   <developers>
     <developer>
       <id>decamps</id>
-      <name>R?gis D?camps</name>
+      <name>Régis Décamps</name>
       <email>decamps@users.sf.net</email>
       <roles>
         <role>developer</role>

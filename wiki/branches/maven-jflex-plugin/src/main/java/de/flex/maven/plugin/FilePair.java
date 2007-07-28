@@ -35,19 +35,19 @@ import org.apache.maven.plugin.logging.Log;
  * Parameter of the maven-jflex-plugin mojo.
  * 
  */
-public class Parser {
+public class FilePair {
 	private static final long serialVersionUID = -1022869916489077448L;
 	public static final String DEFAULT_NAME = "Yylex";
 	/**
 	 * The lexer definition the parser will be generated from.
 	 */
-	public File lexFile;
+	private File lexFile;
 
 	/**
 	 * The java parser code to generate. Defaults to
 	 * <code>${outputDirectory}/package/name/classname.java</code>
 	 */
-	public File outputFile;
+	private File outputFile;
 
 	/**
 	 * Output directory. Set by mojo to
@@ -55,7 +55,12 @@ public class Parser {
 	 */
 	private File outputDirectory;
 
-	public Parser(String lexFilename, String targetDirectoryName) {
+	public FilePair() {
+		// default constructor required by Maven
+		// Cause: Class 'de.flex.maven.plugin.FilePair' cannot be instantiated
+	}
+	
+	public FilePair(String lexFilename, String targetDirectoryName) {
 		this.lexFile = new File(lexFilename);
 		this.outputDirectory = new File(targetDirectoryName);
 	}
@@ -66,6 +71,14 @@ public class Parser {
 
 	public File getLexFile() {
 		return lexFile;
+	}
+
+	public void setLexFile(File lexFile) {
+		this.lexFile = lexFile;
+	}
+
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
 	}
 
 	/**

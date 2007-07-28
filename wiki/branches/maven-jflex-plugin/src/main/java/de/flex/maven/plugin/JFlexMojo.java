@@ -60,14 +60,13 @@ public class JFlexMojo extends AbstractMojo {
 	 * @parameter
 	 * @required
 	 */
-	private Parser[] parsers;
+	private FilePair[] filePairs;
+	
 
 	private Log log = getLog();
 
 	/**
 	 * Name of the directory into which JFlex should generate the parser.
-	 * Default is
-	 * <code>${project.build.directory}/generated-sources/jflex</code>.
 	 * 
 	 * @parameter expression="${project.build.directory}/generated-sources/jflex"
 	 */
@@ -94,24 +93,24 @@ public class JFlexMojo extends AbstractMojo {
 	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		for (int i = 0; i < parsers.length; i++) {
+		for (int i = 0; i < filePairs.length; i++) {
 			// set default output directory.
-			parsers[i].setOutputDirectory(outputDirectory);
+			filePairs[i].setOutputDirectory(outputDirectory);
 
-			File lexFile = parsers[i].getLexFile();
+			File lexFile = filePairs[i].getLexFile();
 
 			checkParameters(lexFile);
 
 			/* set destination directory */
 			File generatedFile;
 			try {
-				generatedFile = parsers[i].getOutputFile();
+				generatedFile = filePairs[i].getOutputFile();
 			} catch (FileNotFoundException e1) {
 				throw new MojoFailureException(e1.getMessage());
 			} catch (IOException e2) {
 				log.warn("Cannot guess name of the Java code to generate");
 				// e1.printStackTrace();
-				generatedFile = new File(outputDirectory + Parser.DEFAULT_NAME
+				generatedFile = new File(outputDirectory + FilePair.DEFAULT_NAME
 						+ ".java");
 			}
 
@@ -172,19 +171,20 @@ public class JFlexMojo extends AbstractMojo {
 		}
 	}
 
-	public Parser[] getLexFiles() {
-		return parsers;
+	public FilePair[] getLexFiles() {
+		return filePairs;
 	}
 
 	public File getOutputDirectory() {
 		return outputDirectory;
 	}
 
-	public void setLexFiles(Parser[] lexFiles) {
-		this.parsers = lexFiles;
+	public void setLexFiles(FilePair[] lexFiles) {
+		this.filePairs = lexFiles;
 	}
 
 	public void setOutputDirectory(File outputDirectory) {
 		this.outputDirectory = outputDirectory;
 	}
+
 }

@@ -34,14 +34,14 @@ public class JFlexMojoTest extends TestCase {
 	protected static final String OUTPUT_DIRECTORY = "target/test/generated";
 	
 	JFlexMojo mojo;
-	Parser preprocessorLex;
+	FilePair preprocessorLex;
 
 	@Override
 	protected void setUp() throws Exception {
 		mojo = new JFlexMojo();
 		mojo.setOutputDirectory(new File(OUTPUT_DIRECTORY));
 		// in a standard execution, the Mojo sets this:
-		preprocessorLex = new Parser(SRC_TEST_RESOURCES_FLEX,
+		preprocessorLex = new FilePair(SRC_TEST_RESOURCES_FLEX,
 				OUTPUT_DIRECTORY);
 	}
 
@@ -56,7 +56,7 @@ public class JFlexMojoTest extends TestCase {
 	 */
 	public void testGenerate() throws MojoExecutionException,
 			MojoFailureException {
-		Parser[] lexFiles = { preprocessorLex };
+		FilePair[] lexFiles = { preprocessorLex };
 		mojo.setLexFiles(lexFiles);
 
 		mojo.execute();
