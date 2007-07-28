@@ -22,7 +22,11 @@ package de.flex.maven.plugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -32,6 +36,8 @@ import org.apache.maven.plugin.logging.Log;
 import JFlex.Main;
 import JFlex.Options;
 
+import de.flex.maven.plugin.ClassInfo;
+
 /**
  * @goal generate
  * @phase generate-sources
@@ -40,14 +46,10 @@ import JFlex.Options;
  */
 public class JFlexMojo extends AbstractMojo {
 	/**
-	 * List of parser definitions to run the JFlex parser generator on.
-	 * 
-	 * A parser is mainly a lexFile. TODO documentation <code>
-	 * 
-	 * </code>
+	 * List of grammar definitions to run the JFlex parser generator on. By
+	 * default, all files in <code>src/main/java/flex</code> will be used.
 	 * 
 	 * @parameter
-	 * @required
 	 */
 	private File[] lexFiles;
 
@@ -70,6 +72,7 @@ public class JFlexMojo extends AbstractMojo {
 	/**
 	 * Whether to produce graphviz .dot files for the generated automata. This
 	 * feature is EXPERIMENTAL.
+	 * 
 	 * @parameter
 	 */
 	private boolean dot = false;
@@ -82,11 +85,19 @@ public class JFlexMojo extends AbstractMojo {
 	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		for (int i = 0; i < lexFiles.length; i++) {
-			// set default output directory.
-			// lexFiles[i].setTargetDirectory(outputDirectory);
-
-			File lexFile = lexFiles[i];
+		Iterator fileIterator;
+		if (lexFiles != null) {
+			List<File> filesIt = Arrays.asList(lexFiles);
+			fileIterator = filesIt.iterator();
+		} else {
+			// use default lexfiles if none provided
+			File defaultDir = new File("src/main/jflex");
+			String[] extensions = { "*.jflex" };
+			fileIterator = FileUtils
+					.iterateFiles(defaultDir, extensions, false);
+		}
+		while (fileIterator.hasNext()) {
+			File lexFile = (File) fileIterator.next();
 			ClassInfo classInfo;
 			try {
 				classInfo = LexSimpleAnalyzer.guessPackageAndClass(lexFile);
@@ -121,6 +132,8 @@ public class JFlexMojo extends AbstractMojo {
 			Options.dot = dot;
 			try {
 				Main.generate(lexFile);
+				log.info("generated " + outputDirectory + File.separator
+						+ classInfo.getOutputFilename());
 			} catch (Exception e) {
 				throw new MojoExecutionException(e.getMessage());
 			}
@@ -170,8 +183,8 @@ public class JFlexMojo extends AbstractMojo {
 	}
 
 	public void setLexFiles(File[] lexFiles) {
-		this.lexFiles=lexFiles;
-		
+		this.lexFiles = lexFiles;
+
 	}
 
 }
