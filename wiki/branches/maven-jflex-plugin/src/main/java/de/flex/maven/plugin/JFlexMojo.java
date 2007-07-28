@@ -70,6 +70,7 @@ public class JFlexMojo extends AbstractMojo {
 	/**
 	 * Whether to produce graphviz .dot files for the generated automata. This
 	 * feature is EXPERIMENTAL.
+	 * @parameter
 	 */
 	private boolean dot = false;
 
