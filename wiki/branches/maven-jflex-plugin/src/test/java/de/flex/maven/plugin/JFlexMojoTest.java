@@ -22,12 +22,15 @@ package de.flex.maven.plugin;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusTestCase;
 
 import junit.framework.TestCase;
 
-public class JFlexMojoTest extends TestCase {
+public class JFlexMojoTest extends PlexusTestCase {
 	protected static final String SRC_TEST_RESOURCES_FLEX = "src/test/resources/preprocessor.jflex";
 	protected static final String EXPECTED_PACKAGE_DIR = "/org/jamwiki/parser/jflex/";
 	protected static final String EXPECTED_CLASS_NAME = "JAMWikiPreProcessor";
@@ -38,8 +41,11 @@ public class JFlexMojoTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
+		/* this is done by Maven */
 		mojo = new JFlexMojo();
+		mojo.setProject(new MavenProject(new Model()));
 		mojo.setOutputDirectory(new File(OUTPUT_DIRECTORY));
+		// parameter that I want to use frequently
 		preprocessorLex=new File(SRC_TEST_RESOURCES_FLEX);
 	}
 
@@ -47,6 +53,11 @@ public class JFlexMojoTest extends TestCase {
 		assertEquals(OUTPUT_DIRECTORY, mojo.getOutputDirectory().getPath());
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		mojo=null;
+	}
+	
 	/**
 	 * Test the full parser generation.
 	 * 
@@ -56,7 +67,6 @@ public class JFlexMojoTest extends TestCase {
 			MojoFailureException {
 		File[] lexFiles = { preprocessorLex };
 		mojo.setLexFiles(lexFiles);
-
 		mojo.execute();
 
 		// approximative checking... Can't use md5 as the generated file
