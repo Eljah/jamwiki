@@ -32,6 +32,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
 
 import JFlex.Main;
 import JFlex.Options;
@@ -46,14 +47,26 @@ import de.flex.maven.plugin.ClassInfo;
  */
 public class JFlexMojo extends AbstractMojo {
 	/**
+	 * Name of the directory where to look for jflex files by default.
+	 */
+	private static final String SRC_MAIN_JFLEX = "src/main/jflex";
+	
+	private Log log = getLog();
+	
+	
+    /**
+     * @parameter expression="${project}"
+     * @required
+     */
+    private MavenProject project;
+
+	/**
 	 * List of grammar definitions to run the JFlex parser generator on. By
 	 * default, all files in <code>src/main/java/flex</code> will be used.
 	 * 
 	 * @parameter
 	 */
-	private File[] lexFiles;
-
-	private Log log = getLog();
+	private File[] lexFiles;	
 
 	/**
 	 * Name of the directory into which JFlex should generate the parser.
@@ -85,20 +98,28 @@ public class JFlexMojo extends AbstractMojo {
 	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		// compiling the generated source in target/generated-sources/ is
+		// the whole point of this plugin compared to running the ant plugin
+		project.addCompileSourceRoot( outputDirectory.getAbsolutePath() );
+		
 		Iterator fileIterator;
 		if (lexFiles != null) {
 			List<File> filesIt = Arrays.asList(lexFiles);
 			fileIterator = filesIt.iterator();
+			log.debug("Parsing " + lexFiles.length
+					+ " jflex files given in configuration");
 		} else {
 			// use default lexfiles if none provided
-			File defaultDir = new File("src/main/jflex");
-			String[] extensions = { "*.jflex" };
+			log.debug("Use all flex files found in " + SRC_MAIN_JFLEX);
+			File defaultDir = new File(SRC_MAIN_JFLEX);
+			String[] extensions = { "jflex" };
 			fileIterator = FileUtils
 					.iterateFiles(defaultDir, extensions, false);
 		}
 		while (fileIterator.hasNext()) {
 			File lexFile = (File) fileIterator.next();
-			ClassInfo classInfo;
+			log.debug("Processing "+lexFile.getName());
+			ClassInfo classInfo=null;
 			try {
 				classInfo = LexSimpleAnalyzer.guessPackageAndClass(lexFile);
 			} catch (FileNotFoundException e1) {
@@ -185,6 +206,10 @@ public class JFlexMojo extends AbstractMojo {
 	public void setLexFiles(File[] lexFiles) {
 		this.lexFiles = lexFiles;
 
+	}
+
+	protected void setProject(MavenProject project) {
+		this.project = project;
 	}
 
 }
