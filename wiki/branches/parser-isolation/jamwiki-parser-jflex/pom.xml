@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>jamwiki-parent</artifactId>
-    <groupId>org.jamwiki</groupId>
-    <version>0.2-SNAPSHOT</version>
-    <relativePath>../jamwiki-parent</relativePath>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jamwiki</groupId>
-  <artifactId>jamwiki-parser-jflex</artifactId>
-  <name>JAMWiki JFlex parser</name>
-  <version>0.6.1-SNAPSHOT</version>
-  <description>This module contains the JFlex parser of JAMWiki. 
-	  JAMWiki is a Java-based Wiki engine, which offers many of the	features of MediaWiki.</description>
-  <url>http://www.jamwiki.org</url>
-  	<properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>jamwiki-parent</artifactId>
+		<groupId>org.jamwiki</groupId>
+		<version>0.2-SNAPSHOT</version>
+		<relativePath>../jamwiki-parent</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jamwiki</groupId>
+	<artifactId>jamwiki-parser-jflex</artifactId>
+	<name>JAMWiki JFlex parser</name>
+	<version>1.0</version>
+	<description>
+		This module contains the JFlex parser of JAMWiki. JAMWiki is a
+		Java-based Wiki engine, which offers many of the features of
+		MediaWiki.
+	</description>
+	<url>http://www.jamwiki.org</url>
+	<properties>
 		<jflex.dir>${basedir}/src/main/lex</jflex.dir>
 		<jflex.output>
 			${project.build.sourceDirectory}/org/jamwiki/parser/jflex
 		</jflex.output>
 	</properties>
 	<build>
-	<plugins><plugin>
+		<plugins>
+			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
@@ -30,11 +36,16 @@
 						<configuration>
 							<tasks>
 								<delete>
-									<fileset dir="${basedir}/src/main/java/org/jamwiki/parser/jflex">
-										<include name="JAMWikiPreProcessor.java" />
-										<include name="JAMWikiProcessor.java" />
-										<include name="JAMWikiPostProcessor.java" />
-										<include name="JAMWikiSpliceProcessor.java" />
+									<fileset
+										dir="${basedir}/src/main/java/org/jamwiki/parser/jflex">
+										<include
+											name="JAMWikiPreProcessor.java" />
+										<include
+											name="JAMWikiProcessor.java" />
+										<include
+											name="JAMWikiPostProcessor.java" />
+										<include
+											name="JAMWikiSpliceProcessor.java" />
 									</fileset>
 								</delete>
 							</tasks>
@@ -73,12 +84,16 @@
 				</executions>
 				<dependencies>
 					<dependency>
-		    	  <groupId>de.jflex</groupId>
-    			  <artifactId>jflex</artifactId>
-		    	  <version>1.4.1</version>
-			    </dependency>
-			    </dependencies>
+						<groupId>org.jamwiki</groupId>
+						<artifactId>jamwiki-core</artifactId>
+					</dependency>
+					<dependency>
+						<groupId>de.jflex</groupId>
+						<artifactId>jflex</artifactId>
+						<version>1.4.1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
-	</plugins>
+		</plugins>
 	</build>
 </project>
