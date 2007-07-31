@@ -25,6 +25,10 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class Role extends GrantedAuthorityImpl {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7995231871249892674L;
 	private static final WikiLogger logger = WikiLogger.getLogger(Role.class.getName());
 	private String description = null;
 

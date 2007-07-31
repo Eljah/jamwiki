@@ -25,6 +25,10 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class Topic implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9205691127283378793L;
 	/* Standard topic type. */
 	public static final int TYPE_ARTICLE = 1;
 	/* Topic redirects to another topic. */

@@ -24,6 +24,10 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class VirtualWiki implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4100223242062074536L;
 	private static final WikiLogger logger = WikiLogger.getLogger(VirtualWiki.class.getName());
 	private String name = null;
 	private String defaultTopicName = null;

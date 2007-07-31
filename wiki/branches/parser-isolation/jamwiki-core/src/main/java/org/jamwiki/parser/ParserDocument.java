@@ -26,6 +26,10 @@ import java.util.LinkedHashMap;
  */
 public class ParserDocument implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1075564226188346609L;
 	private boolean cacheable = true;
 	private final LinkedHashMap categories = new LinkedHashMap();
 	private final Vector links = new Vector();

@@ -21,6 +21,10 @@ package org.jamwiki;
  * Custom exception class for JAMWiki servlet errors.
  */
 public class WikiException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5564328726427104436L;
 	private final WikiMessage wikiMessage;
 
 	/**

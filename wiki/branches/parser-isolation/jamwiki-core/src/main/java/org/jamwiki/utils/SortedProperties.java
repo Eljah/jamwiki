@@ -28,6 +28,10 @@ import java.util.Vector;
  */
 public class SortedProperties extends Properties {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3931255744322508298L;
 	/** Logger */
 	public static final WikiLogger logger = WikiLogger.getLogger(SortedProperties.class.getName());
 

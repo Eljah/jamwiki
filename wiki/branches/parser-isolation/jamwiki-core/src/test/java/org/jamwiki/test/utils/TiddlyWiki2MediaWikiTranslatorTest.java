@@ -38,6 +38,6 @@ public class TiddlyWiki2MediaWikiTranslatorTest extends TestCase {
         
         public void testInsertBreaks() throws Exception {
                 TiddlyWiki2MediaWikiTranslator t = new TiddlyWiki2MediaWikiTranslator();
-                //assertEquals("abc<br/>\ndef<br/>\nghi", t.translate("abc\ndef\nghi"));
+                //FIXME assertEquals("abc<br/>\ndef<br/>\nghi", t.translate("abc\ndef\nghi"));
         }
 }
