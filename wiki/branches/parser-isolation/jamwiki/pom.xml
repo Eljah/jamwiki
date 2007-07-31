@@ -21,22 +21,7 @@
 	</description>
 	<url>http://www.jamwiki.org</url>
 
-	<repositories>
-		<repository>
-			<!--  jamwiki custom repository allows to provide
-			 librairies locally -->
-			<id>.org.jamwiki</id>
-			<name>Maven Repository for Jamwiki</name>
-			<layout>default</layout>
-			<url>file:///${basedir}/repository</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-	</repositories>
+
 
 	<dependencies>
 		<dependency>
@@ -150,14 +135,6 @@
 			<artifactId>standard</artifactId>
 		</dependency>
 
-
-		<!--  These packages are in /repository
-		-->
-		<dependency>
-			<groupId>bliki</groupId>
-			<artifactId>bliki</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
 
 		<!--  These dependencies are related project.
 		They need to be "mvn install"ed 

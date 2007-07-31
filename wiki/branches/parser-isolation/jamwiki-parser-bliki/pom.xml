@@ -14,4 +14,30 @@
   <description>This module contains the core functionnalities of JAMWiki. 
 	  JAMWiki is a Java-based Wiki engine, which offers many of the	features of MediaWiki.</description>
   <url>http://www.jamwiki.org</url>
+	<repositories>
+		<repository>
+			<!--  jamwiki custom repository allows to provide
+			 librairies locally -->
+			<id>.org.jamwiki</id>
+			<name>Maven Repository for Jamwiki</name>
+			<layout>default</layout>
+			<url>file:///${basedir}/repository</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>  
+  <dependencies>
+	  		<!--  These packages are in /repository
+		-->
+		<dependency>
+			<groupId>bliki</groupId>
+			<artifactId>bliki</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+	</depenencies>
+	   
 </project>
