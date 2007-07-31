@@ -41,10 +41,17 @@
 	<!-- dependency management defines the version to use in projects that inherits from the parent.
 		The dependency management does not tell the sub-project to depend from what is listed bellow.-->
 	<properties>
-		<dependency.spring.version>2.0.6</dependency.spring.version>
+		<jamwiki.version>0.6.1-SNPASHOT</jamwiki.version>
+		<dependency.spring.version>2.0.6</dependency.spring.version>		
 	</properties>
 	<dependencyManagement>
-		<dependencies>
+		<dependencies>		
+			<dependency>
+				<groupId>org.jamwiki</groupId>
+				<artifactId>jamwiki-core</artifactId>
+				<version>${jamwiki.version}</version>
+			</dependency>
+		
 			<dependency>
 				<groupId>org.acegisecurity</groupId>
 				<artifactId>acegi-security</artifactId>
@@ -179,4 +186,103 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<build>
+	<plugins>
+	    		 <plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<threshold>Normal</threshold>
+					<effort>Default</effort>
+					<outputDirectory>target/findbugs</outputDirectory>					
+					<excludeFilterFile>
+						findbugs-exclude.xml
+					</excludeFilterFile><!-- 
+					<includeFilterFile>
+						findbugs-include.xml
+					</includeFilterFile>-->
+					<visitors>
+						FindDeadLocalStores,UnreadFields
+					</visitors>
+					<onlyAnalyze>
+						org.jamwiki.*
+					</onlyAnalyze><!-- 
+					<pluginList>
+						/libs/fb-contrib/fb-contrib-2.8.0.jar
+					</pluginList>-->
+					<debug>true</debug>
+					<relaxed>true</relaxed>
+				</configuration>
+			</plugin>
+	</plugins>
+	</build>
+		<reporting>
+		<plugins>
+			<plugin>
+		    	<groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-project-info-reports-plugin</artifactId>
+		        <reportSets>
+                     <reportSet>
+                        <reports>
+                           <report>index</report>                           
+                           <report>dependencies</report>
+                           <report>project-team</report>
+                           <report>issue-tracking</report>
+                           <report>license</report>
+                           <report>scm</report>
+                           <report>summary</report>                           
+                        </reports>
+                     </reportSet>
+                  </reportSets>
+	        </plugin>
+			<plugin>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<configuration>
+					<targetjdk>1.4</targetjdk>
+					<rulesets>
+						<ruleset>${basedir}/pmd.xml</ruleset>
+					</rulesets>
+					<format>xml</format>
+					<linkXref>true</linkXref>
+					<!--  Is is different than utf-8 ??? -->
+					<sourceEncoding>utf-8</sourceEncoding>
+					<minimumTokens>100</minimumTokens>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<configuration>
+				<tags>
+				    <tag>TODO</tag>
+		            <tag>FIXME</tag>
+        		    <tag>@todo</tag>
+        		    <tag>@deprecated</tag>
+				</tags>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			<plugin>
+	    	    <groupId>org.apache.maven.plugins</groupId>
+    	    	<artifactId>maven-jxr-plugin</artifactId>
+	      	</plugin>
+		    <plugin>
+		       	<groupId>org.apache.maven.plugins</groupId>
+		      	<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<encoding>ISO-8859-1</encoding>
+				</configuration>
+		    </plugin>			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
