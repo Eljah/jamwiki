@@ -20,7 +20,6 @@ package org.jamwiki.test.utils;
 
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -28,7 +27,6 @@ import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Topic;
 import org.jamwiki.parser.ParserInput;
-import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.Utilities;
 
 public class UtilitiesTest extends TestCase {
