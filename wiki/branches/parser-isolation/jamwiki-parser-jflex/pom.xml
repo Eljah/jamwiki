@@ -25,6 +25,17 @@
 			${project.build.sourceDirectory}/org/jamwiki/parser/jflex
 		</jflex.output>
 	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -83,10 +94,6 @@
 					</execution>
 				</executions>
 				<dependencies>
-					<dependency>
-						<groupId>org.jamwiki</groupId>
-						<artifactId>jamwiki-core</artifactId>
-					</dependency>
 					<dependency>
 						<groupId>de.jflex</groupId>
 						<artifactId>jflex</artifactId>
