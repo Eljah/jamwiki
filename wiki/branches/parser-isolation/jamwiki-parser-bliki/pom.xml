@@ -8,9 +8,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jamwiki</groupId>
-  <artifactId>jamwiki-</artifactId>
-  <name>JAMWiki ()</name>
-  <version>0.6.1-SNAPSHOT</version>
+  <artifactId>jamwiki-parser-bliki</artifactId>
+  <name>JAMWiki Bliki parser</name>
+  <version>1.0</version>
   <description>This module contains the core functionnalities of JAMWiki. 
 	  JAMWiki is a Java-based Wiki engine, which offers many of the	features of MediaWiki.</description>
   <url>http://www.jamwiki.org</url>
@@ -30,7 +30,7 @@
 			</releases>
 		</repository>
 	</repositories>  
-  <dependencies>
+    <dependencies>
 	  		<!--  These packages are in /repository
 		-->
 		<dependency>
@@ -38,6 +38,10 @@
 			<artifactId>bliki</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-	</depenencies>
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-core</artifactId>
+		</dependency>
+	</dependencies>
 	   
 </project>
