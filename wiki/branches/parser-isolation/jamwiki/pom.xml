@@ -14,7 +14,9 @@
 	<artifactId>jamwiki</artifactId>
 	<packaging>war</packaging>
 	<name>JAMWiki</name>
-	<version>0.6.1-SNAPSHOT</version>
+	<!-- jamwiki (webapp) and jamwiki-core have the same version,
+	defined in jamwiki-parent -->
+	<version>${jamwiki.version}</version>
 	<description>
 		JAMWiki is a Java-based Wiki engine, which offers many of the
 		features of MediaWiki.
@@ -25,45 +27,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.acegisecurity</groupId>
-			<artifactId>acegi-security</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>jdom</groupId>
-			<artifactId>jdom</artifactId>
 		</dependency>
 
 		<dependency>
@@ -78,23 +43,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-highlighter</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>oro</groupId>
-			<artifactId>oro</artifactId>
 		</dependency>
 
 		<dependency>
@@ -113,11 +63,6 @@
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>jsp-api</artifactId>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
 		</dependency>
 
 		<dependency>
@@ -143,7 +88,7 @@
 		<dependency>
 			<groupId>org.jamwiki</groupId>
 			<artifactId>jamwiki-core</artifactId>
-			<version>${project-version}</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	

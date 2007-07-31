@@ -12,9 +12,11 @@
 	</parent>
 	<groupId>org.jamwiki</groupId>
 	<artifactId>jamwiki-core</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>JAMWiki</name>
-	<version>0.6.1-SNAPSHOT</version>
+	<!-- jamwiki (webapp) and jamwiki-core have the same version,
+	defined in jamwiki-parent -->
+	<version>${jamwiki.version}</version>
   <description>This module contains the core functionnalities of JAMWiki. 
 	  JAMWiki is a Java-based Wiki engine, which offers many of the	features of MediaWiki.</description>
 <url>http://www.jamwiki.org</url>
@@ -237,11 +239,6 @@
 	        	</configuration>
     		</plugin>
 			
-			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-			</plugin>
-			
     		 <plugin>
     		 	<artifactId>maven-source-plugin</artifactId>
     		 </plugin>
@@ -276,71 +273,5 @@
 		</plugins>
 	</build>
 
-	<reporting>
-		<plugins>
-			<plugin>
-		    	<groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-project-info-reports-plugin</artifactId>
-		        <reportSets>
-                     <reportSet>
-                        <reports>
-                           <report>index</report>                           
-                           <report>dependencies</report>
-                           <report>project-team</report>
-                           <report>issue-tracking</report>
-                           <report>license</report>
-                           <report>scm</report>
-                           <report>summary</report>                           
-                        </reports>
-                     </reportSet>
-                  </reportSets>
-	        </plugin>
-			<plugin>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<configuration>
-					<targetjdk>1.4</targetjdk>
-					<rulesets>
-						<ruleset>${basedir}/pmd.xml</ruleset>
-					</rulesets>
-					<format>xml</format>
-					<linkXref>true</linkXref>
-					<!--  Is is different than utf-8 ??? -->
-					<sourceEncoding>utf-8</sourceEncoding>
-					<minimumTokens>100</minimumTokens>
-				</configuration>
-			</plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>taglist-maven-plugin</artifactId>
-				<configuration>
-				<tags>
-				    <tag>TODO</tag>
-		            <tag>FIXME</tag>
-        		    <tag>@todo</tag>
-        		    <tag>@deprecated</tag>
-				</tags>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-			</plugin>
-			<plugin>
-	    	    <groupId>org.apache.maven.plugins</groupId>
-    	    	<artifactId>maven-jxr-plugin</artifactId>
-	      	</plugin>
-		    <plugin>
-		       	<groupId>org.apache.maven.plugins</groupId>
-		      	<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<encoding>ISO-8859-1</encoding>
-				</configuration>
-		    </plugin>			
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</reporting>
 </project>

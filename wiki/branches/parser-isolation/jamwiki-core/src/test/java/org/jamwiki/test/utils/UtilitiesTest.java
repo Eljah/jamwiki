@@ -26,7 +26,6 @@ import junit.framework.TestCase;
 
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.db.DatabaseUserHandler;
 import org.jamwiki.model.Topic;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.utils.SortedProperties;
@@ -365,35 +364,6 @@ public class UtilitiesTest extends TestCase {
 		assertSame("result", parent, result);
 	}
 
-	/**
-	 *
-	 */
-	public void testGetVirtualWikiFromRequest() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
-	public void testIsAdmin() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
-	public void testIsCommentsPage() throws Throwable {
-		//TODO
-	}
-
-	/**
-	 *
-	 */
-	public void testIsFirstUse() throws Throwable {
-		// FIXME
-//		boolean result = Utilities.isFirstUse();
-//		assertTrue("result", result);
-	}
 
 	/**
 	 *
@@ -414,20 +384,6 @@ public class UtilitiesTest extends TestCase {
 		assertFalse("null string",Utilities.isIpAddress(null));
 	}
 
-
-	/**
-	 *
-	 */
-	public void testIsUpgrade() throws Throwable {
-		//TODO
-	}
-
-	/**
-	 *
-	 */
-	public void testLogin() throws Throwable {
-		// FIXME - implement this
-	}
 
 	/**
 	 *
@@ -477,13 +433,6 @@ public class UtilitiesTest extends TestCase {
 	/**
 	 *
 	 */
-	public void testParseMetadata() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
 	public void testParseMinimal() throws Throwable {
 		ParserInput parserInput = new ParserInput();
 		parserInput.setVirtualWiki("testUtilitiesVirtualWiki");
@@ -492,26 +441,6 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("result.getContent()", "testUtilitiesContent", result);
 	}
 
-	/**
-	 *
-	 */
-	public void testParseSlice() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
-	public void testParseSplice() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
-	public void testParserDocument() throws Throwable {
-		// FIXME - implement this
-	}
 
 	/**
 	 *
@@ -521,13 +450,7 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("result", "#REDIRECT [[testUtilitiesTopicName]]", result);
 	}
 
-	/**
-	 *
-	 */
-	public void testUserHandlerInstance() throws Throwable {
-		DatabaseUserHandler result = (DatabaseUserHandler) Utilities.userHandlerInstance();
-		assertTrue("result.isWriteable()", result.isWriteable());
-	}
+
 
 	/**
 	 *
@@ -559,53 +482,7 @@ public class UtilitiesTest extends TestCase {
 //		assertEquals("result.size()", 5, result.size());
 	}
 
-	/**
-	 *
-	 */
-	public void testValidateSystemSettings1() throws Throwable {
-		Properties props = new Properties(new SortedProperties());
-		props.put("file-dir-full-path", ")%2F");
-		props.put("homeDir", "testString");
-		props.put("parser", "org.jamwiki.parser.AbstractParser");
-		props.put("url", "testString");
-		Utilities.validateSystemSettings(props);
-		assertTrue("Test completed without Exception", true);
-		// dependencies on static and environment state led to removal of 1 assertion(s)
-	}
 
-	/**
-	 *
-	 */
-	public void testValidateSystemSettings2() throws Throwable {
-		Properties props = new Properties();
-		props.put("file-dir-full-path", "testString");
-		props.put("homeDir", "testString");
-		props.put("url", "testString");
-		Utilities.validateSystemSettings(props);
-		assertTrue("Test completed without Exception", true);
-		// dependencies on static and environment state led to removal of 1 assertion(s)
-	}
-
-	/**
-	 *
-	 */
-	public void testValidateUserName() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
-	public void testAddCookieThrowsNullPointerException() throws Throwable {
-		// FIXME - implement this
-	}
-
-	/**
-	 *
-	 */
-	public void testCurrentWatchlistThrowsNullPointerException() throws Throwable {
-		// FIXME - implement this
-	}
 
 	/**
 	 *
@@ -982,17 +859,7 @@ public class UtilitiesTest extends TestCase {
 		// FIXME - implement this
 	}
 
-	/**
-	 *
-	 */
-	public void testValidateSystemSettingsThrowsNullPointerException1() throws Throwable {
-		try {
-			Utilities.validateSystemSettings(new Properties());
-			fail("Expected NullPointerException to be thrown");
-		} catch (NullPointerException ex) {
-			assertNull("ex.getMessage()", ex.getMessage());
-		}
-	}
+
 
 	/**
 	 *
