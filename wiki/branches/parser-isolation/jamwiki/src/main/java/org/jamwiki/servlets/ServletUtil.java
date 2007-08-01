@@ -24,8 +24,13 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import net.sf.ehcache.Element;
+
+import org.acegisecurity.AuthenticationCredentialsNotFoundException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
@@ -33,6 +38,7 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.db.DatabaseConnection;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
@@ -46,6 +52,7 @@ import org.jamwiki.parser.ParserDocument;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
+import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLink;
@@ -89,7 +96,7 @@ public class ServletUtil {
 	 *  constructed.
 	 */
 	private static void buildLayout(HttpServletRequest request, ModelAndView next) {
-		String virtualWikiName = Utilities.getVirtualWikiFromURI(request);
+		String virtualWikiName = getVirtualWikiFromURI(request);
 		if (virtualWikiName == null) {
 			logger.severe("No virtual wiki available for page request " + request.getRequestURI());
 			virtualWikiName = WikiBase.DEFAULT_VWIKI;
@@ -259,7 +266,42 @@ public class ServletUtil {
 		}
 		return true;
 	}
-
+	/**
+	 * Retrieve a topic name from the request URI.  This method will retrieve
+	 * the portion of the URI that follows the virtual wiki and decode it
+	 * appropriately.
+	 *
+	 * @param request The servlet request object.
+	 * @return The decoded topic name retrieved from the URI.
+	 */
+	public static String getTopicFromURI(HttpServletRequest request) {
+		// skip one directory, which is the virutal wiki
+		String topic = retrieveDirectoriesFromURI(request, 1);
+		if (topic == null) {
+			logger.warning("No topic in URL: " + request.getRequestURI());
+			return null;
+		}
+		int pos = topic.indexOf('?');
+		if (pos != -1) {
+			// strip everything after and including '?'
+			if (pos == 0) {
+				logger.warning("No topic in URL: " + request.getRequestURI());
+				return null;
+			}
+			topic = topic.substring(0, topic.indexOf('?'));
+		}
+		pos = topic.indexOf('#');
+		if (pos != -1) {
+			// strip everything after and including '#'
+			if (pos == 0) {
+				logger.warning("No topic in URL: " + request.getRequestURI());
+				return null;
+			}
+			topic = topic.substring(0, topic.indexOf('#'));
+		}
+		topic = Utilities.decodeFromURL(topic);
+		return topic;
+	}
 	/**
 	 * Examine the request object, and see if the requested topic or page
 	 * matches a given value.
@@ -271,7 +313,7 @@ public class ServletUtil {
 	 */
 	protected static boolean isTopic(HttpServletRequest request, String value) {
 		try {
-			String topic = Utilities.getTopicFromURI(request);
+			String topic = getTopicFromURI(request);
 			if (!StringUtils.hasText(topic)) {
 				return false;
 			}
@@ -349,16 +391,16 @@ public class ServletUtil {
 				editLink += "&topicVersionId=" + request.getParameter("topicVersionId");
 			}
 			next.addObject("edit", editLink);
-			String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+			String virtualWiki = getVirtualWikiFromURI(request);
 			pageInfo.setMoveable(ServletUtil.isMoveable(virtualWiki, article, user));
 			pageInfo.setEditable(ServletUtil.isEditable(virtualWiki, article, user));
-			Watchlist watchlist = Utilities.currentWatchlist(request, virtualWiki);
+			Watchlist watchlist = currentWatchlist(request, virtualWiki);
 			if (watchlist.containsTopic(pageInfo.getTopicName())) {
 				pageInfo.setWatched(true);
 			}
 		}
 		if (!StringUtils.hasText(pageInfo.getTopicName())) {
-			pageInfo.setTopicName(Utilities.getTopicFromURI(request));
+			pageInfo.setTopicName(getTopicFromURI(request));
 		}
 		next.addObject(ServletUtil.PARAMETER_PAGE_INFO, pageInfo);
 	}
@@ -447,7 +489,7 @@ public class ServletUtil {
 	protected static ModelAndView viewLogin(HttpServletRequest request, WikiPageInfo pageInfo, String topic, WikiMessage messageObject) throws Exception {
 		ModelAndView next = new ModelAndView("wiki");
 		pageInfo.reset();
-		String virtualWikiName = Utilities.getVirtualWikiFromURI(request);
+		String virtualWikiName = getVirtualWikiFromURI(request);
 		String target = request.getParameter("target");
 		if (!StringUtils.hasText(target)) {
 			if (!StringUtils.hasText(topic)) {
@@ -481,7 +523,7 @@ public class ServletUtil {
 	 * @throws Exception Thrown if any error occurs during processing.
 	 */
 	protected static void viewTopic(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, String topicName) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+		String virtualWiki = getVirtualWikiFromURI(request);
 		if (!StringUtils.hasText(virtualWiki)) {
 			virtualWiki = WikiBase.DEFAULT_VWIKI;
 		}
@@ -627,31 +669,6 @@ public class ServletUtil {
 		return new Pagination(num, offset);
 	}
 	
-	/**
-	 * Retrieve the current logged-in user's watchlist from the session.  If
-	 * there is no watchlist return an empty watchlist.
-	 *
-	 * @param request The servlet request object.
-	 * @param virtualWiki The virtual wiki for the watchlist being parsed.
-	 * @return The current logged-in user's watchlist, or an empty watchlist
-	 *  if there is no watchlist in the session.
-	 */
-	public static Watchlist currentWatchlist(HttpServletRequest request, String virtualWiki) throws Exception {
-		// get watchlist stored in session
-		Watchlist watchlist = (Watchlist)request.getSession().getAttribute(ServletUtil.PARAMETER_WATCHLIST);
-		if (watchlist != null) {
-			return watchlist;
-		}
-		// no watchlist in session, retrieve from database
-		watchlist = new Watchlist();
-		WikiUser user = currentUser();
-		if (!user.hasRole(Role.ROLE_USER)) {
-			return watchlist;
-		}
-		watchlist = WikiBase.getDataHandler().getWatchlist(virtualWiki, user.getUserId());
-		request.getSession().setAttribute(ServletUtil.PARAMETER_WATCHLIST, watchlist);
-		return watchlist;
-	}
 	
 	/**
 	 * Retrieve the current logged-in user's watchlist from the session.  If
@@ -670,7 +687,7 @@ public class ServletUtil {
 		}
 		// no watchlist in session, retrieve from database
 		watchlist = new Watchlist();
-		WikiUser user = currentUser();
+		WikiUser user = Utilities.currentUser();
 		if (!user.hasRole(Role.ROLE_USER)) {
 			return watchlist;
 		}
@@ -707,7 +724,7 @@ public class ServletUtil {
 	 * @return The decoded virtual wiki name retrieved from the URI.
 	 */
 	public static String getVirtualWikiFromURI(HttpServletRequest request) {
-		String uri = Utilities.retrieveDirectoriesFromURI(request, 0);
+		String uri = retrieveDirectoriesFromURI(request, 0);
 		if (uri == null) {
 			logger.warning("No virtual wiki found in URL: " + request.getRequestURI());
 			return null;
@@ -730,7 +747,7 @@ public class ServletUtil {
 	 *  object and if that user is an admin, <code>false</code> otherwise.
 	 */
 	public static boolean isAdmin(HttpServletRequest request) throws Exception {
-		WikiUser user = currentUser();
+		WikiUser user = Utilities.currentUser();
 		return (user.hasRole(Role.ROLE_ADMIN));
 	}
 	/**
@@ -754,7 +771,7 @@ public class ServletUtil {
 		parserInput.setLocale(request.getLocale());
 		parserInput.setTopicName(topicName);
 		parserInput.setVirtualWiki(virtualWiki);
-		AbstractParser parser = parserInstance(parserInput);
+		AbstractParser parser = Utilities.parserInstance(parserInput);
 		ParserDocument parserDocument = new ParserDocument();
 		return parser.parseSlice(parserDocument, topic.getTopicContent(), targetSection);
 	}
@@ -784,7 +801,7 @@ public class ServletUtil {
 		parserInput.setLocale(request.getLocale());
 		parserInput.setTopicName(topicName);
 		parserInput.setVirtualWiki(virtualWiki);
-		AbstractParser parser = parserInstance(parserInput);
+		AbstractParser parser = Utilities.parserInstance(parserInput);
 		return parser.parseSplice(parserDocument, topic.getTopicContent(), targetSection, replacementText);
 	}
 	/**
