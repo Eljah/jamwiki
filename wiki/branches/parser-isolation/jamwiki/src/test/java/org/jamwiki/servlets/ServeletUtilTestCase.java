@@ -2,6 +2,8 @@ package org.jamwiki.servlets;
 
 import java.util.Properties;
 
+import org.jamwiki.db.DatabaseUserHandler;
+import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.Utilities;
 
 import junit.framework.TestCase;
@@ -17,7 +19,7 @@ public class ServeletUtilTestCase extends TestCase {
 		props.put("file-dir-full-path", "testString");
 		props.put("homeDir", "testString");
 		props.put("url", "testString");
-		Utilities.validateSystemSettings(props);
+		ServletUtil.validateSystemSettings(props);
 		assertTrue("Test completed without Exception", true);
 		// dependencies on static and environment state led to removal of 1 assertion(s)
 	}
@@ -28,14 +30,14 @@ public class ServeletUtilTestCase extends TestCase {
 		props.put("homeDir", "testString");
 		props.put("parser", "org.jamwiki.parser.AbstractParser");
 		props.put("url", "testString");
-		Utilities.validateSystemSettings(props);
+		ServletUtil.validateSystemSettings(props);
 		assertTrue("Test completed without Exception", true);
 		// dependencies on static and environment state led to removal of 1 assertion(s)
 	}
 	
 	public void testValidateSystemSettingsThrowsNullPointerException1() throws Throwable {
 		try {
-			Utilities.validateSystemSettings(new Properties());
+			ServletUtil.validateSystemSettings(new Properties());
 			fail("Expected NullPointerException to be thrown");
 		} catch (NullPointerException ex) {
 			assertNull("ex.getMessage()", ex.getMessage());
