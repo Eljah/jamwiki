@@ -19,6 +19,8 @@ package org.jamwiki.taglib;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+
+import org.jamwiki.servlets.ServletUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Utilities;
@@ -33,6 +35,10 @@ import org.springframework.web.util.ExpressionEvaluationUtils;
  */
 public class LinkTag extends BodyTagSupport {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4444154378842839003L;
 	private static final WikiLogger logger = WikiLogger.getLogger(LinkTag.class.getName());
 	private String style = null;
 	private String target = null;
@@ -67,7 +73,7 @@ public class LinkTag extends BodyTagSupport {
 		String tagText = buildLinkText();
 		HttpServletRequest request = (HttpServletRequest)this.pageContext.getRequest();
 		String url = null;
-		String virtualWiki = Utilities.getVirtualWikiFromRequest(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromRequest(request);
 		if (StringUtils.hasText(this.queryParams)) {
 			wikiLink.setQuery(this.queryParams);
 		}

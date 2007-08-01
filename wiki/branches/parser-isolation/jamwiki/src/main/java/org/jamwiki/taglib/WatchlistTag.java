@@ -19,6 +19,8 @@ package org.jamwiki.taglib;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+
+import org.jamwiki.servlets.ServletUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.utils.Utilities;
@@ -40,8 +42,8 @@ public class WatchlistTag extends BodyTagSupport {
 		try {
 			String tagValue = evaluateTag();
 			HttpServletRequest request = (HttpServletRequest)this.pageContext.getRequest();
-			String virtualWiki = Utilities.getVirtualWikiFromRequest(request);
-			Watchlist watchlist = Utilities.currentWatchlist(request, virtualWiki);
+			String virtualWiki = ServletUtil.getVirtualWikiFromRequest(request);
+			Watchlist watchlist = ServletUtil.currentWatchlist(request, virtualWiki);
 			if (watchlist.containsTopic(tagValue)) {
 				this.pageContext.getOut().print("<strong>");
 			}
@@ -59,8 +61,8 @@ public class WatchlistTag extends BodyTagSupport {
 		try {
 			String tagValue = evaluateTag();
 			HttpServletRequest request = (HttpServletRequest)this.pageContext.getRequest();
-			String virtualWiki = Utilities.getVirtualWikiFromRequest(request);
-			Watchlist watchlist = Utilities.currentWatchlist(request, virtualWiki);
+			String virtualWiki = ServletUtil.getVirtualWikiFromRequest(request);
+			Watchlist watchlist = ServletUtil.currentWatchlist(request, virtualWiki);
 			if (watchlist.containsTopic(tagValue)) {
 				this.pageContext.getOut().print("</strong>");
 			}
