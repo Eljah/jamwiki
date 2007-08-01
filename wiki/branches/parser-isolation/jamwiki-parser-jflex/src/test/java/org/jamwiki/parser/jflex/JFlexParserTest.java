@@ -64,7 +64,7 @@ public class JFlexParserTest extends TestCase {
 		super.setUp();
 	}
 	
-	private void testReady() {
+	public void testReady() {
 		assertNotNull(this);
 
 	}
