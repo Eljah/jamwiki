@@ -147,16 +147,6 @@
 		<contributor><name>Michael (mindweb)</name><organization>VQWiki project</organization><roles><role>translator</role></roles></contributor>	
 	</contributors>
 
-	<!-- TODO: split parent (inheritance of properties) 
-		from aggregator (multiple modules called from one agregator project)
-	<modules>
-		<module>../javadiff</module>
-		<module>../jamwiki-core</module>
-		
-		<module>../jamwiki</module>
-		
-	</modules>-->
-
 	<!-- dependency management defines the version to use in projects that inherits from the parent.
 		The dependency management does not tell the sub-project to depend from what is listed bellow.-->
 	<properties>
@@ -361,7 +351,7 @@
 				<configuration>
 					<targetjdk>1.4</targetjdk>
 					<rulesets>
-						<ruleset>${basedir}/pmd.xml</ruleset>
+						<ruleset>${basedir}/../jamwiki-parent/pmd.xml</ruleset>
 					</rulesets>
 					<format>xml</format>
 					<linkXref>true</linkXref>
