@@ -46,8 +46,8 @@ public class RecentChangesServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void recentChanges(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		Pagination pagination = Utilities.buildPagination(request, next);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
+		Pagination pagination = ServletUtil.buildPagination(request, next);
 		Collection changes = WikiBase.getDataHandler().getRecentChanges(virtualWiki, pagination, true);
 		next.addObject("changes", changes);
 		next.addObject("numChanges", new Integer(changes.size()));

@@ -162,7 +162,7 @@ public class RecentChangesFeedServlet extends AbstractController {
 		feed.setEncoding(FEED_ENCODING);
 		feed.setTitle(Environment.getValue(Environment.PROP_RSS_TITLE));
 		StringBuffer requestURL = request.getRequestURL();
-		String feedURL = feedUrlPrefix + requestURL.substring(0, requestURL.length() - Utilities.getTopicFromURI(request).length());
+		String feedURL = feedUrlPrefix + requestURL.substring(0, requestURL.length() - ServletUtil.getTopicFromURI(request).length());
 		feed.setLink(feedURL);
 		feed.setDescription("List of the last " + changes.size() + " changed wiki pages.");
 		boolean includeMinorEdits = ServletRequestUtils.getBooleanParameter(request, MINOR_EDITS,
@@ -235,8 +235,8 @@ public class RecentChangesFeedServlet extends AbstractController {
 	 *
 	 */
 	private Collection getChanges(HttpServletRequest request) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		Pagination pagination = Utilities.buildPagination(request, null);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
+		Pagination pagination = ServletUtil.buildPagination(request, null);
 		return WikiBase.getDataHandler().getRecentChanges(virtualWiki, pagination, true);
 	}
 

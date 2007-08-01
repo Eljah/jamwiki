@@ -50,9 +50,9 @@ public class TopicServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String topic = Utilities.getTopicFromURI(request);
+		String topic = ServletUtil.getTopicFromURI(request);
 		if (!StringUtils.hasText(topic)) {
-			String virtualWikiName = Utilities.getVirtualWikiFromURI(request);
+			String virtualWikiName = ServletUtil.getVirtualWikiFromURI(request);
 			VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
 			topic = virtualWiki.getDefaultTopicName();
 		}

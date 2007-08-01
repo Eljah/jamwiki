@@ -37,7 +37,7 @@ public class StylesheetServlet extends JAMWikiServlet {
 	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		String virtualWiki = null;
 		try {
-			virtualWiki = Utilities.getVirtualWikiFromURI(request);
+			virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
 			String stylesheet = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWiki, WikiBase.SPECIAL_PAGE_STYLESHEET, false);
 			response.setContentType("text/css; charset=utf-8");
 			// cache for 30 minutes (60 * 30 = 1800)

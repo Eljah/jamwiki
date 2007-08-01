@@ -55,15 +55,15 @@ public class HistoryServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void history(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		String topicName = Utilities.getTopicFromRequest(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
+		String topicName = ServletUtil.getTopicFromRequest(request);
 		if (!StringUtils.hasText(topicName)) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
 		pageInfo.setContentJsp(JSP_HISTORY);
 		pageInfo.setTopicName(topicName);
 		pageInfo.setPageTitle(new WikiMessage("history.title", topicName));
-		Pagination pagination = Utilities.buildPagination(request, next);
+		Pagination pagination = ServletUtil.buildPagination(request, next);
 		Collection changes = WikiBase.getDataHandler().getRecentChanges(virtualWiki, topicName, pagination, true);
 		next.addObject("changes", changes);
 		next.addObject("numChanges", new Integer(changes.size()));
@@ -74,8 +74,8 @@ public class HistoryServlet extends JAMWikiServlet {
 	 */
 	private void viewVersion(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// display an older version
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		String topicName = Utilities.getTopicFromRequest(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
+		String topicName = ServletUtil.getTopicFromRequest(request);
 		int topicVersionId = Integer.parseInt(request.getParameter("topicVersionId"));
 		TopicVersion topicVersion = WikiBase.getDataHandler().lookupTopicVersion(topicVersionId, null);
 		if (topicVersion == null) {

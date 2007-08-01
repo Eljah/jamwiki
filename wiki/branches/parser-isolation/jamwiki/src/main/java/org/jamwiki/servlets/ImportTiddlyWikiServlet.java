@@ -66,7 +66,7 @@ public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void importFile(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
 		Iterator iterator = ServletUtil.processMultipartRequest(request);
 		WikiUser user = Utilities.currentUser();
 		if (!user.hasRole(Role.ROLE_USER)) {

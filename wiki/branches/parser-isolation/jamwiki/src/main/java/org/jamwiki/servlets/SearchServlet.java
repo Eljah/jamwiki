@@ -53,7 +53,7 @@ public class SearchServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void jumpTo(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
 		String topic = request.getParameter("text");
 		if (WikiBase.exists(virtualWiki, topic)) {
 			ServletUtil.redirect(next, virtualWiki, topic);
@@ -67,7 +67,7 @@ public class SearchServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void search(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
 		String searchField = request.getParameter("text");
 		if (request.getParameter("text") == null) {
 			pageInfo.setPageTitle(new WikiMessage("search.title"));

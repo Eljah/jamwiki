@@ -47,7 +47,7 @@ public class DiffServlet extends JAMWikiServlet {
 	 *
 	 */
 	protected void diff(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String topicName = Utilities.getTopicFromRequest(request);
+		String topicName = ServletUtil.getTopicFromRequest(request);
 		String diffType = request.getParameter("type");
 		if (diffType != null && diffType.equals("arbitrary")) {
 			// FIXME - used with history.jsp, this is ugly

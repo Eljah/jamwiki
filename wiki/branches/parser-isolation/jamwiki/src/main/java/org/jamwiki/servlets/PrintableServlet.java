@@ -53,8 +53,8 @@ public class PrintableServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void print(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
-		String topicName = Utilities.getTopicFromRequest(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
+		String topicName = ServletUtil.getTopicFromRequest(request);
 		if (!StringUtils.hasText(topicName)) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}

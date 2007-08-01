@@ -51,7 +51,7 @@ public class SpecialPagesServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void specialPages(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String virtualWiki = Utilities.getVirtualWikiFromURI(request);
+		String virtualWiki = ServletUtil.getVirtualWikiFromURI(request);
 		String contents = Utilities.readSpecialPage(request.getLocale(), WikiBase.SPECIAL_PAGE_SPECIAL_PAGES);
 		ParserInput parserInput = new ParserInput();
 		parserInput.setContext(request.getContextPath());
