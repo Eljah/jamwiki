@@ -14,67 +14,65 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.test.parser.jflex;
+package org.jamwiki.parser.jflex;
 
 /**
  *
  */
-public class HtmlTagTest extends JFlexParserTest {
+public class CharacterTagTest extends JFlexParserTest {
 
 	/**
 	 *
 	 */
-	public HtmlTagTest(String name) {
+	public CharacterTagTest(String name) {
 		super(name);
 	}
 
 	/**
 	 *
 	 */
-	public void testAttribute() {
+	public void testEntity() {
 		String input = "";
 		String output = "";
-		input = "<font style=\"test\">text</font>";
-		output = "<p><font style=\"test\">text</font>\n</p>";
+		input = "&";
+		output = "<p>&amp;\n</p>";
 		assertEquals(output, this.parse(input));
-		input = "<font style=\"test\" color=\"red\">text</font>";
-		output = "<p><font style=\"test\" color=\"red\">text</font>\n</p>";
+		input = "& \"";
+		output = "<p>&amp; &quot;\n</p>";
 		assertEquals(output, this.parse(input));
-		input = "< font   style=\"test\" color=\"red\"  >text<  /  font  >";
-		output = "<p><font style=\"test\" color=\"red\">text</font>\n</p>";
+		input = "&#39;";
+		output = "<p>&#39;\n</p>";
+		assertEquals(output, this.parse(input));
+		input = "&lt;";
+		output = "<p>&lt;\n</p>";
+		assertEquals(output, this.parse(input));
+		input = "&lt; > &gt;";
+		output = "<p>&lt; &gt; &gt;\n</p>";
 		assertEquals(output, this.parse(input));
 	}
 
 	/**
 	 *
 	 */
-	public void testNoAttribute() {
+	public void testInvalidEntity() {
 		String input = "";
 		String output = "";
-		input = "<u>text</u>";
-		output = "<p><u>text</u>\n</p>";
-		assertEquals(output, this.parse(input));
-		input = "< u >text< / u >";
-		output = "<p><u>text</u>\n</p>";
-		assertEquals(output, this.parse(input));
-		input = "<strike>text</strike>";
-		output = "<p><strike>text</strike>\n</p>";
+		input = "&bogus;";
+		output = "<p>&amp;bogus;\n</p>";
 		assertEquals(output, this.parse(input));
 	}
 
 	/**
 	 *
 	 */
-	public void testXSS() {
+	public void testNonEntity() {
 		String input = "";
 		String output = "";
-		input = "<u CLASS=x onmouseover=\"alert('Ownage');\" >text</u>";
-		// FIXME - output should be what is below
-		// output = "<p><u class=\"x\">text</u>\n</p>";
-		output = "<p><u >text</u>\n</p>";
+		input = "a";
+		output = "<p>a\n</p>";
 		assertEquals(output, this.parse(input));
-		input = "<DIV STYLE=\"background-image: url(javascript:(1) && ('XSS9'))\">x</div>";
-		output = "<div >x</div>\n";
+		input = "a b c 1 2 3";
+		output = "<p>a b c 1 2 3\n</p>";
 		assertEquals(output, this.parse(input));
 	}
 }

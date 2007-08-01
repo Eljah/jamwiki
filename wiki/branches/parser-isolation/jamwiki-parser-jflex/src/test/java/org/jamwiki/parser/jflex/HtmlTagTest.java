@@ -14,56 +14,67 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.test.parser.jflex;
+package org.jamwiki.parser.jflex;
 
 /**
  *
  */
-public class HtmlPreTagTest extends JFlexParserTest {
+public class HtmlTagTest extends JFlexParserTest {
 
 	/**
 	 *
 	 */
-	public HtmlPreTagTest(String name) {
+	public HtmlTagTest(String name) {
 		super(name);
 	}
 
 	/**
 	 *
 	 */
-	public void testMalformed() {
+	public void testAttribute() {
 		String input = "";
 		String output = "";
-		input = "<pre><u>test</u></pre><u>test</u></pre>";
-		output = "<pre>&lt;u&gt;test&lt;/u&gt;</pre><p><u>test</u>&lt;/pre&gt;\n</p>";
+		input = "<font style=\"test\">text</font>";
+		output = "<p><font style=\"test\">text</font>\n</p>";
+		assertEquals(output, this.parse(input));
+		input = "<font style=\"test\" color=\"red\">text</font>";
+		output = "<p><font style=\"test\" color=\"red\">text</font>\n</p>";
+		assertEquals(output, this.parse(input));
+		input = "< font   style=\"test\" color=\"red\"  >text<  /  font  >";
+		output = "<p><font style=\"test\" color=\"red\">text</font>\n</p>";
 		assertEquals(output, this.parse(input));
 	}
 
 	/**
 	 *
 	 */
-	public void testStandard() {
+	public void testNoAttribute() {
 		String input = "";
 		String output = "";
-		input = "<pre>test</pre>";
-		output = "<pre>test</pre>\n";
+		input = "<u>text</u>";
+		output = "<p><u>text</u>\n</p>";
 		assertEquals(output, this.parse(input));
-		input = "<pre><u>test</u></pre>";
-		output = "<pre>&lt;u&gt;test&lt;/u&gt;</pre>\n";
+		input = "< u >text< / u >";
+		output = "<p><u>text</u>\n</p>";
+		assertEquals(output, this.parse(input));
+		input = "<strike>text</strike>";
+		output = "<p><strike>text</strike>\n</p>";
 		assertEquals(output, this.parse(input));
 	}
 
 	/**
 	 *
 	 */
-	public void testWikiSyntax() {
+	public void testXSS() {
 		String input = "";
 		String output = "";
-		input = "<pre><nowiki>test</nowiki></pre>";
-		output = "<pre>test</pre>\n";
+		input = "<u CLASS=x onmouseover=\"alert('Ownage');\" >text</u>";
+		// FIXME - output should be what is below
+		// output = "<p><u class=\"x\">text</u>\n</p>";
+		output = "<p><u >text</u>\n</p>";
 		assertEquals(output, this.parse(input));
-		input = "<pre>'''bold'''</pre>";
-		output = input+"\n";
+		input = "<DIV STYLE=\"background-image: url(javascript:(1) && ('XSS9'))\">x</div>";
+		output = "<div >x</div>\n";
 		assertEquals(output, this.parse(input));
 	}
 }

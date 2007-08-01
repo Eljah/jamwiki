@@ -14,65 +14,56 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.test.parser.jflex;
+package org.jamwiki.parser.jflex;
 
 /**
  *
  */
-public class CharacterTagTest extends JFlexParserTest {
+public class HtmlPreTagTest extends JFlexParserTest {
 
 	/**
 	 *
 	 */
-	public CharacterTagTest(String name) {
+	public HtmlPreTagTest(String name) {
 		super(name);
 	}
 
 	/**
 	 *
 	 */
-	public void testEntity() {
+	public void testMalformed() {
 		String input = "";
 		String output = "";
-		input = "&";
-		output = "<p>&amp;\n</p>";
-		assertEquals(output, this.parse(input));
-		input = "& \"";
-		output = "<p>&amp; &quot;\n</p>";
-		assertEquals(output, this.parse(input));
-		input = "&#39;";
-		output = "<p>&#39;\n</p>";
-		assertEquals(output, this.parse(input));
-		input = "&lt;";
-		output = "<p>&lt;\n</p>";
-		assertEquals(output, this.parse(input));
-		input = "&lt; > &gt;";
-		output = "<p>&lt; &gt; &gt;\n</p>";
+		input = "<pre><u>test</u></pre><u>test</u></pre>";
+		output = "<pre>&lt;u&gt;test&lt;/u&gt;</pre><p><u>test</u>&lt;/pre&gt;\n</p>";
 		assertEquals(output, this.parse(input));
 	}
 
 	/**
 	 *
 	 */
-	public void testInvalidEntity() {
+	public void testStandard() {
 		String input = "";
 		String output = "";
-		input = "&bogus;";
-		output = "<p>&amp;bogus;\n</p>";
+		input = "<pre>test</pre>";
+		output = "<pre>test</pre>\n";
+		assertEquals(output, this.parse(input));
+		input = "<pre><u>test</u></pre>";
+		output = "<pre>&lt;u&gt;test&lt;/u&gt;</pre>\n";
 		assertEquals(output, this.parse(input));
 	}
 
 	/**
 	 *
 	 */
-	public void testNonEntity() {
+	public void testWikiSyntax() {
 		String input = "";
 		String output = "";
-		input = "a";
-		output = "<p>a\n</p>";
+		input = "<pre><nowiki>test</nowiki></pre>";
+		output = "<pre>test</pre>\n";
 		assertEquals(output, this.parse(input));
-		input = "a b c 1 2 3";
-		output = "<p>a b c 1 2 3\n</p>";
+		input = "<pre>'''bold'''</pre>";
+		output = input+"\n";
 		assertEquals(output, this.parse(input));
 	}
 }
