@@ -630,7 +630,7 @@ public class Utilities {
 	 * @return An instance of the system parser.
 	 * @throws Exception Thrown if a parser instance can not be instantiated.
 	 */
-	private static AbstractParser parserInstance(ParserInput parserInput) throws Exception {
+	public static AbstractParser parserInstance(ParserInput parserInput) throws Exception {
 		String parserClass = Environment.getValue(Environment.PROP_PARSER_CLASS);
 		logger.fine("Using parser: " + parserClass);
 		Class clazz = ClassUtils.forName(parserClass);
