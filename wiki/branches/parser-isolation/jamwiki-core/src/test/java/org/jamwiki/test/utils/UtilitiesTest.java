@@ -27,6 +27,8 @@ import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Topic;
 import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.TableOfContents;
+import org.jamwiki.parser.TableOfContentsImpl;
 import org.jamwiki.utils.Utilities;
 
 public class UtilitiesTest extends TestCase {
@@ -81,39 +83,6 @@ public class UtilitiesTest extends TestCase {
 		// TODO
 	}
 
-	/**
-	 *
-	 */
-	public void testDecodeFromRequest() throws Throwable {
-		String result = Utilities.decodeFromRequest("Page_requested");
-		assertEquals("Page requested", result);
-	}
-
-	/**
-	 *
-	 */
-	public void testDecodeFromURL() throws Throwable {
-		String result = Utilities.decodeFromURL("\u1342%20");
-		assertEquals("\u1342 ", result);
-	}
-
-	/**
-	 *
-	 */
-	public void testEncodeForFilename() throws Throwable {
-		//TODO
-		String result = Utilities.encodeForFilename("testUtilitiesName");
-		assertEquals("result", "testUtilitiesName", result);
-	}
-
-	/**
-	 *
-	 */
-	public void testEncodeForURL() throws Throwable {
-		//TODO
-		String result = Utilities.encodeForURL(null);
-		assertNull("result", result);
-	}
 
 	/**
 	 *
@@ -421,7 +390,7 @@ public class UtilitiesTest extends TestCase {
 	}
 
 	private ParserInput getParserInput() {
-		ParserInput parserInput = new ParserInput();
+		ParserInput parserInput = new ParserInput(new TableOfContentsImpl());
 		parserInput.setTopicName("testUtilitiesTopicName");
 		parserInput.setVirtualWiki("testUtilitiesVirtualWiki");
 		parserInput.setContext("testUtilitiesContext");
@@ -432,7 +401,7 @@ public class UtilitiesTest extends TestCase {
 	 *
 	 */
 	public void testParseMinimal() throws Throwable {
-		ParserInput parserInput = new ParserInput();
+		ParserInput parserInput = new ParserInput(new TableOfContentsImpl());
 		parserInput.setVirtualWiki("testUtilitiesVirtualWiki");
 		parserInput.setTopicName("testUtilitiesTopicName");
 		String result = Utilities.parseMinimal(parserInput, "testUtilitiesContent");
@@ -696,7 +665,7 @@ public class UtilitiesTest extends TestCase {
 	 */
 	public void testParseMetadataThrowsException() throws Throwable {
 		try {
-			Utilities.parseMetadata(new ParserInput(), "testUtilitiesContent");
+			Utilities.parseMetadata(new ParserInput(new TableOfContentsImpl()), "testUtilitiesContent");
 			fail("Expected Exception to be thrown");
 		} catch (Exception ex) {
 			assertEquals("ex.getMessage()", "Parser info not properly initialized", ex.getMessage());
@@ -734,7 +703,7 @@ public class UtilitiesTest extends TestCase {
 	 */
 	public void testParseThrowsException() throws Throwable {
 		try {
-			Utilities.parse(new ParserInput(), null, "testUtilitiesContent");
+			Utilities.parse(new ParserInput(new TableOfContentsImpl()), null, "testUtilitiesContent");
 			fail("Expected Exception to be thrown");
 		} catch (Exception ex) {
 			assertEquals("ex.getMessage()", "Parser info not properly initialized", ex.getMessage());
