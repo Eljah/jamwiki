@@ -87,7 +87,10 @@
 			<artifactId>javadiff</artifactId>
 			<version>1.0.5</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-parser-api</artifactId>
+		</dependency>
 		<!-- dependencies in scope test -->		
 		<dependency>
 			<groupId>junit</groupId>

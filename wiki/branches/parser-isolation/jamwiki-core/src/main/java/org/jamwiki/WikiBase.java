@@ -18,7 +18,7 @@ package org.jamwiki;
 
 import java.util.Locale;
 import org.jamwiki.model.Topic;
-import org.jamwiki.model.WikiUser;
+import org.jamwiki.model.User;
 import org.jamwiki.search.LuceneSearchEngine;
 import org.jamwiki.search.SearchEngine;
 import org.jamwiki.utils.InterWikiHandler;
@@ -178,7 +178,7 @@ public class WikiBase {
 	 *  be created as a part of the initialization process.
 	 * @throws Exception Thrown if an error occurs during re-initialization.
 	 */
-	public static void reset(Locale locale, WikiUser user) throws Exception {
+	public static void reset(Locale locale, User user) throws Exception {
 		WikiBase.instance = new WikiBase();
 		WikiCache.initialize();
 		WikiBase.dataHandler.setup(locale, user);

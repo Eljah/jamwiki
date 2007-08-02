@@ -23,7 +23,6 @@ import java.util.Set;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationCredentialsNotFoundException;
 import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.userdetails.UserDetails;
 import org.jamwiki.WikiBase;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -34,7 +33,7 @@ import org.springframework.util.StringUtils;
  * Provides an object representing Wiki-specific information about a user of
  * the Wiki.
  */
-public class WikiUser implements UserDetails {
+public class WikiUser implements User {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiUser.class.getName());
 	private static final long serialVersionUID = -2818435399240684581L;
@@ -119,99 +118,99 @@ public class WikiUser implements UserDetails {
 		this.addRoles(authorities);
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getCreateDate()
 	 */
 	public Timestamp getCreateDate() {
 		return this.createDate;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setCreateDate(java.sql.Timestamp)
 	 */
 	public void setCreateDate(Timestamp createDate) {
 		this.createDate = createDate;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getCreateIpAddress()
 	 */
 	public String getCreateIpAddress() {
 		return this.createIpAddress;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setCreateIpAddress(java.lang.String)
 	 */
 	public void setCreateIpAddress(String createIpAddress) {
 		this.createIpAddress = createIpAddress;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getDefaultLocale()
 	 */
 	public String getDefaultLocale() {
 		return this.defaultLocale;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setDefaultLocale(java.lang.String)
 	 */
 	public void setDefaultLocale(String defaultLocale) {
 		this.defaultLocale = defaultLocale;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getDisplayName()
 	 */
 	public String getDisplayName() {
 		return this.displayName;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setDisplayName(java.lang.String)
 	 */
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getLastLoginDate()
 	 */
 	public Timestamp getLastLoginDate() {
 		return this.lastLoginDate;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setLastLoginDate(java.sql.Timestamp)
 	 */
 	public void setLastLoginDate(Timestamp lastLoginDate) {
 		this.lastLoginDate = lastLoginDate;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getLastLoginIpAddress()
 	 */
 	public String getLastLoginIpAddress() {
 		return this.lastLoginIpAddress;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setLastLoginIpAddress(java.lang.String)
 	 */
 	public void setLastLoginIpAddress(String lastLoginIpAddress) {
 		this.lastLoginIpAddress = lastLoginIpAddress;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getUserId()
 	 */
 	public int getUserId() {
 		return this.userId;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setUserId(int)
 	 */
 	public void setUserId(int userId) {
 		this.userId = userId;
@@ -219,10 +218,8 @@ public class WikiUser implements UserDetails {
 
 	// Acegi Security: UserDetails contract
 
-	/**
-	 * Returns granted authorites.
-	 *
-	 * @return authorites, never null.
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getAuthorities()
 	 */
 	public GrantedAuthority[] getAuthorities() {
 		return authorities;
@@ -236,53 +233,53 @@ public class WikiUser implements UserDetails {
 		this.authorities = authorities;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getPassword()
 	 */
 	public String getPassword() {
 		return password;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#setPassword(java.lang.String)
 	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#getUsername()
 	 */
 	public String getUsername() {
 		return username;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#isAccountNonExpired()
 	 */
 	public boolean isAccountNonExpired() {
 		// TODO Not yet implemented
 		return true;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#isAccountNonLocked()
 	 */
 	public boolean isAccountNonLocked() {
 		// TODO Not yet implemented
 		return true;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#isCredentialsNonExpired()
 	 */
 	public boolean isCredentialsNonExpired() {
 		// TODO Not yet implemented
 		return true;
 	}
 
-	/**
-	 *
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#isEnabled()
 	 */
 	public boolean isEnabled() {
 		// TODO Not yet implemented
@@ -341,14 +338,8 @@ public class WikiUser implements UserDetails {
 		this.addRoles(userRoles);
 	}
 
-	/**
-	 * Convenience method for determining if a user has been assigned a role
-	 * without the need to examine an array of Role objects.
-	 *
-	 * @param role If the user has been assigned this role then the method will
-	 *  return <code>true</code>.
-	 * @return <code>true</code> if the user has been assigned the specified
-	 *  role, <code>false</code> otherwise.
+	/* (non-Javadoc)
+	 * @see org.jamwiki.model.User#hasRole(org.jamwiki.model.Role)
 	 */
 	public boolean hasRole(Role role) {
 		if (this.authorities == null) {
@@ -376,13 +367,13 @@ public class WikiUser implements UserDetails {
 	 * @throws AuthenticationCredentialsNotFoundException If authentication
 	 *  credentials are unavailable.
 	 */
-	public static WikiUser initWikiUser(Authentication auth) throws AuthenticationCredentialsNotFoundException {
+	public static User initWikiUser(Authentication auth) throws AuthenticationCredentialsNotFoundException {
 		if (auth == null) {
 			throw new AuthenticationCredentialsNotFoundException("No authentication credential available");
 		}
 		if (auth.getPrincipal() instanceof WikiUser) {
 			// logged-in user
-			return (WikiUser)auth.getPrincipal();
+			return (User)auth.getPrincipal();
 		}
 		WikiUser user = new WikiUser();
 		user.setAuthorities(auth.getAuthorities());

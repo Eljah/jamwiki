@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
-import org.jamwiki.model.WikiUser;
+import org.jamwiki.model.User;
 import org.jamwiki.parser.ParserDocument;
 
 /**
@@ -51,7 +51,7 @@ public class TiddlyWikiParser {
 
     
     private String virtualWiki;
-    private WikiUser user;
+    private User user;
     private String authorIpAddress;
     
     /**
@@ -79,7 +79,7 @@ public class TiddlyWikiParser {
      * @param user user who is currently logged in
      * @param authorIpAddress IP address of uploading user
      */
-    public TiddlyWikiParser(String virtualWiki, WikiUser user, String authorIpAddress) {
+    public TiddlyWikiParser(String virtualWiki, User user, String authorIpAddress) {
             this.virtualWiki = virtualWiki;
             this.user = user;
             this.authorIpAddress = authorIpAddress;
@@ -92,7 +92,7 @@ public class TiddlyWikiParser {
      * @param authorIpAddress IP address of uploading user.
      * @param wikiBase Overwrites default WikiBaseFascade
      */
-    public TiddlyWikiParser(String virtualWiki, WikiUser user, String authorIpAddress, WikiBaseFascade wikiBase) {
+    public TiddlyWikiParser(String virtualWiki, User user, String authorIpAddress, WikiBaseFascade wikiBase) {
             this(virtualWiki, user, authorIpAddress);
             this.wikiBase = wikiBase;
     }

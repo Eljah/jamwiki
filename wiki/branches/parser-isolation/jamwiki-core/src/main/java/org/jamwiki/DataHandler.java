@@ -21,12 +21,12 @@ import java.util.Locale;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
+import org.jamwiki.model.User;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
-import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserInfo;
 import org.jamwiki.parser.ParserDocument;
 import org.jamwiki.utils.Pagination;
@@ -429,7 +429,7 @@ public interface DataHandler {
 	 *  <code>null</code> if no matching WikiUser exists.
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
-	public WikiUser lookupWikiUser(int userId, Object transactionObject) throws Exception;
+	public User lookupWikiUser(int userId, Object transactionObject) throws Exception;
 
 	/**
 	 * Retrieve a WikiUser object matching a given username.
@@ -443,7 +443,7 @@ public interface DataHandler {
 	 *  <code>null</code> if no matching WikiUser exists.
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
-	public WikiUser lookupWikiUser(String username, Object transactionObject) throws Exception;
+	public User lookupWikiUser(String username, Object transactionObject) throws Exception;
 
 	/**
 	 * Return a count of all wiki users.
@@ -502,7 +502,7 @@ public interface DataHandler {
 	 *  other DataHandler parameters.
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
-	public void setup(Locale locale, WikiUser user) throws Exception;
+	public void setup(Locale locale, User user) throws Exception;
 
 	/**
 	 * Create the special pages used on the wiki, such as the left menu and
@@ -521,7 +521,7 @@ public interface DataHandler {
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
 	// FIXME - move this to another location
-	public void setupSpecialPages(Locale locale, WikiUser user, VirtualWiki virtualWiki, Object transactionObject) throws Exception;
+	public void setupSpecialPages(Locale locale, User user, VirtualWiki virtualWiki, Object transactionObject) throws Exception;
 
 	/**
 	 * Undelete a previously deleted topic by setting its delete date to a
@@ -563,7 +563,7 @@ public interface DataHandler {
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
 	// FIXME - move this to another location
-	public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, WikiUser user, String ipAddress, Object transactionObject) throws Exception;
+	public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, User user, String ipAddress, Object transactionObject) throws Exception;
 
 	/**
 	 * Add or update a WikiFile object.  This method will add a new record if
@@ -725,5 +725,5 @@ public interface DataHandler {
 	 *  transaction then this value should be <code>null</code>.
 	 * @throws Exception Thrown if any error occurs during method execution.
 	 */
-	public void writeWikiUser(WikiUser user, WikiUserInfo userInfo, Object transactionObject) throws Exception;
+	public void writeWikiUser(User user, WikiUserInfo userInfo, Object transactionObject) throws Exception;
 }

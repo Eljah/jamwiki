@@ -23,7 +23,7 @@ import javax.xml.parsers.SAXParser;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
-import org.jamwiki.model.WikiUser;
+import org.jamwiki.model.User;
 import org.springframework.util.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -38,7 +38,7 @@ public class XMLTopicFactory extends DefaultHandler {
 	/** Amount to indent */
 	private static final String XML_INDENT = "    ";
 
-	private final WikiUser user;
+	private final User user;
 	private final String authorIpAddress;
 	private int indentLevel = 0;
 	String virtualWiki = "en";
@@ -57,7 +57,7 @@ public class XMLTopicFactory extends DefaultHandler {
 	/**
 	 *
 	 */
-	public XMLTopicFactory(String virtualWiki, WikiUser user, String authorIpAddress) {
+	public XMLTopicFactory(String virtualWiki, User user, String authorIpAddress) {
 		this.virtualWiki = virtualWiki;
 		this.authorIpAddress = authorIpAddress;
 		this.user = user;
