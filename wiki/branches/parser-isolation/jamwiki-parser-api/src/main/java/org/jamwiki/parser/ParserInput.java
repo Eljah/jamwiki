@@ -33,7 +33,7 @@ public class ParserInput {
 	/** Depth is used to prevent infinite nesting of templates and other objects. */
 	private int depth = 0;
 	private Locale locale = null;
-	private TableOfContents tableOfContents = new TableOfContents();
+	private TableOfContents tableOfContents = new TableOfContentsImpl();
 	/** Template inclusion tracks whether or not template code is being parsed.  A counter is used to deal with nested templates. */
 	private int templateDepth = 0;
 	/** Hashtable of generic temporary objects used during parsing. */
