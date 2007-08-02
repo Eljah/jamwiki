@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jamwiki</groupId>
-  <artifactId>jamwiki-parser-api</artifactId>
-  <version>0.0.1</version>
-  <description>The API that a JamWiki parser must implement.</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>jamwiki-parent</artifactId>
+		<groupId>org.jamwiki</groupId>
+		<version>0.2-SNAPSHOT</version>
+		<relativePath>../jamwiki-parent</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jamwiki-parser-api</artifactId>
+	<version>0.6.1-SNAPSHOT</version>
+	<description>
+		The API that a JamWiki parser must implement.
+	</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-commons</artifactId>
+		</dependency>
+	</dependencies>
 </project>
 
