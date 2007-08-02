@@ -21,6 +21,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jamwiki.Environment;
+import org.jamwiki.WikiEnvironment;
+import org.jamwiki.utils.URLUtils;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.Utilities;
 import org.springframework.web.util.HtmlUtils;
@@ -128,7 +130,7 @@ public class TableOfContentsImpl implements TableOfContents {
 			// TOC disallowed
 			return "";
 		}
-		if (!Environment.getBooleanValue(Environment.PROP_PARSER_TOC)) {
+		if (!WikiEnvironment.getBooleanValue(Environment.PROP_PARSER_TOC)) {
 			// TOC turned off for the wiki
 			return "";
 		}
@@ -211,13 +213,13 @@ public class TableOfContentsImpl implements TableOfContents {
 			entry = (TableOfContentsEntry)e.nextElement();
 			// adjusted level determines how far to indent the list
 			adjustedLevel = ((entry.level - minLevel) + 1);
-			if (adjustedLevel > Environment.getIntValue(Environment.PROP_PARSER_TOC_DEPTH)) {
+			if (adjustedLevel > WikiEnvironment.getIntValue(Environment.PROP_PARSER_TOC_DEPTH)) {
 				// do not display if nested deeper than max
 				continue;
 			}
 			closeList(adjustedLevel, text);
 			openList(adjustedLevel, text);
-			text.append("<a href=\"#").append(Utilities.encodeForURL(entry.name)).append("\">").append(HtmlUtils.htmlEscape(entry.text)).append("</a>");
+			text.append("<a href=\"#").append(URLUtils.encodeForURL(entry.name)).append("\">").append(HtmlUtils.htmlEscape(entry.text)).append("</a>");
 		}
 		closeList(0, text);
 		text.append("</td></tr></table>");

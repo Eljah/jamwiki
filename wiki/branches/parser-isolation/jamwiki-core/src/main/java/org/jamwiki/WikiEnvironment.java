@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Properties;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.jamwiki.Environment;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -31,78 +32,9 @@ import org.jamwiki.utils.WikiLogger;
 /**
  * Provides access to JAMWiki property values.
  */
-public class Environment {
-	private static final WikiLogger logger = WikiLogger.getLogger(Environment.class.getName());
+public class WikiEnvironment implements Environment {
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiEnvironment.class.getName());
 
-	public static final String PROP_BASE_COOKIE_EXPIRE = "cookie-expire";
-	public static final String PROP_BASE_DEFAULT_TOPIC = "default-topic";
-	public static final String PROP_BASE_FILE_DIR = "homeDir";
-	public static final String PROP_BASE_INITIALIZED = "props-initialized";
-	public static final String PROP_BASE_LOGO_IMAGE = "logo-image";
-	public static final String PROP_BASE_META_DESCRIPTION = "meta-description";
-	public static final String PROP_BASE_PERSISTENCE_TYPE = "persistenceType";
-	public static final String PROP_BASE_USER_HANDLER = "user-handler";
-	public static final String PROP_BASE_WIKI_VERSION = "wiki-version";
-	public static final String PROP_CACHE_INDIVIDUAL_SIZE = "cache-individual-size";
-	public static final String PROP_CACHE_MAX_AGE = "cache-max-age";
-	public static final String PROP_CACHE_MAX_IDLE_AGE = "cache-max-idle-age";
-	public static final String PROP_CACHE_TOTAL_SIZE = "cache-total-size";
-	public static final String PROP_DB_DRIVER= "driver";
-	public static final String PROP_DB_PASSWORD = "db-password";
-	public static final String PROP_DB_TYPE = "database-type";
-	public static final String PROP_DB_URL = "url";
-	public static final String PROP_DB_USERNAME = "db-user";
-	public static final String PROP_DBCP_MAX_ACTIVE = "dbcp-max-active";
-	public static final String PROP_DBCP_MAX_IDLE = "dbcp-max-idle";
-	public static final String PROP_DBCP_MIN_EVICTABLE_IDLE_TIME = "dbcp-min-evictable-idle-time";
-	public static final String PROP_DBCP_NUM_TESTS_PER_EVICTION_RUN = "dbcp-num-tests-per-eviction-run";
-	public static final String PROP_DBCP_TEST_ON_BORROW = "dbcp-test-on-borrow";
-	public static final String PROP_DBCP_TEST_ON_RETURN = "dbcp-test-on-return";
-	public static final String PROP_DBCP_TEST_WHILE_IDLE = "dbcp-test-while-idle";
-	public static final String PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS = "dbcp-time-between-eviction-runs";
-	public static final String PROP_DBCP_WHEN_EXHAUSTED_ACTION = "dbcp-when-exhausted-action";
-	public static final String PROP_EMAIL_REPLY_ADDRESS = "reply-address";
-	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
-	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-password";
-	public static final String PROP_EMAIL_SMTP_USERNAME = "smtp-username";
-	public static final String PROP_ENCRYPTION_ALGORITHM = "encryption-algorithm";
-	public static final String PROP_EXTERNAL_LINK_NEW_WINDOW = "external-link-new-window";
-	public static final String PROP_FILE_BLACKLIST = "file-blacklist";
-	public static final String PROP_FILE_BLACKLIST_TYPE = "file-blacklist-type";
-	public static final String PROP_FILE_DIR_FULL_PATH = "file-dir-full-path";
-	public static final String PROP_FILE_DIR_RELATIVE_PATH = "file-dir-relative-path";
-	public static final String PROP_FILE_MAX_FILE_SIZE = "max-file-size";
-	public static final String PROP_FILE_WHITELIST = "file-whitelist";
-	public static final String PROP_IMAGE_RESIZE_INCREMENT = "image-resize-increment";
-	public static final String PROP_LDAP_FACTORY_CLASS = "ldap-factory-class";
-	public static final String PROP_LDAP_CONTEXT = "ldap-context";
-	public static final String PROP_LDAP_FIELD_EMAIL = "ldap-field-email";
-	public static final String PROP_LDAP_FIELD_FIRST_NAME = "ldap-field-first-name";
-	public static final String PROP_LDAP_FIELD_LAST_NAME = "ldap-field-last-name";
-	public static final String PROP_LDAP_FIELD_USERID = "ldap-field-login";
-	public static final String PROP_LDAP_LOGIN = "ldap-login";
-	public static final String PROP_LDAP_PASSWORD = "ldap-password";
-	public static final String PROP_LDAP_SECURITY_AUTHENTICATION = "ldap-security";
-	public static final String PROP_LDAP_URL = "ldap-url";
-	public static final String PROP_PARSER_ALLOW_HTML = "allowHTML";
-	public static final String PROP_PARSER_ALLOW_JAVASCRIPT = "allow-javascript";
-	public static final String PROP_PARSER_ALLOW_TEMPLATES = "allow-templates";
-	public static final String PROP_PARSER_CLASS = "parser";
-	public static final String PROP_PARSER_SIGNATURE_DATE_PATTERN = "signature-date";
-	public static final String PROP_PARSER_SIGNATURE_USER_PATTERN = "signature-user";
-	public static final String PROP_PARSER_TOC = "allow-toc";
-	public static final String PROP_PARSER_TOC_DEPTH = "toc-depth";
-	public static final String PROP_PRINT_NEW_WINDOW = "print-new-window";
-	public static final String PROP_RECENT_CHANGES_NUM = "recent-changes-days";
-	public static final String PROP_RSS_ALLOWED = "rss-allowed";
-	public static final String PROP_RSS_TITLE = "rss-title";
-	// FIXME - this property can be removed once the abilitity to upgrade to 0.6.0 is removed
-	public static final String PROP_TOPIC_FORCE_USERNAME = "force-username";
-	// FIXME - this property can be removed once the abilitity to upgrade to 0.6.0 is removed
-	public static final String PROP_TOPIC_NON_ADMIN_TOPIC_MOVE = "non-admin-redirect";
-	public static final String PROP_TOPIC_SPAM_FILTER = "use-spam-filter";
-	public static final String PROP_TOPIC_USE_PREVIEW = "use-preview";
-	public static final String PROP_TOPIC_WYSIWYG = "wysiwyg-editor";
 	private static final String PROPERTY_FILE_NAME = "jamwiki.properties";
 
 	private static Properties defaults = null;
@@ -111,13 +43,13 @@ public class Environment {
 
 	// initialize the singleton instance
 	static {
-		instance = new Environment();
+		instance = new WikiEnvironment();
 	}
 
 	/**
 	 * The constructor loads property values from the property file.
 	 */
-	private Environment() {
+	private WikiEnvironment() {
 		try {
 			initDefaultProperties();
 			logger.fine("Default properties initialized: " + defaults.toString());
@@ -146,7 +78,7 @@ public class Environment {
 			return file; //NOPMD
 		}
 		// search for file in class loader path
-		return Environment.retrievePropertyFile(filename);
+		return WikiEnvironment.retrievePropertyFile(filename);
 	}
 
 	/**
@@ -371,7 +303,7 @@ public class Environment {
 	 *  error occurs.
 	 */
 	public static void saveProperties() throws IOException {
-		Environment.saveProperties(PROPERTY_FILE_NAME, props, null);
+		WikiEnvironment.saveProperties(PROPERTY_FILE_NAME, props, null);
 	}
 
 	/**

@@ -23,6 +23,8 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
+
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.Environment;
 
 /**
@@ -84,9 +86,9 @@ public class WikiCache {
 	 */
 	private static Cache getCache(String cacheName) {
 		if (!WikiCache.cacheManager.cacheExists(cacheName)) {
-			int maxSize = Environment.getIntValue(Environment.PROP_CACHE_INDIVIDUAL_SIZE);
-			int maxAge = Environment.getIntValue(Environment.PROP_CACHE_MAX_AGE);
-			int maxIdleAge = Environment.getIntValue(Environment.PROP_CACHE_MAX_IDLE_AGE);
+			int maxSize = WikiEnvironment.getIntValue(WikiEnvironment.PROP_CACHE_INDIVIDUAL_SIZE);
+			int maxAge = WikiEnvironment.getIntValue(WikiEnvironment.PROP_CACHE_MAX_AGE);
+			int maxIdleAge = WikiEnvironment.getIntValue(WikiEnvironment.PROP_CACHE_MAX_IDLE_AGE);
 			Cache cache = new Cache(cacheName, maxSize, true, false, maxAge, maxIdleAge);
 			WikiCache.cacheManager.addCache(cache);
 		}
@@ -103,7 +105,7 @@ public class WikiCache {
 				WikiCache.cacheManager.removalAll();
 				WikiCache.cacheManager.shutdown();
 			}
-			File directory = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), CACHE_DIR);
+			File directory = new File(WikiEnvironment.getValue(Environment.PROP_BASE_FILE_DIR), CACHE_DIR);
 			if (!directory.exists()) {
 				directory.mkdir();
 			}
@@ -112,7 +114,7 @@ public class WikiCache {
 			defaultCacheConfiguration.setDiskPersistent(false);
 			defaultCacheConfiguration.setEternal(false);
 			defaultCacheConfiguration.setOverflowToDisk(true);
-			defaultCacheConfiguration.setMaxElementsInMemory(Environment.getIntValue(Environment.PROP_CACHE_TOTAL_SIZE));
+			defaultCacheConfiguration.setMaxElementsInMemory(WikiEnvironment.getIntValue(Environment.PROP_CACHE_TOTAL_SIZE));
 			defaultCacheConfiguration.setName("defaultCache");
 			configuration.addDefaultCache(defaultCacheConfiguration);
 			DiskStoreConfiguration diskStoreConfiguration = new DiskStoreConfiguration();

@@ -40,9 +40,10 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLEncoder;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.FSDirectory;
-import org.jamwiki.Environment;
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.Environment;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.ParserDocument;
@@ -274,7 +275,7 @@ public class LuceneSearchEngine implements SearchEngine {
 	 * Get the path, which holds all index files
 	 */
 	private String getSearchIndexPath(String virtualWiki) {
-		File parent = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), SEARCH_DIR);
+		File parent = new File(WikiEnvironment.getValue(Environment.PROP_BASE_FILE_DIR), SEARCH_DIR);
 		try {
 			if (System.getProperty("org.apache.lucene.lockdir") == null) {
 				// set the Lucene lock directory.  this defaults to java.io.tmpdir,

@@ -18,8 +18,9 @@ package org.jamwiki.utils;
 
 import java.io.File;
 import org.apache.commons.io.FilenameUtils;
-import org.jamwiki.Environment;
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.Environment;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiImage;
@@ -68,9 +69,9 @@ public class LinkUtil {
 		if (!StringUtils.hasText(param)) {
 			return query;
 		}
-		url += Utilities.encodeForURL(param) + "=";
+		url += URLUtils.encodeForURL(param) + "=";
 		if (StringUtils.hasText(value)) {
-			url += Utilities.encodeForURL(value);
+			url += URLUtils.encodeForURL(value);
 		}
 		return url;
 	}
@@ -151,7 +152,7 @@ public class LinkUtil {
 			if (!StringUtils.hasText(caption)) {
 				caption = topicName.substring(NamespaceHandler.NAMESPACE_IMAGE.length() + 1);
 			}
-			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + wikiFile.getUrl());
+			String url = FilenameUtils.normalize(WikiEnvironment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + wikiFile.getUrl());
 			url = FilenameUtils.separatorsToUnix(url);
 			return "<a href=\"" + url + "\">" + HtmlUtils.htmlEscape(caption) + "</a>";
 		}
@@ -187,7 +188,7 @@ public class LinkUtil {
 			style = "wikiimg";
 		}
 		html += "<img class=\"" + style + "\" src=\"";
-		String url = new File(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH), wikiImage.getUrl()).getPath();
+		String url = new File(WikiEnvironment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH), wikiImage.getUrl()).getPath();
 		url = FilenameUtils.separatorsToUnix(url);
 		html += url;
 		html += "\"";
@@ -305,7 +306,7 @@ public class LinkUtil {
 		String section = wikiLink.getSection();
 		String query = wikiLink.getQuery();
 		if (!StringUtils.hasText(topic) && StringUtils.hasText(section)) {
-			return "#" + Utilities.encodeForURL(section);
+			return "#" + URLUtils.encodeForURL(section);
 		}
 		if (!WikiBase.exists(virtualWiki, topic)) {
 			return LinkUtil.buildEditLinkUrl(context, virtualWiki, topic, query, -1);
@@ -317,14 +318,14 @@ public class LinkUtil {
 		// context never ends with a "/" per servlet specification
 		url += "/";
 		// get the virtual wiki, which should have been set by the parent servlet
-		url += Utilities.encodeForURL(virtualWiki);
+		url += URLUtils.encodeForURL(virtualWiki);
 		url += "/";
-		url += Utilities.encodeForURL(topic);
+		url += URLUtils.encodeForURL(topic);
 		if (StringUtils.hasText(section)) {
 			if (!section.startsWith("#")) {
 				url += "#";
 			}
-			url += Utilities.encodeForURL(section);
+			url += URLUtils.encodeForURL(section);
 		}
 		if (StringUtils.hasText(query)) {
 			if (!query.startsWith("?")) {
@@ -393,9 +394,9 @@ public class LinkUtil {
 		if (namespacePos > 0) {
 			topic = processed.substring(namespacePos + 1);
 		}
-		wikiLink.setArticle(Utilities.decodeFromURL(topic));
+		wikiLink.setArticle(URLUtils.decodeFromURL(topic));
 		// destination is namespace + topic
-		wikiLink.setDestination(Utilities.decodeFromURL(processed));
+		wikiLink.setDestination(URLUtils.decodeFromURL(processed));
 		return wikiLink;
 	}
 }

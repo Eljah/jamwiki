@@ -38,12 +38,13 @@ import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.commons.io.FileUtils;
 import org.jamwiki.DataHandler;
-import org.jamwiki.Environment;
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.UserHandler;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.WikiVersion;
+import org.jamwiki.Environment;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.User;
@@ -51,6 +52,7 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.AbstractParser;
 import org.jamwiki.parser.ParserDocument;
 import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.TableOfContentsImpl;
 import org.springframework.beans.propertyeditors.LocaleEditor;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -164,35 +166,35 @@ public class Utilities {
 	public static DataHandler dataHandlerInstance() throws Exception {
 		// FIXME - remove this conditional after the ability to upgrade to
 		// 0.5.0 is removed.
-		if (Environment.getValue(Environment.PROP_DB_TYPE) == null) {
+		if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE) == null) {
 			// this is a problem, but it should never occur
 			logger.warning("Utilities.dataHandlerInstance called without a valid PROP_DB_TYPE value");
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("ansi")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_ANSI);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("hsql")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_HSQL);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("mssql")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_MSSQL);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("mysql")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_MYSQL);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("oracle")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_ORACLE);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("postgres")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_POSTGRES);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("db2")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_DB2);
-			Environment.saveProperties();
-		} else if (Environment.getValue(Environment.PROP_DB_TYPE).equals("db2/400")) {
-			Environment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_DB2400);
-			Environment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("ansi")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_ANSI);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("hsql")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_HSQL);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("mssql")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_MSSQL);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("mysql")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_MYSQL);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("oracle")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_ORACLE);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("postgres")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_POSTGRES);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("db2")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_DB2);
+			WikiEnvironment.saveProperties();
+		} else if (WikiEnvironment.getValue(Environment.PROP_DB_TYPE).equals("db2/400")) {
+			WikiEnvironment.setValue(Environment.PROP_DB_TYPE, WikiBase.DATA_HANDLER_DB2400);
+			WikiEnvironment.saveProperties();
 		}
-		String dataHandlerClass = Environment.getValue(Environment.PROP_DB_TYPE);
+		String dataHandlerClass = WikiEnvironment.getValue(Environment.PROP_DB_TYPE);
 		logger.fine("Using data handler: " + dataHandlerClass);
 		Class clazz = ClassUtils.forName(dataHandlerClass);
 		Class[] parameterTypes = new Class[0];
@@ -201,74 +203,6 @@ public class Utilities {
 		return (DataHandler)constructor.newInstance(initArgs);
 	}
 
-	/**
-	 * Decode a value that has been retrieved from a servlet request.  This
-	 * method will replace any underscores with spaces.
-	 *
-	 * @param url The encoded value that is to be decoded.
-	 * @return A decoded value.
-	 */
-	public static String decodeFromRequest(String url) {
-		// convert underscores to spaces
-		return StringUtils.replace(url, "_", " ");
-	}
-
-	/**
-	 * Decode a value that has been retrieved directly from a URL or file
-	 * name.  This method will URL decode the value and then replace any
-	 * underscores with spaces.  Note that this method SHOULD NOT be called
-	 * for values retrieved using request.getParameter(), but only values
-	 * taken directly from a URL.
-	 *
-	 * @param url The encoded value that is to be decoded.
-	 * @return A decoded value.
-	 */
-	public static String decodeFromURL(String url) {
-		String result = url;
-		try {
-			result = URLDecoder.decode(result, "UTF-8");
-		} catch (Exception e) {
-			logger.info("Failure while decoding url " + url + " with charset UTF-8");
-		}
-		return Utilities.decodeFromRequest(result);
-	}
-
-	/**
-	 * Convert a topic name or other value into a value suitable for use as a
-	 * file name.  This method replaces spaces with underscores, and then URL
-	 * encodes the value.
-	 *
-	 * @param name The value that is to be encoded for use as a file name.
-	 * @return The encoded value.
-	 */
-	public static String encodeForFilename(String name) {
-		// replace spaces with underscores
-		String result = StringUtils.replace(name, " ", "_");
-		// URL encode the rest of the name
-		try {
-			result = URLEncoder.encode(result, "UTF-8");
-		} catch (Exception e) {
-			logger.warning("Failure while encoding " + name + " with charset UTF-8");
-		}
-		return result;
-	}
-
-	/**
-	 * Encode a topic name for use in a URL.  This method will replace spaces
-	 * with underscores and URL encode the value, but it will not URL encode
-	 * colons.
-	 *
-	 * @param url The topic name to be encoded for use in a URL.
-	 * @return The encoded topic name value.
-	 */
-	public static String encodeForURL(String url) {
-		String result = Utilities.encodeForFilename(url);
-		// un-encode colons
-		result = StringUtils.replace(result, "%3A", ":");
-		// un-encode forward slashes
-		result = StringUtils.replace(result, "%2F", "/");
-		return result;
-	}
 
 	/**
 	 * Given an article name, return the appropriate comments topic article name.
@@ -484,7 +418,7 @@ public class Utilities {
 	 *  <code>false</code> otherwise.
 	 */
 	public static boolean isFirstUse() {
-		return !Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED);
+		return !WikiEnvironment.getBooleanValue(Environment.PROP_BASE_INITIALIZED);
 	}
 
 	/**
@@ -498,7 +432,7 @@ public class Utilities {
 		if (Utilities.isFirstUse()) {
 			return false;
 		}
-		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
+		WikiVersion oldVersion = new WikiVersion(WikiEnvironment.getValue(Environment.PROP_BASE_WIKI_VERSION));
 		WikiVersion currentVersion = new WikiVersion(WikiVersion.CURRENT_WIKI_VERSION);
 		return (oldVersion.before(currentVersion));
 	}
@@ -616,7 +550,7 @@ public class Utilities {
 	 * @throws Exception Thrown if a parser error occurs.
 	 */
 	public static ParserDocument parserDocument(String content, String virtualWiki, String topicName) throws Exception {
-		ParserInput parserInput = new ParserInput();
+		ParserInput parserInput = new ParserInput(new TableOfContentsImpl());
 		parserInput.setVirtualWiki(virtualWiki);
 		parserInput.setTopicName(topicName);
 		parserInput.setAllowSectionEdit(false);
@@ -632,7 +566,7 @@ public class Utilities {
 	 * @throws Exception Thrown if a parser instance can not be instantiated.
 	 */
 	public static AbstractParser parserInstance(ParserInput parserInput) throws Exception {
-		String parserClass = Environment.getValue(Environment.PROP_PARSER_CLASS);
+		String parserClass = WikiEnvironment.getValue(Environment.PROP_PARSER_CLASS);
 		logger.fine("Using parser: " + parserClass);
 		Class clazz = ClassUtils.forName(parserClass);
 		Class[] parameterTypes = new Class[1];
@@ -704,7 +638,7 @@ public class Utilities {
 		if (StringUtils.hasText(language) && StringUtils.hasText(country)) {
 			try {
 				subdirectory = new File(WikiBase.SPECIAL_PAGE_DIR, language + "_" + country).getPath();
-				filename = new File(subdirectory, Utilities.encodeForFilename(pageName) + ".txt").getPath();
+				filename = new File(subdirectory, URLUtils.encodeForFilename(pageName) + ".txt").getPath();
 				contents = Utilities.readFile(filename);
 			} catch (Exception e) {
 				logger.info("File " + filename + " does not exist");
@@ -713,7 +647,7 @@ public class Utilities {
 		if (contents == null && StringUtils.hasText(language)) {
 			try {
 				subdirectory = new File(WikiBase.SPECIAL_PAGE_DIR, language).getPath();
-				filename = new File(subdirectory, Utilities.encodeForFilename(pageName) + ".txt").getPath();
+				filename = new File(subdirectory, URLUtils.encodeForFilename(pageName) + ".txt").getPath();
 				contents = Utilities.readFile(filename);
 			} catch (Exception e) {
 				logger.info("File " + filename + " does not exist");
@@ -722,7 +656,7 @@ public class Utilities {
 		if (contents == null) {
 			try {
 				subdirectory = new File(WikiBase.SPECIAL_PAGE_DIR).getPath();
-				filename = new File(subdirectory, Utilities.encodeForFilename(pageName) + ".txt").getPath();
+				filename = new File(subdirectory, URLUtils.encodeForFilename(pageName) + ".txt").getPath();
 				contents = Utilities.readFile(filename);
 			} catch (Exception e) {
 				logger.warning("File " + filename + " could not be read", e);
@@ -744,12 +678,12 @@ public class Utilities {
 	 */
 	public static List retrieveUploadFileList() {
 		List list = new Vector();
-		int blacklistType = Environment.getIntValue(Environment.PROP_FILE_BLACKLIST_TYPE);
+		int blacklistType = WikiEnvironment.getIntValue(Environment.PROP_FILE_BLACKLIST_TYPE);
 		String listString = "";
 		if (blacklistType == WikiBase.UPLOAD_BLACKLIST) {
-			listString = Environment.getValue(Environment.PROP_FILE_BLACKLIST);
+			listString = WikiEnvironment.getValue(Environment.PROP_FILE_BLACKLIST);
 		} else if (blacklistType == WikiBase.UPLOAD_WHITELIST) {
-			listString = Environment.getValue(Environment.PROP_FILE_WHITELIST);
+			listString = WikiEnvironment.getValue(Environment.PROP_FILE_WHITELIST);
 		}
 		StringTokenizer tokens = new StringTokenizer(listString, "\n\r ,.");
 		while (tokens.hasMoreTokens()) {
@@ -771,7 +705,7 @@ public class Utilities {
 	 *  instantiated.
 	 */
 	public static UserHandler userHandlerInstance() throws Exception {
-		String userHandlerClass = Environment.getValue(Environment.PROP_BASE_USER_HANDLER);
+		String userHandlerClass = WikiEnvironment.getValue(Environment.PROP_BASE_USER_HANDLER);
 		logger.fine("Using user handler: " + userHandlerClass);
 		Class clazz = ClassUtils.forName(userHandlerClass);
 		Class[] parameterTypes = new Class[0];

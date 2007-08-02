@@ -21,6 +21,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.Environment;
 
 /**
@@ -56,7 +57,7 @@ public class SpamFilter {
 	 *  or matching against the spam filter regular expressions.
 	 */
 	public static String containsSpam(String content) throws Exception {
-		if (!Environment.getBooleanValue(Environment.PROP_TOPIC_SPAM_FILTER)) {
+		if (!WikiEnvironment.getBooleanValue(Environment.PROP_TOPIC_SPAM_FILTER)) {
 			return null;
 		}
 		long start = System.currentTimeMillis();

@@ -25,6 +25,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.Environment;
 import org.springframework.util.StringUtils;
 
@@ -82,7 +83,7 @@ public class Encryption {
 	 */
 	public static String encrypt(String unencryptedString) throws Exception {
 		MessageDigest md = null;
-		String encryptionAlgorithm = Environment.getValue(Environment.PROP_ENCRYPTION_ALGORITHM);
+		String encryptionAlgorithm = WikiEnvironment.getValue(Environment.PROP_ENCRYPTION_ALGORITHM);
 		try {
 			md = MessageDigest.getInstance(encryptionAlgorithm);
 		} catch (NoSuchAlgorithmException e) {
@@ -99,8 +100,8 @@ public class Encryption {
 			try {
 				// save the algorithm so that if the user upgrades the JDK they can
 				// still use passwords encrypted with the weaker algorithm
-				Environment.setValue(Environment.PROP_ENCRYPTION_ALGORITHM, "SHA-1");
-				Environment.saveProperties();
+				WikiEnvironment.setValue(Environment.PROP_ENCRYPTION_ALGORITHM, "SHA-1");
+				WikiEnvironment.saveProperties();
 			} catch (Exception e) {
 				logger.info("Failure while saving encryption algorithm property", e);
 			}
@@ -176,7 +177,7 @@ public class Encryption {
 		if (props != null) {
 			return Encryption.decrypt64(props.getProperty(name));
 		}
-		return Encryption.decrypt64(Environment.getValue(name));
+		return Encryption.decrypt64(WikiEnvironment.getValue(name));
 	}
 
 	/**
@@ -192,7 +193,7 @@ public class Encryption {
 			encrypted = "";
 		}
 		if (props == null) {
-			Environment.setValue(name, encrypted);
+			WikiEnvironment.setValue(name, encrypted);
 		} else {
 			props.setProperty(name, encrypted);
 		}

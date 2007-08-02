@@ -17,6 +17,8 @@
 package org.jamwiki;
 
 import java.util.Locale;
+
+import org.jamwiki.Environment;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.User;
 import org.jamwiki.search.LuceneSearchEngine;
@@ -134,7 +136,7 @@ public class WikiBase {
 		if (InterWikiHandler.isInterWiki(topicName)) {
 			return true;
 		}
-		if (!StringUtils.hasText(Environment.getValue(Environment.PROP_BASE_FILE_DIR)) || !Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
+		if (!StringUtils.hasText(WikiEnvironment.getValue(Environment.PROP_BASE_FILE_DIR)) || !WikiEnvironment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
 			// not initialized yet
 			return false;
 		}

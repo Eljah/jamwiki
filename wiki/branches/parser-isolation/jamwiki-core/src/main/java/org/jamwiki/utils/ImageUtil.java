@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javax.imageio.ImageIO;
 import net.sf.ehcache.Element;
+
+import org.jamwiki.WikiEnvironment;
 import org.jamwiki.Environment;
 import org.jamwiki.model.WikiImage;
 import org.jamwiki.model.WikiFile;
@@ -48,7 +50,7 @@ public class ImageUtil {
 	 *
 	 */
 	private static int calculateImageIncrement(int maxDimension) {
-		int increment = Environment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
+		int increment = WikiEnvironment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
 		double result = Math.ceil((double)maxDimension / (double)increment) * increment;
 		return (int)result;
 	}
@@ -90,7 +92,7 @@ public class ImageUtil {
 			imageObject = ImageUtil.resizeImage(wikiImage, maxDimension);
 			setScaledDimensions(imageObject, wikiImage, maxDimension);
 		} else {
-			File imageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
+			File imageFile = new File(WikiEnvironment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
 			imageObject = ImageUtil.loadImage(imageFile);
 			wikiImage.setWidth(imageObject.getWidth());
 			wikiImage.setHeight(imageObject.getHeight());
@@ -143,10 +145,10 @@ public class ImageUtil {
 	 * or height exceeds the value specified.
 	 */
 	private static BufferedImage resizeImage(WikiImage wikiImage, int maxDimension) throws Exception {
-		File imageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
+		File imageFile = new File(WikiEnvironment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
 		BufferedImage original = ImageUtil.loadImage(imageFile);
 		maxDimension = calculateImageIncrement(maxDimension);
-		int increment = Environment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
+		int increment = WikiEnvironment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
 		if (increment <= 0 || (maxDimension > original.getWidth() && maxDimension > original.getHeight())) {
 			// let the browser scale the image
 			return original;
@@ -159,7 +161,7 @@ public class ImageUtil {
 			newUrl += "-" + maxDimension + "px";
 		}
 		wikiImage.setUrl(newUrl);
-		File newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
+		File newImageFile = new File(WikiEnvironment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
 		if (newImageFile.exists()) {
 			return ImageUtil.loadImage(newImageFile);
 		}

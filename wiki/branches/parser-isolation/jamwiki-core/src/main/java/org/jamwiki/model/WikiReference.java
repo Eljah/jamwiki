@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import org.jamwiki.utils.URLUtils;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.util.StringUtils;
@@ -78,7 +79,7 @@ public class WikiReference {
 		if (!StringUtils.hasText(this.name)) {
 			return "_note-" + this.citation;
 		}
-		return "_note-" + Utilities.encodeForURL(this.name);
+		return "_note-" + URLUtils.encodeForURL(this.name);
 	}
 
 	/**
@@ -88,6 +89,6 @@ public class WikiReference {
 		if (!StringUtils.hasText(this.name)) {
 			return "_ref-" + this.citation;
 		}
-		return "_ref-" + Utilities.encodeForURL(this.name) + "_" + this.count;
+		return "_ref-" + URLUtils.encodeForURL(this.name) + "_" + this.count;
 	}
 }
