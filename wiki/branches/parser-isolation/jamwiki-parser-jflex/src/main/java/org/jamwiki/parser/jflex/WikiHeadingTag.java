@@ -95,7 +95,7 @@ public class WikiHeadingTag implements ParserTag {
 		output += "<h" + level + ">";
 		output += ParserUtil.parseFragment(parserInput, tagText, mode);
 		output += "</h" + level + ">";
-		return output.toString();
+		return output;
 	}
 
 	/**
