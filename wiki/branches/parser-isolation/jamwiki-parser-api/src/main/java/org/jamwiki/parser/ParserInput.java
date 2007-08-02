@@ -19,7 +19,6 @@ package org.jamwiki.parser;
 import java.util.Hashtable;
 import java.util.Locale;
 import org.jamwiki.model.Role;
-import org.jamwiki.model.TableOfContents;
 import org.jamwiki.model.User;
 
 /**
@@ -33,7 +32,7 @@ public class ParserInput {
 	/** Depth is used to prevent infinite nesting of templates and other objects. */
 	private int depth = 0;
 	private Locale locale = null;
-	private TableOfContents tableOfContents = new TableOfContentsImpl();
+	private TableOfContents tableOfContents ;
 	/** Template inclusion tracks whether or not template code is being parsed.  A counter is used to deal with nested templates. */
 	private int templateDepth = 0;
 	/** Hashtable of generic temporary objects used during parsing. */
@@ -46,9 +45,10 @@ public class ParserInput {
 	private User wikiUser = null;
 
 	/**
-	 *
+	 * 
+	 * @param toc The table of contents renderer.
 	 */
-	public ParserInput() {
+	public ParserInput(TableOfContents toc) {
 	}
 
 	/**
