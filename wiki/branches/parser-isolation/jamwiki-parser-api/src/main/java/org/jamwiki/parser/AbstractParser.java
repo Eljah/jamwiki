@@ -16,8 +16,6 @@
  */
 package org.jamwiki.parser;
 
-import org.jamwiki.utils.WikiLogger;
-
 /**
  * Abstract class to be used when implementing new parsers.  New parsers
  * should extend this class and override any methods that need to be
@@ -25,7 +23,6 @@ import org.jamwiki.utils.WikiLogger;
  */
 public abstract class AbstractParser {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(AbstractParser.class.getName());
 	/** Parser configuration information. */
 	protected ParserInput parserInput = null;
 
