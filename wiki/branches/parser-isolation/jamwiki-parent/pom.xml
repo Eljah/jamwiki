@@ -164,6 +164,21 @@
 				<artifactId>jamwiki-core</artifactId>
 				<version>${jamwiki.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.jamwiki</groupId>
+				<artifactId>jamwiki-api</artifactId>
+				<version>0.6.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jamwiki</groupId>
+				<artifactId>jamwiki-parser-api</artifactId>
+				<version>0.6.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jamwiki</groupId>
+				<artifactId>jamwiki-commons</artifactId>
+				<version>0.1-SNAPSHOT</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.acegisecurity</groupId>
@@ -291,7 +306,13 @@
 				<artifactId>spring-webmvc</artifactId>
 				<version>${dependency.spring.version}</version>
 			</dependency>
-
+			
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${dependency.spring.version}</version>
+			</dependency>
+			
 			<dependency>
 				<groupId>taglibs</groupId>
 				<artifactId>standard</artifactId>
