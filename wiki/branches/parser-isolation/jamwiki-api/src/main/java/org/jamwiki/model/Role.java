@@ -22,12 +22,22 @@ import org.acegisecurity.GrantedAuthorityImpl;
  * Provides an object representing a Wiki role and implementing the Acegi
  * <code>GrantedAuthority</code> interface.
  */
-public class Role  extends GrantedAuthorityImpl  {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7995231871249892674L;
+public class Role extends GrantedAuthorityImpl {
+
 	private String description = null;
+
+	public static final Role ROLE_ADMIN = new Role("ROLE_ADMIN");
+	/** ROLE_ANONYMOUS is not store in the database but is instead automatically assigned to all non-logged in users. */
+	public static final Role ROLE_ANONYMOUS = new Role("ROLE_ANONYMOUS");
+	public static final Role ROLE_DELETE = new Role("ROLE_DELETE");
+	public static final Role ROLE_EDIT_EXISTING = new Role("ROLE_EDIT_EXISTING");
+	public static final Role ROLE_EDIT_NEW = new Role("ROLE_EDIT_NEW");
+	public static final Role ROLE_MOVE = new Role("ROLE_MOVE");
+	public static final Role ROLE_TRANSLATE = new Role("ROLE_TRANSLATE");
+	public static final Role ROLE_UPLOAD = new Role("ROLE_UPLOAD");
+	/** ROLE_USER is not store in the database but is instead automatically assigned to all logged in users. */
+	public static final Role ROLE_USER = new Role("ROLE_USER");
+	public static final Role ROLE_VIEW = new Role("ROLE_VIEW");
 
 	/**
 	 *
@@ -36,22 +46,22 @@ public class Role  extends GrantedAuthorityImpl  {
 		super((role == null) ? null : role.toUpperCase());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jamwiki.model.Role#getDescription()
+	/**
+	 *
 	 */
 	public String getDescription() {
 		return this.description;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jamwiki.model.Role#setDescription(java.lang.String)
+	/**
+	 *
 	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jamwiki.model.Role#equals(org.jamwiki.model.WikiRole)
+	/**
+	 * Two roles are equal if the role names are the same.
 	 */
 	public boolean equals(Role role) {
 		if (this.getAuthority() == null && role != null && role.getAuthority() == null) {
