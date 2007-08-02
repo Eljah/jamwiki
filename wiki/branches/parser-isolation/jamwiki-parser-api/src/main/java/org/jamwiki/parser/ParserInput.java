@@ -19,7 +19,8 @@ package org.jamwiki.parser;
 import java.util.Hashtable;
 import java.util.Locale;
 import org.jamwiki.model.Role;
-import org.jamwiki.model.WikiUser;
+import org.jamwiki.model.TableOfContents;
+import org.jamwiki.model.User;
 
 /**
  * This class is a utility class used to hold configuration settings for the
@@ -42,7 +43,7 @@ public class ParserInput {
 	private String userIpAddress = null;
 	private String virtualWiki = null;
 	/** Current WikiUser (if any). */
-	private WikiUser wikiUser = null;
+	private User wikiUser = null;
 
 	/**
 	 *
@@ -304,7 +305,7 @@ public class ParserInput {
 	 * @return The wiki user object associated with the current parser input
 	 * instance.
 	 */
-	public WikiUser getWikiUser() {
+	public User getWikiUser() {
 		return this.wikiUser;
 	}
 
@@ -316,7 +317,7 @@ public class ParserInput {
 	 * @param user The wiki user object associated with the current
 	 *  parser input instance.
 	 */
-	public void setWikiUser(WikiUser user) {
+	public void setWikiUser(User user) {
 		if (user!=null && !user.hasRole(Role.ROLE_USER)) {
 			// FIXME - setting the user to null may not be necessary, but it is
 			// consistent with how the code behaved when Utilities.currentUser()
