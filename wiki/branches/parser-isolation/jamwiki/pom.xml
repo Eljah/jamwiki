@@ -37,12 +37,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 		</dependency>
@@ -51,7 +45,6 @@
 			<groupId>rome</groupId>
 			<artifactId>rome</artifactId>
 		</dependency>
-
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -90,6 +83,13 @@
 			<artifactId>jamwiki-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- dependencies in test scope -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 	
 
