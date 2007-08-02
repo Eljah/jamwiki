@@ -12,14 +12,18 @@
 	<url>http://www.jamwiki.org</url>
 
 	<scm>
-		<connection>scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/trunk</connection>
-		<developerConnection>scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/trunk</developerConnection>
+		<connection>
+			scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/trunk
+		</developerConnection>
 		<tag>HEAD</tag>
 		<url>http://jamwiki.svn.sourceforge.net/viewvc/jamwiki/</url>
 	</scm>
-	
+
 	<issueManagement>
-		<system>Wiki</system>	
+		<system>Wiki</system>
 		<url>http://jamwiki.org/wiki/en/Bug_Reports</url>
 	</issueManagement>
 
@@ -32,8 +36,8 @@
 	</licenses>
 	<developers>
 		<!--  
-		See http://www.ohloh.net/projects/6482/analyses/latest/contributors
-		 -->
+			See http://www.ohloh.net/projects/6482/analyses/latest/contributors
+		-->
 		<developer>
 			<id>wrh2</id>
 			<name>Ryan Holliday</name>
@@ -45,7 +49,7 @@
 			</roles>
 			<timezone>-8</timezone>
 		</developer>
-		
+
 		<developer>
 			<id>rainers</id>
 			<name>Rainer Schmitz</name>
@@ -54,7 +58,7 @@
 				<role>developer</role>
 			</roles>
 		</developer>
-		
+
 		<developer>
 			<id>dlpa</id>
 			<name>dlpa</name>
@@ -62,8 +66,8 @@
 			<roles>
 				<role>developer</role>
 			</roles>
-		</developer>		
-		
+		</developer>
+
 		<developer>
 			<id>mikegremi</id>
 			<name>Michael Greifeneder</name>
@@ -73,7 +77,7 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
-				
+
 		<developer>
 			<id>axelcl</id>
 			<name>Axel C. Kramer</name>
@@ -82,7 +86,7 @@
 				<role>developer</role>
 			</roles>
 		</developer>
-		
+
 		<developer>
 			<id>ncsaba</id>
 			<name>Csaba Nagy</name>
@@ -91,7 +95,7 @@
 				<role>developer</role>
 			</roles>
 		</developer>
-		
+
 		<developer>
 			<id>decamps</id>
 			<name>Régis Décamps</name>
@@ -100,7 +104,7 @@
 				<role>developer</role>
 			</roles>
 			<timezone>+1</timezone>
-		</developer>		
+		</developer>
 	</developers>
 	<contributors>
 		<contributor><name>Jiading</name><email>ewen0930</email><roles><role>translator (Chinese)</role></roles></contributor>
@@ -151,16 +155,16 @@
 		The dependency management does not tell the sub-project to depend from what is listed bellow.-->
 	<properties>
 		<jamwiki.version>0.6.1-SNAPSHOT</jamwiki.version>
-		<dependency.spring.version>2.0.6</dependency.spring.version>		
+		<dependency.spring.version>2.0.6</dependency.spring.version>
 	</properties>
 	<dependencyManagement>
-		<dependencies>		
+		<dependencies>
 			<dependency>
 				<groupId>org.jamwiki</groupId>
 				<artifactId>jamwiki-core</artifactId>
 				<version>${jamwiki.version}</version>
 			</dependency>
-		
+
 			<dependency>
 				<groupId>org.acegisecurity</groupId>
 				<artifactId>acegi-security</artifactId>
@@ -296,8 +300,8 @@
 		</dependencies>
 	</dependencyManagement>
 	<build>
-	<plugins>
-	    		 <plugin>
+		<plugins>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>1.1.1</version>
@@ -305,53 +309,57 @@
 					<xmlOutput>true</xmlOutput>
 					<threshold>Normal</threshold>
 					<effort>Default</effort>
-					<outputDirectory>target/findbugs</outputDirectory>					
+					<outputDirectory>target/findbugs</outputDirectory>
 					<excludeFilterFile>
 						findbugs-exclude.xml
-					</excludeFilterFile><!-- 
-					<includeFilterFile>
+					</excludeFilterFile>
+					<!-- 
+						<includeFilterFile>
 						findbugs-include.xml
-					</includeFilterFile>-->
+						</includeFilterFile>-->
 					<visitors>
 						FindDeadLocalStores,UnreadFields
 					</visitors>
-					<onlyAnalyze>
-						org.jamwiki.*
-					</onlyAnalyze><!-- 
-					<pluginList>
+					<onlyAnalyze>org.jamwiki.*</onlyAnalyze>
+					<!-- 
+						<pluginList>
 						/libs/fb-contrib/fb-contrib-2.8.0.jar
-					</pluginList>-->
+						</pluginList>-->
 					<debug>true</debug>
 					<relaxed>true</relaxed>
 				</configuration>
 			</plugin>
-	</plugins>
+		</plugins>
 	</build>
-		<reporting>
+	<reporting>
 		<plugins>
 			<plugin>
-		    	<groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-project-info-reports-plugin</artifactId>
-		        <reportSets>
-                     <reportSet>
-                        <reports>
-                           <report>index</report>                           
-                           <report>dependencies</report>
-                           <report>project-team</report>
-                           <report>issue-tracking</report>
-                           <report>license</report>
-                           <report>scm</report>
-                           <report>summary</report>                           
-                        </reports>
-                     </reportSet>
-                  </reportSets>
-	        </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>
+					maven-project-info-reports-plugin
+				</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>dependencies</report>
+							<report>project-team</report>
+							<report>issue-tracking</report>
+							<report>license</report>
+							<report>scm</report>
+							<report>summary</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
 			<plugin>
 				<artifactId>maven-pmd-plugin</artifactId>
 				<configuration>
 					<targetjdk>1.4</targetjdk>
 					<rulesets>
-						<ruleset>${basedir}/../jamwiki-parent/pmd.xml</ruleset>
+						<ruleset>
+							${basedir}/../jamwiki-parent/pmd.xml
+						</ruleset>
 					</rulesets>
 					<format>xml</format>
 					<linkXref>true</linkXref>
@@ -365,12 +373,12 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>taglist-maven-plugin</artifactId>
 				<configuration>
-				<tags>
-				    <tag>TODO</tag>
-		            <tag>FIXME</tag>
-        		    <tag>@todo</tag>
-        		    <tag>@deprecated</tag>
-				</tags>
+					<tags>
+						<tag>TODO</tag>
+						<tag>FIXME</tag>
+						<tag>@todo</tag>
+						<tag>@deprecated</tag>
+					</tags>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -378,19 +386,23 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
 			<plugin>
-	    	    <groupId>org.apache.maven.plugins</groupId>
-    	    	<artifactId>maven-jxr-plugin</artifactId>
-	      	</plugin>
-		    <plugin>
-		       	<groupId>org.apache.maven.plugins</groupId>
-		      	<artifactId>maven-javadoc-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<encoding>ISO-8859-1</encoding>
 				</configuration>
-		    </plugin>			
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</reporting>
