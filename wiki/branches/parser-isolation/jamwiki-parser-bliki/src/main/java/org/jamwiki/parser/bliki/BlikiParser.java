@@ -1,6 +1,5 @@
 package org.jamwiki.parser.bliki;
 
-import org.jamwiki.parser.MediawikiParser;
 import org.jamwiki.parser.ParserDocument;
 import org.jamwiki.parser.ParserInput;
 
