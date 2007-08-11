@@ -91,17 +91,30 @@ public class JFlexMojo extends AbstractMojo {
 	private boolean dot = false;
 
 	/**
+	 * Use external skeleton file.
+	 * @parameter
+	 */
+	private File skeleton ;
+	
+	/**
+	 * Strict JLex compatibility.
+	 * @parameter
+	 */
+	private boolean jlex;
+	
+	/**
 	 * Generate java parser from lexer definition.
 	 * 
 	 * This methods is checks parameters, sets options and calls
 	 * JFlex.Main.generate()
 	 */
+	@SuppressWarnings("unchecked")
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		// compiling the generated source in target/generated-sources/ is
 		// the whole point of this plugin compared to running the ant plugin
 		project.addCompileSourceRoot( outputDirectory.getAbsolutePath() );
 		
-		Iterator fileIterator;
+		Iterator<File> fileIterator;
 		if (lexFiles != null) {
 			List<File> filesIt = Arrays.asList(lexFiles);
 			fileIterator = filesIt.iterator();
@@ -116,7 +129,7 @@ public class JFlexMojo extends AbstractMojo {
 					.iterateFiles(defaultDir, extensions, false);
 		}
 		while (fileIterator.hasNext()) {
-			File lexFile = (File) fileIterator.next();
+			File lexFile = fileIterator.next();
 			log.debug("Processing "+lexFile.getName());
 			ClassInfo classInfo=null;
 			try {
@@ -145,11 +158,15 @@ public class JFlexMojo extends AbstractMojo {
 			 * set options. Very strange that JFlex expects this in a static
 			 * way.
 			 */
+			Options.setDefaults();
 			Options.setDir(FilenameUtils.getFullPath(generatedFile
 					.getAbsoluteFile().getPath()));
 			Options.dump = verbose;
 			Options.verbose = verbose;
 			Options.dot = dot;
+			Options.setSkeleton(skeleton);
+			Options.jlex=jlex;
+			
 			try {
 				Main.generate(lexFile);
 				log.info("generated " + outputDirectory + File.separator
@@ -186,7 +203,7 @@ public class JFlexMojo extends AbstractMojo {
 	private void checkParameters(File lexFile) throws MojoExecutionException {
 		if (lexFile == null) {
 			throw new MojoExecutionException(
-					"<lexFile> is empty. Please define input file with <lexFile>input.lex</lexFile>");
+					"<lexFile> is empty. Please define input file with <lexFile>input.jflex</lexFile>");
 		}
 		if (!lexFile.exists()) {
 			throw new MojoExecutionException("Input file does not exist: "
