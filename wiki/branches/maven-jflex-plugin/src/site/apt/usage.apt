@@ -48,7 +48,9 @@ Usage
         <version>0.1</version>
         <executions>
           <execution>
-            <goal>generate</goal>
+            <goals>
+              <goal>generate</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
