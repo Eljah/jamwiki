@@ -96,7 +96,6 @@ public class JFlexMojo extends AbstractMojo {
 	 * This methods is checks parameters, sets options and calls
 	 * JFlex.Main.generate()
 	 */
-	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		// compiling the generated source in target/generated-sources/ is
 		// the whole point of this plugin compared to running the ant plugin
@@ -112,7 +111,7 @@ public class JFlexMojo extends AbstractMojo {
 			// use default lexfiles if none provided
 			log.debug("Use all flex files found in " + SRC_MAIN_JFLEX);
 			File defaultDir = new File(SRC_MAIN_JFLEX);
-			String[] extensions = { "jflex" };
+			String[] extensions = { "jflex" , "jlex", "lex" };
 			fileIterator = FileUtils
 					.iterateFiles(defaultDir, extensions, false);
 		}
