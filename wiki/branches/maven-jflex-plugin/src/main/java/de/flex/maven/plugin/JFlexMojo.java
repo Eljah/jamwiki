@@ -50,15 +50,14 @@ public class JFlexMojo extends AbstractMojo {
 	 * Name of the directory where to look for jflex files by default.
 	 */
 	private static final String SRC_MAIN_JFLEX = "src/main/jflex";
-	
+
 	private Log log = getLog();
-	
-	
-    /**
-     * @parameter expression="${project}"
-     * @required
-     */
-    private MavenProject project;
+
+	/**
+	 * @parameter expression="${project}"
+	 * @required
+	 */
+	private MavenProject project;
 
 	/**
 	 * List of grammar definitions to run the JFlex parser generator on. By
@@ -66,7 +65,7 @@ public class JFlexMojo extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private File[] lexFiles;	
+	private File[] lexFiles;
 
 	/**
 	 * Name of the directory into which JFlex should generate the parser.
@@ -92,16 +91,18 @@ public class JFlexMojo extends AbstractMojo {
 
 	/**
 	 * Use external skeleton file.
+	 * 
 	 * @parameter
 	 */
-	private File skeleton ;
-	
+	private File skeleton;
+
 	/**
 	 * Strict JLex compatibility.
+	 * 
 	 * @parameter
 	 */
 	private boolean jlex;
-	
+
 	/**
 	 * Generate java parser from lexer definition.
 	 * 
@@ -112,8 +113,8 @@ public class JFlexMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		// compiling the generated source in target/generated-sources/ is
 		// the whole point of this plugin compared to running the ant plugin
-		project.addCompileSourceRoot( outputDirectory.getAbsolutePath() );
-		
+		project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
+
 		Iterator<File> fileIterator;
 		if (lexFiles != null) {
 			List<File> filesIt = Arrays.asList(lexFiles);
@@ -124,57 +125,62 @@ public class JFlexMojo extends AbstractMojo {
 			// use default lexfiles if none provided
 			log.debug("Use all flex files found in " + SRC_MAIN_JFLEX);
 			File defaultDir = new File(SRC_MAIN_JFLEX);
-			String[] extensions = { "jflex" , "jlex", "lex" };
+			String[] extensions = { "jflex", "jlex", "lex", "flex" };
 			fileIterator = FileUtils
 					.iterateFiles(defaultDir, extensions, false);
 		}
 		while (fileIterator.hasNext()) {
 			File lexFile = fileIterator.next();
-			log.debug("Processing "+lexFile.getName());
-			ClassInfo classInfo=null;
-			try {
-				classInfo = LexSimpleAnalyzer.guessPackageAndClass(lexFile);
-			} catch (FileNotFoundException e1) {
-				throw new MojoFailureException(e1.getMessage());
-			} catch (IOException e3) {
-				classInfo = new ClassInfo();
-				classInfo.className = LexSimpleAnalyzer.DEFAULT_NAME;
-				classInfo.packageName = null;
-			}
+			log.debug("Processing " + lexFile.getName());
+			parseLexFile(lexFile);
+		}
+	}
 
-			checkParameters(lexFile);
+	private void parseLexFile(File lexFile) throws MojoFailureException,
+			MojoExecutionException {
+		ClassInfo classInfo = null;
+		try {
+			classInfo = LexSimpleAnalyzer.guessPackageAndClass(lexFile);
+		} catch (FileNotFoundException e1) {
+			throw new MojoFailureException(e1.getMessage());
+		} catch (IOException e3) {
+			classInfo = new ClassInfo();
+			classInfo.className = LexSimpleAnalyzer.DEFAULT_NAME;
+			classInfo.packageName = null;
+		}
 
-			/* set destination directory */
-			File generatedFile = new File(outputDirectory
-					+ classInfo.getOutputFilename());
+		checkParameters(lexFile);
 
-			/* Generate only if needs to */
-			if (lexFile.lastModified() < generatedFile.lastModified()) {
-				log.info(generatedFile.getName() + " is up to date.");
-				continue;
-			}
+		/* set destination directory */
+		File generatedFile = new File(outputDirectory
+				+ classInfo.getOutputFilename());
 
-			/*
-			 * set options. Very strange that JFlex expects this in a static
-			 * way.
-			 */
-			Options.setDefaults();
-			Options.setDir(FilenameUtils.getFullPath(generatedFile
-					.getAbsoluteFile().getPath()));
-			Options.dump = verbose;
-			Options.verbose = verbose;
-			Options.dot = dot;
+		/* Generate only if needs to */
+		if (lexFile.lastModified() < generatedFile.lastModified()) {
+			log.info(generatedFile.getName() + " is up to date.");
+			return;
+		}
+
+		/*
+		 * set options. Very strange that JFlex expects this in a static way.
+		 */
+		Options.setDefaults();
+		Options.setDir(FilenameUtils.getFullPath(generatedFile
+				.getAbsoluteFile().getPath()));
+		Options.dump = verbose;
+		Options.verbose = verbose;
+		Options.dot = dot;
+		if (skeleton != null) {
 			Options.setSkeleton(skeleton);
-			Options.jlex=jlex;
-			
-			try {
-				Main.generate(lexFile);
-				log.info("generated " + outputDirectory + File.separator
-						+ classInfo.getOutputFilename());
-			} catch (Exception e) {
-				throw new MojoExecutionException(e.getMessage());
-			}
+		}
+		Options.jlex = jlex;
 
+		try {
+			Main.generate(lexFile);
+			log.info("generated " + outputDirectory + File.separator
+					+ classInfo.getOutputFilename());
+		} catch (Exception e) {
+			throw new MojoExecutionException(e.getMessage());
 		}
 	}
 
