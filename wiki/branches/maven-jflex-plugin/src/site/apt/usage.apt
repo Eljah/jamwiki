@@ -33,7 +33,7 @@ Usage
 	This configuration generates java code of a parser
 	for all grammar files (<<<*.jflex>>>, <<<*.jlex>>>, <<<.lex>>>, <<.flex>>) found in  <<<src/main/jflex/>>>.
 	The generated Java source code is <<<target/generated-source/jflex>>>.
-	Its name is the on defined in the grammar.
+	Its name and package are the ones defined in the grammar.
 	
 	<<pom.xml>>
 	
