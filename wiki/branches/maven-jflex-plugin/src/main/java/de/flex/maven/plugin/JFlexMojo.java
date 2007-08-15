@@ -127,7 +127,7 @@ public class JFlexMojo extends AbstractMojo {
 			File defaultDir = new File(SRC_MAIN_JFLEX);
 			String[] extensions = { "jflex", "jlex", "lex", "flex" };
 			fileIterator = FileUtils
-					.iterateFiles(defaultDir, extensions, false);
+					.iterateFiles(defaultDir, extensions, true);
 		}
 		while (fileIterator.hasNext()) {
 			File lexFile = fileIterator.next();
