@@ -81,10 +81,10 @@
 	</reporting>
 	<scm>
 		<connection>
-			http://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/branches/maven-jflex-plugin/
+			scm:svn:http://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/branches/maven-jflex-plugin/
 		</connection>
 		<developerConnection>
-			https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/branches/maven-jflex-plugin/
+			scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/branches/maven-jflex-plugin/
 		</developerConnection>
 	</scm>
 </project>
