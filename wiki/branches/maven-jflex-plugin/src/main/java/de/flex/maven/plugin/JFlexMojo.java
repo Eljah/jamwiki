@@ -61,29 +61,31 @@ public class JFlexMojo extends AbstractMojo {
 
 	/**
 	 * List of grammar definitions to run the JFlex parser generator on. By
-	 * default, all files in <code>src/main/java/flex</code> will be used.
+	 * default, all files in <code>{@value #SRC_MAIN_JFLEX}</code> will be
+	 * used.
 	 * 
 	 * @parameter
 	 */
 	private File[] lexFiles;
 
 	/**
-	 * Name of the directory into which JFlex should generate the parser.
+	 * Name of the directory into which JFlex should generate the parser. The
+	 * default is {@code ${project.build.directory}/generated-sources/jflex}
 	 * 
 	 * @parameter expression="${project.build.directory}/generated-sources/jflex"
 	 */
 	private File outputDirectory;
 
 	/**
-	 * Whether source code generation should be verbose.
+	 * Whether source code generation should be verbose. Default is false.
 	 * 
 	 * @parameter
 	 */
-	private boolean verbose;
+	private boolean verbose = false;
 
 	/**
 	 * Whether to produce graphviz .dot files for the generated automata. This
-	 * feature is EXPERIMENTAL.
+	 * feature is EXPERIMENTAL. Default is false.
 	 * 
 	 * @parameter
 	 */
@@ -97,14 +99,14 @@ public class JFlexMojo extends AbstractMojo {
 	private File skeleton;
 
 	/**
-	 * Strict JLex compatibility.
+	 * Strict JLex compatibility. Default is false.
 	 * 
 	 * @parameter
 	 */
-	private boolean jlex;
+	private boolean jlex = false;
 
 	/**
-	 * Generate java parser from lexer definition.
+	 * Generate java parsers from lexer definition files.
 	 * 
 	 * This methods is checks parameters, sets options and calls
 	 * JFlex.Main.generate()
@@ -126,8 +128,7 @@ public class JFlexMojo extends AbstractMojo {
 			log.debug("Use all flex files found in " + SRC_MAIN_JFLEX);
 			File defaultDir = new File(SRC_MAIN_JFLEX);
 			String[] extensions = { "jflex", "jlex", "lex", "flex" };
-			fileIterator = FileUtils
-					.iterateFiles(defaultDir, extensions, true);
+			fileIterator = FileUtils.iterateFiles(defaultDir, extensions, true);
 		}
 		while (fileIterator.hasNext()) {
 			File lexFile = fileIterator.next();
@@ -136,6 +137,15 @@ public class JFlexMojo extends AbstractMojo {
 		}
 	}
 
+	/**
+	 * Generate java code of a parser from a lexer file.
+	 * 
+	 * @param lexFile
+	 *            Lexer definiton to process.
+	 * @throws MojoFailureException
+	 *             if the file is not found.
+	 * @throws MojoExecutionException
+	 */
 	private void parseLexFile(File lexFile) throws MojoFailureException,
 			MojoExecutionException {
 		ClassInfo classInfo = null;
@@ -184,6 +194,13 @@ public class JFlexMojo extends AbstractMojo {
 		}
 	}
 
+	/**
+	 * Get the output directory from a package name.
+	 * 
+	 * @param packageName
+	 * @return The concatanation of the base output with the directory following
+	 *         the Java convention for packages.
+	 */
 	public File findDestDirectory(String packageName) {
 		File destDirectory;
 		if (packageName == null) {
