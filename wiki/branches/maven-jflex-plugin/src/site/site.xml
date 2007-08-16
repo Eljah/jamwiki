@@ -10,6 +10,7 @@
 			<item name="License" href="license.html" />
 			<item name="Developers" href="team-list.html" />
 			<item name="Source code" href="source-repository.html" />
+			<item name="Javadoc" href="apidocs/index.html" />
 		</menu>
 	</body>
 </project>
