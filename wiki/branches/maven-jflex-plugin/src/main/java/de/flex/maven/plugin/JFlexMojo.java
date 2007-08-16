@@ -49,7 +49,7 @@ public class JFlexMojo extends AbstractMojo {
 	/**
 	 * Name of the directory where to look for jflex files by default.
 	 */
-	private static final String SRC_MAIN_JFLEX = "src/main/jflex";
+	public static final String SRC_MAIN_JFLEX = "src/main/jflex";
 
 	private Log log = getLog();
 
@@ -64,30 +64,29 @@ public class JFlexMojo extends AbstractMojo {
 	 * default, all files in <code>{@value #SRC_MAIN_JFLEX}</code> will be
 	 * used.
 	 * 
-	 * @parameter
+	 * @parameter default-value="src/main/jflex"
 	 */
 	private File[] lexFiles;
 
 	/**
-	 * Name of the directory into which JFlex should generate the parser. The
-	 * default is {@code ${project.build.directory}/generated-sources/jflex}
+	 * Name of the directory into which JFlex should generate the parser. 
 	 * 
 	 * @parameter expression="${project.build.directory}/generated-sources/jflex"
 	 */
 	private File outputDirectory;
 
 	/**
-	 * Whether source code generation should be verbose. Default is false.
+	 * Whether source code generation should be verbose.
 	 * 
-	 * @parameter
+	 * @parameter default-value="false"
 	 */
 	private boolean verbose = false;
 
 	/**
 	 * Whether to produce graphviz .dot files for the generated automata. This
-	 * feature is EXPERIMENTAL. Default is false.
+	 * feature is EXPERIMENTAL.
 	 * 
-	 * @parameter
+	 * @parameter default-value="false"
 	 */
 	private boolean dot = false;
 
@@ -99,9 +98,9 @@ public class JFlexMojo extends AbstractMojo {
 	private File skeleton;
 
 	/**
-	 * Strict JLex compatibility. Default is false.
+	 * Strict JLex compatibility.
 	 * 
-	 * @parameter
+	 * @parameter default-value="false"
 	 */
 	private boolean jlex = false;
 
