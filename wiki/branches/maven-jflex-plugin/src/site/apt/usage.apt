@@ -72,28 +72,28 @@ Usage
 	 and produces the code in <<<src/main/java>>> instead of
 	 <<</target/generated-sources/jflex>>>
 
-	in <<pom.xml>>
+  in <<pom.xml>>
 
-+-------------------	
-			<plugin>
-				<groupId>de.jflex.maven.plugin</groupId>
-				<artifactId>maven-jflex-plugin</artifactId>
-				<version>0.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<outputDirectory>src/main/java</outputDirectory>
-					<lexFiles>
-						<lexFile>src/main/jflex/preprocessor.jflex</lexFile>
-						<lexFile>/pub/postrocessor.jflex</lexFile>
-					</lexFiles>
-				</configuration>
-			</plugin>
++-------------------  
+      <plugin>
+        <groupId>de.jflex.maven.plugin</groupId>
+        <artifactId>maven-jflex-plugin</artifactId>
+        <version>0.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputDirectory>src/main/java</outputDirectory>
+          <lexFiles>
+            <lexFile>src/main/jflex/preprocessor.jflex</lexFile>
+            <lexFile>/pub/postrocessor.jflex</lexFile>
+          </lexFiles>
+        </configuration>
+      </plugin>
 +-------------------
 	
 	More documentation on the configuration options can be found 
