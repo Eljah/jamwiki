@@ -22,6 +22,7 @@ package de.flex.maven.plugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -59,17 +60,19 @@ public class JFlexMojo extends AbstractMojo {
 	 */
 	private MavenProject project;
 
+	// cannot use {@value SRC_MAIN_JFLEX} because Maven site goals.html
+	// is kept raw.
 	/**
 	 * List of grammar definitions to run the JFlex parser generator on. By
-	 * default, all files in <code>{@value #SRC_MAIN_JFLEX}</code> will be
-	 * used.
-	 * 
-	 * @parameter default-value="src/main/jflex"
+	 * default, all files in <code>src/main/java/flex</code> will be
+	 * processed.
+	 * @see #SRC_MAIN_JFLEX
+	 * @parameter
 	 */
-	private File[] lexFiles;
+	private File[] lexDefinitions;
 
 	/**
-	 * Name of the directory into which JFlex should generate the parser. 
+	 * Name of the directory into which JFlex should generate the parser.
 	 * 
 	 * @parameter expression="${project.build.directory}/generated-sources/jflex"
 	 */
@@ -80,7 +83,7 @@ public class JFlexMojo extends AbstractMojo {
 	 * 
 	 * @parameter default-value="false"
 	 */
-	private boolean verbose = false;
+	private boolean verbose;
 
 	/**
 	 * Whether to produce graphviz .dot files for the generated automata. This
@@ -88,7 +91,7 @@ public class JFlexMojo extends AbstractMojo {
 	 * 
 	 * @parameter default-value="false"
 	 */
-	private boolean dot = false;
+	private boolean dot;
 
 	/**
 	 * Use external skeleton file.
@@ -102,7 +105,7 @@ public class JFlexMojo extends AbstractMojo {
 	 * 
 	 * @parameter default-value="false"
 	 */
-	private boolean jlex = false;
+	private boolean jlex;
 
 	/**
 	 * Generate java parsers from lexer definition files.
@@ -116,37 +119,66 @@ public class JFlexMojo extends AbstractMojo {
 		// the whole point of this plugin compared to running the ant plugin
 		project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
 
-		Iterator<File> fileIterator;
-		if (lexFiles != null) {
-			List<File> filesIt = Arrays.asList(lexFiles);
-			fileIterator = filesIt.iterator();
-			log.debug("Parsing " + lexFiles.length
-					+ " jflex files given in configuration");
+		List<File> filesIt;
+		if (lexDefinitions != null) {
+			// use arguments provided in the plugin configuration
+			filesIt = Arrays.asList(lexDefinitions);
+
+			log.debug("Parsing " + lexDefinitions.length
+					+ " jflex files or directories given in configuration");
 		} else {
 			// use default lexfiles if none provided
-			log.debug("Use all flex files found in " + SRC_MAIN_JFLEX);
+			log.debug("Use lexer files found in (default) " + SRC_MAIN_JFLEX);
+			filesIt = new ArrayList<File>();
 			File defaultDir = new File(SRC_MAIN_JFLEX);
-			String[] extensions = { "jflex", "jlex", "lex", "flex" };
-			fileIterator = FileUtils.iterateFiles(defaultDir, extensions, true);
+			if (defaultDir.exists() && defaultDir.isDirectory()) {
+				filesIt.add(defaultDir);
+			}
 		}
+		//process all lexDefinitions
+		Iterator<File> fileIterator = filesIt.iterator();
 		while (fileIterator.hasNext()) {
-			File lexFile = fileIterator.next();
-			log.debug("Processing " + lexFile.getName());
-			parseLexFile(lexFile);
+			File lexDefinition = fileIterator.next();
+
+			parseLexDefinition(lexDefinition);
 		}
 	}
 
 	/**
 	 * Generate java code of a parser from a lexer file.
 	 * 
-	 * @param lexFile
-	 *            Lexer definiton to process.
+	 * If the {@code lexDefinition} is a directory, process all lexer files
+	 * contained within.
+	 * 
+	 * @param lexDefinition
+	 *            Lexer definiton file or directory to process.
 	 * @throws MojoFailureException
 	 *             if the file is not found.
 	 * @throws MojoExecutionException
 	 */
-	private void parseLexFile(File lexFile) throws MojoFailureException,
+	@SuppressWarnings("unchecked")
+	private void parseLexDefinition(File lexDefinition) throws MojoFailureException,
 			MojoExecutionException {
+		
+
+		if (lexDefinition.isDirectory()) {
+			// recursively process files contained within
+			String[] extensions = { "jflex", "jlex", "lex", "flex" };
+			log.debug("Processing lexer files found in " + lexDefinition.getAbsolutePath());
+			Iterator<File> fileIterator = FileUtils.iterateFiles(lexDefinition,
+					extensions, true);
+			while (fileIterator.hasNext()) {
+				File lexFile = fileIterator.next();
+				parseLexFile(lexFile);
+			}
+		} 
+		else {
+			parseLexFile(lexDefinition);
+		}
+	}
+
+	private void parseLexFile(File lexFile) throws MojoFailureException, MojoExecutionException {
+		log.debug("Generationg Java code from "+lexFile.getName());
 		ClassInfo classInfo = null;
 		try {
 			classInfo = LexSimpleAnalyzer.guessPackageAndClass(lexFile);
@@ -166,7 +198,7 @@ public class JFlexMojo extends AbstractMojo {
 
 		/* Generate only if needs to */
 		if (lexFile.lastModified() < generatedFile.lastModified()) {
-			log.info(generatedFile.getName() + " is up to date.");
+			log.info("  "+generatedFile.getName() + " is up to date.");
 			return;
 		}
 
@@ -186,11 +218,11 @@ public class JFlexMojo extends AbstractMojo {
 
 		try {
 			Main.generate(lexFile);
-			log.info("generated " + outputDirectory + File.separator
+			log.info("  generated " + outputDirectory + File.separator
 					+ classInfo.getOutputFilename());
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getMessage());
-		}
+		}		
 	}
 
 	/**
@@ -242,7 +274,7 @@ public class JFlexMojo extends AbstractMojo {
 	}
 
 	public void setLexFiles(File[] lexFiles) {
-		this.lexFiles = lexFiles;
+		this.lexDefinitions = lexFiles;
 
 	}
 
