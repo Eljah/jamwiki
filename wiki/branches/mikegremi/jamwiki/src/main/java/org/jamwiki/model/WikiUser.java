@@ -45,6 +45,9 @@ public class WikiUser implements UserDetails {
 	private String lastLoginIpAddress = "0.0.0.0";
 	private String username = null;
 	private int userId = -1;
+        
+        private int enabled;
+        private String validationCode;
 
 	/**
 	 * GrantedAuthority is used by Acegi Security to support several authorities
@@ -272,9 +275,8 @@ public class WikiUser implements UserDetails {
 	/**
 	 *
 	 */
-	public boolean isEnabled() {
-		// TODO Not yet implemented
-		return true;
+	public int getEnabled() {
+	        return enabled;
 	}
 
 	/**
@@ -343,4 +345,23 @@ public class WikiUser implements UserDetails {
 		}
 		return Arrays.asList(authorities).contains(role);
 	}
+
+        public String getValidationCode() {
+                return validationCode;
+        }
+
+        public void setValidationCode(String validationCode) {
+                this.validationCode = validationCode;
+        }
+
+        public void setEnabled(int enabled) {
+                this.enabled = enabled;
+        }
+
+        public boolean isEnabled() {
+                if (enabled > 0) {
+                        return true;
+                }
+                return false;
+        }
 }

@@ -168,12 +168,14 @@ public class AdminServlet extends JAMWikiServlet {
 			setProperty(props, request, Environment.PROP_FILE_BLACKLIST_TYPE);
 			setProperty(props, request, Environment.PROP_FILE_BLACKLIST);
 			setProperty(props, request, Environment.PROP_FILE_WHITELIST);
-			/*
+			
+                        setBooleanProperty(props, request, Environment.PROP_EMAIL_ACTIVATED);
 			setProperty(props, request, Environment.PROP_EMAIL_SMTP_HOST);
+                        setProperty(props, request, Environment.PROP_EMAIL_SMTP_PORT);
 			setProperty(props, request, Environment.PROP_EMAIL_SMTP_USERNAME);
 			setPassword(props, request, next, Environment.PROP_EMAIL_SMTP_PASSWORD, "smtpPassword");
 			setProperty(props, request, Environment.PROP_EMAIL_REPLY_ADDRESS);
-			*/
+			
 			setProperty(props, request, Environment.PROP_LDAP_CONTEXT);
 			setProperty(props, request, Environment.PROP_LDAP_FACTORY_CLASS);
 			setProperty(props, request, Environment.PROP_LDAP_FIELD_EMAIL);

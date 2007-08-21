@@ -283,4 +283,9 @@ public class WikiLogger {
 	public void warning(String msg, Throwable thrown) {
 		this.logger.log(Level.WARNING, msg, thrown);
 	}
+        
+        public boolean isLoggable(Level level) {
+                return logger.isLoggable(level);
+        }
+        
 }

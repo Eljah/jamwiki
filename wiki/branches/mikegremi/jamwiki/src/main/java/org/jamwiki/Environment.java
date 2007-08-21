@@ -63,7 +63,9 @@ public class Environment {
 	public static final String PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS = "dbcp-time-between-eviction-runs";
 	public static final String PROP_DBCP_WHEN_EXHAUSTED_ACTION = "dbcp-when-exhausted-action";
 	public static final String PROP_EMAIL_REPLY_ADDRESS = "reply-address";
+        public static final String PROP_EMAIL_ACTIVATED = "smtp-activated";
 	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
+        public static final String PROP_EMAIL_SMTP_PORT = "smtp-port";
 	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-password";
 	public static final String PROP_EMAIL_SMTP_USERNAME = "smtp-username";
 	public static final String PROP_ENCRYPTION_ALGORITHM = "encryption-algorithm";

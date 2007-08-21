@@ -18,8 +18,13 @@ package org.jamwiki.mail;
 
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -36,30 +41,34 @@ import org.jamwiki.utils.WikiLogger;
 public class WikiMail {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiMail.class.getName());
-	private final Session session;
-	private static WikiMail instance;
+	
+        private final Session session;
 
-	/**
+        /**
 	 * Construct the object by opening a JavaMail session. Use getInstance to provide Singleton behavior.
 	 */
-	public WikiMail() {
-		Properties props = System.getProperties();
-		props.setProperty("mail.smtp.host", Environment.getValue(Environment.PROP_EMAIL_SMTP_HOST));
-		if (Environment.getValue(Environment.PROP_EMAIL_SMTP_USERNAME).equals("")) {
-			session = Session.getInstance(props, null);
-		} else {
-			session = Session.getInstance(props, new WikiMailAuthenticator());
-		}
-	}
-
-	/**
-	 * Provide a Singleton instance of the object.
-	 */
-	public static WikiMail getInstance() {
-		if (instance == null) {
-			instance = new WikiMail();
-		}
-		return instance;
+	public WikiMail(String host, int port, final String account, final String password) {
+                logger.fine("Host=" + host);
+                logger.fine("Port=" + port);
+                logger.fine("Account=" + account);
+                logger.fine("Pasword=" + password);
+                
+                Properties props = new Properties();
+                props.setProperty("mail.smtp.host", host); 
+                props.setProperty("mail.smtp.port", Integer.toString(port));
+                props.setProperty("mail.smtp.auth" , "true"); 
+                session = Session.getInstance(props, new javax.mail.Authenticator()
+                {
+                    protected PasswordAuthentication getPasswordAuthentication()
+                    {
+                        return new PasswordAuthentication(account, password);
+                    }
+                });
+                if (logger.isLoggable(Level.FINE)) {
+                        session.setDebug(true);
+                        session.setDebugOut(System.out);
+                        //TODO: redirect to logging system?
+                }
 	}
 
 	/**
@@ -71,6 +80,10 @@ public class WikiMail {
 	 * @param body the RFC 822 "Body" field
 	 */
 	public void sendMail(String from, String to, String subject, String body) {
+                logger.info("From:" + from);
+                logger.info("To:" + to);
+                logger.info("Subject:" + subject);
+                logger.info("Body:" + body);
 		try {
 			MimeMessage message = new MimeMessage(session);
 			InternetAddress internetAddress = new InternetAddress(from);
@@ -81,16 +94,11 @@ public class WikiMail {
 			message.setText(body);
 			message.setSentDate(new Date());
 			message.saveChanges();
+                        
 			Transport.send(message);
 		} catch (MessagingException e) {
 			logger.warning("Mail error", e);
 		}
 	}
 
-	/**
-	 *
-	 */
-	public static void init() {
-		instance = null;
-	}
 }

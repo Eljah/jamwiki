@@ -22,9 +22,11 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.acegisecurity.context.SecurityContextHolder;
+import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.mail.WikiEmailService;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserInfo;
@@ -41,16 +43,21 @@ public class RegisterServlet extends JAMWikiServlet {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(RegisterServlet.class.getName());
 	protected static final String JSP_REGISTER = "register.jsp";
+        protected static final String JSP_MESSAGE = "show-message.jsp";
+        
+        private WikiEmailService emailService;
 
 	/**
 	 *
 	 */
 	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		if (request.getParameter("function") == null) {
+                String function = request.getParameter("function");
+                logger.info("Function=" + function);
+                if (function == null) {
 			view(request, next, pageInfo);
-		} else {
+		} else if ("Save".equals(function)){
 			register(request, next, pageInfo);
-		}
+		} 
 		return next;
 	}
 
@@ -102,13 +109,33 @@ public class RegisterServlet extends JAMWikiServlet {
 			}
 			this.loadDefaults(request, next, pageInfo, user, userInfo);
 		} else {
-			WikiBase.getDataHandler().writeWikiUser(user, userInfo, null);
-			// force logout to ensure current user will be re-validated.  this is
-			// necessary because the install may have changed underlying data structures.
-			SecurityContextHolder.clearContext();
-			VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
-			String topic = virtualWiki.getDefaultTopicName();
-			ServletUtil.redirect(next, virtualWikiName, topic);
+                        emailService.loadConfiguration();
+                        
+                        if (emailService.isActivated()) {
+                                logger.finest("email is activated");
+                                user.setEnabled(0);
+                                String code = emailService.sendActivationLink(request, Utilities.buildLocale(user.getDefaultLocale()), user.getUsername(), userInfo.getEmail());
+                                user.setValidationCode(code);
+                                WikiBase.getDataHandler().writeWikiUser(user, userInfo, null);
+                                loadDefaults(request, next, pageInfo, user, userInfo);
+                                
+                                next.addObject("message", "register.activation.message");
+                                next.addObject("items", new Object[] { "Special:Login"});
+                                pageInfo.setContentJsp(JSP_MESSAGE);
+                        }
+                        else {
+                                user.setEnabled(1);
+                                //see EmailServet.confirmRegistration
+                                logger.finest("writing user info");
+                                WikiBase.getDataHandler().writeWikiUser(user, userInfo, null);
+                                // force logout to ensure current user will be re-validated.  this is
+                                // necessary because the install may have changed underlying data structures.
+                                SecurityContextHolder.clearContext();
+                                VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
+                                //String topic = virtualWiki.getDefaultTopicName();
+                                String topic = "Special:Login";
+                                ServletUtil.redirect(next, virtualWikiName, topic);
+                        }
 		}
 	}
 
@@ -214,4 +241,13 @@ public class RegisterServlet extends JAMWikiServlet {
 		}
 		this.loadDefaults(request, next, pageInfo, user, userInfo);
 	}
+
+        public WikiEmailService getEmailService() {
+                return emailService;
+        }
+
+        public void setEmailService(WikiEmailService emailService) {
+                this.emailService = emailService;
+        }
+        
 }

@@ -268,7 +268,7 @@
 	<properties>
 		<jflex.dir>${basedir}/src/lex</jflex.dir>
 		<jflex.output.directory>
-			${basedir}/target/generated-sources/jflex/
+			${basedir}/src/main/java/
 		</jflex.output.directory>
 	</properties>
 	<build>
@@ -297,7 +297,7 @@
 				<executions>
 					<execution>
 						<id>generate-flex</id>
-						<phase>generate</phase>
+						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
 								<taskdef

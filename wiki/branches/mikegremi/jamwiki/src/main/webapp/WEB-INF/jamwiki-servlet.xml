@@ -18,7 +18,8 @@
 				<prop key="/**/Special:Contributions">Contributions</prop>
 				<prop key="/**/Special:Diff">Diff</prop>
 				<prop key="/**/Special:Edit">Edit</prop>
-				<prop key="/**/Special:Export">Export</prop>
+				<prop key="/**/Special:Email">Email</prop>
+				<prop key="/**/Special:Export">Export</prop>	
 				<prop key="/**/Special:Filelist">Items</prop>
 				<prop key="/**/Special:History">History</prop>
 				<prop key="/**/Special:Import">Import</prop>
@@ -55,13 +56,19 @@
 	<bean id="Contributions" class="org.jamwiki.servlets.ContributionsServlet" />
 	<bean id="Diff" class="org.jamwiki.servlets.DiffServlet" />
 	<bean id="Edit" class="org.jamwiki.servlets.EditServlet" />
+ 	<bean id="Email" class="org.jamwiki.servlets.EmailServlet" >
+ 		<property name="emailService" ref="emailService"></property>
+ 	</bean>
+ 		
 	<bean id="Export" class="org.jamwiki.servlets.ExportServlet" />
 	<bean id="History" class="org.jamwiki.servlets.HistoryServlet" />
 	<bean id="Import" class="org.jamwiki.servlets.ImportServlet" />
 	<bean id="ImportTiddly" class="org.jamwiki.servlets.ImportTiddlyWikiServlet" />
 	<bean id="Items" class="org.jamwiki.servlets.ItemsServlet" />
 	<bean id="LinkTo" class="org.jamwiki.servlets.LinkToServlet" />
-	<bean id="Login" class="org.jamwiki.servlets.LoginServlet" />
+	<bean id="Login" class="org.jamwiki.servlets.LoginServlet">
+		<property name="emailService" ref="emailService"></property>
+	</bean>
 	<bean id="Manage" class="org.jamwiki.servlets.ManageServlet" />
 	<bean id="Move" class="org.jamwiki.servlets.MoveServlet" />
 	<bean id="Printable" class="org.jamwiki.servlets.PrintableServlet" />
@@ -70,7 +77,10 @@
 		<property name="defaultFeedType" value="rss_2.0"/>
 		<property name="defaultIncludeMinorEdits" value="false"/>
 	</bean>
-	<bean id="Register" class="org.jamwiki.servlets.RegisterServlet" />
+	<bean id="Register" class="org.jamwiki.servlets.RegisterServlet" >
+	 	<property name="emailService" ref="emailService"></property>
+	</bean>
+	
 	<bean id="Roles" class="org.jamwiki.servlets.RolesServlet" />
 	<bean id="Search" class="org.jamwiki.servlets.SearchServlet" />
 	<bean id="Setup" class="org.jamwiki.servlets.SetupServlet" />
@@ -90,4 +100,8 @@
 
 	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
 
+ 	<bean id="emailService" class="org.jamwiki.mail.WikiEmailService">
+ 		<property name="servletName" value="Special:Email"/>
+ 	</bean>
+ 	
 </beans>

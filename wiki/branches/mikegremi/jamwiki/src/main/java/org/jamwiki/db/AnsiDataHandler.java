@@ -715,6 +715,8 @@ public class AnsiDataHandler implements DataHandler {
 			user.setLastLoginIpAddress(rs.getString("last_login_ip_address"));
 			user.setPassword(rs.getString("remember_key"));
 			user.setDefaultLocale(rs.getString("default_locale"));
+                        user.setEnabled(rs.getInt("enabled"));
+                        user.setValidationCode(rs.getString("validation_code"));
 			return user;
 		} catch (Exception e) {
 			logger.severe("Failure while initializing user", e);

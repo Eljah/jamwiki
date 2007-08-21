@@ -72,13 +72,24 @@ function onRSS() {
 	}
 	document.getElementById("<%= Environment.PROP_RSS_TITLE %>").disabled = disabled;
 }
+function onEmail() {
+	var disabled = true;
+	if (document.getElementById("<%= Environment.PROP_EMAIL_ACTIVATED %>").checked) {
+		disabled = false;
+	}
+	document.getElementById("<%= Environment.PROP_EMAIL_SMTP_HOST %>").disabled = disabled;
+	document.getElementById("<%= Environment.PROP_EMAIL_SMTP_PORT %>").disabled = disabled;
+	document.getElementById("<%= Environment.PROP_EMAIL_SMTP_USERNAME %>").disabled = disabled;
+	document.getElementById("<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>").disabled = disabled;
+	document.getElementById("<%= Environment.PROP_EMAIL_REPLY_ADDRESS %>").disabled = disabled;
+}
 </script>
 
 <form name="form1" method="post" action="<jamwiki:link value="Special:Admin" />">
 
 <div class="submenu">
-<a href="#general"><f:message key="admin.header.general" /></a> | <a href="#parser"><f:message key="admin.header.parser" /></a> | <a href="#database"><f:message key="admin.header.persistence" /></a> | <a href="#upload"><f:message key="admin.header.upload" /></a><br />
-<a href="#authentication"><f:message key="admin.header.ldap" /></a> | <a href="#cache"><f:message key="admin.header.cache" /></a> | <a href="#rss"><f:message key="admin.header.rss" /></a> | <a href="#save"><f:message key="admin.action.save" /></a>
+<a href="#general"><f:message key="admin.header.general" /> </a> | <a href="#parser"><f:message key="admin.header.parser" /></a> | <a href="#email"><f:message key="admin.header.email" /> | <a href="#database"><f:message key="admin.header.persistence" /></a> <br />
+<a href="#upload"><f:message key="admin.header.upload" /></a> | <a href="#authentication"><f:message key="admin.header.ldap" /></a> | <a href="#cache"><f:message key="admin.header.cache" /></a> | <a href="#rss"><f:message key="admin.header.rss" /></a> | <a href="#save"><f:message key="admin.action.save" /></a>
 </div>
 
 <c:if test="${!empty message}">
@@ -212,18 +223,25 @@ function onRSS() {
 </fieldset>
 <!-- END PARSER -->
 
-<%--
-FIXME - Email not supported right now, comment this out
-
 <!-- BEGIN EMAIL -->
 <a name="email"></a>
 <fieldset>
 <legend><f:message key="admin.caption.smtp" /></legend>
 <table border="0" class="contents">
 <tr>
+	<td class="formcaption"><label for="<%= Environment.PROP_EMAIL_ACTIVATED %>"><f:message key="admin.caption.smtp.activate" /></label></td>
+	<c:set var="PROP_EMAIL_ACTIVATED"><%= Environment.PROP_EMAIL_ACTIVATED %></c:set>
+	<td class="formelement"><jamwiki:checkbox name="${PROP_EMAIL_ACTIVATED}" value="true" checked="${props[PROP_EMAIL_ACTIVATED]}" id="${PROP_EMAIL_ACTIVATED}" onclick="onEmail()"/></td>
+</tr>
+<tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_EMAIL_SMTP_HOST %>"><f:message key="admin.caption.smtp.host" /></label></td>
 	<c:set var="PROP_EMAIL_SMTP_HOST"><%= Environment.PROP_EMAIL_SMTP_HOST %></c:set>
 	<td class="formelement"><jamwiki:text name="${PROP_EMAIL_SMTP_HOST}" value="${props[PROP_EMAIL_SMTP_HOST]}" size="30" id="${PROP_EMAIL_SMTP_HOST}" /></td>
+</tr>
+<tr>
+	<td class="formcaption"><label for="<%= Environment.PROP_EMAIL_SMTP_PORT %>"><f:message key="admin.caption.smtp.port" /></label></td>
+	<c:set var="PROP_EMAIL_SMTP_PORT"><%= Environment.PROP_EMAIL_SMTP_PORT %></c:set>
+	<td class="formelement"><jamwiki:text name="${PROP_EMAIL_SMTP_PORT}" value="${props[PROP_EMAIL_SMTP_PORT]}" size="30" id="${PROP_EMAIL_SMTP_PORT}" /></td>
 </tr>
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_EMAIL_SMTP_USERNAME %>"><f:message key="admin.caption.smtp.user" /></label></td>
@@ -241,9 +259,7 @@ FIXME - Email not supported right now, comment this out
 </tr>
 </table>
 </fieldset>
-<!-- END EMAIL -->
 
---%>
 
 <!-- BEGIN DATABASE PERSISTENCE -->
 <a name="database"></a>
@@ -473,6 +489,7 @@ FIXME - Email not supported right now, comment this out
 onPersistenceType()
 onUploadType()
 onLdap()
+onEmail()
 </script>
 </table>
 </fieldset>
