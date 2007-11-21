@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+ http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jamwiki</groupId>
+		<artifactId>jamwiki-parent</artifactId>
+		<version>0.2-SNAPSHOT</version>
+		<relativePath>../jamwiki-parent</relativePath>
+	</parent>
+	<groupId>org.jamwiki</groupId>
+	<artifactId>jamwiki</artifactId>
+	<packaging>war</packaging>
+	<name>JAMWiki</name>
+	<!-- jamwiki (webapp) and jamwiki-core have the same version,
+	defined in jamwiki-parent -->
+	<version>${jamwiki.version}</version>
+	<description>
+		JAMWiki is a Java-based Wiki engine, which offers many of the
+		features of MediaWiki.
+	</description>
+	<url>http://www.jamwiki.org</url>
+
+
+
+	<dependencies>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>rome</groupId>
+			<artifactId>rome</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>taglibs</groupId>
+			<artifactId>standard</artifactId>
+		</dependency>
+
+
+		<!--  These dependencies are related project.
+		They need to be "mvn install"ed 
+		before being able to compile JAMwiki. 
+		-->
+		<dependency>
+			<groupId>org.jamwiki</groupId>
+			<artifactId>jamwiki-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- dependencies in test scope -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>		
+	</dependencies>
+	
+
+	<build>
+		<defaultGoal>package</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.4</source>
+					<target>1.4</target>
+					<encoding>ISO-8859-1</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+    		    <artifactId>maven-surefire-plugin</artifactId>
+        		<configuration>
+        		 	<includes>
+        		 		<include>org/jamwiki/test/JAMWikiTestSuite.java</include>
+        		 	</includes>
+	        	</configuration>
+    		</plugin>
+			
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+			</plugin>
+			
+    		 <plugin>
+    		 	<artifactId>maven-source-plugin</artifactId>
+    		 </plugin>
+		</plugins>
+	</build>
+</project>

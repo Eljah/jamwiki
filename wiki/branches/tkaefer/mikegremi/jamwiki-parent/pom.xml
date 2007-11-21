@@ -1,0 +1,36 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jamwiki</groupId>
+	<artifactId>jamwiki-parent</artifactId>
+	<packaging>pom</packaging>
+	<version>0.2-SNAPSHOT</version>
+	<name>Jamwiki Super POM</name>
+	<url>http://www.jamwiki.org</url>
+
+	<scm>
+		<connection>scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/trunk</connection>
+		<developerConnection>scm:svn:https://jamwiki.svn.sourceforge.net/svnroot/jamwiki/wiki/trunk</developerConnection>
+		<tag>HEAD</tag>
+		<url>http://jamwiki.svn.sourceforge.net/viewvc/jamwiki/</url>
+	</scm>
+	
+	<issueManagement>
+		<system>Wiki</system>	
+		<url>http://jamwiki.org/wiki/en/Bug_Reports</url>
+	</issueManagement>  
+	
+	<licenses>
+		<license>
+			<name>LGPL</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<!-- TODO: split parent (inheritance of properties) 
+	from agregator (multiple modules called from one agregator project)-->	
+	<modules>
+		<module>../jamwiki</module>
+		<module>../javadiff</module>
+	</modules>
+</project>
