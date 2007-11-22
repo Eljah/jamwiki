@@ -57,6 +57,7 @@ public class OpenSearchDescriptionServlet extends AbstractController {
         response.setCharacterEncoding(FEED_ENCODING);
         StringBuffer requestURL = request.getRequestURL();
         String feedURL = requestURL.substring(0, requestURL.length() - WikiUtil.getTopicFromURI(request).length());
+        String wikiURL = feedURL.substring(0, feedURL.length() - WikiUtil.getVirtualWikiFromURI(request).length() - 1);
         try{
 			XMLOutputFactory factory = XMLOutputFactory.newInstance();
 			XMLStreamWriter writer = factory.createXMLStreamWriter(response.getWriter());
@@ -74,6 +75,12 @@ public class OpenSearchDescriptionServlet extends AbstractController {
 					writer.writeEndElement();
 					writer.writeStartElement("Tags");
 						writer.writeCharacters("JAMWiki wiki");
+					writer.writeEndElement();
+					writer.writeStartElement("Image");
+						writer.writeAttribute("height", "16");
+						writer.writeAttribute("width", "16");
+						writer.writeAttribute("type", "image/x-icon");
+						writer.writeCharacters( wikiURL + "images/favicon.ico");
 					writer.writeEndElement();
 					writer.writeStartElement("Contact");
 						//TODO retrieve standard contact
