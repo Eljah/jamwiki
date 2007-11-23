@@ -109,8 +109,8 @@ public class OpenSearchResultFeedServlet extends AbstractController {
         OpenSearchModule osm = new OpenSearchModuleImpl();
         osm.setItemsPerPage(1);
         osm.setStartIndex(1);
-        osm.setTotalResults(1024);
-        osm.setItemsPerPage(50);
+        osm.setTotalResults(results.size());
+        osm.setItemsPerPage(results.size());
 
         OSQuery query = new OSQuery();
         query.setRole("superset");
