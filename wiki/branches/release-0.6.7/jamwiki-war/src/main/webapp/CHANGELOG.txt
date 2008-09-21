@@ -26,6 +26,8 @@ Bugfixes:
   * Editing a section of a topic did not always redirect back to that section
     after saving the topic in cases of section names with umlauts or other
     special characters.
+  * Resolve a CSS issue that impacted edit links on IE6.  Reported by an
+    anonymous user.
 
 Translation Updates:
 
