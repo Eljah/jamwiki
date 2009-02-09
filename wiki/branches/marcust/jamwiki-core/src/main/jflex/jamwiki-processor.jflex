@@ -343,7 +343,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     if (yystate() == PARAGRAPH) {
         endState();
     }
-    WikiHeadingTag parserTag = new WikiHeadingTag();
+    WikiHeadingTag parserTag = this.parserInput.getTagFactory().newWikiHeadingTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
@@ -391,19 +391,19 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 <YYINITIAL, LIST, TABLE, PARAGRAPH>{imagelinkcaption} {
     logger.finer("imagelinkcaption: " + yytext() + " (" + yystate() + ")");
-    WikiLinkTag parserTag = new WikiLinkTag();
+    WikiLinkTag parserTag = this.parserInput.getTagFactory().newWikiLinkTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
 <YYINITIAL, LIST, TABLE, PARAGRAPH>{wikilink} {
     logger.finer("wikilink: " + yytext() + " (" + yystate() + ")");
-    WikiLinkTag parserTag = new WikiLinkTag();
+    WikiLinkTag parserTag = this.parserInput.getTagFactory().newWikiLinkTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
 <YYINITIAL, LIST, TABLE, PARAGRAPH>{htmllink} {
     logger.finer("htmllink: " + yytext() + " (" + yystate() + ")");
-    HtmlLinkTag parserTag = new HtmlLinkTag();
+    HtmlLinkTag parserTag = this.parserInput.getTagFactory().newHtmlLinkTag();
     return parserTag.parse(this.parserInput, this.mode, yytext());
 }
 
@@ -431,19 +431,19 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 <YYINITIAL, LIST, TABLE, PARAGRAPH>{reference} {
     logger.finer("reference: " + yytext() + " (" + yystate() + ")");
-    WikiReferenceTag parserTag = new WikiReferenceTag();
+    WikiReferenceTag parserTag = this.parserInput.getTagFactory().newWikiReferenceTag();
     return parserTag.parse(this.parserInput, this.mode, yytext());
 }
 
 <YYINITIAL, LIST, TABLE, PARAGRAPH>{referencenocontent} {
     logger.finer("referencenocontent: " + yytext() + " (" + yystate() + ")");
-    WikiReferenceTag parserTag = new WikiReferenceTag();
+    WikiReferenceTag parserTag = this.parserInput.getTagFactory().newWikiReferenceTag();
     return parserTag.parse(this.parserInput, this.mode, yytext());
 }
 
 <YYINITIAL, LIST, TABLE, PARAGRAPH>{references} {
     logger.finer("references: " + yytext() + " (" + yystate() + ")");
-    WikiReferencesTag parserTag = new WikiReferencesTag();
+    WikiReferencesTag parserTag = this.parserInput.getTagFactory().newWikiReferencesTag();
     return parserTag.parse(this.parserInput, this.mode, yytext());
 }
 

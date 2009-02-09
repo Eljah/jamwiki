@@ -34,7 +34,7 @@ import org.jamwiki.utils.WikiLogger;
         if (inTargetSection && this.sectionDepth >= level) {
             inTargetSection = false;
         } else if (this.targetSection == this.section) {
-            WikiHeadingTag parserTag = new WikiHeadingTag();
+            WikiHeadingTag parserTag = this.parserInput.getTagFactory().newWikiHeadingTag();
             parserTag.parse(this.parserInput, this.parserOutput, this.mode, headingText);
             inTargetSection = true;
             this.sectionDepth = level;

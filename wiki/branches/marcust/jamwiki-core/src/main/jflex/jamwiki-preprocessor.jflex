@@ -140,7 +140,7 @@ wikisignature      = ([~]{3,5})
         endState();
         String value = new String(this.templateString);
         this.templateString = "";
-        TemplateTag parserTag = new TemplateTag();
+        TemplateTag parserTag = this.parserInput.getTagFactory().newTemplateTag();
         return parserTag.parse(this.parserInput, this.parserOutput, this.mode, value);
     }
     return "";
@@ -184,13 +184,13 @@ wikisignature      = ([~]{3,5})
 
 <YYINITIAL, TEMPLATE>{includeonly} {
     logger.finer("includeonly: " + yytext() + " (" + yystate() + ")");
-    IncludeOnlyTag parserTag = new IncludeOnlyTag();
+    IncludeOnlyTag parserTag = this.parserInput.getTagFactory().newIncludeOnlyTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
 <YYINITIAL, TEMPLATE>{noinclude} {
     logger.finer("noinclude: " + yytext() + " (" + yystate() + ")");
-    NoIncludeTag parserTag = new NoIncludeTag();
+    NoIncludeTag parserTag = this.parserInput.getTagFactory().newNoIncludeTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
@@ -198,13 +198,13 @@ wikisignature      = ([~]{3,5})
 
 <YYINITIAL>{imagelinkcaption} {
     logger.finer("imagelinkcaption: " + yytext() + " (" + yystate() + ")");
-    WikiLinkTag parserTag = new WikiLinkTag();
+    WikiLinkTag parserTag = this.parserInput.getTagFactory().newWikiLinkTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
 <YYINITIAL>{wikilink} {
     logger.finer("wikilink: " + yytext() + " (" + yystate() + ")");
-    WikiLinkTag parserTag = new WikiLinkTag();
+    WikiLinkTag parserTag = this.parserInput.getTagFactory().newWikiLinkTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
@@ -212,7 +212,7 @@ wikisignature      = ([~]{3,5})
 
 <YYINITIAL>{wikisignature} {
     logger.finer("wikisignature: " + yytext() + " (" + yystate() + ")");
-    WikiSignatureTag parserTag = new WikiSignatureTag();
+    WikiSignatureTag parserTag = this.parserInput.getTagFactory().newWikiSignatureTag();
     return parserTag.parse(this.parserInput, this.parserOutput, this.mode, yytext());
 }
 
