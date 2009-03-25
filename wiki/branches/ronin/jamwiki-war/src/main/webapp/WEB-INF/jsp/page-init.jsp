@@ -21,7 +21,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://jamwiki.org/taglib" prefix="jamwiki" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
-
+<%@ taglib uri="/WEB-INF/FCKeditor.tld" prefix="fck" %>
 <%
 // no-cache headers
 response.setHeader("Cache-Control", "private, s-maxage=0, max-age=0, must-revalidate");

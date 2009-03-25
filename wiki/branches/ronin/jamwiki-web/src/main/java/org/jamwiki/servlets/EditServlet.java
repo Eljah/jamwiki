@@ -180,6 +180,16 @@ public class EditServlet extends JAMWikiServlet {
 		WikiUser user = ServletUtil.currentWikiUser();
 		String editor = user.getEditor();
 		next.addObject("editor", editor);
+
+		//[ronin] convert to wiki format
+		ParserInput parserInput = new ParserInput();
+		parserInput.setContext(request.getContextPath());
+		parserInput.setLocale(request.getLocale());
+		parserInput.setTopicName(topicName);
+		parserInput.setVirtualWiki(virtualWiki);
+		
+		contents = ParserUtil.parse(parserInput, null, contents);
+
 		next.addObject("contents", contents);
 	}
 
@@ -239,7 +249,12 @@ public class EditServlet extends JAMWikiServlet {
 		String contents = (String)request.getParameter("contents");
 		Topic previewTopic = new Topic();
 		previewTopic.setName(topicName);
-		previewTopic.setTopicContent(contents);
+		//previewTopic.setTopicContent(contents);
+		
+		// ronin: parse to wiki format before previewing.
+		String previewContents = WikiUtil.getWikiFormat(contents);
+		previewTopic.setTopicContent(previewContents);
+		
 		previewTopic.setVirtualWiki(virtualWiki);
 		next.addObject("editPreview", "true");
 		ServletUtil.viewTopic(request, next, pageInfo, null, previewTopic, false);
@@ -253,9 +268,15 @@ public class EditServlet extends JAMWikiServlet {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		Topic lastTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
 		String contents1 = lastTopic.getTopicContent();
-		String contents2 = request.getParameter("contents");
+		//String contents2 = request.getParameter("contents");
+
+		//[ronin] convert to wiki format
+		String previewContents2 = request.getParameter("contents");
+		String contents2 = WikiUtil.getWikiFormat(previewContents2);
+		
 		next.addObject("lastTopicVersionId", lastTopic.getCurrentVersionId());
-		next.addObject("contentsResolve", contents2);
+		//next.addObject("contentsResolve", contents2);
+		next.addObject("contentsResolve", previewContents2);
 		this.loadDiff(request, next, pageInfo, contents1, contents2);
 		this.loadEdit(request, next, pageInfo, contents1, virtualWiki, topicName, false);
 		next.addObject("editResolve", "true");
@@ -316,6 +337,10 @@ public class EditServlet extends JAMWikiServlet {
 		parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
 		parserInput.setVirtualWiki(virtualWiki);
 		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
+		
+		//[ronin] convert to wiki format
+		contents = WikiUtil.getWikiFormat(contents);
+
 		// parse signatures and other values that need to be updated prior to saving
 		contents = ParserUtil.parseMinimal(parserInput, contents);
 		topic.setTopicContent(contents);
