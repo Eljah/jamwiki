@@ -60,8 +60,21 @@
 <input type="hidden" name="section" value="<c:out value="${section}" />" />
 <input type="hidden" name="topicVersionId" value="<c:out value="${topicVersionId}" />" />
 
+<c:choose>
+	<c:when test="${editor == 'toolbar'}">
+		<%@ include file="editor-toolbar-include.jsp" %>
+	</c:when>
+</c:choose>
+
 <p>
-<fck:editor imageUploadURL="../filemanager/upload/simpleuploader.jsp?Type=Image" height="480" width="100%" id="contents">${contents}</fck:editor>
+<c:choose>
+	<c:when test="${editor == 'fckeditor'}">
+		<fck:editor imageUploadURL="../filemanager/upload/simpleuploader.jsp?Type=Image" height="480" width="100%" id="contents">${contents}</fck:editor>
+	</c:when>
+	<c:otherwise>
+		<textarea id="topicContents" name="contents" rows="25" cols="80" accesskey=","><c:out value="${contents}" escapeXml="true" /></textarea>
+	</c:otherwise>
+</c:choose>
 </p>
 <p><label for="editComment"><fmt:message key="edit.caption.comment" /></label>: <input type="text" name="editComment" value="<c:out value="${editComment}" />" size="60" id="editComment" /></p>
 <p>
@@ -83,7 +96,14 @@
 <c:if test="${!empty editResolve}">
 <%@ include file="diff-include.jsp" %>
 <p>
-<fck:editor height="480" width="100%" id="contentsResolve">${contentsResolve}</fck:editor>
+<c:choose>
+	<c:when test="${editor == 'fckeditor'}">
+		<fck:editor height="480" width="100%" id="contentsResolve">${contentsResolve}</fck:editor>
+	</c:when>
+	<c:otherwise>
+		<textarea name="contentsResolve" rows="25" cols="80"><c:out value="${contentsResolve}" escapeXml="true" /></textarea>
+	</c:otherwise>
+</c:choose>
 </p>
 </c:if>
 

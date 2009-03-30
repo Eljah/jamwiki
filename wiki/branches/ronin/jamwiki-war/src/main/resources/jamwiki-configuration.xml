@@ -108,6 +108,10 @@
 		<key>none</key>
 	</editor>
 	<editor>
+		<name>FCKEditor (WYSIWYG)</name>
+		<key>fckeditor</key>
+	</editor>
+	<editor>
 		<name>Toolbar</name>
 		<key>toolbar</key>
 	</editor>
