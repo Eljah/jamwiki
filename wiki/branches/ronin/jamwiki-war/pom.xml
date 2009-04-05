@@ -12,6 +12,20 @@
 	<artifactId>jamwiki-war</artifactId>
 	<packaging>war</packaging>
 	<name>JAMWiki WAR</name>
+	<repositories>
+		<repository>
+			<id>org.jamwiki</id>
+			<name>Maven Repository for Jamwiki</name>
+			<layout>default</layout>
+			<url>file://${basedir}/../repository</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.jamwiki</groupId>
@@ -20,6 +34,11 @@
 		<dependency>
 			<groupId>org.jamwiki</groupId>
 			<artifactId>jamwiki-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.fckeditor</groupId>
+			<artifactId>fckeditor</artifactId>
+			<version>2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
