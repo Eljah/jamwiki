@@ -75,6 +75,9 @@
 
 <jamwiki:enabled property="PROP_TOPIC_USE_PREVIEW"><input type="submit" name="preview" value="<fmt:message key="edit.action.preview" />" accesskey="p" /></jamwiki:enabled>
 <jamwiki:enabled property="PROP_TOPIC_USE_SHOW_CHANGES"><input type="submit" name="showChanges" value="<fmt:message key="edit.action.showchanges" />" accesskey="v" /></jamwiki:enabled>
+<c:if test="${!empty lastTopicVersionId}">
+    &nbsp;<a href="<jamwiki:link value="${pageInfo.topicName}"/>"><fmt:message key="common.cancel" /></a>
+</c:if>
 
 &nbsp;&nbsp;&nbsp;
 <input type="checkbox" value="true" name="minorEdit"<c:if test="${minorEdit}"> checked</c:if> id="minorEdit" accesskey="i" />
