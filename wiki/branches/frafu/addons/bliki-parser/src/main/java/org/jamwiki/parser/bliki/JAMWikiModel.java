@@ -22,7 +22,6 @@ import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.jflex.WikiHeadingTag;
 import org.jamwiki.parser.jflex.WikiSignatureTag;
-import org.jamwiki.utils.InterWikiHandler;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Utilities;
@@ -98,6 +97,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 
 	}
 
+	@Override
 	public void appendSignature(Appendable writer, int numberOfTildes) throws IOException {
 		WikiSignatureTag parserTag;
 		switch (numberOfTildes) {
@@ -116,6 +116,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		}
 	}
 
+	@Override
 	public void appendInternalLink(String topic, String hashSection, String topicDescription, String cssClass, boolean parseRecursive) {
 		try {
 			WikiLink wikiLink;
@@ -133,7 +134,8 @@ public class JAMWikiModel extends AbstractWikiModel {
 			if (StringUtils.isBlank(topic) && !StringUtils.isBlank(section)) {
 				// do not check existence for section links
 			} else {
-				if (!LinkUtil.isExistingArticle(virtualWiki, topic)) {
+				String articleName = topic.replace('_', ' ');
+				if (!LinkUtil.isExistingArticle(virtualWiki, articleName)) {
 					style = "edit";
 					href = LinkUtil.buildEditLinkUrl(fContextPath, virtualWiki, topic, query, -1);
 				}
@@ -207,20 +209,24 @@ public class JAMWikiModel extends AbstractWikiModel {
 		return url.toString();
 	}
 
+	@Override
 	public void addCategory(String categoryName, String sortKey) {
 		fParserOutput.addCategory(getCategoryNamespace() + NamespaceHandler.NAMESPACE_SEPARATOR + categoryName, sortKey);
 	}
 
+	@Override
 	public void addLink(String topic) {
 		fParserOutput.addLink(topic);
 	}
 
+	@Override
 	public void addTemplate(String template) {
 		fParserOutput.addTemplate(template);
 	}
 
-	public String getRawWikiContent(String namespace, String topicName, Map map) {
-		String result = super.getRawWikiContent(namespace, topicName, map);
+	@Override
+	public String getRawWikiContent(String namespace, String topicName, Map<String, String> templateParameters) {
+		String result = super.getRawWikiContent(namespace, topicName, templateParameters);
 		if (result != null) {
 			return result;
 		}
@@ -237,6 +243,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		return result;
 	}
 
+	@Override
 	public void buildEditLinkUrl(int section) {
 		if (fParserInput.getAllowSectionEdit()) {
 			TagNode divTagNode = new TagNode("div");
@@ -246,8 +253,10 @@ public class JAMWikiModel extends AbstractWikiModel {
 
 			String url = "";
 			try {
+				// Use correct section number. 
+				// Bliki starts with offset 0 so it must be "section+1"
 				url = LinkUtil.buildEditLinkUrl(fParserInput.getContext(), fParserInput.getVirtualWiki(), fParserInput.getTopicName(),
-						null, section);
+						null, section + 1);
 			} catch (Exception e) {
 				logger.severe("Failure while building link for topic " + fParserInput.getVirtualWiki() + " / "
 						+ fParserInput.getTopicName(), e);
@@ -260,22 +269,27 @@ public class JAMWikiModel extends AbstractWikiModel {
 		}
 	}
 
+	@Override
 	public boolean parseBBCodes() {
 		return false;
 	}
 
+	@Override
 	public boolean replaceColon() {
 		return false;
 	}
 
+	@Override
 	public String getCategoryNamespace() {
 		return NamespaceHandler.NAMESPACE_CATEGORY;
 	}
 
+	@Override
 	public String getImageNamespace() {
 		return NamespaceHandler.NAMESPACE_IMAGE;
 	}
 
+	@Override
 	public String getTemplateNamespace() {
 		return NamespaceHandler.NAMESPACE_TEMPLATE;
 	}
@@ -284,6 +298,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		return null;
 	}
 
+	@Override
 	public void appendInterWikiLink(String namespace, String title, String topicDescription) {
 		String hrefLink = getInterwikiMap().get(namespace.toLowerCase());
 		if (hrefLink != null) {
@@ -305,6 +320,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		}
 	}
 
+	@Override
 	public boolean isTemplateTopic() {
 		String topicName = fParserInput.getTopicName();
 		int index = topicName.indexOf(':');
@@ -317,10 +333,12 @@ public class JAMWikiModel extends AbstractWikiModel {
 		return false;
 	}
 
+	@Override
 	public boolean isMathtranRenderer() {
 		return true;
 	}
 
+	@Override
 	public String parseTemplates(String rawWikiText, boolean parseOnlySignature) {
 		if (rawWikiText == null) {
 			return "";
