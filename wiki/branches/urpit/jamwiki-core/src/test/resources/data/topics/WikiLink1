@@ -1,0 +1,32 @@
+<!-- test parsing of wiki links -->
+[[Example1]]
+
+[[Example1|text]]
+
+[[Example1]]s
+
+[[Example1|text]]s
+
+[[Example1]]S
+
+[[Example1|text]]S
+
+[[Example1]]9
+
+[[Example1|text]]9
+
+[[Comments:Example1]]9
+
+[[#Section]]
+
+[[#Section|text]]
+
+[[Special:Upload]]
+
+[[+]]
+
+[[+ start]]
+
+[[end +]]
+
+[[at the + middle]]
