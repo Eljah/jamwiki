@@ -157,6 +157,11 @@ function onRSS() {
 		</select>
 	</span>
 </div>
+<div class="formentry <jamwiki:alternate value1="mediumbg" value2="lightbg" attributeName="general" />">
+	<span class="formcaption"><label for="<%= Environment.PROP_BASE_SEARCH_IN_ALL_WIKIS %>"><fmt:message key="admin.caption.searchinallwikis" /></label></span>
+	<c:set var="PROP_BASE_SEARCH_IN_ALL_WIKIS"><%= Environment.PROP_BASE_SEARCH_IN_ALL_WIKIS %></c:set>
+	<span class="formelement"><jamwiki:checkbox name="${PROP_BASE_SEARCH_IN_ALL_WIKIS}" value="true" checked="${props[PROP_BASE_SEARCH_IN_ALL_WIKIS]}" id="${PROP_BASE_SEARCH_IN_ALL_WIKIS}" /></span>
+</div>
 </fieldset>
 <!-- END GENERAL SETTINGS -->
 

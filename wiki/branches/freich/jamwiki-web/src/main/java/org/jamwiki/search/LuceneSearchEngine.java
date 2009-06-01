@@ -18,8 +18,11 @@ package org.jamwiki.search;
 
 import java.io.File;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -51,6 +54,8 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.WikiLogger;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * An implementation of {@link org.jamwiki.SearchEngine} that uses
@@ -238,6 +243,20 @@ public class LuceneSearchEngine implements SearchEngine {
 	 *  contain the search term.
 	 */
 	public Collection findResults(String virtualWiki, String text) {
+		if (virtualWiki == null)
+			return findResultsInAllVirtualWikis(text);
+		
+		// TODO: check if user is in role XXXX (for all virtual wikis) or in role XXXX_wiki (for this specific virtual wiki).
+		/*
+		List roles = new ArrayList();
+	    roles.add(ParserUtil.getRoleNameForVirtualWiki("ROLE_VIEW", null));
+	    roles.add(ParserUtil.getRoleNameForVirtualWiki("ROLE_VIEW", virtualWiki));
+	    if (! ParserUtil.isUserInRole(roles)) {
+	    	logger.info("User is not in allowed to view wiki " + virtualWiki + "; user is in role " + ParserUtil.getGrantedAuthorities());
+	    	return results;
+	    }
+	    */
+		
 		StandardAnalyzer analyzer = new StandardAnalyzer();
 		Collection results = new Vector();
 		logger.fine("search text: " + text);
@@ -265,6 +284,7 @@ public class LuceneSearchEngine implements SearchEngine {
 				result.setRanking(hits[i].score);
 				result.setTopic(doc.get(ITYPE_TOPIC_PLAIN));
 				result.setSummary(summary);
+				result.setVirtualWiki(virtualWiki);
 				results.add(result);
 			}
 		} catch (Exception e) {
@@ -275,6 +295,33 @@ public class LuceneSearchEngine implements SearchEngine {
 					searcher.close();
 				} catch (Exception e) {}
 			}
+		}
+		return results;
+	}
+	
+	private Collection findResultsInAllVirtualWikis(String text) {
+		ArrayList results = new ArrayList();
+		logger.fine("search text in all virtual wikis: " + text);
+		List allWikis;
+		try {
+			allWikis = WikiBase.getDataHandler().getVirtualWikiList();
+			for (Iterator iter = allWikis.iterator(); iter.hasNext();) {
+				VirtualWiki virtualWiki = (VirtualWiki) iter.next();
+    			Collection localResults = findResults(virtualWiki.getName(), text);
+    			if (localResults != null && !localResults.isEmpty())
+    				results.addAll(localResults);
+    		}
+			Collections.sort(results, new Comparator() {
+				public int compare(Object arg0, Object arg1) {
+					if (arg0 instanceof SearchResultEntry && arg1 instanceof SearchResultEntry) {
+						return Float.compare(((SearchResultEntry) arg1).getRanking(), ((SearchResultEntry) arg0).getRanking());
+					}
+					return 0;
+				}
+			});
+		}
+		catch (Exception e) {
+			logger.severe("Exception while searching all virtual wikis for " + text, e);
 		}
 		return results;
 	}

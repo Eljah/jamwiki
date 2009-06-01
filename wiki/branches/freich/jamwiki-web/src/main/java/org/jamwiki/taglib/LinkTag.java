@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import org.apache.commons.lang.StringUtils;
+import org.jamwiki.WikiBase;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
@@ -72,6 +73,13 @@ public class LinkTag extends BodyTagSupport {
 			wikiLink.setQuery(this.queryParams);
 		}
 		try {
+			// check if it's an interwiki link
+			if (WikiBase.getDataHandler().lookupVirtualWiki(wikiLink.getNamespace()) != null) {
+				virtualWiki = wikiLink.getNamespace();
+				if (!StringUtils.isBlank(wikiLink.getArticle())) {
+					wikiLink.setDestination(wikiLink.getArticle());
+				}
+			}
 			if (!StringUtils.isBlank(tagText)) {
 				// return formatted link of the form "<a href="/wiki/en/Special:Edit">text</a>"
 				url = LinkUtil.buildInternalLinkHtml(request.getContextPath(), virtualWiki, wikiLink, tagText, this.style, tagTarget, true);

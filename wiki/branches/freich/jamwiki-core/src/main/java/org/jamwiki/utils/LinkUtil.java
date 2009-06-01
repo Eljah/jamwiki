@@ -16,7 +16,6 @@
  */
 package org.jamwiki.utils;
 
-import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -499,7 +498,7 @@ public class LinkUtil {
 		String namespaceString = "";
 		int namespacePos = processed.indexOf(':', 1);
 		if (namespacePos != -1 && namespacePos < processed.length()) {
-			namespaceString = processed.substring(0, namespacePos);
+			namespaceString = processed.substring((processed.charAt(0)==':'?1:0), namespacePos);
 		}
 		wikiLink.setNamespace(namespaceString);
 		String topic = processed;

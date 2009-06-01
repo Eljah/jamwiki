@@ -31,13 +31,29 @@ public class SearchResultEntry {
 	private float ranking = 0.0f;
 	/** Result summary */
 	private String summary = null;
-
+	/** The virtual wiki of this entry */
+	private String virtualWiki = null;
+	
 	/**
 	 *
 	 */
 	protected SearchResultEntry() {
 	}
 
+	/**
+	 *
+	 */
+	public String getVirtualWiki() {
+		return this.virtualWiki;
+	}
+	
+	/**
+	 *
+	 */
+	public void setVirtualWiki(String virtualWiki) {
+		this.virtualWiki = virtualWiki;
+	}
+	
 	/**
 	 *
 	 */

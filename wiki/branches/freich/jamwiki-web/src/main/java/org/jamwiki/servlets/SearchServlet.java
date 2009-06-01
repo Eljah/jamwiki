@@ -20,6 +20,7 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
+import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.utils.LinkUtil;
@@ -83,9 +84,12 @@ public class SearchServlet extends JAMWikiServlet {
 			return;
 		}
 		// grab search engine instance and find
-		Collection results = WikiBase.getSearchEngine().findResults(virtualWiki, searchField);
+		Collection results = WikiBase.getSearchEngine().findResults(
+				(Boolean.valueOf(Environment.getValue(Environment.PROP_BASE_SEARCH_IN_ALL_WIKIS)).booleanValue() ? null : virtualWiki), 
+				searchField);
 		next.addObject("searchField", searchField);
 		next.addObject("results", results);
+		next.addObject("currentWiki", virtualWiki);
 		pageInfo.setContentJsp(JSP_SEARCH_RESULTS);
 		pageInfo.setSpecial(true);
 	}

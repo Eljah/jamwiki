@@ -225,6 +225,7 @@ public class AdminServlet extends JAMWikiServlet {
 			setBooleanProperty(props, request, Environment.PROP_PRINT_NEW_WINDOW);
 			setBooleanProperty(props, request, Environment.PROP_EXTERNAL_LINK_NEW_WINDOW);
 			setProperty(props, request, Environment.PROP_BASE_SEARCH_ENGINE);
+			setBooleanProperty(props, request, Environment.PROP_BASE_SEARCH_IN_ALL_WIKIS);
 			setProperty(props, request, Environment.PROP_PARSER_CLASS);
 			setBooleanProperty(props, request, Environment.PROP_PARSER_TOC);
 			setProperty(props, request, Environment.PROP_PARSER_TOC_DEPTH);
