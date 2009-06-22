@@ -14,32 +14,39 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.taglib;
-
-import java.io.IOException;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
-import org.jamwiki.utils.WikiLogger;
-import org.jamwiki.WikiVersion;
+package org.jamwiki.parser;
 
 /**
- * JSP tag that displays the current Wiki version as specified by
- * {@link org.jamwiki.WikiVersion#CURRENT_WIKI_VERSION}.
+ * Custom exception class for JAMWiki parsing errors.
  */
-public class WikiVersionTag extends TagSupport {
-
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiVersionTag.class.getName());
+public class ParserException extends Exception {
 
 	/**
+	 * Constructor for an exception containing a message.
 	 *
+	 * @param message The message information for the exception.
 	 */
-	public int doEndTag() throws JspException {
-		try {
-			this.pageContext.getOut().print(WikiVersion.CURRENT_WIKI_VERSION);
-		} catch (IOException e) {
-			logger.severe("Failure while retrieving Wiki version", e);
-			throw new JspException(e);
-		}
-		return EVAL_PAGE;
+	public ParserException(String message) {
+		super(message);
+	}
+
+	/**
+	 * Constructor for an exception containing a message and wrapping another
+	 * exception.
+	 *
+	 * @param message The message information for the exception.
+	 * @param t The exception that is the cause of this exception.
+	 */
+	public ParserException(String message, Throwable t) {
+		super(message, t);
+	}
+
+	/**
+	 * Constructor for an exception that wraps another exception.
+	 *
+	 * @param t The exception that is the cause of this exception.
+	 */
+	public ParserException(Throwable t) {
+		super(t);
 	}
 }

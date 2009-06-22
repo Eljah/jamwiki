@@ -61,6 +61,9 @@
 <input type="hidden" name="topicVersionId" value="<c:out value="${topicVersionId}" />" />
 
 <c:choose>
+	<c:when test="${editor == 'fckeditor'}">
+		<script type="text/javascript" src="<c:url value="/FCKeditor/fckeditor.js" />"></script>
+	</c:when>
 	<c:when test="${editor == 'toolbar'}">
 		<%@ include file="editor-toolbar-include.jsp" %>
 	</c:when>

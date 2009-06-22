@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.utils.NamespaceHandler;
@@ -38,7 +39,6 @@ public class WikiSignatureTag {
 	 *
 	 */
 	private String buildWikiSignature(ParserInput parserInput, ParserOutput parserOutput, int mode, boolean includeUser, boolean includeDate) {
-		try {
 			String signature = "";
 			if (includeUser) {
 				signature = this.retrieveUserSignature(parserInput);
@@ -46,7 +46,13 @@ public class WikiSignatureTag {
 				WikiLinkTag wikiLinkTag = new WikiLinkTag();
 				wikiLinkTag.parse(parserInput, parserOutput, mode, signature);
 				if (mode != JFlexParser.MODE_MINIMAL) {
-					signature = JFlexParserUtil.parseFragment(parserInput, signature, mode);
+					try {
+						signature = JFlexParserUtil.parseFragment(parserInput, signature, mode);
+					} catch (ParserException e) {
+						logger.severe("Failure while building wiki signature", e);
+						// FIXME - return empty or a failure indicator?
+						return "";
+					}
 				}
 			}
 			if (includeUser && includeDate) {
@@ -58,11 +64,6 @@ public class WikiSignatureTag {
 				signature += format.format(new java.util.Date());
 			}
 			return signature;
-		} catch (Exception e) {
-			logger.severe("Failure while building wiki signature", e);
-			// FIXME - return empty or a failure indicator?
-			return "";
-		}
 	}
 
 	/**
@@ -81,7 +82,7 @@ public class WikiSignatureTag {
 		}
 		return raw;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -100,7 +101,7 @@ public class WikiSignatureTag {
 			email = user.getEmail();
 			userId = Integer.toString(user.getUserId());
 		}
-		if (login == null || email == null || displayName == null) {
+		if (login == null || displayName == null) {
 			logger.info("Signature tagged parsed without user information available, returning empty");
 			return "";
 		}
@@ -112,7 +113,7 @@ public class WikiSignatureTag {
 		params[2] = NamespaceHandler.NAMESPACE_USER_COMMENTS + NamespaceHandler.NAMESPACE_SEPARATOR + login;
 		params[3] = login;
 		params[4] = displayName;
-		params[5] = email;
+		params[5] = email!=null ? email : "";
 		params[6] = userId;
 		return formatter.format(params);
 	}

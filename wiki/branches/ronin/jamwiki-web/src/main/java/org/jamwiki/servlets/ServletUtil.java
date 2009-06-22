@@ -17,6 +17,8 @@
 package org.jamwiki.servlets;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -26,12 +28,14 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import net.sf.ehcache.Element;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
@@ -46,6 +50,7 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
@@ -195,15 +200,16 @@ public class ServletUtil {
 			try {
 				// FIXME - do not lookup the user every time this method is called, that will kill performance
 				user = WikiBase.getDataHandler().lookupWikiUser(username);
-				if (user == null) {
-					// invalid user.  someone has either spoofed a cookie or the user account is no longer in
-					// the database.
-					logger.warning("No user exists for principal found in security context authentication: " + username);
-					SecurityContextHolder.clearContext();
-					throw new AuthenticationCredentialsNotFoundException("Invalid user credentials found - username " + username + " does not exist in this wiki installation");
-				}
-			} catch (Exception e) {
+			} catch (DataAccessException e) {
 				logger.severe("Failure while retrieving user from database with login: " + username, e);
+				return user;
+			}
+			if (user == null) {
+				// invalid user.  someone has either spoofed a cookie or the user account is no longer in
+				// the database.
+				logger.warning("No user exists for principal found in security context authentication: " + username);
+				SecurityContextHolder.clearContext();
+				throw new AuthenticationCredentialsNotFoundException("Invalid user credentials found - username " + username + " does not exist in this wiki installation");
 			}
 		}
 		return user;
@@ -217,8 +223,9 @@ public class ServletUtil {
 	 * @param virtualWiki The virtual wiki for the watchlist being parsed.
 	 * @return The current logged-in user's watchlist, or an empty watchlist
 	 *  if there is no watchlist in the session.
+	 * @throws WikiException Thrown if any error occurs during processing.
 	 */
-	public static Watchlist currentWatchlist(HttpServletRequest request, String virtualWiki) throws Exception {
+	public static Watchlist currentWatchlist(HttpServletRequest request, String virtualWiki) throws WikiException {
 		// try to get watchlist stored in session
 		if (request.getSession(false) != null) {
 			Watchlist watchlist = (Watchlist)request.getSession(false).getAttribute(WikiUtil.PARAMETER_WATCHLIST);
@@ -233,7 +240,11 @@ public class ServletUtil {
 			return watchlist;
 		}
 		WikiUser user = ServletUtil.currentWikiUser();
-		watchlist = WikiBase.getDataHandler().getWatchlist(virtualWiki, user.getUserId());
+		try {
+			watchlist = WikiBase.getDataHandler().getWatchlist(virtualWiki, user.getUserId());
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 		if (request.getSession(false) != null) {
 			// add watchlist to session
 			request.getSession(false).setAttribute(WikiUtil.PARAMETER_WATCHLIST, watchlist);
@@ -279,12 +290,17 @@ public class ServletUtil {
 	 * @return A new topic object with basic fields initialized, or if a topic
 	 *  with the given name already exists then the pre-existing topic is
 	 *  returned.
-	 * @throws Exception Thrown if any error occurs while retrieving or
+	 * @throws WikiException Thrown if any error occurs while retrieving or
 	 *  initializing the topic object.
 	 */
-	protected static Topic initializeTopic(String virtualWiki, String topicName) throws Exception {
+	protected static Topic initializeTopic(String virtualWiki, String topicName) throws WikiException {
 		WikiUtil.validateTopicName(topicName);
-		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
+		Topic topic = null;
+		try {
+			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 		if (topic != null) {
 			return topic;
 		}
@@ -312,17 +328,23 @@ public class ServletUtil {
 	 *  no current user.
 	 * @return <code>true</code> if the user is allowed to edit the topic,
 	 *  <code>false</code> otherwise.
+	 * @throws WikiException Thrown if any error occurs during processing.
 	 */
-	protected static boolean isEditable(String virtualWiki, String topicName, WikiUserDetails user) throws Exception {
+	protected static boolean isEditable(String virtualWiki, String topicName, WikiUserDetails user) throws WikiException {
 		if (user == null || !user.hasRole(Role.ROLE_EDIT_EXISTING)) {
 			// user does not have appropriate permissions
 			return false;
 		}
-		if (!user.hasRole(Role.ROLE_EDIT_NEW) && WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null) == null) {
-			// user does not have appropriate permissions
-			return false;
+		Topic topic = null;
+		try {
+			if (!user.hasRole(Role.ROLE_EDIT_NEW) && WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null) == null) {
+				// user does not have appropriate permissions
+				return false;
+			}
+			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 		}
-		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
 		if (topic == null) {
 			// new topic, edit away...
 			return true;
@@ -345,13 +367,19 @@ public class ServletUtil {
 	 *  no current user.
 	 * @return <code>true</code> if the user is allowed to move the topic,
 	 *  <code>false</code> otherwise.
+	 * @throws WikiException Thrown if any error occurs during processing.
 	 */
-	protected static boolean isMoveable(String virtualWiki, String topicName, WikiUserDetails user) throws Exception {
+	protected static boolean isMoveable(String virtualWiki, String topicName, WikiUserDetails user) throws WikiException {
 		if (user == null || !user.hasRole(Role.ROLE_MOVE)) {
 			// no permission granted to move pages
 			return false;
 		}
-		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
+		Topic topic = null;
+		try {
+			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 		if (topic == null) {
 			// cannot move a topic that doesn't exist
 			return false;
@@ -375,15 +403,13 @@ public class ServletUtil {
 	 *  page name, <code>false</code> otherwise.
 	 */
 	protected static boolean isTopic(HttpServletRequest request, String value) {
-		try {
-			String topic = WikiUtil.getTopicFromURI(request);
-			if (StringUtils.isBlank(topic)) {
-				return false;
-			}
-			if (value != null &&  topic.equals(value)) {
-				return true;
-			}
-		} catch (Exception e) {}
+		String topic = WikiUtil.getTopicFromURI(request);
+		if (StringUtils.isBlank(topic)) {
+			return false;
+		}
+		if (value != null &&  topic.equals(value)) {
+			return true;
+		}
 		return false;
 	}
 
@@ -397,11 +423,17 @@ public class ServletUtil {
 	 *  information.
 	 * @param virtualWiki The virtual wiki name for the topic being rendered.
 	 * @param topicName The name of the topic that is being rendered.
+	 * @throws WikiException Thrown if any error occurs during processing.
 	 */
-	protected static void loadCategoryContent(ModelAndView next, String virtualWiki, String topicName) throws Exception {
+	protected static void loadCategoryContent(ModelAndView next, String virtualWiki, String topicName) throws WikiException {
 		String categoryName = topicName.substring(NamespaceHandler.NAMESPACE_CATEGORY.length() + NamespaceHandler.NAMESPACE_SEPARATOR.length());
 		next.addObject("categoryName", categoryName);
-		List<Category> categoryTopics = WikiBase.getDataHandler().lookupCategoryTopics(virtualWiki, topicName);
+		List<Category> categoryTopics = null;
+		try {
+			categoryTopics = WikiBase.getDataHandler().lookupCategoryTopics(virtualWiki, topicName);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 		List<Category> categoryImages = new ArrayList<Category>();
 		LinkedHashMap<String, String> subCategories = new LinkedHashMap<String, String>();
 		int i = 0;
@@ -457,16 +489,20 @@ public class ServletUtil {
 	 * @param uploadDirectory The directory into which files will be uploaded.
 	 * @param maxFileSize The maximum allowed file size in bytes.
 	 * @return Returns an iterator of FileItem objects the corresponds to the request.
-	 * @throws Exception Thrown if any problems occur while processing the request.
+	 * @throws WikiException Thrown if any problems occur while processing the request.
 	 */
-	public static Iterator processMultipartRequest(HttpServletRequest request, String uploadDirectory, long maxFileSize) throws Exception {
+	public static Iterator processMultipartRequest(HttpServletRequest request, String uploadDirectory, long maxFileSize) throws WikiException {
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setRepository(new File(uploadDirectory));
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setHeaderEncoding("UTF-8");
 		upload.setSizeMax(maxFileSize);
-		return upload.parseRequest(request).iterator();
+		try {
+			return upload.parseRequest(request).iterator();
+		} catch (FileUploadException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 	}
 
 	/**
@@ -480,9 +516,15 @@ public class ServletUtil {
 	 *  to.
 	 * @param destination The topic or page name that is the redirection
 	 *  target.  An example might be "Special:Login".
+	 * @throws WikiException Thrown if any error occurs while processing.
 	 */
-	protected static void redirect(ModelAndView next, String virtualWiki, String destination) throws Exception {
-		String target = LinkUtil.buildTopicUrl(null, virtualWiki, destination, true);
+	protected static void redirect(ModelAndView next, String virtualWiki, String destination) throws WikiException {
+		String target = null;
+		try {
+			target = LinkUtil.buildTopicUrl(null, virtualWiki, destination, true);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 		String view = ServletUtil.SPRING_REDIRECT_PREFIX + target;
 		next.clear();
 		next.setViewName(view);
@@ -531,7 +573,7 @@ public class ServletUtil {
 		if (Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
 			try {
 				virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
-			} catch (Exception e) {}
+			} catch (DataAccessException e) {}
 		}
 		if (virtualWiki == null) {
 			logger.severe("No virtual wiki found for " + virtualWikiName);
@@ -568,7 +610,7 @@ public class ServletUtil {
 			if (classesDirError != null) {
 				errors.add(classesDirError);
 			}
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
 			errors.add(new WikiMessage("error.directorywrite", classesDir, e.getMessage()));
 		}
 		// test database
@@ -578,25 +620,27 @@ public class ServletUtil {
 		String password = Encryption.getEncryptedProperty(Environment.PROP_DB_PASSWORD, props);
 		try {
 			DatabaseConnection.testDatabase(driver, url, userName, password, false);
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
+			logger.severe("Invalid database settings", e);
+			errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
+		} catch (SQLException e) {
 			logger.severe("Invalid database settings", e);
 			errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
 		}
 		// verify valid parser class
-		boolean validParser = true;
 		String parserClass = props.getProperty(Environment.PROP_PARSER_CLASS);
 		String abstractParserClass = "org.jamwiki.parser.AbstractParser";
-		if (parserClass == null || parserClass.equals(abstractParserClass)) {
-			validParser = false;
-		}
-		try {
-			Class parent = ClassUtils.getClass(parserClass);
-			Class child = ClassUtils.getClass(abstractParserClass);
-			if (!child.isAssignableFrom(parent)) {
+		boolean validParser = (parserClass != null && !parserClass.equals(abstractParserClass));
+		if (validParser) {
+			try {
+				Class parent = ClassUtils.getClass(parserClass);
+				Class child = ClassUtils.getClass(abstractParserClass);
+				if (!child.isAssignableFrom(parent)) {
+					validParser = false;
+				}
+			} catch (ClassNotFoundException e) {
 				validParser = false;
 			}
-		} catch (Exception e) {
-			validParser = false;
 		}
 		if (!validParser) {
 			errors.add(new WikiMessage("error.parserclass", parserClass));
@@ -616,16 +660,21 @@ public class ServletUtil {
 	 *  page.
 	 * @return Returns a ModelAndView object corresponding to the login page
 	 *  display.
-	 * @throws Exception Thrown if any error occurs during processing.
+	 * @throws WikiException Thrown if any error occurs during processing.
 	 */
-	protected static ModelAndView viewLogin(HttpServletRequest request, WikiPageInfo pageInfo, String topic, WikiMessage messageObject) throws Exception {
+	protected static ModelAndView viewLogin(HttpServletRequest request, WikiPageInfo pageInfo, String topic, WikiMessage messageObject) throws WikiException {
 		ModelAndView next = new ModelAndView("wiki");
 		pageInfo.reset();
 		String virtualWikiName = pageInfo.getVirtualWikiName();
 		String target = request.getParameter(JAMWikiAuthenticationConstants.SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME);
 		if (StringUtils.isBlank(target)) {
 			if (StringUtils.isBlank(topic)) {
-				VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
+				VirtualWiki virtualWiki = null;
+				try {
+					virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
+				} catch (DataAccessException e) {
+					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+				}
 				topic = virtualWiki.getDefaultTopicName();
 			}
 			target = "/" + virtualWikiName + "/" + topic;
@@ -670,18 +719,28 @@ public class ServletUtil {
 	 * @param topic The Topic object for the topic being displayed.
 	 * @param sectionEdit Set to <code>true</code> if edit links should be displayed
 	 *  for each section of the topic.
-	 * @throws Exception Thrown if any error occurs during processing.
+	 * @throws WikiException Thrown if any error occurs while retrieving or parsing the topic.
 	 */
-	protected static void viewTopic(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, WikiMessage pageTitle, Topic topic, boolean sectionEdit) throws Exception {
+	protected static void viewTopic(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, WikiMessage pageTitle, Topic topic, boolean sectionEdit) throws WikiException {
 		// FIXME - what should the default be for topics that don't exist?
 		if (topic == null) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
 		WikiUtil.validateTopicName(topic.getName());
 		if (topic.getTopicType() == Topic.TYPE_REDIRECT && (request.getParameter("redirect") == null || !request.getParameter("redirect").equalsIgnoreCase("no"))) {
-			Topic child = WikiUtil.findRedirectedTopic(topic, 0);
+			Topic child = null;
+			try {
+				child = WikiUtil.findRedirectedTopic(topic, 0);
+			} catch (DataAccessException e) {
+				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+			}
 			if (!child.getName().equals(topic.getName())) {
-				String redirectUrl = LinkUtil.buildTopicUrl(request.getContextPath(), topic.getVirtualWiki(), topic.getName(), true);
+				String redirectUrl = null;
+				try {
+					redirectUrl = LinkUtil.buildTopicUrl(request.getContextPath(), topic.getVirtualWiki(), topic.getName(), true);
+				} catch (DataAccessException e) {
+					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+				}
 				// FIXME - hard coding
 				redirectUrl += LinkUtil.appendQueryParam("", "redirect", "no");
 				String redirectName = topic.getName();
@@ -708,7 +767,12 @@ public class ServletUtil {
 		parserInput.setVirtualWiki(virtualWiki);
 		parserInput.setAllowSectionEdit(sectionEdit);
 		ParserOutput parserOutput = new ParserOutput();
-		String content = ParserUtil.parse(parserInput, parserOutput, topic.getTopicContent());
+		String content = null;
+		try {
+			content = ParserUtil.parse(parserInput, parserOutput, topic.getTopicContent());
+		} catch (ParserException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
 		if (parserOutput.getCategories().size() > 0) {
 			LinkedHashMap<String, String> categories = new LinkedHashMap<String, String>();
 			for (String key : parserOutput.getCategories().keySet()) {
@@ -722,7 +786,12 @@ public class ServletUtil {
 			loadCategoryContent(next, virtualWiki, topic.getName());
 		}
 		if (topic.getTopicType() == Topic.TYPE_IMAGE || topic.getTopicType() == Topic.TYPE_FILE) {
-			List<WikiFileVersion> fileVersions = WikiBase.getDataHandler().getAllWikiFileVersions(virtualWiki, topicName, true);
+			List<WikiFileVersion> fileVersions = null;
+			try {
+				fileVersions = WikiBase.getDataHandler().getAllWikiFileVersions(virtualWiki, topicName, true);
+			} catch (DataAccessException e) {
+				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+			}
 			for (WikiFileVersion fileVersion : fileVersions) {
 				// update version urls to include web root path
 				String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + fileVersion.getUrl());
