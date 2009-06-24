@@ -40,7 +40,7 @@ import org.jamwiki.WikiVersion;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
-import info.bliki.html.HTML2WikiConverter;
+
 /**
  * This class provides a variety of general utility methods for handling
  * wiki-specific functionality such as retrieving topics from the URL.
@@ -682,17 +682,5 @@ public class WikiUtil {
 		if (!m.matches()) {
 			throw new WikiException(new WikiMessage("common.exception.name", name));
 		}
-	}
-
-	/*
-	static {
-		org.htmlcleaner.TagNode.addAllowedAttribute("style");
-	}
-	*/
-
-	public static String getWikiFormat(String htmlText){
-		HTML2WikiConverter conv = new HTML2WikiConverter();
-		conv.setInputHTML(htmlText);
-		return conv.toWiki(new ToWikipediaEx());
 	}
 }

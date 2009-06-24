@@ -51,10 +51,6 @@
 			<groupId>org.incava</groupId>
 			<artifactId>javadiff</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>info.bliki.wiki</groupId>
-			<artifactId>bliki-core</artifactId>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -139,6 +139,10 @@
 			<scope>runtime</scope>
 		</dependency>
 		-->
+		<dependency>
+			<groupId>info.bliki.wiki</groupId>
+			<artifactId>bliki-core</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

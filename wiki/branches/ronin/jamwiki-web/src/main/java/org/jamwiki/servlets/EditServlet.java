@@ -40,6 +40,7 @@ import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
+import info.bliki.html.HTML2WikiConverter;
 
 /**
  * Used to process topic edits including saving an edit, preview, resolving
@@ -251,7 +252,7 @@ public class EditServlet extends JAMWikiServlet {
 		WikiUser user = ServletUtil.currentWikiUser();
 		if (StringUtils.equals(user.getEditor(), "fckeditor")) {
 			// ronin: parse to wiki format before previewing.
-			String previewContents = WikiUtil.getWikiFormat(contents);
+			String previewContents = this.getWikiFormat(contents);
 			previewTopic.setTopicContent(previewContents);
 		} else {
 			previewTopic.setTopicContent(contents);
@@ -274,7 +275,7 @@ public class EditServlet extends JAMWikiServlet {
 		if (StringUtils.equals(user.getEditor(), "fckeditor")) {
 			//[ronin] convert to wiki format
 			String previewContents2 = request.getParameter("contents");
-			contents2 = WikiUtil.getWikiFormat(previewContents2);
+			contents2 = this.getWikiFormat(previewContents2);
 			next.addObject("contentsResolve", previewContents2);
 		} else {
 			next.addObject("contentsResolve", contents2);
@@ -342,7 +343,7 @@ public class EditServlet extends JAMWikiServlet {
 		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
 		if (StringUtils.equals(user.getEditor(), "fckeditor")) {
 			//[ronin] convert to wiki format
-			contents = WikiUtil.getWikiFormat(contents);
+			contents = this.getWikiFormat(contents);
 		}
 		// parse signatures and other values that need to be updated prior to saving
 		contents = ParserUtil.parseMinimal(parserInput, contents);
@@ -397,5 +398,17 @@ public class EditServlet extends JAMWikiServlet {
 		}
 		this.loadDiff(request, next, pageInfo, contents1, contents2);
 		next.addObject("editShowChanges", "true");
+	}
+
+	/*
+	static {
+		org.htmlcleaner.TagNode.addAllowedAttribute("style");
+	}
+	*/
+
+	private String getWikiFormat(String htmlText) {
+		HTML2WikiConverter conv = new HTML2WikiConverter();
+		conv.setInputHTML(htmlText);
+		return conv.toWiki(new ToWikipediaEx());
 	}
 }
