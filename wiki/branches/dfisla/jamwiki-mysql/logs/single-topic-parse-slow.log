@@ -1,0 +1,78 @@
+D:\MySQL\MySQL Server 5.0\bin\mysqld-nt, Version: 5.0.45-community-nt-log (MySQL Community Edition (GPL)). started with:
+TCP Port: 3306, Named Pipe: (null)
+Time                 Id Command    Argument
+# Time: 090720 14:38:00
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 1  Rows_examined: 1
+use jamwiki;
+select * from jam_virtual_wiki;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:pp-move-indef' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:anarchism sidebar' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:oclc' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:cite journal' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:cite book' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:main' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:cite web' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:iep' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:verify credibility' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:sep entry' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:details' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:ndash' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:further' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:pdflink' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:page number' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:fr icon' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:see also' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:reflist' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:anarchism portal' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:sisterlinks' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:political ideologies' order by jam_topic.delete_date;
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 6
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'template:link fa' order by jam_topic.delete_date;
+# Time: 090720 14:38:01
+# User@Host: admin[admin] @ localhost [127.0.0.1]
+# Query_time: 0  Lock_time: 0  Rows_sent: 1  Rows_examined: 8
+select jam_topic.*, jam_topic_version.version_content, jam_topic_version.version_content_clean, jam_topic_version.version_content_short from jam_topic, jam_topic_version where jam_topic.current_version_id = jam_topic_version.topic_version_id and jam_topic.virtual_wiki_id = 1 and lower(jam_topic.topic_name) = 'anarchism' order by jam_topic.delete_date;
