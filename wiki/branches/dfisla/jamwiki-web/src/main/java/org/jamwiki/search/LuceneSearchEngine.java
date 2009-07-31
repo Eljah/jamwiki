@@ -90,8 +90,7 @@ public class LuceneSearchEngine implements SearchEngine {
     /**
      * Constructor
      *
-     * @param root path for data directory where search child folder "search" and another subchild "search+en" will be created
-     * such as ../data/search/indexen
+     * @param searchIndexPath
      */
     public LuceneSearchEngine(String searchIndexPath){
         CUSTOM_DATA_PATH = searchIndexPath;
@@ -367,6 +366,7 @@ public class LuceneSearchEngine implements SearchEngine {
     /**
      * Refresh the current search index by re-visiting all topic pages.
      *
+     * @param wikiTopicLimit
      * @throws Exception Thrown if any error occurs while re-indexing the Wiki.
      */
     public synchronized void refreshIndex(int wikiTopicLimit) throws Exception {

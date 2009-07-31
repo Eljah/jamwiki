@@ -176,6 +176,7 @@ public class AnsiQueryHandler implements QueryHandler {
 
     /**
      *
+     * @param username
      */
     public boolean authenticateUser(String username, String encryptedPassword, Connection conn) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_USERS_AUTHENTICATION);
@@ -234,6 +235,7 @@ public class AnsiQueryHandler implements QueryHandler {
 
     /**
      *
+     * @param childTopicId
      */
     public void deleteTopicCategories(int childTopicId, Connection conn) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_DELETE_TOPIC_CATEGORIES);
@@ -376,6 +378,12 @@ public class AnsiQueryHandler implements QueryHandler {
         return stmt.executeQuery();
     }
 
+    /**
+     *
+     * @param virtualWikiId
+     * @return
+     * @throws SQLException
+     */
     public WikiResultSet getAllTopicIdentifiers(int virtualWikiId) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_TOPIC_IDS);
         stmt.setInt(1, virtualWikiId);
@@ -550,6 +558,7 @@ public class AnsiQueryHandler implements QueryHandler {
 
     /**
      *
+     * @param props
      */
     protected void init(Properties props) {
         STATEMENT_CONNECTION_VALIDATION_QUERY = props.getProperty("STATEMENT_CONNECTION_VALIDATION_QUERY");
@@ -693,6 +702,26 @@ public class AnsiQueryHandler implements QueryHandler {
         }
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_INSERT_CATEGORY);
         stmt.setInt(1, rs.getInt(AnsiDataHandler.DATA_TOPIC_ID));
+        stmt.setString(2, category.getName());
+        stmt.setString(3, category.getSortKey());
+        stmt.executeUpdate(conn);
+    }
+
+    /**
+     *
+     * @param category 
+     * @param topicId
+     * @param conn
+     * @param virtualWikiId
+     * @throws SQLException
+     */
+    public void insertCategoryAdvanced(Category category, int topicId, int virtualWikiId, Connection conn) throws SQLException {
+
+        if (topicId == -1) {
+            throw new SQLException("Unassigned topic identifier " + category.getChildTopicName() + " for category " + category.getName());
+        }
+        WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_INSERT_CATEGORY);
+        stmt.setInt(1, topicId);
         stmt.setString(2, category.getName());
         stmt.setString(3, category.getSortKey());
         stmt.executeUpdate(conn);
@@ -1083,6 +1112,14 @@ public class AnsiQueryHandler implements QueryHandler {
         return stmt.executeQuery(conn);
     }
 
+    /**
+     *
+     * @param virtualWikiId
+     * @param topicId
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
     public WikiResultSet lookupTopicById(int virtualWikiId, int topicId, Connection conn) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_TOPIC_BY_ID);
         stmt.setInt(1, virtualWikiId);
@@ -1090,6 +1127,14 @@ public class AnsiQueryHandler implements QueryHandler {
         return stmt.executeQuery(conn);
     }
 
+    /**
+     *
+     * @param virtualWikiId
+     * @param topicId
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
     public WikiResultSet lookupTopicMetaDataById(int virtualWikiId, int topicId, Connection conn) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_TOPIC_METADATA_BY_ID);
         stmt.setInt(1, virtualWikiId);
@@ -1115,6 +1160,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      * @param virtualWikiId The virtual wiki id for the virtual wiki of the topics
      *  being retrieved.
+     * @return
+     * @throws SQLException
      */
     public WikiResultSet lookupTopicCount(int virtualWikiId) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_TOPIC_COUNT);
@@ -1147,6 +1194,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      * @param virtualWikiId The virtual wiki id for the virtual wiki of the files
      *  being retrieved.
+     * @return
+     * @throws SQLException
      */
     public WikiResultSet lookupWikiFileCount(int virtualWikiId) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_WIKI_FILE_COUNT);
@@ -1174,6 +1223,7 @@ public class AnsiQueryHandler implements QueryHandler {
 
     /**
      *
+     * @param username
      */
     public WikiResultSet lookupWikiUser(String username, Connection conn) throws SQLException {
         WikiPreparedStatement stmt = new WikiPreparedStatement(STATEMENT_SELECT_WIKI_USER_LOGIN);
@@ -1183,6 +1233,8 @@ public class AnsiQueryHandler implements QueryHandler {
 
     /**
      * Return a count of all wiki users.
+     * @return
+     * @throws SQLException
      */
     public WikiResultSet lookupWikiUserCount() throws SQLException {
         return DatabaseConnection.executeQuery(STATEMENT_SELECT_WIKI_USER_COUNT);
@@ -1352,6 +1404,10 @@ public class AnsiQueryHandler implements QueryHandler {
 
     /**
      *
+     * @param topicVersion
+     * @param virtualWikiId
+     * @param conn
+     * @throws SQLException
      */
     public void updateTopicVersion(TopicVersion topicVersion, int virtualWikiId, Connection conn) throws SQLException {
 

@@ -56,7 +56,8 @@ public class WikiResultSet {
 	 * Create a WikiResultSet from a standard ResultSet.
 	 *
 	 * @see ResultSet
-	 * @param rs The ResultSet used to populate this WikiResultSet.
+         * @param rs The ResultSet used to populate this WikiResultSet.
+         * @throws SQLException
 	 */
 	protected WikiResultSet(ResultSet rs) throws SQLException {
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -388,7 +389,9 @@ public class WikiResultSet {
 		return this.totalRows;
 	}
 
-	// PERFORMANCE-EXPERIMENTAL
+        /**
+         * PERFORMANCE-EXPERIMENTAL
+         */
         public void logResultSetColumns(){
             Collection c = this.currentRow.values();
 

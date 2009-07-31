@@ -614,6 +614,9 @@ public interface DataHandler {
          * PERFORMANCE-EXPERIMENTAL
          * Exposed from private to public, this should be only used for ETL/loading purposes!
          *
+         * @param topic 
+         * @throws DataAccessException
+         * @throws WikiException
          */
         void updateTopic(Topic topic) throws DataAccessException, WikiException;
 
@@ -621,38 +624,75 @@ public interface DataHandler {
          * PERFORMANCE-EXPERIMENTAL
          * Exposed from private to public, this should be only used for ETL/loading purposes!
          *
+         * @param topic 
+         * @param topicVersion 
+         * @throws DataAccessException
+         * @throws WikiException
          */
         void updateTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException;
         
         /**
          * PERFORMANCE-EXPERIMENTAL
          * Update TopicVersion indenpendent of Topic, categories, but NOT links/search. A new TopicVersion will not be created, instead all data will be overwritten, the identifier remains.
+         * @param topicVersion 
+         * @param categories
+         * @param topicName
+         * @param virtualWiki
+         * @throws DataAccessException
+         * @throws WikiException
          */
         void updateTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException;
 
         /**
          * PERFORMANCE-EXPERIMENTAL
          * Update Topic & TopicVersion content, categories, but NOT links/search. A new TopicVersion will not be created, instead all data will be overwritten, the identifier remains.
+         * @param topic 
+         * @param links
+         * @param categories
+         * @param topicVersion
+         * @throws DataAccessException
+         * @throws WikiException
          */
         void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException;
 
         /**
          * PERFORMANCE-EXPERIMENTAL
          * Update Topic & TopicVersion content, categories, and links/search. A new TopicVersion will not be created, instead all data will be overwritten, the identifier remains.
+         * @param topic 
+         * @param topicVersion 
+         * @param links
+         * @param categories
+         * @param updateSearchIndex
+         * @throws DataAccessException
+         * @throws WikiException
          */
         void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean updateSearchIndex) throws DataAccessException, WikiException;
 
         /**
          * PERFORMANCE-EXPERIMENTAL
          * Import TopicVersion indenpendent of Topic and rebuild categories. Optimized to avoid virtual wiki lookup.
+         * @param topicVersion 
+         * @param categories 
+         * @param virtualWiki
+         * @param topicName
+         * @param virtualWikiId
+         * @throws DataAccessException
+         * @throws WikiException
          */
         void importTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki, int virtualWikiId) throws DataAccessException, WikiException;
 
         /**
          * PERFORMANCE-EXPERIMENTAL
          * Build TopicVersion's categories only. Primarily to be used after importing content and rebuilding categories from an empty table.
+         * @param topicVersion 
+         * @param topicId
+         * @param categories
+         * @param topicName
+         * @param virtualWiki
+         * @throws DataAccessException
+         * @throws WikiException
          */
-        void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException;
+        void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, int topicId, String virtualWiki) throws DataAccessException, WikiException;
 
 	/**
 	 * Add or update a WikiFile object.  This method will add a new record if

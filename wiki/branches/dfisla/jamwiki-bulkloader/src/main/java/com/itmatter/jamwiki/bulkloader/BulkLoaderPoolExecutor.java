@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.itmatter.jamwiki.bulkloader;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,10 +11,10 @@ import java.util.logging.Logger;
  */
 public class BulkLoaderPoolExecutor {
 
-    static Logger logger = Logger.getLogger(Main.class.getName());
-    long keepAliveTime = 10;
-    ThreadPoolExecutor threadPool = null;
-    final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(5);
+    private static Logger logger = Logger.getLogger(BulkLoaderPoolExecutor.class.getName());
+    private long keepAliveTime = 10;
+    private ThreadPoolExecutor threadPool = null;
+    private final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(5);
 
     public BulkLoaderPoolExecutor(int poolSize, int maxPoolSize) {
         threadPool = new ThreadPoolExecutor(poolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, queue);
@@ -34,7 +30,7 @@ public class BulkLoaderPoolExecutor {
         // System.out.println("Pool Size after assigning the
         // task.."+threadPool.getActiveCount() );
         // System.out.println("Task count.."+threadPool.getTaskCount() );
-        System.out.println("Task count.." + queue.size());
+        // System.out.println("Task count.." + queue.size());
 
     }
 

@@ -51,6 +51,12 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
     private DataHandler dataHandler = null;
     private boolean importRedirects = false;
 
+    /**
+     *
+     * @param virtualWiki
+     * @param user
+     * @param authorIpAddress
+     */
     public JAMWikiLoadHandler(String virtualWiki, WikiUser user, String authorIpAddress) {
         this.currentElementBuffer = new StringBuffer();
 
@@ -119,16 +125,6 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
     }
 
     public void endElement(String namespaceURI, String localName, String qName) throws org.xml.sax.SAXException {
-
-        /*
-         * Current element is fully read, so it is ok to
-         * remove the element value from the map
-         *
-         */
-        //System.out.println("DEPTH: " + STACK.size() + " END-ELEMENT: " + STACK.peek());
-
-        //String value = ((StringBuffer) (elementValues.get(qName))).toString();
-        //elementValues.remove(qName);
 
         /*
          * We do not reset the current element here as the startElement
@@ -216,7 +212,7 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
                     // manage mapping between MediaWiki and JAMWiki namespaces
                     topic.setTopicType(convertNamespaceFromMediaWikiToJAMWiki(namespace));
 
-                    // FIXME
+                    // PERFORMANCE-EXPERIMENTAL
                     // THIS IS COMPLICATED and equivalent to buildall.php from Mediawiki
                     //ParserOutput parserOutput = ParserUtil.parserOutput(pageText, virtualWiki, pageName);
 
@@ -236,13 +232,14 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
 
         }
 
-        //System.out.println("DEPTH: " + STACK.size() + " END-ELEMENT: " + STACK.peek());
-
         STACK.pop();
-        //this.currentElementBuffer = new StringBuffer();
-
     }
 
+    /**
+     *
+     * @param text
+     * @return
+     */
     public String preprocessText(String text) {
         String ret = text;
         // convert all namespaces names from MediaWiki to JAMWiki local representation
@@ -350,10 +347,18 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
         logger.error("FATAL ERROR!", x);
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isImportRedirects() {
         return importRedirects;
     }
 
+    /**
+     *
+     * @param importRedirects
+     */
     public void setImportRedirects(boolean importRedirects) {
         this.importRedirects = importRedirects;
     }

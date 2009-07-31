@@ -29,11 +29,19 @@ public class JAMWikiCategoryHandler implements java.lang.Runnable {
     private final String authorIpAddress;
     private String virtualWiki = "en";
     private int virtualWikiId = 1;
-
     private List<Integer> topicIds = null;
     private String fileName = null;
     private DataHandler dataHandler = null;
 
+    /**
+     *
+     * @param virtualWiki
+     * @param virtualWikiId
+     * @param user
+     * @param authorIpAddress
+     * @param ids
+     * @throws DataAccessException
+     */
     public JAMWikiCategoryHandler(String virtualWiki, int virtualWikiId, WikiUser user, String authorIpAddress, List<Integer> ids) throws DataAccessException {
 
         this.virtualWiki = virtualWiki;
@@ -73,9 +81,13 @@ public class JAMWikiCategoryHandler implements java.lang.Runnable {
 
                         logger.debug("TOPIC-NAME =>: " + pageName);
 
-                        parserOutput = ParserUtil.parserOutput(pageText, virtualWiki, pageName);
-
-                        dataHandler.buildTopicCategories(topicVersion, parserOutput.getCategories(), pageName, virtualWiki);
+                        //parserOutput = ParserUtil.parserOutput(pageText, virtualWiki, pageName);
+                        //dataHandler.buildTopicCategories(topicVersion, parserOutput.getCategories(), pageName, virtualWiki);
+                        try{
+                            dataHandler.buildTopicCategories(topicVersion, ParserUtil.parseCategories(pageText), pageName, topicId, virtualWiki);
+                        }catch(Exception ex){
+                            logger.error(ex.getMessage() + " TOPIC-NAME: " + pageName + " TOPIC-ID" + topicId, ex);
+                        }
                     } else {
                         logger.error("LOOKUP-FAIL-TOPICVERSION-ID =>: " + topic.getCurrentVersionId());
                     }
@@ -89,18 +101,34 @@ public class JAMWikiCategoryHandler implements java.lang.Runnable {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public String getVirtualWiki() {
         return virtualWiki;
     }
 
+    /**
+     *
+     * @param virtualWiki
+     */
     public void setVirtualWiki(String virtualWiki) {
         this.virtualWiki = virtualWiki;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Integer> getTopicIds() {
         return topicIds;
     }
 
+    /**
+     *
+     * @param topicIds
+     */
     public void setTopicIds(List<Integer> topicIds) {
         this.topicIds = topicIds;
     }

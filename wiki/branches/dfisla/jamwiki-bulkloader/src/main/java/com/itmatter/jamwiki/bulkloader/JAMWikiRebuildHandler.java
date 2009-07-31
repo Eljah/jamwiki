@@ -38,6 +38,15 @@ public class JAMWikiRebuildHandler implements java.lang.Runnable {
     private String fileName = null;
     private DataHandler dataHandler = null;
 
+    /**
+     *
+     * @param virtualWiki
+     * @param virtualWikiId
+     * @param user
+     * @param authorIpAddress
+     * @param ids
+     * @throws DataAccessException
+     */
     public JAMWikiRebuildHandler(String virtualWiki, int virtualWikiId, WikiUser user, String authorIpAddress, List<Integer> ids) throws DataAccessException {
 
         this.virtualWiki = virtualWiki;
@@ -133,6 +142,11 @@ public class JAMWikiRebuildHandler implements java.lang.Runnable {
 
     }
 
+    /**
+     *
+     * @param text
+     * @return
+     */
     public String removeHtmlTags(String text){
         String regex = "\\<.*?>";
 
@@ -141,34 +155,66 @@ public class JAMWikiRebuildHandler implements java.lang.Runnable {
         return p.matcher(text).replaceAll("");
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isUpdateCleanContent() {
         return updateCleanContent;
     }
 
+    /**
+     *
+     * @param updateCleanContent
+     */
     public void setUpdateCleanContent(boolean updateCleanContent) {
         this.updateCleanContent = updateCleanContent;
     }
 
+    /**
+     * 
+     * @return
+     */
     public boolean isUpdateSearchIndex() {
         return updateSearchIndex;
     }
 
+    /**
+     *
+     * @param updateSearchIndex
+     */
     public void setUpdateSearchIndex(boolean updateSearchIndex) {
         this.updateSearchIndex = updateSearchIndex;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getVirtualWiki() {
         return virtualWiki;
     }
 
+    /**
+     *
+     * @param virtualWiki
+     */
     public void setVirtualWiki(String virtualWiki) {
         this.virtualWiki = virtualWiki;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Integer> getTopicIds() {
         return topicIds;
     }
 
+    /**
+     *
+     * @param topicIds
+     */
     public void setTopicIds(List<Integer> topicIds) {
         this.topicIds = topicIds;
     }

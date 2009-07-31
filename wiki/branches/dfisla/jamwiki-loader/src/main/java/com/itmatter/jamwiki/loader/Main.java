@@ -20,7 +20,7 @@ public class Main {
     static Logger logger = Logger.getLogger(Main.class.getName());
     private static final String USAGE = "[-h] [-f <file> | -n <number>]";
     private static final String HEADER = "JAM Wiki Loader - Imports MediaWiki wikipedia XML exports to JAMWiki.";
-    private static final String FOOTER = "";//For more instructions, see our website at: http://www.blah123.org";
+    private static final String FOOTER = "";
 
     private static void printUsage(Options options) {
         HelpFormatter helpFormatter = new HelpFormatter();

@@ -30,7 +30,7 @@ public class Main {
     private static final WikiLogger logger = WikiLogger.getLogger(Main.class.getName());
     private static final String USAGE = "[-h] [-t <string:topic name> -w <string:wiki name>] | [-r <string:regex>]";
     private static final String HEADER = "JAM Wiki Content Analyzer - Parses and Transforms article content.";
-    private static final String FOOTER = "";//For more instructions, see our website at: http://www.blah123.org";
+    private static final String FOOTER = "";
 
     private static void printUsage(Options options) {
         HelpFormatter helpFormatter = new HelpFormatter();

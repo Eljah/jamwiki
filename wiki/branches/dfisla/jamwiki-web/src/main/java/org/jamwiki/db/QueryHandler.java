@@ -395,6 +395,9 @@ public interface QueryHandler {
 	 */
 	void insertCategory(Category category, int virtualWikiId, Connection conn) throws SQLException;
 
+        // PERFORMANCE-EXPERIMENTAL
+        void insertCategoryAdvanced(Category category, int topicId, int virtualWikiId, Connection conn) throws SQLException;
+
 	/**
 	 * Add a new authority for a specified group.  The group must not already have
 	 * this authority or else an error will be thrown.

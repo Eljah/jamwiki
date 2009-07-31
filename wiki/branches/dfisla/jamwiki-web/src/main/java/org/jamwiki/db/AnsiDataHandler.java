@@ -90,6 +90,16 @@ public class AnsiDataHandler implements DataHandler {
         }
     }
 
+    private void addCategoryAdvanced(Category category, int topicId, Connection conn) throws DataAccessException, WikiException {
+        int virtualWikiId = this.lookupVirtualWikiId(category.getVirtualWiki());
+        this.validateCategory(category);
+        try {
+            this.queryHandler().insertCategoryAdvanced(category, topicId, virtualWikiId, conn);
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
     /**
      *
      */
@@ -303,6 +313,7 @@ public class AnsiDataHandler implements DataHandler {
      */
     private static void checkLength(String value, int maxLength) throws WikiException {
         if (value != null && value.length() > maxLength) {
+            logger.error("error.fieldlength value =>: " + value + " limit: " + Integer.valueOf(maxLength).toString());
             throw new WikiException(new WikiMessage("error.fieldlength", value, Integer.valueOf(maxLength).toString()));
         }
     }
@@ -543,6 +554,7 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param authority
      */
     public List<RoleMap> getRoleMapByRole(String authority) throws DataAccessException {
         LinkedHashMap<String, RoleMap> roleMaps = new LinkedHashMap<String, RoleMap>();
@@ -1507,6 +1519,7 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @return
      */
     protected QueryHandler queryHandler() {
         return this.queryHandler;
@@ -1817,7 +1830,7 @@ public class AnsiDataHandler implements DataHandler {
         DatabaseConnection.commit(status);
     }
 
-    public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException {
+    public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, int topicId, String virtualWiki) throws DataAccessException, WikiException {
 
         TransactionStatus status = null;
         try {
@@ -1834,7 +1847,7 @@ public class AnsiDataHandler implements DataHandler {
                     category.setSortKey(categories.get(categoryName));
                     category.setVirtualWiki(virtualWiki);
                     category.setChildTopicName(topicName);
-                    this.addCategory(category, conn);
+                    this.addCategoryAdvanced(category, topicId, conn);
                 }
             }
         } catch (DataAccessException e) {
@@ -1961,6 +1974,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param role
+     * @throws WikiException
      */
     protected void validateAuthority(String role) throws WikiException {
         checkLength(role, 30);
@@ -1968,14 +1983,18 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param category
+     * @throws WikiException
      */
     protected void validateCategory(Category category) throws WikiException {
-        checkLength(category.getName(), 200);
-        checkLength(category.getSortKey(), 200);
+        checkLength(category.getName(), 255);
+        checkLength(category.getSortKey(), 255);
     }
 
     /**
      *
+     * @param change
+     * @throws WikiException
      */
     protected void validateRecentChange(RecentChange change) throws WikiException {
         checkLength(change.getTopicName(), 200);
@@ -1986,6 +2005,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param role 
+     * @throws WikiException
      */
     protected void validateRole(Role role) throws WikiException {
         checkLength(role.getAuthority(), 30);
@@ -1994,6 +2015,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param topic 
+     * @throws WikiException
      */
     protected void validateTopic(Topic topic) throws WikiException {
         checkLength(topic.getName(), 200);
@@ -2002,6 +2025,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param topicVersion
+     * @throws WikiException
      */
     protected void validateTopicVersion(TopicVersion topicVersion) throws WikiException {
         checkLength(topicVersion.getAuthorDisplay(), 100);
@@ -2010,6 +2035,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param userDetails
+     * @throws WikiException
      */
     protected void validateUserDetails(WikiUserDetails userDetails) throws WikiException {
         checkLength(userDetails.getUsername(), 100);
@@ -2021,6 +2048,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param virtualWiki 
+     * @throws WikiException
      */
     protected void validateVirtualWiki(VirtualWiki virtualWiki) throws WikiException {
         checkLength(virtualWiki.getName(), 100);
@@ -2029,6 +2058,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param topicName 
+     * @throws WikiException
      */
     protected void validateWatchlistEntry(String topicName) throws WikiException {
         checkLength(topicName, 200);
@@ -2036,6 +2067,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param wikiFile 
+     * @throws WikiException
      */
     protected void validateWikiFile(WikiFile wikiFile) throws WikiException {
         checkLength(wikiFile.getFileName(), 200);
@@ -2045,6 +2078,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param wikiFileVersion 
+     * @throws WikiException
      */
     protected void validateWikiFileVersion(WikiFileVersion wikiFileVersion) throws WikiException {
         checkLength(wikiFileVersion.getUrl(), 200);
@@ -2055,6 +2090,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param group
+     * @throws WikiException
      */
     protected void validateWikiGroup(WikiGroup group) throws WikiException {
         checkLength(group.getName(), 30);
@@ -2063,6 +2100,8 @@ public class AnsiDataHandler implements DataHandler {
 
     /**
      *
+     * @param user 
+     * @throws WikiException
      */
     protected void validateWikiUser(WikiUser user) throws WikiException {
         checkLength(user.getUsername(), 100);

@@ -44,7 +44,9 @@ public class WikiPreparedStatement {
 
 	/**
 	 *
-	 */
+         *
+         * @param sql
+         */
 	public WikiPreparedStatement(String sql) {
         logger.debug("SQL-PREPARE =>: " + sql);
 		this.sql = sql;
@@ -55,7 +57,10 @@ public class WikiPreparedStatement {
 
 	/**
 	 *
-	 */
+         *
+         * @return
+         * @throws SQLException
+         */
 	public WikiResultSet executeQuery() throws SQLException {
 		Connection conn = null;
 		try {
@@ -68,7 +73,11 @@ public class WikiPreparedStatement {
 
 	/**
 	 *
-	 */
+         *
+         * @param conn
+         * @return
+         * @throws SQLException
+         */
 	public WikiResultSet executeQuery(Connection conn) throws SQLException {
 		ResultSet rs = null;
 		try {
@@ -98,7 +107,10 @@ public class WikiPreparedStatement {
 
 	/**
 	 *
-	 */
+         *
+         * @return
+         * @throws SQLException
+         */
 	public int executeUpdate() throws SQLException {
 		Connection conn = null;
 		try {
@@ -111,7 +123,11 @@ public class WikiPreparedStatement {
 
 	/**
 	 *
-	 */
+         *
+         * @param conn
+         * @return
+         * @throws SQLException
+         */
 	public int executeUpdate(Connection conn) throws SQLException {
 		try {
 			long start = System.currentTimeMillis();
@@ -236,7 +252,12 @@ public class WikiPreparedStatement {
 	}
 
         // PERFORMANCE-EXPERIMENTAL
-	public void setBytes(int parameterIndex, byte[] data) {
+        /**
+         *
+         * @param parameterIndex
+         * @param data
+         */
+        public void setBytes(int parameterIndex, byte[] data) {
 		this.verifyParams(parameterIndex);
 		this.paramTypes[parameterIndex - 1] = Types.BLOB;
 		this.params[parameterIndex - 1] = data;
@@ -265,7 +286,9 @@ public class WikiPreparedStatement {
 		}
 	}
 
-	// PERFORMANCE-EXPERIMENTAL
+        /**
+         * PERFORMANCE-EXPERIMENTAL
+         */
         public void logParams(){
             for(int x=0; x < params.length; x++){
                 logger.debug("["+x+"] PARAM_TYPE: " + this.paramTypes[x] + " VALUE: " + this.params[x]);

@@ -422,6 +422,13 @@ public class TestDataHandler implements DataHandler {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * PERFORMANCE-EXPERIMENTAL
+         */
+        public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, int topicId, String virtualWiki) throws DataAccessException, WikiException {
+            throw new UnsupportedOperationException();
+        }
+
 	/**
 	 *
 	 */

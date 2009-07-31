@@ -11,6 +11,10 @@ import java.util.zip.Inflater;
 import org.apache.log4j.Logger;
 
 
+/**
+ *
+ * @author dfisla
+ */
 public class DataCompression {
 
     private static final Logger logger = Logger.getLogger(AnsiDataHandler.class.getName());
@@ -18,6 +22,11 @@ public class DataCompression {
     public static final int  PROP_DB_COMPRESSION_NONE = 0;
     public static final int  PROP_DB_COMPRESSION_DEFAULT = 1;
 
+    /**
+     *
+     * @param buffer
+     * @return
+     */
     protected static byte[] decompressByteArray(byte[] buffer) {
 
         byte[] output = null;
@@ -51,6 +60,11 @@ public class DataCompression {
         return output;
     }
 
+    /**
+     *
+     * @param buffer
+     * @return
+     */
     protected static byte[] compressByteArray(byte[] buffer) {
 
         byte[] output = null;
