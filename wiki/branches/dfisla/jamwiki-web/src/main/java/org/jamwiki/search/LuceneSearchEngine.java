@@ -17,8 +17,10 @@
 package org.jamwiki.search;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -51,6 +53,8 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.apache.log4j.Logger;
+import org.apache.lucene.store.Directory;
+import org.jamwiki.DataHandler;
 
 /**
  * An implementation of {@link org.jamwiki.SearchEngine} that uses
@@ -76,15 +80,14 @@ public class LuceneSearchEngine implements SearchEngine {
     /** Maximum number of results to return per search. */
     // FIXME - make this configurable
     private static final int MAXIMUM_RESULTS_PER_SEARCH = 200;
-
     private static boolean SEARCH_DIR_OVERRIDE = false;
     private static String CUSTOM_DATA_PATH = null;
+    private List<Integer> topicIds = null;
 
     /**
      * Default Constructor
      */
-    public LuceneSearchEngine(){
-
+    public LuceneSearchEngine() {
     }
 
     /**
@@ -92,9 +95,21 @@ public class LuceneSearchEngine implements SearchEngine {
      *
      * @param searchIndexPath
      */
-    public LuceneSearchEngine(String searchIndexPath){
+    public LuceneSearchEngine(String searchIndexPath) {
         CUSTOM_DATA_PATH = searchIndexPath;
         SEARCH_DIR_OVERRIDE = true;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param searchIndexPath
+     * @param
+     */
+    public LuceneSearchEngine(String searchIndexPath, List<Integer> ids) {
+        CUSTOM_DATA_PATH = searchIndexPath;
+        SEARCH_DIR_OVERRIDE = true;
+        this.topicIds = ids;
     }
 
     /**
@@ -318,10 +333,9 @@ public class LuceneSearchEngine implements SearchEngine {
 
         File parent = null;
 
-        if(SEARCH_DIR_OVERRIDE){
+        if (SEARCH_DIR_OVERRIDE) {
             parent = new File(CUSTOM_DATA_PATH, SEARCH_DIR);
-        }
-        else{
+        } else {
             parent = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), SEARCH_DIR);
         }
 
@@ -335,7 +349,15 @@ public class LuceneSearchEngine implements SearchEngine {
             // probably a security exception
             logger.warn("Unable to specify Lucene lock directory, default will be used: " + e.getMessage());
         }
-        File child = new File(parent.getPath(), "index" + virtualWiki + File.separator);
+
+        long threadId = Thread.currentThread().getId();
+
+        File child = null;
+        if (this.topicIds == null) {
+            child = new File(parent.getPath(), "index" + virtualWiki + File.separator);
+        } else {
+            child = new File(parent.getPath(), String.format("index-%s-%s", threadId, virtualWiki) + File.separator);
+        }
         if (!child.exists()) {
             child.mkdirs();
             IndexWriter writer = null;
@@ -357,6 +379,57 @@ public class LuceneSearchEngine implements SearchEngine {
             }
         }
         return child.getPath();
+    }
+
+    /**
+     *
+     * @param sourceDir
+     * @param mergeDir
+     * @param mergeFactor
+     * @param bufferSizeMB
+     */
+    public synchronized void merge(String sourceDir, String mergeDir, int mergeFactor, int bufferSizeMB) {
+
+        File indexesDirectory = new File(sourceDir);
+        File mergeDirectory = new File(mergeDir);
+
+        if (!mergeDirectory.exists()) {
+            mergeDirectory.mkdir();
+        }
+
+        Date start = new Date();
+
+        try {
+            //IndexWriter writer = new IndexWriter(INDEX_DIR, new StandardAnalyzer(), true, IndexWriter.MaxFieldLength.UNLIMITED);
+            IndexWriter writer = new IndexWriter(mergeDirectory, new StandardAnalyzer(), true);
+            writer.setMergeFactor(mergeFactor);
+            writer.setRAMBufferSizeMB(bufferSizeMB);
+
+            Directory indexes[] = new Directory[indexesDirectory.list().length];
+
+            for (int i = 0; i < indexesDirectory.list().length; i++) {
+                logger.info("Adding: " + indexesDirectory.list()[i]);
+                String index = indexesDirectory.getAbsolutePath() + "/" + indexesDirectory.list()[i];
+
+                logger.info("Found Index: " + index);
+                indexes[i] = FSDirectory.getDirectory(index);
+            }
+
+            logger.info("Merging added indexes...");
+            writer.addIndexesNoOptimize(indexes);
+            logger.info("done");
+
+            logger.info("Optimizing index...");
+            writer.optimize();
+            writer.close();
+            logger.info("done");
+
+            Date end = new Date();
+            logger.info("It took: " + ((end.getTime() - start.getTime()) / 1000) + "\"");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public synchronized void refreshIndex() throws Exception {
@@ -384,21 +457,22 @@ public class LuceneSearchEngine implements SearchEngine {
                 Topic topic = null;
 
                 String wikiName = virtualWiki.getName();
-
+                DataHandler handler = WikiBase.getDataHandler();
                 writer = new IndexWriter(directory, new StandardAnalyzer(), true, IndexWriter.MaxFieldLength.LIMITED);
-                //List<String> topicNames = WikiBase.getDataHandler().getAllTopicNames(virtualWiki.getName());
-                List<Integer> topicIds = WikiBase.getDataHandler().getAllTopicIdentifiers(wikiName);
 
+                if (this.topicIds == null) {
+                    this.topicIds = handler.getAllTopicIdentifiers(wikiName);
+                }
                 int wikiTopicCount = 0;
-                logger.debug("Retrieved WIki Topic IDs =>: " + topicIds.size());
+                logger.info("Retrieved WIki Topic IDs =>: " + this.topicIds.size());
 
-                for (Integer topicId : topicIds) {
+                for (Integer topicId : this.topicIds) {
 
                     if (!(wikiTopicCount < wikiTopicLimit)) {
                         break;
                     }
                     //topic = WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), topicName, false, null);
-                    topic = WikiBase.getDataHandler().lookupTopicById(wikiName, topicId.intValue());
+                    topic = handler.lookupTopicById(wikiName, topicId.intValue());
 
                     String topicContent = topic.getTopicContent();
 
@@ -407,11 +481,11 @@ public class LuceneSearchEngine implements SearchEngine {
                         Document standardDocument = createStandardDocument(topic);
                         writer.addDocument(standardDocument);
 
-                        // PERFORMANCE-EXPERIMENTAL
                         ParserOutput parserOutput = ParserUtil.parserOutput(topic.getTopicContent(), virtualWiki.getName(), topic.getName());
                         Document keywordDocument = createKeywordDocument(topic, parserOutput.getLinks());
                         writer.addDocument(keywordDocument, keywordAnalyzer);
                         count++;
+                        logger.info("TOPIC-COUNT: " + wikiTopicCount);
                         wikiTopicCount++;
                     }
                 }

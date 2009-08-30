@@ -89,7 +89,7 @@ public class Main {
 
             if (cmd.hasOption("p")) {
                 String pfileNames = cmd.getOptionValue("p");
-                logger.debug("PARTITION-LIST =>: " + pfileNames);
+                logger.info("PARTITION-LIST =>: " + pfileNames);
 
                 if (pfileNames != null) {
                     String[] parts = pfileNames.split(",");

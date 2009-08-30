@@ -68,7 +68,7 @@ public class JAMWikiRebuildHandler implements java.lang.Runnable {
         TopicVersion topicVersion = null;
 
         try {
-            logger.debug("Retrieved Wiki Topic IDs =>: " + topicIds.size());
+            logger.info("Retrieved Wiki Topic IDs =>: " + topicIds.size());
 
             for (Integer topicId : topicIds) {
                 logger.debug("TOPIC-LOOKUP-BY-ID =>: " + topicId);

@@ -43,6 +43,7 @@ function cancel() {
 </head>
 <body>
 <%
+// FIXME Daniel
 WikiLogger logger = Logger.getLogger("org.jamwiki.jsp");
 String errorMessage = "";
 if (exception != null) {

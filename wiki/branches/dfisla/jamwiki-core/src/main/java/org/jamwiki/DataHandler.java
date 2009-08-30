@@ -141,7 +141,6 @@ public interface DataHandler {
 	List<String> getAllTopicNames(String virtualWiki) throws DataAccessException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
 	 * Return a List of all topic identifiers for all non-deleted topics that
 	 * exist for the virtual wiki.
 	 *
@@ -379,7 +378,6 @@ public interface DataHandler {
 	int lookupTopicCount(String virtualWiki) throws DataAccessException;
 
 	 /**
-         * PERFORMANCE-EXPERIMENTAL
 	 * Retrieve a Topic object that matches the given topic id and virtual wiki.
 	 *
 	 * @param virtualWiki The virtual wiki for the topic being queried.
@@ -391,7 +389,6 @@ public interface DataHandler {
         Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException;
 
          /**
-         * PERFORMANCE-EXPERIMENTAL
 	 * Retrieve a Topic object BUT DO NOT RETRIEVE TOPIC CONTENT/VERSION
          * that matches the given topic id and virtual wiki.
 	 *
@@ -611,7 +608,6 @@ public interface DataHandler {
 	void updateSpecialPage(Locale locale, String virtualWiki, String topicName, String userDisplay) throws DataAccessException, WikiException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Exposed from private to public, this should be only used for ETL/loading purposes!
          *
          * @param topic 
@@ -621,7 +617,6 @@ public interface DataHandler {
         void updateTopic(Topic topic) throws DataAccessException, WikiException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Exposed from private to public, this should be only used for ETL/loading purposes!
          *
          * @param topic 
@@ -632,7 +627,6 @@ public interface DataHandler {
         void updateTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException;
         
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Update TopicVersion indenpendent of Topic, categories, but NOT links/search. A new TopicVersion will not be created, instead all data will be overwritten, the identifier remains.
          * @param topicVersion 
          * @param categories
@@ -644,7 +638,6 @@ public interface DataHandler {
         void updateTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Update Topic & TopicVersion content, categories, but NOT links/search. A new TopicVersion will not be created, instead all data will be overwritten, the identifier remains.
          * @param topic 
          * @param links
@@ -656,7 +649,6 @@ public interface DataHandler {
         void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Update Topic & TopicVersion content, categories, and links/search. A new TopicVersion will not be created, instead all data will be overwritten, the identifier remains.
          * @param topic 
          * @param topicVersion 
@@ -669,7 +661,6 @@ public interface DataHandler {
         void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean updateSearchIndex) throws DataAccessException, WikiException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Import TopicVersion indenpendent of Topic and rebuild categories. Optimized to avoid virtual wiki lookup.
          * @param topicVersion 
          * @param categories 
@@ -682,7 +673,6 @@ public interface DataHandler {
         void importTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki, int virtualWikiId) throws DataAccessException, WikiException;
 
         /**
-         * PERFORMANCE-EXPERIMENTAL
          * Build TopicVersion's categories only. Primarily to be used after importing content and rebuilding categories from an empty table.
          * @param topicVersion 
          * @param topicId
@@ -775,7 +765,7 @@ public interface DataHandler {
 	 */
 	void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean userVisible) throws DataAccessException, WikiException;
 
-        /** PERFORMANCE-EXPERIMENTAL
+        /**
 	 * Add or update a Topic object.  This method will add a new record if
 	 * the Topic does not have a topic ID, otherwise it will perform an update.
 	 * A TopicVersion object will also be created to capture the author, date,

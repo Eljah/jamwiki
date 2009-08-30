@@ -142,22 +142,7 @@ public class DatabaseConnection {
 	/**
 	 *
 	 */
-	protected static WikiResultSet executeQuery(String sql) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = DatabaseConnection.getConnection();
-			return executeQuery(sql, conn);
-		} finally {
-			if (conn != null) {
-				DatabaseConnection.closeConnection(conn);
-			}
-		}
-	}
-
-	/**
-	 *
-	 */
-	protected static WikiResultSet executeQuery(String sql, Connection conn) throws SQLException {
+	protected static ResultSet executeQuery(String sql, Connection conn) throws SQLException {
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -169,36 +154,24 @@ public class DatabaseConnection {
 				logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
 			}
 			logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
-			return new WikiResultSet(rs);
+			return rs;
 		} catch (SQLException e) {
 			logger.fatal("Failure while executing " + sql, e);
 			throw e;
 		} finally {
+                        /*
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {}
 			}
+
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {}
 			}
-		}
-	}
-
-	/**
-	 *
-	 */
-	protected static void executeUpdate(String sql) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = DatabaseConnection.getConnection();
-			executeUpdate(sql, conn);
-		} finally {
-			if (conn != null) {
-				DatabaseConnection.closeConnection(conn);
-			}
+                        */
 		}
 	}
 
@@ -222,11 +195,13 @@ public class DatabaseConnection {
 			logger.fatal("Failure while executing " + sql, e);
 			throw e;
 		} finally {
+                        /*
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {}
 			}
+                        */
 		}
 	}
 

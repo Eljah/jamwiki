@@ -4,20 +4,27 @@
  */
 package com.itmatter.jamwiki.analyzer;
 
+import info.bliki.wiki.filter.ITextConverter;
+import info.bliki.wiki.model.IWikiModel;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-import java.util.regex.Pattern;
-import org.apache.commons.cli.*;
-import org.apache.commons.lang.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jamwiki.DataHandler;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 
-import org.jamwiki.utils.HtmlUtil;
+import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.bliki.BlikiProxyParser;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
@@ -71,6 +78,20 @@ public class Main {
 
     }
 
+    public static void render(IWikiModel fModel, ITextConverter converter, Appendable appendable, String fHeader, Topic topic) throws IOException {
+
+        if (fHeader != null) {
+            appendable.append(fHeader);
+        }
+
+        // print page information
+        String rawWikiText = topic.getTopicContent();
+        fModel.setPageName(topic.getName());
+        // System.out.println(rawWikiText);
+        appendable.append(fModel.render(converter, rawWikiText));
+
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -117,15 +138,37 @@ public class Main {
                 Topic topic = dh.lookupTopic(wikiName, topicName, true, null);
                 Locale locale = new Locale("en", "US");
 
+                //TODO: Switch to new BlikiProxyParser
+                /*
+                WikiModel wikiModel = new WikiModel("${image}", "${title}");
+
                 String wikiContent = topic.getTopicContent();
-                String htmlContent = HtmlUtil.parseToHtml(wikiContent, topic.getName(), "/wiki", locale, wikiName);
-                writeToHtmlFile(topicName + ".wiki.txt", wikiContent);
+                String htmlContent = wikiModel.render(wikiContent);
+                writeToFile(topicName + ".wiki.txt", wikiContent);
                 writeToHtmlFile(topicName + ".html", htmlContent);
 
-                //content = HtmlUtil.removeTemplateTags(htmlContent);
-                String content = Utilities.stripMarkup(htmlContent); //HtmlUtil.removeHtmlTags(content);
+                String content = Utilities.stripMarkup(htmlContent);
+                writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+                 */
 
-                //writeToFile(topicName + ".txt", content);
+                ParserInput parserInput = new ParserInput();
+                parserInput.setContext("/wiki");
+                parserInput.setLocale(locale);
+                //parserInput.setWikiUser(user);
+                parserInput.setTopicName(topicName);
+                //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
+                parserInput.setVirtualWiki(wikiName);
+                parserInput.setAllowSectionEdit(false);
+                BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
+
+                ParserOutput parserOutput = new ParserOutput();
+                String wikiContent = topic.getTopicContent();
+                String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+
+                writeToFile(topicName + ".wiki.txt", wikiContent);
+                writeToHtmlFile(topicName + ".html", htmlContent);
+
+                String content = Utilities.stripMarkup(htmlContent);
                 writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
             }
 

@@ -10,6 +10,8 @@ import info.bliki.wiki.model.ImageFormat;
 import info.bliki.wiki.tags.WPATag;
 import info.bliki.wiki.tags.util.TagStack;
 
+import info.bliki.wiki.namespaces.INamespace;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +22,6 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
-import org.jamwiki.parser.jflex.WikiHeadingTag;
 import org.jamwiki.parser.jflex.WikiSignatureTag;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
@@ -36,12 +37,10 @@ public class JAMWikiModel extends AbstractWikiModel {
 	// see: JFlexParser.MODE_MINIMAL
 	protected static final int MODE_MINIMAL = 3;
 
-	private static final Logger logger = Logger.getLogger(WikiHeadingTag.class.getName());
+	private static final Logger logger = Logger.getLogger(JAMWikiModel.class.getName());
 
 	protected String fContextPath;
-
 	protected ParserInput fParserInput;
-
 	protected ParserOutput fParserOutput;
 
 	static {
@@ -354,6 +353,10 @@ public class JAMWikiModel extends AbstractWikiModel {
 			buf.append("<span class=\"error\">TemplateParser exception: " + ioe.getClass().getSimpleName() + "</span>");
 		}
 		return buf.toString();
+	}
+
+        public INamespace getNamespace() {
+		return fNamespace;
 	}
 
 }

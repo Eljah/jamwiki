@@ -411,35 +411,6 @@ FIXME - Email not supported right now, comment this out
 </fieldset>
 <!-- END FILE UPLOAD -->
 
-<!-- BEGIN CACHE -->
-<a name="cache"></a>
-<fieldset>
-<legend><fmt:message key="admin.header.cache" /></legend>
-<div class="formentry <jamwiki:alternate value1="mediumbg" value2="lightbg" attributeName="cache" />">
-	<span class="formcaption"><label for="<%= Environment.PROP_CACHE_TOTAL_SIZE %>"><fmt:message key="admin.cache.caption.totalsize" /></label></span>
-	<c:set var="PROP_CACHE_TOTAL_SIZE"><%= Environment.PROP_CACHE_TOTAL_SIZE %></c:set>
-	<span class="formelement"><jamwiki:text name="${PROP_CACHE_TOTAL_SIZE}" id="${PROP_CACHE_TOTAL_SIZE}" value="${props[PROP_CACHE_TOTAL_SIZE]}" size="10" /></span>
-	<div class="formhelp"><fmt:message key="admin.cache.help.totalsize" /></div>
-</div>
-<div class="formentry <jamwiki:alternate value1="mediumbg" value2="lightbg" attributeName="cache" />">
-	<span class="formcaption"><label for="<%= Environment.PROP_CACHE_INDIVIDUAL_SIZE %>"><fmt:message key="admin.cache.caption.individualsize" /></label></span>
-	<c:set var="PROP_CACHE_INDIVIDUAL_SIZE"><%= Environment.PROP_CACHE_INDIVIDUAL_SIZE %></c:set>
-	<span class="formelement"><jamwiki:text name="${PROP_CACHE_INDIVIDUAL_SIZE}" id="${PROP_CACHE_INDIVIDUAL_SIZE}" value="${props[PROP_CACHE_INDIVIDUAL_SIZE]}" size="10" /></span>
-	<div class="formhelp"><fmt:message key="admin.cache.help.individualsize" /></div>
-</div>
-<div class="formentry <jamwiki:alternate value1="mediumbg" value2="lightbg" attributeName="cache" />">
-	<span class="formcaption"><label for="<%= Environment.PROP_CACHE_MAX_AGE %>"><fmt:message key="admin.cache.caption.maxage" /></label></span>
-	<c:set var="PROP_CACHE_MAX_AGE"><%= Environment.PROP_CACHE_MAX_AGE %></c:set>
-	<span class="formelement"><jamwiki:text name="${PROP_CACHE_MAX_AGE}" id="${PROP_CACHE_MAX_AGE}" value="${props[PROP_CACHE_MAX_AGE]}" size="10" /></span>
-</div>
-<div class="formentry <jamwiki:alternate value1="mediumbg" value2="lightbg" attributeName="cache" />">
-	<span class="formcaption"><label for="<%= Environment.PROP_CACHE_MAX_IDLE_AGE %>"><fmt:message key="admin.cache.caption.idleage" /></label></span>
-	<c:set var="PROP_CACHE_MAX_IDLE_AGE"><%= Environment.PROP_CACHE_MAX_IDLE_AGE %></c:set>
-	<span class="formelement"><jamwiki:text name="${PROP_CACHE_MAX_IDLE_AGE}" id="${PROP_CACHE_MAX_IDLE_AGE}" value="${props[PROP_CACHE_MAX_IDLE_AGE]}" size="10" /></span>
-</div>
-</fieldset>
-<!-- END CACHE -->
-
 <!-- BEGIN RSS -->
 <a name="rss"></a>
 <fieldset>

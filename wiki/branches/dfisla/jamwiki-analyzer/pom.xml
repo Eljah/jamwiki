@@ -132,6 +132,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.jamwiki</groupId>
+            <artifactId>bliki-parser</artifactId>
+            <version>0.8.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.6</version>
@@ -242,6 +248,10 @@
                     <repositoryName>lib</repositoryName>
                     <repositoryLayout>flat</repositoryLayout>
 					<!-- <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>-->
+                    <platforms>
+                        <platform>windows</platform>
+                        <platform>unix</platform>
+                    </platforms>
                 </configuration>
             </plugin>
             <plugin>

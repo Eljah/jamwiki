@@ -249,10 +249,10 @@ public class AdminServlet extends JAMWikiServlet {
 			setPassword(props, request, next, Environment.PROP_EMAIL_SMTP_PASSWORD, "smtpPassword");
 			setProperty(props, request, Environment.PROP_EMAIL_REPLY_ADDRESS);
 			*/
-			setProperty(props, request, Environment.PROP_CACHE_INDIVIDUAL_SIZE);
-			setProperty(props, request, Environment.PROP_CACHE_MAX_AGE);
-			setProperty(props, request, Environment.PROP_CACHE_MAX_IDLE_AGE);
-			setProperty(props, request, Environment.PROP_CACHE_TOTAL_SIZE);
+			//setProperty(props, request, Environment.PROP_CACHE_INDIVIDUAL_SIZE);
+			//setProperty(props, request, Environment.PROP_CACHE_MAX_AGE);
+			//setProperty(props, request, Environment.PROP_CACHE_MAX_IDLE_AGE);
+			//setProperty(props, request, Environment.PROP_CACHE_TOTAL_SIZE);
 			setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
 			setProperty(props, request, Environment.PROP_RSS_TITLE);
 			List<WikiMessage> errors = ServletUtil.validateSystemSettings(props);
