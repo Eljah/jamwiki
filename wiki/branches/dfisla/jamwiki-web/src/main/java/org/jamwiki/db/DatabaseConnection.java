@@ -46,333 +46,354 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  */
 public class DatabaseConnection {
 
-	private static final Logger logger = Logger.getLogger(DatabaseConnection.class.getName());
-	/** Any queries that take longer than this value (specified in milliseconds) will print a warning to the log. */
-	protected static final int SLOW_QUERY_LIMIT = 250;
-	private static DataSource dataSource = null;
-	private static DataSourceTransactionManager transactionManager = null;
+    private static final Logger logger = Logger.getLogger(DatabaseConnection.class.getName());
+    /** Any queries that take longer than this value (specified in milliseconds) will print a warning to the log. */
+    protected static final int SLOW_QUERY_LIMIT = 250;
+    private static DataSource dataSource = null;
+    private static DataSourceTransactionManager transactionManager = null;
 
-	/**
-	 * This class has only static methods and is never instantiated.
-	 */
-	private DatabaseConnection() {
-	}
+    /**
+     * This class has only static methods and is never instantiated.
+     */
+    private DatabaseConnection() {
+    }
 
-	/**
-	 * Utility method for closing a database connection, a statement and a result set.
-	 * This method must ALWAYS be called for any connection retrieved by the
-	 * {@link DatabaseConnection#getConnection getConnection()} method, and the
-	 * connection SHOULD NOT have already been closed.
-	 *
-	 * @param conn A database connection, retrieved using DatabaseConnection.getConnection(),
-	 *  that is to be closed.  This connection SHOULD NOT have been previously closed.
-	 * @param stmt A statement object that is to be closed.  May be <code>null</code>.
-	 * @param rs A result set object that is to be closed.  May be <code>null</code>.
-	 */
-	protected static void closeConnection(Connection conn, Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException e) {}
-		}
-		DatabaseConnection.closeConnection(conn, stmt);
-	}
+    /**
+     * Utility method for closing a database connection, a statement and a result set.
+     * This method must ALWAYS be called for any connection retrieved by the
+     * {@link DatabaseConnection#getConnection getConnection()} method, and the
+     * connection SHOULD NOT have already been closed.
+     *
+     * @param conn A database connection, retrieved using DatabaseConnection.getConnection(),
+     *  that is to be closed.  This connection SHOULD NOT have been previously closed.
+     * @param stmt A statement object that is to be closed.  May be <code>null</code>.
+     * @param rs A result set object that is to be closed.  May be <code>null</code>.
+     */
+    protected static void closeConnection(Connection conn, Statement stmt, ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+            }
+        }
+        DatabaseConnection.closeConnection(conn, stmt);
+    }
 
-	/**
-	 * Utility method for closing a database connection and a statement.  This method
-	 * must ALWAYS be called for any connection retrieved by the
-	 * {@link DatabaseConnection#getConnection getConnection()} method, and the
-	 * connection SHOULD NOT have already been closed.
-	 *
-	 * @param conn A database connection, retrieved using DatabaseConnection.getConnection(),
-	 *  that is to be closed.  This connection SHOULD NOT have been previously closed.
-	 * @param stmt A statement object that is to be closed.  May be <code>null</code>.
-	 */
-	protected static void closeConnection(Connection conn, Statement stmt) {
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException e) {}
-		}
-		DatabaseConnection.closeConnection(conn);
-	}
+    /**
+     * Utility method for closing a database connection and a statement.  This method
+     * must ALWAYS be called for any connection retrieved by the
+     * {@link DatabaseConnection#getConnection getConnection()} method, and the
+     * connection SHOULD NOT have already been closed.
+     *
+     * @param conn A database connection, retrieved using DatabaseConnection.getConnection(),
+     *  that is to be closed.  This connection SHOULD NOT have been previously closed.
+     * @param stmt A statement object that is to be closed.  May be <code>null</code>.
+     */
+    protected static void closeConnection(Connection conn, Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+            }
+        }
+        DatabaseConnection.closeConnection(conn);
+    }
 
-	/**
-	 * Utility method for closing a database connection.  This method must ALWAYS be
-	 * called for any connection retrieved by the
-	 * {@link DatabaseConnection#getConnection getConnection()} method, and the
-	 * connection SHOULD NOT have already been closed.
-	 *
-	 * @param conn A database connection, retrieved using DatabaseConnection.getConnection(),
-	 *  that is to be closed.  This connection SHOULD NOT have been previously closed.
-	 */
-	protected static void closeConnection(Connection conn) {
-		if (conn == null) {
-			return;
-		}
-		DataSourceUtils.releaseConnection(conn, dataSource);
-	}
+    /**
+     * Utility method for closing a database connection.  This method must ALWAYS be
+     * called for any connection retrieved by the
+     * {@link DatabaseConnection#getConnection getConnection()} method, and the
+     * connection SHOULD NOT have already been closed.
+     *
+     * @param conn A database connection, retrieved using DatabaseConnection.getConnection(),
+     *  that is to be closed.  This connection SHOULD NOT have been previously closed.
+     */
+    protected static void closeConnection(Connection conn) {
+        if (conn == null) {
+            return;
+        }
+        DataSourceUtils.releaseConnection(conn, dataSource);
+    }
 
-	/**
-	 * Close the connection pool, to be called for example during Servlet shutdown.
-	 * <p>
-	 * Note that this only applies if the DataSource was created by JAMWiki;
-	 * in the case of a container DataSource obtained via JNDI this method does nothing
-	 * except clear the static reference to the DataSource.
-	 */
-	protected static void closeConnectionPool() throws SQLException {
-		try {
-			DataSource testDataSource = dataSource;
-			while (testDataSource instanceof DelegatingDataSource) {
-				testDataSource = ((DelegatingDataSource) testDataSource).getTargetDataSource();
-			}
-			if (testDataSource instanceof BasicDataSource) {
-				// required to release any connections e.g. in case of servlet shutdown
-				((BasicDataSource) testDataSource).close();
-			}
-		} catch (SQLException e) {
-			logger.fatal("Unable to close connection pool", e);
-			throw e;
-		}
-		// clear references to prevent them being reused (& allow garbage collection)
-		dataSource = null;
-		transactionManager = null;
-	}
+    /**
+     * Close the connection pool, to be called for example during Servlet shutdown.
+     * <p>
+     * Note that this only applies if the DataSource was created by JAMWiki;
+     * in the case of a container DataSource obtained via JNDI this method does nothing
+     * except clear the static reference to the DataSource.
+     */
+    protected static void closeConnectionPool() throws SQLException {
+        try {
+            DataSource testDataSource = dataSource;
+            while (testDataSource instanceof DelegatingDataSource) {
+                testDataSource = ((DelegatingDataSource) testDataSource).getTargetDataSource();
+            }
+            if (testDataSource instanceof BasicDataSource) {
+                // required to release any connections e.g. in case of servlet shutdown
+                ((BasicDataSource) testDataSource).close();
+            }
+        } catch (SQLException e) {
+            logger.fatal("Unable to close connection pool", e);
+            throw e;
+        }
+        // clear references to prevent them being reused (& allow garbage collection)
+        dataSource = null;
+        transactionManager = null;
+    }
 
-	/**
-	 *
-	 */
-	protected static ResultSet executeQuery(String sql, Connection conn) throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
-		try {
-			long start = System.currentTimeMillis();
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			long execution = System.currentTimeMillis() - start;
-			if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
-				logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
-			}
-			logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
-			return rs;
-		} catch (SQLException e) {
-			logger.fatal("Failure while executing " + sql, e);
-			throw e;
-		} finally {
+    /**
+     * Utility method for closing a statement that may or may not be <code>null</code>.
+     * The statement SHOULD NOT have already been closed.
+     *
+     * @param stmt A statement object that is to be closed.  May be <code>null</code>.
+     */
+    protected static void closeStatement(Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    protected static ResultSet executeQuery(String sql, Connection conn) throws SQLException {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            long start = System.currentTimeMillis();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            long execution = System.currentTimeMillis() - start;
+            if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
+                logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
+            }
+            logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
+            return rs;
+        } catch (SQLException e) {
+            logger.fatal("Failure while executing " + sql, e);
+            throw e;
+        } finally {
+            // ResultSet cannot be closed until it is used by caller methods
                         /*
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+            if (rs != null) {
+            try {
+            rs.close();
+            } catch (SQLException e) {}
+            }
 
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {}
-			}
-                        */
-		}
-	}
+            if (stmt != null) {
+            try {
+            stmt.close();
+            } catch (SQLException e) {}
+            }
+             */
+        }
+    }
 
-	/**
-	 *
-	 */
-	protected static int executeUpdate(String sql, Connection conn) throws SQLException {
-		Statement stmt = null;
-		try {
-			long start = System.currentTimeMillis();
-			stmt = conn.createStatement();
-			logger.debug("Executing SQL: " + sql);
-			int result = stmt.executeUpdate(sql);
-			long execution = System.currentTimeMillis() - start;
-			if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
-				logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
-			}
-			logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
-			return result;
-		} catch (SQLException e) {
-			logger.fatal("Failure while executing " + sql, e);
-			throw e;
-		} finally {
-                        /*
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {}
-			}
-                        */
-		}
-	}
+    /**
+     *
+     */
+    protected static int executeUpdate(String sql, Connection conn) throws SQLException {
+        Statement stmt = null;
+        try {
+            long start = System.currentTimeMillis();
+            stmt = conn.createStatement();
+            logger.debug("Executing SQL: " + sql);
+            int result = stmt.executeUpdate(sql);
+            long execution = System.currentTimeMillis() - start;
+            if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
+                logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
+            }
+            logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
+            return result;
+        } catch (SQLException e) {
+            logger.fatal("Failure while executing " + sql, e);
+            throw e;
+        } finally {
 
-	/**
-	 *
-	 */
-	protected static Connection getConnection() throws SQLException {
-		if (dataSource == null) {
-			// DataSource has not yet been created, obtain it now
-			configDataSource();
-		}
-		return DataSourceUtils.getConnection(dataSource);
-	}
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    throw(e);
+                }
+            }
 
-	/**
-	 * Static method that will configure a DataSource based on the Environment setup.
-	 */
-	private synchronized static void configDataSource() throws SQLException {
-		if (dataSource != null) {
-			closeConnectionPool(); // DataSource has already been created so remove it
-		}
-		String url = Environment.getValue(Environment.PROP_DB_URL);
-		DataSource targetDataSource = null;
-		if (url.startsWith("jdbc:")) {
-			try {
-				// Use an internal "LocalDataSource" configured from the Environment
-				targetDataSource = new LocalDataSource();
-			} catch (ClassNotFoundException e) {
-				logger.fatal("Failure while configuring local data source", e);
-				throw new SQLException("Failure while configuring local data source: " + e.toString());
-			}
-		} else {
-			try {
-				// Use a container DataSource obtained via JNDI lookup
-				// TODO: Should try prefix java:comp/env/ if not already part of the JNDI name?
-				Context ctx = new InitialContext();
-				targetDataSource = (DataSource)ctx.lookup(url);
-			} catch (NamingException e) {
-				logger.fatal("Failure while configuring JNDI data source with URL: " + url, e);
-				throw new SQLException("Unable to configure JNDI data source with URL " + url + ": " + e.toString());
-			}
-		}
-		dataSource = new LazyConnectionDataSourceProxy(targetDataSource);
-		transactionManager = new DataSourceTransactionManager(targetDataSource);
-	}
+        }
+    }
 
-	/**
-	 * Test whether the database identified by the given parameters can be connected to.
-	 *
-	 * @param driver A String indicating the full path for the database driver class.
-	 * @param url The JDBC driver URL.
-	 * @param user The database user.
-	 * @param password The database user password.
-	 * @param existence Set to <code>true</code> if a test query should be executed.
-	 * @throws SQLException Thrown if any failure occurs while creating a test connection.
-	 */
-	public static void testDatabase(String driver, String url, String user, String password, boolean existence) throws SQLException, ClassNotFoundException {
-		Connection conn = null;
-		try {
-			conn = getTestConnection(driver, url, user, password);
-			if (existence) {
-				// test to see if database exists
-				executeQuery(WikiDatabase.getExistenceValidationQuery(), conn);
-			}
-		} finally {
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e) {}
-			}
-		}
-	}
+    /**
+     *
+     */
+    protected static Connection getConnection() throws SQLException {
+        if (dataSource == null) {
+            // DataSource has not yet been created, obtain it now
+            configDataSource();
+        }
+        return DataSourceUtils.getConnection(dataSource);
+    }
 
-	/**
-	 * Return a connection to the database with the specified parameters.
-	 * The caller <b>must</b> close this connection when finished!
-	 *
-	 * @param driver A String indicating the full path for the database driver class.
-	 * @param url The JDBC driver URL.
-	 * @param user The database user.
-	 * @param password The database user password.
-	 * @throws SQLException Thrown if any failure occurs while getting the test connection.
-	 */
-	protected static Connection getTestConnection(String driver, String url, String user, String password) throws SQLException {
-		if (url.startsWith("jdbc:")) {
-			if (!StringUtils.isBlank(driver)) {
-				try {
-					// ensure that the Driver class has been loaded
-					Utilities.forName(driver);
-				} catch (ClassNotFoundException e) {
-					throw new SQLException("Unable to instantiate class with name: " + driver);
-				}
-			}
-			return DriverManager.getConnection(url, user, password);
-		} else {
-			DataSource testDataSource = null;
-			try {
-				Context ctx = new InitialContext();
-				// TODO: Try appending "java:comp/env/" to the JNDI Name if it is missing?
-				testDataSource = (DataSource) ctx.lookup(url);
-			} catch (NamingException e) {
-				logger.fatal("Failure while configuring JNDI data source with URL: " + url, e);
-				throw new SQLException("Unable to configure JNDI data source with URL " + url + ": " + e.toString());
-			}
-			return testDataSource.getConnection();
-		}
-	}
+    /**
+     * Static method that will configure a DataSource based on the Environment setup.
+     */
+    private synchronized static void configDataSource() throws SQLException {
+        if (dataSource != null) {
+            closeConnectionPool(); // DataSource has already been created so remove it
+        }
+        String url = Environment.getValue(Environment.PROP_DB_URL);
+        DataSource targetDataSource = null;
+        if (url.startsWith("jdbc:")) {
+            try {
+                // Use an internal "LocalDataSource" configured from the Environment
+                targetDataSource = new LocalDataSource();
+            } catch (ClassNotFoundException e) {
+                logger.fatal("Failure while configuring local data source", e);
+                throw new SQLException("Failure while configuring local data source: " + e.toString());
+            }
+        } else {
+            try {
+                // Use a container DataSource obtained via JNDI lookup
+                // TODO: Should try prefix java:comp/env/ if not already part of the JNDI name?
+                Context ctx = new InitialContext();
+                targetDataSource = (DataSource) ctx.lookup(url);
+            } catch (NamingException e) {
+                logger.fatal("Failure while configuring JNDI data source with URL: " + url, e);
+                throw new SQLException("Unable to configure JNDI data source with URL " + url + ": " + e.toString());
+            }
+        }
+        dataSource = new LazyConnectionDataSourceProxy(targetDataSource);
+        transactionManager = new DataSourceTransactionManager(targetDataSource);
+    }
 
-	/**
-	 * Starts a transaction using the default settings.
-	 *
-	 * @return TransactionStatus representing the status of the Transaction
-	 * @throws SQLException
-	 */
-	public static TransactionStatus startTransaction() throws SQLException {
-		return startTransaction(new DefaultTransactionDefinition());
-	}
+    /**
+     * Test whether the database identified by the given parameters can be connected to.
+     *
+     * @param driver A String indicating the full path for the database driver class.
+     * @param url The JDBC driver URL.
+     * @param user The database user.
+     * @param password The database user password.
+     * @param existence Set to <code>true</code> if a test query should be executed.
+     * @throws SQLException Thrown if any failure occurs while creating a test connection.
+     */
+    public static void testDatabase(String driver, String url, String user, String password, boolean existence) throws SQLException, ClassNotFoundException {
+        Connection conn = null;
+        try {
+            conn = getTestConnection(driver, url, user, password);
+            if (existence) {
+                // test to see if database exists
+                executeQuery(WikiDatabase.getExistenceValidationQuery(), conn);
+            }
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+    }
 
-	/**
-	 * Starts a transaction, using the given TransactionDefinition
-	 *
-	 * @param definition TransactionDefinition
-	 * @return TransactionStatus
-	 * @throws SQLException
-	 */
-	protected static TransactionStatus startTransaction(TransactionDefinition definition) throws SQLException {
-		if (transactionManager == null || dataSource == null) {
-			configDataSource(); // this will create both the DataSource and a TransactionManager
-		}
-		return transactionManager.getTransaction(definition);
-	}
+    /**
+     * Return a connection to the database with the specified parameters.
+     * The caller <b>must</b> close this connection when finished!
+     *
+     * @param driver A String indicating the full path for the database driver class.
+     * @param url The JDBC driver URL.
+     * @param user The database user.
+     * @param password The database user password.
+     * @throws SQLException Thrown if any failure occurs while getting the test connection.
+     */
+    protected static Connection getTestConnection(String driver, String url, String user, String password) throws SQLException {
+        if (url.startsWith("jdbc:")) {
+            if (!StringUtils.isBlank(driver)) {
+                try {
+                    // ensure that the Driver class has been loaded
+                    Utilities.forName(driver);
+                } catch (ClassNotFoundException e) {
+                    throw new SQLException("Unable to instantiate class with name: " + driver);
+                }
+            }
+            return DriverManager.getConnection(url, user, password);
+        } else {
+            DataSource testDataSource = null;
+            try {
+                Context ctx = new InitialContext();
+                // TODO: Try appending "java:comp/env/" to the JNDI Name if it is missing?
+                testDataSource = (DataSource) ctx.lookup(url);
+            } catch (NamingException e) {
+                logger.fatal("Failure while configuring JNDI data source with URL: " + url, e);
+                throw new SQLException("Unable to configure JNDI data source with URL " + url + ": " + e.toString());
+            }
+            return testDataSource.getConnection();
+        }
+    }
 
-	/**
-	 * Perform a rollback, handling rollback exceptions properly.
-	 * @param status object representing the transaction
-	 * @param ex the thrown application exception or error
-	 * @throws TransactionException in case of a rollback error
-	 */
-	protected static void rollbackOnException(TransactionStatus status, Throwable ex) throws TransactionException {
-		logger.debug("Initiating transaction rollback on application exception", ex);
-		if (status == null) {
-			logger.info("TransactionStatus is null, unable to rollback");
-			return;
-		}
-		try {
-			transactionManager.rollback(status);
-		} catch (TransactionSystemException ex2) {
-			logger.fatal("Application exception overridden by rollback exception", ex);
-			ex2.initApplicationException(ex);
-			throw ex2;
-		} catch (RuntimeException ex2) {
-			logger.fatal("Application exception overridden by rollback exception", ex);
-			throw ex2;
-		} catch (Error err) {
-			logger.fatal("Application exception overridden by rollback error", ex);
-			throw err;
-		}
-	}
+    /**
+     * Starts a transaction using the default settings.
+     *
+     * @return TransactionStatus representing the status of the Transaction
+     * @throws SQLException
+     */
+    public static TransactionStatus startTransaction() throws SQLException {
+        return startTransaction(new DefaultTransactionDefinition());
+    }
 
-	/**
-	 * Commit the current transaction.
-	 * Note if the transaction has been programmatically marked for rollback then
-	 * a rollback will occur instead.
-	 *
-	 * @param status TransactionStatus representing the status of the transaction
-	 */
-	protected static void commit(TransactionStatus status) {
-		if (status == null) {
-			logger.debug("TransactionStatus is null, unable to commit");
-			return;
-		}
-		transactionManager.commit(status);
-	}
+    /**
+     * Starts a transaction, using the given TransactionDefinition
+     *
+     * @param definition TransactionDefinition
+     * @return TransactionStatus
+     * @throws SQLException
+     */
+    protected static TransactionStatus startTransaction(TransactionDefinition definition) throws SQLException {
+        if (transactionManager == null || dataSource == null) {
+            configDataSource(); // this will create both the DataSource and a TransactionManager
+        }
+        return transactionManager.getTransaction(definition);
+    }
+
+    /**
+     * Perform a rollback, handling rollback exceptions properly.
+     * @param status object representing the transaction
+     * @param ex the thrown application exception or error
+     * @throws TransactionException in case of a rollback error
+     */
+    protected static void rollbackOnException(TransactionStatus status, Throwable ex) throws TransactionException {
+        logger.debug("Initiating transaction rollback on application exception", ex);
+        if (status == null) {
+            logger.info("TransactionStatus is null, unable to rollback");
+            return;
+        }
+        try {
+            transactionManager.rollback(status);
+        } catch (TransactionSystemException ex2) {
+            logger.fatal("Application exception overridden by rollback exception", ex);
+            ex2.initApplicationException(ex);
+            throw ex2;
+        } catch (RuntimeException ex2) {
+            logger.fatal("Application exception overridden by rollback exception", ex);
+            throw ex2;
+        } catch (Error err) {
+            logger.fatal("Application exception overridden by rollback error", ex);
+            throw err;
+        }
+    }
+
+    /**
+     * Commit the current transaction.
+     * Note if the transaction has been programmatically marked for rollback then
+     * a rollback will occur instead.
+     *
+     * @param status TransactionStatus representing the status of the transaction
+     */
+    protected static void commit(TransactionStatus status) {
+        if (status == null) {
+            logger.debug("TransactionStatus is null, unable to commit");
+            return;
+        }
+        transactionManager.commit(status);
+    }
 }
