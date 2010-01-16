@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.ParsedTopic;
 import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
@@ -107,6 +108,8 @@ public interface DataHandler {
 	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
 	void deleteTopic(Topic topic, TopicVersion topicVersion, boolean userVisible) throws DataAccessException, WikiException;
+
+        void deleteParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException;
 
 	/**
 	 * Return a List of all Category objects for a given virtual wiki.
@@ -363,6 +366,8 @@ public interface DataHandler {
 	 */
 	Topic lookupTopic(String virtualWiki, String topicName, boolean deleteOK, Object transactionObject) throws DataAccessException;
 
+        ParsedTopic lookupParsedTopic(String virtualWiki, String topicName, Object transactionObject) throws DataAccessException;
+
 	/**
 	 * Return a count of all topics, including redirects, comments pages and
 	 * templates, for the given virtual wiki.  Deleted topics are not included
@@ -616,6 +621,8 @@ public interface DataHandler {
          */
         void updateTopic(Topic topic) throws DataAccessException, WikiException;
 
+        void updateParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException;
+
         /**
          * Exposed from private to public, this should be only used for ETL/loading purposes!
          *
@@ -764,6 +771,8 @@ public interface DataHandler {
 	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
 	void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean userVisible) throws DataAccessException, WikiException;
+
+        void writeParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException;
 
         /**
 	 * Add or update a Topic object.  This method will add a new record if

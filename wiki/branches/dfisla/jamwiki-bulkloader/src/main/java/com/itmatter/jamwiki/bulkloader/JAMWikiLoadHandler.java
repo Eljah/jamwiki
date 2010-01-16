@@ -49,7 +49,6 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
     private Date startDate = new Date();
     private Date endDate = new Date();
     private DataHandler dataHandler = null;
-    private boolean importRedirects = false;
 
     /**
      *
@@ -193,38 +192,18 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
 
                 pageText = preprocessText(pageText);
 
-                boolean importCheck = true;
+                Topic topic = new Topic();
+                topic.setName(convertArticleNameFromWikipediaToJAMWiki(pageName));
+                topic.setVirtualWiki(virtualWiki);
+                topic.setTopicContent(pageText);
+                int charactersChanged = StringUtils.length(pageText);
 
-                if ((pageText != null) && (pageText.startsWith("#REDIRECT")) && (!this.importRedirects)) {
-                    importCheck = false;
-                } else if ((pageText != null) && (pageText.startsWith("#redirect")) && (!this.importRedirects)) {
-                    importCheck = false;
-                }
+                TopicVersion topicVersion = new TopicVersion(user, authorIpAddress, pageComment, pageText, charactersChanged);
+                // manage mapping between MediaWiki and JAMWiki namespaces
+                topic.setTopicType(convertNamespaceFromMediaWikiToJAMWiki(namespace));
 
-                if (importCheck) {
-                    Topic topic = new Topic();
-                    topic.setName(convertArticleNameFromWikipediaToJAMWiki(pageName));
-                    topic.setVirtualWiki(virtualWiki);
-                    topic.setTopicContent(pageText);
-                    int charactersChanged = StringUtils.length(pageText);
+                dataHandler.writeTopic(topic, topicVersion, null, null, true, false);
 
-                    TopicVersion topicVersion = new TopicVersion(user, authorIpAddress, pageComment, pageText, charactersChanged);
-                    // manage mapping between MediaWiki and JAMWiki namespaces
-                    topic.setTopicType(convertNamespaceFromMediaWikiToJAMWiki(namespace));
-
-                    // PERFORMANCE-EXPERIMENTAL
-                    // THIS IS COMPLICATED and equivalent to buildall.php from Mediawiki
-                    //ParserOutput parserOutput = ParserUtil.parserOutput(pageText, virtualWiki, pageName);
-
-                    //if ((pageText != null) && (!pageText.startsWith("#REDIRECT")) && (this.updateCleanContent)) {
-                    //    topicVersion.setVersionContentClean(this.parseCleanArticleContent(pageText, pageName, virtualWiki, user));
-                    //}
-
-                    //if(this.updateSearchIndex)
-                    //    WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null, true);
-                    //else
-                    dataHandler.writeTopic(topic, topicVersion, null, null, true, false);
-                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 //throw new SAXException(e);
@@ -347,19 +326,4 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
         logger.error("FATAL ERROR!", x);
     }
 
-    /**
-     *
-     * @return
-     */
-    public boolean isImportRedirects() {
-        return importRedirects;
-    }
-
-    /**
-     *
-     * @param importRedirects
-     */
-    public void setImportRedirects(boolean importRedirects) {
-        this.importRedirects = importRedirects;
-    }
 }

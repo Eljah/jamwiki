@@ -36,6 +36,7 @@ import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
 import org.apache.log4j.Logger;
+import org.jamwiki.model.ParsedTopic;
 
 /**
  *
@@ -499,4 +500,24 @@ public class TestDataHandler implements DataHandler {
 	public void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
 		throw new UnsupportedOperationException();
 	}
+
+        // EXPERIMENTAL
+        public void deleteParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException{
+            throw new UnsupportedOperationException();
+        }
+
+        // EXPERIMENTAL
+        public ParsedTopic lookupParsedTopic(String virtualWiki, String topicName, Object transactionObject) throws DataAccessException{
+            throw new UnsupportedOperationException();
+        }
+
+        // EXPERIMENTAL
+        public void updateParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException{
+            throw new UnsupportedOperationException();
+        }
+
+        // EXPERIMENTAL
+        public void writeParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException{
+            throw new UnsupportedOperationException();
+        }
 }

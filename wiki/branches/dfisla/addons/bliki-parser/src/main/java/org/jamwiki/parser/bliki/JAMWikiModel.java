@@ -152,7 +152,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 			}
 			popNode();
 		} catch (DataAccessException e1) {
-			e1.printStackTrace();
+			logger.error(e1.getMessage(), e1);
 			append(new ContentToken(topicDescription));
 		}
 	}
@@ -237,7 +237,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 			}
 			return topic.getTopicContent();
 		} catch (Exception e) {
-			e.printStackTrace();
+                        logger.error(e.getMessage(), e);
 		}
 		return result;
 	}
@@ -349,7 +349,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		try {
 			TemplateParser.parse(rawWikiText, this, buf, parseOnlySignature, true);
 		} catch (Exception ioe) {
-			ioe.printStackTrace();
+                        logger.error(ioe.getMessage(), ioe);
 			buf.append("<span class=\"error\">TemplateParser exception: " + ioe.getClass().getSimpleName() + "</span>");
 		}
 		return buf.toString();

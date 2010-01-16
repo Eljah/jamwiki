@@ -18,6 +18,7 @@
 		<module>jamwiki-loader</module>
 		<module>jamwiki-bulkloader</module>
 		<module>jamwiki-analyzer</module>
+		<module>jamwiki-crawler</module>
 	</modules>
 	<scm>
 		<connection>scm:svn:https://svn.itmatter.net/svn/itm/jamwiki/trunk</connection>
@@ -97,7 +98,7 @@
 			<dependency>
 				<groupId>commons-dbcp</groupId>
 				<artifactId>commons-dbcp</artifactId>
-				<version>1.2.2</version>
+				<version>1.3</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-fileupload</groupId>
@@ -117,7 +118,7 @@
 			<dependency>
 				<groupId>commons-pool</groupId>
 				<artifactId>commons-pool</artifactId>
-				<version>1.3</version>
+				<version>1.5.4</version>
 			</dependency>
 			<dependency>
 				<groupId>hsqldb</groupId>

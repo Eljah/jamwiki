@@ -24,6 +24,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
 import org.apache.log4j.Logger;
+import org.jamwiki.WikiException;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -71,6 +72,12 @@ public class TopicServlet extends JAMWikiServlet {
 			next.addObject("notopic", wikiMessage);
 		}
 		WikiMessage pageTitle = new WikiMessage("topic.title", topicName);
-		ServletUtil.viewTopic(request, next, pageInfo, pageTitle, topic, true, true);
+               
+                try {
+                    ServletUtil.viewTopic(request, next, pageInfo, pageTitle, topic, true, true);
+                } catch (WikiException e) {
+                    logger.fatal("Unable to view topic menu", e);
+                }
+                
 	}
 }

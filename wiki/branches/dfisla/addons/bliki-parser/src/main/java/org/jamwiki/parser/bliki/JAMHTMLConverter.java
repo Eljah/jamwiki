@@ -1,12 +1,18 @@
 package org.jamwiki.parser.bliki;
 
+import info.bliki.wiki.tags.HTMLTag;
+import info.bliki.htmlcleaner.ContentToken;
+import info.bliki.htmlcleaner.EndTagToken;
 import info.bliki.htmlcleaner.TagNode;
 import info.bliki.htmlcleaner.Utils;
 import info.bliki.wiki.filter.HTMLConverter;
+import info.bliki.wiki.model.Configuration;
 import info.bliki.wiki.model.IWikiModel;
 import info.bliki.wiki.model.ImageFormat;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -17,6 +23,7 @@ import org.jamwiki.utils.NamespaceHandler;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.WikiFile;
@@ -30,11 +37,67 @@ public class JAMHTMLConverter extends HTMLConverter {
     private static final int DEFAULT_THUMBNAIL_SIZE = 180;
     private ParserInput fParserInput;
 
+    private final long START_TIME = System.currentTimeMillis();
+
     public JAMHTMLConverter(ParserInput parserInput) {
         super();
         fParserInput = parserInput;
     }
 
+    @Override
+    public void nodesToText(List<? extends Object> nodes, Appendable resultBuffer, IWikiModel model) throws IOException {
+		if (nodes != null && !nodes.isEmpty()) {
+			try {
+				int level = model.incrementRecursionLevel();
+
+				if (level > Configuration.RENDERER_RECURSION_LIMIT) {
+					resultBuffer.append("<span class=\"error\">ERROR - Processing recursion limit exceeded rendering tags count " + Configuration.RENDERER_RECURSION_LIMIT +".</span>");
+					return;
+				}
+
+                                if (System.currentTimeMillis() - START_TIME > Environment.getLongValue(Environment.PROP_PARSER_TIME_LIMIT)) {
+                                        logger.error("Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms");
+                                        resultBuffer.append("<span class=\"error\">TIME - Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms.</span>");
+					return;
+				}
+
+				Iterator<? extends Object> childrenIt = nodes.iterator();
+				while (childrenIt.hasNext()) {
+					Object item = childrenIt.next();
+					if (item != null) {
+						if (item instanceof List) {
+							nodesToText((List) item, resultBuffer, model);
+						} else if (item instanceof ContentToken) {
+							ContentToken contentToken = (ContentToken) item;
+							String content = contentToken.getContent();
+							content = Utils.escapeXml(content, true, true, true);
+							resultBuffer.append(content);
+						} else if (item instanceof HTMLTag) {
+							((HTMLTag) item).renderHTML(this, resultBuffer, model);
+						} else if (item instanceof TagNode) {
+							TagNode node = (TagNode) item;
+							Map<String, Object> map = node.getObjectAttributes();
+							if (map != null && map.size() > 0) {
+								Object attValue = map.get("wikiobject");
+								if (attValue instanceof ImageFormat) {
+									imageNodeToText(node, (ImageFormat) attValue, resultBuffer, model);
+								}
+							} else {
+								nodeToHTML(node, resultBuffer, model);
+							}
+						} else if (item instanceof EndTagToken) {
+							EndTagToken node = (EndTagToken) item;
+							resultBuffer.append('<');
+							resultBuffer.append(node.getName());
+							resultBuffer.append("/>");
+						}
+					}
+				}
+			} finally {
+				model.decrementRecursionLevel();
+			}
+		}
+	}
    
     @Override
     public void imageNodeToText(TagNode imageTagNode, ImageFormat imageFormat, Appendable resultBuffer, IWikiModel model)
@@ -68,7 +131,7 @@ public class JAMHTMLConverter extends HTMLConverter {
             logger.debug("IMAGE-LINK-HTML =>: " + linkHtml);
             resultBuffer.append(linkHtml);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
     }

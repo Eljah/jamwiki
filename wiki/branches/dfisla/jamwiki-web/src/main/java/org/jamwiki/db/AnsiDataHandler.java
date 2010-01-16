@@ -57,6 +57,7 @@ import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLink;
 import org.apache.log4j.Logger;
 import org.jamwiki.Environment;
+import org.jamwiki.model.ParsedTopic;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
 
@@ -158,6 +159,21 @@ public class AnsiDataHandler implements DataHandler {
             throw new DataAccessException(e);
         }
         return topicVersionId;
+    }
+
+    /**
+     * EXPERIMENTAL
+     */
+    private int addParsedTopic(ParsedTopic parsedTopic, Connection conn) throws DataAccessException, WikiException {
+        int virtualWikiId = this.lookupVirtualWikiId(parsedTopic.getVirtualWiki());
+        int rv = -1;
+        try {
+            rv = this.queryHandler().insertParsedTopic(parsedTopic, virtualWikiId, conn);
+        } catch (SQLException e) {
+            logger.error("WRITE-PARSED-TOPIC-FAILED, TOPIC-ID: " + parsedTopic.getTopicId() + " CONTENT: " + parsedTopic.getTopicContent());
+            throw new DataAccessException(e);
+        }
+        return rv;
     }
 
     /**
@@ -422,11 +438,19 @@ public class AnsiDataHandler implements DataHandler {
                 // topic type not initialized since it is not needed
                 results.add(category);
             }
+            
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -447,9 +471,17 @@ public class AnsiDataHandler implements DataHandler {
             while (rs.next()) {
                 results.add(this.initRole(rs));
             }
+
         } catch (SQLException e) {
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
         return results;
@@ -473,11 +505,19 @@ public class AnsiDataHandler implements DataHandler {
             while (rs.next()) {
                 all.add(rs.getString(DATA_TOPIC_NAME));
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -501,11 +541,19 @@ public class AnsiDataHandler implements DataHandler {
             while (rs.next()) {
                 all.add(rs.getInt(DATA_TOPIC_ID));
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -540,6 +588,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -564,6 +619,7 @@ public class AnsiDataHandler implements DataHandler {
                 RecentChange change = initRecentChange(rs);
                 all.add(change);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -572,6 +628,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -600,6 +663,7 @@ public class AnsiDataHandler implements DataHandler {
                 RecentChange change = initRecentChange(rs);
                 all.add(change);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -608,6 +672,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -639,11 +710,19 @@ public class AnsiDataHandler implements DataHandler {
                 roleMap.addRole(rs.getString("authority"));
                 roleMaps.put(userId, roleMap);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -684,11 +763,19 @@ public class AnsiDataHandler implements DataHandler {
                 roleMap.addRole(rs.getString("authority"));
                 roleMaps.put(key, roleMap);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -713,6 +800,7 @@ public class AnsiDataHandler implements DataHandler {
                 Role role = this.initRole(rs);
                 results.add(role);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -721,6 +809,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -733,10 +828,11 @@ public class AnsiDataHandler implements DataHandler {
     public List<RoleMap> getRoleMapGroups() throws DataAccessException {
         LinkedHashMap<Integer, RoleMap> roleMaps = new LinkedHashMap<Integer, RoleMap>();
         Connection conn = null;
+        ResultSet rs = null;
         try {
             conn = DatabaseConnection.getConnection();
 
-            ResultSet rs = this.queryHandler().getRoleMapGroups(conn);
+            rs = this.queryHandler().getRoleMapGroups(conn);
             while (rs.next()) {
                 Integer groupId = rs.getInt(DATA_GROUP_ID);
                 RoleMap roleMap = new RoleMap();
@@ -749,9 +845,17 @@ public class AnsiDataHandler implements DataHandler {
                 roleMap.addRole(rs.getString("authority"));
                 roleMaps.put(groupId, roleMap);
             }
+
         } catch (SQLException e) {
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -776,6 +880,7 @@ public class AnsiDataHandler implements DataHandler {
                 Role role = this.initRole(rs);
                 results.add(role);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -784,6 +889,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -808,11 +920,19 @@ public class AnsiDataHandler implements DataHandler {
                 String topicName = rs.getString(DATA_TOPIC_NAME);
                 all.add(topicName);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -841,6 +961,7 @@ public class AnsiDataHandler implements DataHandler {
                 RecentChange change = initRecentChange(rs);
                 all.add(change);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -849,6 +970,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -871,6 +999,7 @@ public class AnsiDataHandler implements DataHandler {
                 VirtualWiki virtualWiki = initVirtualWiki(rs);
                 results.add(virtualWiki);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -879,6 +1008,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -905,11 +1041,19 @@ public class AnsiDataHandler implements DataHandler {
                 String topicName = rs.getString(DATA_TOPIC_NAME);
                 all.add(topicName);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -935,11 +1079,19 @@ public class AnsiDataHandler implements DataHandler {
                 RecentChange change = initRecentChange(rs);
                 all.add(change);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1162,6 +1314,33 @@ public class AnsiDataHandler implements DataHandler {
         }
     }
 
+
+    /**
+     * EXPERIMENTAL
+     */
+    private ParsedTopic initParsedTopic(ResultSet rs) throws DataAccessException {
+        try {
+            ParsedTopic parsedTopic = null;
+
+            byte[] buffer = null;
+
+            try {
+                buffer = (byte[]) rs.getObject("data");
+                if (buffer != null) {
+                    parsedTopic = new ParsedTopic(new String(buffer));
+                }
+            } catch (Exception uee) {
+                logger.error(uee.getMessage(), uee);
+            }
+
+            logger.debug("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
+            return parsedTopic;
+        } catch (Exception e) {
+            logger.fatal("Failure while initializing parsed topic", e);
+            throw new DataAccessException(e);
+        }
+    }
+
     /**
      *
      */
@@ -1291,11 +1470,19 @@ public class AnsiDataHandler implements DataHandler {
                 category.setTopicType(rs.getInt("topic_type"));
                 results.add(category);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1336,11 +1523,12 @@ public class AnsiDataHandler implements DataHandler {
         Topic topic = null;
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
             int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
-            ResultSet rs = this.queryHandler().lookupTopic(virtualWikiId, topicName, caseSensitive, conn);
+            rs = this.queryHandler().lookupTopic(virtualWikiId, topicName, caseSensitive, conn);
             if (rs.next()) {
                 topic = initTopic(rs);
             }
@@ -1350,6 +1538,7 @@ public class AnsiDataHandler implements DataHandler {
                 Topic cacheTopic = (topic == null) ? null : new Topic(topic);
                 WikiCache.addToCache(CACHE_TOPICS, key, cacheTopic);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -1358,6 +1547,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1383,11 +1579,19 @@ public class AnsiDataHandler implements DataHandler {
 
             rs = this.queryHandler().lookupTopicCount(virtualWikiId, conn);
             result = rs.getInt("topic_count");
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1402,26 +1606,35 @@ public class AnsiDataHandler implements DataHandler {
         int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            ResultSet rs = this.queryHandler().lookupTopicByType(virtualWikiId, topicType, pagination, conn);
+            rs = this.queryHandler().lookupTopicByType(virtualWikiId, topicType, pagination, conn);
             while (rs.next()) {
                 results.add(rs.getString(DATA_TOPIC_NAME));
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
         return results;
     }
 
-    // Danieil
+    // Daniel
     public Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException {
         Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPICS, topicId);
         if (cacheElement != null) {
@@ -1433,14 +1646,15 @@ public class AnsiDataHandler implements DataHandler {
         Topic result = null;
         TransactionStatus status = null;
         Connection conn = null;
-
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
-            ResultSet rs = this.queryHandler().lookupTopicById(virtualWikiId, topicId, conn);
+            rs = this.queryHandler().lookupTopicById(virtualWikiId, topicId, conn);
             if (rs.next()) {
                 result = this.initTopic(rs);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -1449,6 +1663,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1467,13 +1688,15 @@ public class AnsiDataHandler implements DataHandler {
         Topic result = null;
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
-            ResultSet rs = this.queryHandler().lookupTopicMetaDataById(virtualWikiId, topicId, conn);
+            rs = this.queryHandler().lookupTopicMetaDataById(virtualWikiId, topicId, conn);
             if (rs.next()) {
                 result = this.initTopicMetaData(rs);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -1482,6 +1705,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1500,14 +1730,15 @@ public class AnsiDataHandler implements DataHandler {
         TopicVersion result = null;
         TransactionStatus status = null;
         Connection conn = null;
-
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
-            ResultSet rs = this.queryHandler().lookupTopicVersion(topicVersionId, conn);
+            rs = this.queryHandler().lookupTopicVersion(topicVersionId, conn);
             if (rs.next()) {
                 result = this.initTopicVersion(rs);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -1516,6 +1747,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1592,11 +1830,19 @@ public class AnsiDataHandler implements DataHandler {
             if (rs.next()) {
                 wikiFile = initWikiFile(rs);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1614,17 +1860,26 @@ public class AnsiDataHandler implements DataHandler {
         TransactionStatus status = null;
         Connection conn = null;
         int result = 0;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            ResultSet rs = this.queryHandler().lookupWikiFileCount(virtualWikiId, conn);
+            rs = this.queryHandler().lookupWikiFileCount(virtualWikiId, conn);
             result = rs.getInt("file_count");
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1647,11 +1902,19 @@ public class AnsiDataHandler implements DataHandler {
             if (rs.next()) {
                 wikiGroup = initWikiGroup(rs);
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
         return wikiGroup;
@@ -1664,13 +1927,15 @@ public class AnsiDataHandler implements DataHandler {
         WikiUser result = null;
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
-            ResultSet rs = this.queryHandler().lookupWikiUser(userId, conn);
+            rs = this.queryHandler().lookupWikiUser(userId, conn);
             if (rs.next()) {
                 result = initWikiUser(rs);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -1679,6 +1944,13 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1692,17 +1964,19 @@ public class AnsiDataHandler implements DataHandler {
         WikiUser result = null;
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            ResultSet rs = this.queryHandler().lookupWikiUser(username, conn);
+            rs = this.queryHandler().lookupWikiUser(username, conn);
             if (!rs.next()) {
                 result = null;
             } else {
                 int userId = rs.getInt(DATA_WIKI_USER_ID);
                 result = lookupWikiUser(userId);
             }
+
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -1710,7 +1984,14 @@ public class AnsiDataHandler implements DataHandler {
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
-        } finally {
+        } finally{
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1723,14 +2004,23 @@ public class AnsiDataHandler implements DataHandler {
     public int lookupWikiUserCount() throws DataAccessException {
         Connection conn = null;
         int rv;
+        ResultSet rs = null;
 
         try {
             conn = DatabaseConnection.getConnection();
-            ResultSet rs = this.queryHandler().lookupWikiUserCount(conn);
+            rs = this.queryHandler().lookupWikiUserCount(conn);
             rv = rs.getInt("user_count");
+
         } catch (SQLException e) {
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
         return rv;
@@ -1743,20 +2033,30 @@ public class AnsiDataHandler implements DataHandler {
         TransactionStatus status = null;
         String result = null;
         Connection conn = null;
+        ResultSet rs = null;
+
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            ResultSet rs = this.queryHandler().lookupWikiUserEncryptedPassword(username, conn);
+            rs = this.queryHandler().lookupWikiUserEncryptedPassword(username, conn);
 
             if (rs.next()) {
                 result = rs.getString("password");
             }
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1770,19 +2070,28 @@ public class AnsiDataHandler implements DataHandler {
         List<String> results = new ArrayList<String>();
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            ResultSet rs = this.queryHandler().lookupWikiUsers(pagination, conn);
+            rs = this.queryHandler().lookupWikiUsers(pagination, conn);
             while (rs.next()) {
                 results.add(rs.getString("login"));
             }
+            rs.close();
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
 
@@ -1977,6 +2286,10 @@ public class AnsiDataHandler implements DataHandler {
         TransactionStatus status = null;
         Connection conn = null;
         try {
+
+            String key = WikiCache.key(virtualWiki, topicName);
+            WikiCache.removeFromCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
+
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
             String contents = WikiUtil.readSpecialPage(locale, topicName);
@@ -2888,5 +3201,118 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.closeConnection(conn);
         }
         
+    }
+
+    // EXPERIMENTAL
+    public void deleteParsedTopic(ParsedTopic parsedTopic) throws DataAccessException, WikiException{
+
+        TransactionStatus status = null;
+        Connection conn = null;
+
+        try {
+            status = DatabaseConnection.startTransaction();
+            conn = DatabaseConnection.getConnection();
+
+            int virtualWikiId = this.lookupVirtualWikiId(parsedTopic.getVirtualWiki());
+            this.queryHandler().deleteParsedTopic(virtualWikiId, parsedTopic.getTopicId(), conn);
+        } catch (DataAccessException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw e;
+        } catch (SQLException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw new DataAccessException(e);
+        } finally {
+            DatabaseConnection.closeConnection(conn);
+        }
+
+    }
+
+    // EXPERIMENTAL
+    public ParsedTopic lookupParsedTopic(String virtualWiki, String topicName, Object transactionObject) throws DataAccessException {
+
+        ParsedTopic result = null;
+        TransactionStatus status = null;
+        Connection conn = null;
+        ResultSet rs = null;
+        try {
+            status = DatabaseConnection.startTransaction();
+            conn = DatabaseConnection.getConnection();
+
+            int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
+            rs = this.queryHandler().lookupParsedTopic(virtualWikiId, topicName, conn);
+            if (rs.next()) {
+                result = this.initParsedTopic(rs);
+            }
+            rs.close();
+            DatabaseConnection.commit(status);
+        } catch (DataAccessException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw e;
+        } catch (SQLException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw new DataAccessException(e);
+        } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
+            DatabaseConnection.closeConnection(conn);
+        }
+
+        return result;
+    }
+
+    // EXPERIMENTAL
+    public void updateParsedTopic(ParsedTopic parsedTopic) throws DataAccessException, WikiException{
+
+        int virtualWikiId = this.lookupVirtualWikiId(parsedTopic.getVirtualWiki());
+
+        TransactionStatus status = null;
+        Connection conn = null;
+        try {
+            status = DatabaseConnection.startTransaction();
+            conn = DatabaseConnection.getConnection();
+
+            this.queryHandler().updateParsedTopic(parsedTopic, virtualWikiId, conn);
+            DatabaseConnection.commit(status);
+
+        } catch (SQLException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw new DataAccessException(e);
+        } finally {
+            DatabaseConnection.closeConnection(conn);
+        }
+    }
+
+    // EXPERIMENTAL
+    public void writeParsedTopic(ParsedTopic parsedTopic) throws DataAccessException, WikiException {
+
+        TransactionStatus status = null;
+        Connection conn = null;
+        int topicId = -1;
+
+        try {
+            status = DatabaseConnection.startTransaction();
+            conn = DatabaseConnection.getConnection();
+
+            topicId = addParsedTopic(parsedTopic, conn);
+            logger.debug("PARSED-TOPIC-ID =>: " + topicId);
+
+            DatabaseConnection.commit(status);
+        } catch (DataAccessException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw e;
+        } catch (SQLException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw new DataAccessException(e);
+        } catch (WikiException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw e;
+        } finally {
+            DatabaseConnection.closeConnection(conn);
+        }
     }
 }

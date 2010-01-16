@@ -16,14 +16,10 @@
  */
 package org.jamwiki.model;
 
-import org.apache.log4j.Logger;
-
 /**
  * Provides an object that can be used to store search result information.
  */
 public class SearchResultEntry {
-
-	private static final Logger logger = Logger.getLogger(SearchResultEntry.class.getName());
 
 	/** The topic of this entry */
 	private String topic = null;

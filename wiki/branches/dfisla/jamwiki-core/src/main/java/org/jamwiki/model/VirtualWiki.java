@@ -16,15 +16,11 @@
  */
 package org.jamwiki.model;
 
-import java.io.Serializable;
-import org.apache.log4j.Logger;
-
 /**
  * Provides an object representing a virtual wiki.
  */
-public class VirtualWiki implements Serializable {
+public class VirtualWiki {
 
-	private static final Logger logger = Logger.getLogger(VirtualWiki.class.getName());
 	private String name = null;
 	private String defaultTopicName = null;
 	private int virtualWikiId = -1;

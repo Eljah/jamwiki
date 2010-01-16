@@ -150,8 +150,6 @@ public class Main {
             InputSource is = new InputSource(new java.io.FileInputStream(file));
 
             JAMWikiLoadHandler loadHandler = new JAMWikiLoadHandler(virtualWikiName, user, ip);
-            loadHandler.setImportRedirects(false);
-
             sp.parse(is, loadHandler);
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -491,7 +491,9 @@ public class WikiDatabase {
 
         String sql = "select max(" + primaryIdColumnName + ") as max_table_id from " + tableName;
         ResultSet rs = DatabaseConnection.executeQuery(sql, conn);
-        return rs.getInt("max_table_id");
+        int rv = rs.getInt("max_table_id");
+        rs.close();
+        return rv;
     }
 
     /**

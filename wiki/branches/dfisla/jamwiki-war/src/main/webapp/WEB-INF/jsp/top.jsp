@@ -22,6 +22,7 @@
 <head>
 	<title><fmt:message key="${pageInfo.pageTitle.key}"><fmt:param value="${pageInfo.pageTitle.params[0]}" /></fmt:message> - <fmt:message key="common.sitename" /></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
 	<meta name="DC.Title" content="<fmt:message key="${pageInfo.pageTitle.key}"><fmt:param value="${pageInfo.pageTitle.params[0]}" /></fmt:message> - <fmt:message key="common.sitename" />" />
 <c:if test="${!empty pageInfo.metaDescription}">
 	<meta name="description" content="<c:out value="${pageInfo.metaDescription}" />" />

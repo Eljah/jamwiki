@@ -44,6 +44,9 @@ public class WikiBase {
 
 	/** Cache name for the cache of parsed topic content. */
 	public static final String CACHE_PARSED_TOPIC_CONTENT = "org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_CONTENT";
+
+        public static final String CACHE_PARSED_TOPIC_DATA = "org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_DATA";
+
 	/** Name of the default wiki */
 	// FIXME - make this configurable
 	public static final String DEFAULT_VWIKI = "en";

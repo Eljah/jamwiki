@@ -112,6 +112,12 @@ public class DatabaseConnection {
         if (conn == null) {
             return;
         }
+        try{
+            if(conn.isClosed()){
+                return;
+            }
+        }catch(Exception ex){}
+
         DataSourceUtils.releaseConnection(conn, dataSource);
     }
 
@@ -174,6 +180,16 @@ public class DatabaseConnection {
             return rs;
         } catch (SQLException e) {
             logger.fatal("Failure while executing " + sql, e);
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {}
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {}
+            }
             throw e;
         } finally {
             // ResultSet cannot be closed until it is used by caller methods
@@ -216,7 +232,9 @@ public class DatabaseConnection {
 
             if (stmt != null) {
                 try {
-                    stmt.close();
+                    if(!stmt.isClosed()){
+                        stmt.close();
+                    }
                 } catch (SQLException e) {
                     throw(e);
                 }

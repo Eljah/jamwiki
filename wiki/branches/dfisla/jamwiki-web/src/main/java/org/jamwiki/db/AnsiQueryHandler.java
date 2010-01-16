@@ -39,6 +39,7 @@ import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
 import org.apache.log4j.Logger;
+import org.jamwiki.model.ParsedTopic;
 
 /**
  * Default implementation of the QueryHandler implementation for retrieving, inserting,
@@ -161,6 +162,14 @@ public class AnsiQueryHandler implements QueryHandler {
     protected static String STATEMENT_UPDATE_VIRTUAL_WIKI = null;
     protected static String STATEMENT_UPDATE_WIKI_FILE = null;
     protected static String STATEMENT_UPDATE_WIKI_USER = null;
+
+    protected static String STATEMENT_CREATE_TOPIC_CACHE_TABLE = null;
+    protected static String STATEMENT_DELETE_TOPIC_CACHE = null;
+    protected static String STATEMENT_INSERT_TOPIC_CACHE = null;
+    protected static String STATEMENT_SELECT_TOPIC_CACHE = null;
+    protected static String STATEMENT_SELECT_TOPIC_CACHE_BY_ID = null;
+    protected static String STATEMENT_UPDATE_TOPIC_CACHE = null;
+
     private static Properties props = null;
 
     /**
@@ -683,7 +692,12 @@ public class AnsiQueryHandler implements QueryHandler {
         STATEMENT_UPDATE_WIKI_FILE = props.getProperty("STATEMENT_UPDATE_WIKI_FILE");
         STATEMENT_UPDATE_WIKI_USER = props.getProperty("STATEMENT_UPDATE_WIKI_USER");
 
-
+        STATEMENT_CREATE_TOPIC_CACHE_TABLE = props.getProperty("STATEMENT_CREATE_TOPIC_CACHE_TABLE");
+        STATEMENT_DELETE_TOPIC_CACHE = props.getProperty("STATEMENT_DELETE_TOPIC_CACHE");
+        STATEMENT_INSERT_TOPIC_CACHE = props.getProperty("STATEMENT_INSERT_TOPIC_CACHE");
+        STATEMENT_SELECT_TOPIC_CACHE = props.getProperty("STATEMENT_SELECT_TOPIC_CACHE");
+        STATEMENT_SELECT_TOPIC_CACHE_BY_ID = props.getProperty("STATEMENT_SELECT_TOPIC_CACHE_BY_ID");
+        STATEMENT_UPDATE_TOPIC_CACHE = props.getProperty("STATEMENT_UPDATE_TOPIC_CACHE");
     }
 
     /**
@@ -708,6 +722,14 @@ public class AnsiQueryHandler implements QueryHandler {
         stmt.setString(3, category.getSortKey());
         stmt.executeUpdate();
         DatabaseConnection.closeStatement(stmt);
+
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (Exception ex) {
+                logger.warn("Could not close ResultSet!", ex);
+            }
+        }
     }
 
     /**
@@ -836,6 +858,13 @@ public class AnsiQueryHandler implements QueryHandler {
             logger.error(e.getMessage(), e);
             throw e;
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn, stmt, rs);
         }
         return topicId;
@@ -915,10 +944,19 @@ public class AnsiQueryHandler implements QueryHandler {
             logger.error(e.getMessage(), e);
             throw e;
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn, stmt, rs);
         }
         return topicVersionId;
     }
+    
+   
 
     /**
      *
@@ -1490,5 +1528,81 @@ public class AnsiQueryHandler implements QueryHandler {
         stmt.setInt(9, user.getUserId());
         stmt.executeUpdate();
         DatabaseConnection.closeStatement(stmt);
+    }
+
+    // EXPERIMENTAL
+    public void deleteParsedTopic(int virtualWikiId, int topicId, Connection conn) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_DELETE_TOPIC_CACHE);
+        stmt.setInt(1, virtualWikiId);
+        stmt.setInt(2, topicId);
+        stmt.executeUpdate();
+        DatabaseConnection.closeStatement(stmt);
+    }
+
+    // EXPERIMENTAL
+    public int insertParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException {
+        int rv = -1; // number of records inserted NOT GENERATED KEY
+
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_CACHE);
+
+            stmt.setInt(1, parsedTopic.getTopicId());
+            stmt.setInt(2, virtualWikiId);
+            stmt.setString(3, parsedTopic.getName());
+            stmt.setBytes(4, parsedTopic.toString().getBytes());
+       
+            //stmt.logParams();
+            logger.debug("SQL-QUERY-STRING =>: " + stmt.toString());
+            rv = stmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warn("Could not close ResultSet!", ex);
+                }
+            }
+            DatabaseConnection.closeConnection(conn, stmt, rs);
+        }
+        return rv;
+    }
+
+    // EXPERIMENTAL
+    public ResultSet lookupParsedTopic(int virtualWikiId, String topicName, Connection conn) throws SQLException {
+
+        PreparedStatement stmt = null;
+        stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_CACHE);
+
+        stmt.setInt(1, virtualWikiId);
+        stmt.setString(2, topicName);
+        return stmt.executeQuery();
+    }
+
+    // EXPERIMENTAL
+    public void updateParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException {
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(STATEMENT_UPDATE_TOPIC_CACHE);
+
+            stmt.setInt(1, virtualWikiId);
+            stmt.setString(2, parsedTopic.getName());
+            stmt.setBytes(3, parsedTopic.toString().getBytes());
+            stmt.setInt(4, parsedTopic.getTopicId());
+
+            stmt.executeUpdate();
+            DatabaseConnection.closeStatement(stmt);
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            DatabaseConnection.closeConnection(conn);
+        }
+
     }
 }

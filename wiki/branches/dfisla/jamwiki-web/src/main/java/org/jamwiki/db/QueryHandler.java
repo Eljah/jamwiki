@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.jamwiki.authentication.WikiUserDetails;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.ParsedTopic;
 import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
@@ -131,6 +132,8 @@ public interface QueryHandler {
 	 */
 	void deleteWatchlistEntry(int virtualWikiId, String topicName, int userId, Connection conn) throws SQLException;
 
+        // EXPERIMENTAL
+        void deleteParsedTopic(int virtualWikiId, int topicId, Connection conn) throws SQLException;
 	/**
 	 * Drop all JAMWiki database objects.  This method drops tables, indexes, and
 	 * any database objects, as well as all data in those objects.  Note that if
@@ -457,6 +460,8 @@ public interface QueryHandler {
 	 */
 	int insertTopic(Topic topic, int virtualWikiId, Connection conn) throws SQLException;
 
+        int insertParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException;
+
         /**
 	 * Add a new topic version record to the database.  The topic version must
 	 * not already exist in the database or else an error will be thrown.
@@ -601,6 +606,9 @@ public interface QueryHandler {
         ResultSet lookupTopicById(int virtualWikiId, int topicId, Connection conn) throws SQLException;
 
         ResultSet lookupTopicMetaDataById(int virtualWikiId, int topicId, Connection conn) throws SQLException;
+
+        // EXPERIMENTAL
+        ResultSet lookupParsedTopic(int virtualWikiId, String topicName, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a result set of all topics of a given type within a virtual wiki.
@@ -812,6 +820,8 @@ public interface QueryHandler {
 	 */
 	void updateTopic(Topic topic, int virtualWikiId, Connection conn) throws SQLException;
 
+        // EXPERIMENTAL
+        void updateParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException;
 
         void updateTopicVersion(TopicVersion topicVersion, int virtualWikiId, Connection conn) throws SQLException;
 

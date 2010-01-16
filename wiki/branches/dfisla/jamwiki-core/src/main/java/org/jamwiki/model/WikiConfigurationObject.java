@@ -16,16 +16,11 @@
  */
 package org.jamwiki.model;
 
-import org.apache.log4j.Logger;
-
 /**
  * Provides an object representing a configuration value as used by
  * {@link org.jamwiki.WikiConfiguration}.
  */
 public class WikiConfigurationObject {
-
-	/** Standard logger. */
-	private static final Logger logger = Logger.getLogger(WikiConfigurationObject.class.getName());
 
 	private String clazz;
 	private String key;

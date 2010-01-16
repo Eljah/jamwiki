@@ -16,14 +16,14 @@
  */
 package org.jamwiki.model;
 
-import org.apache.log4j.Logger;
+import org.jamwiki.WikiException;
+import org.jamwiki.WikiMessage;
 
 /**
  * Provides an object representing a Wiki category.
  */
 public class Category {
 
-	private static final Logger logger = Logger.getLogger(Category.class.getName());
 	private String childTopicName = null;
 	private String name = null;
 	private String sortKey = null;
@@ -34,6 +34,25 @@ public class Category {
 	 *
 	 */
 	public Category() {
+	}
+
+        public Category(String data) throws WikiException {
+
+            try {
+                if ((data != null) && (data.indexOf("|") != -1)) {
+
+                    String[] parts = data.split("\\|");
+                    if ((parts != null) && (parts.length == 5)) {
+                        childTopicName = parts[0];
+                        name = parts[1];
+                        sortKey = parts[2];
+                        topicType = Integer.parseInt(parts[3]);
+                        virtualWiki = parts[4];
+                    }
+                }
+            } catch (Exception ex) {
+                throw new WikiException(new WikiMessage("Could not parse object from data."), ex);
+            }
 	}
 
 	/**
@@ -105,4 +124,9 @@ public class Category {
 	public void setVirtualWiki(String virtualWiki) {
 		this.virtualWiki = virtualWiki;
 	}
+
+        @Override
+        public String toString(){
+            return String.format("%s|%s|%s|%d|%s", childTopicName, name, sortKey, topicType, virtualWiki);
+        }
 }

@@ -18,15 +18,12 @@ package org.jamwiki.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
 
 /**
  * Provides an object representing a Wiki reference, which is a citation
  * appearing within a Wiki topic.
  */
 public class WikiReference {
-
-	private static final Logger logger = Logger.getLogger(WikiReference.class.getName());
 
 	private final int citation;
 	private String content;

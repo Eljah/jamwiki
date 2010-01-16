@@ -34,6 +34,10 @@ public class IndexerPoolExecutor {
 
     }
 
+    public ThreadPoolExecutor getThreadPool() {
+        return threadPool;
+    }
+
     public void shutDown() {
         threadPool.shutdown();
     }

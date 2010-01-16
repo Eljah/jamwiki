@@ -16,14 +16,12 @@
  */
 package org.jamwiki.model;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
-import org.apache.log4j.Logger;
 
 /**
  * Provides an object representing a version of a Wiki topic.
  */
-public class TopicVersion implements Serializable {
+public class TopicVersion {
 
     public static final int EDIT_NORMAL = 1;
     public static final int EDIT_MINOR = 2;
@@ -47,7 +45,6 @@ public class TopicVersion implements Serializable {
     private String versionContentClean = null;
     private String versionContentShort = null;
     private int bzType = 0;
-    private static final Logger logger = Logger.getLogger(TopicVersion.class.getName());
 
     /**
      *

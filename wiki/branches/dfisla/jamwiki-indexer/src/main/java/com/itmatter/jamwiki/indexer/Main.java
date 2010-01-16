@@ -6,20 +6,14 @@ package com.itmatter.jamwiki.indexer;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import org.jamwiki.search.LuceneSearchEngine;
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.jamwiki.model.WikiUser;
 
 /**
@@ -154,6 +148,7 @@ public class Main {
                 }
                 pCount++;
             }
+         
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }

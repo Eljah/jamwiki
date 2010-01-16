@@ -5,7 +5,9 @@
 package org.jamwiki.parser.bliki;
 
 import info.bliki.wiki.model.WikiModel;
+import java.io.StringReader;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.parser.AbstractParser;
@@ -13,6 +15,14 @@ import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.apache.log4j.Logger;
+import org.jamwiki.DataAccessException;
+import org.jamwiki.WikiBase;
+import org.jamwiki.parser.jflex.JAMWikiSpliceProcessor;
+import org.jamwiki.parser.jflex.JFlexLexer;
+import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.utils.NamespaceHandler;
+import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.WikiLink;
 
 /**
  *
@@ -37,10 +47,11 @@ public class BlikiProxyParser extends AbstractParser {
     protected static final int MODE_POSTPROCESS = 7;
     /** Pattern to determine if the topic is a redirect. */
     private static final Pattern REDIRECT_PATTERN = Pattern.compile("#REDIRECT[ ]+\\[\\[([^\\n\\r\\]]+)\\]\\]", Pattern.CASE_INSENSITIVE);
+    /** Pattern to detect sidebar */
     private static final Pattern SIDEBAR_PATTERN = Pattern.compile("\\{\\{.*sidebar+\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     //private static final Pattern IFERROR_PATTERN = Pattern.compile("\\(?\\s*\\{\\{.*iferror+.*\\}\\}\\s*\\)?", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     //private static final Pattern IFERROR_2_PATTERN = Pattern.compile("\\(\\s*\\{\\{.*iferror+.*\\}\\}\\s*\\)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    private static final boolean SECTION_EDIT = false;
+    //private static final boolean SECTION_EDIT = true;
 
     /**
      * The constructor creates a parser instance, initialized with the
@@ -51,7 +62,7 @@ public class BlikiProxyParser extends AbstractParser {
      */
     public BlikiProxyParser(ParserInput parserInput) {
         super(parserInput);
-        this.parserInput.setAllowSectionEdit(SECTION_EDIT);
+        //this.parserInput.setAllowSectionEdit(SECTION_EDIT);
     }
 
     /**
@@ -85,15 +96,18 @@ public class BlikiProxyParser extends AbstractParser {
         ParserOutput parserOutput = new ParserOutput();
 
         raw = this.removeUnsupportedMediaWikiMarkup(raw);
-        
+
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
         output = wikiModel.parseTemplates(raw, true);
 
         //output = this.removeUnsupportedHtml(output);
-        
+
         output = output == null ? "" : output;
-        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-        logger.info("Parse time (parseMinimal) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
+        if (logger.isInfoEnabled()) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            logger.info("Parse time (parseMinimal) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        }
         return output;
     }
 
@@ -135,8 +149,10 @@ public class BlikiProxyParser extends AbstractParser {
             }
         }
 
-        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-        logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        if (logger.isInfoEnabled()) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        }
         return output;
     }
 
@@ -144,12 +160,13 @@ public class BlikiProxyParser extends AbstractParser {
         text = SIDEBAR_PATTERN.matcher(text).replaceAll("");
         return text;
     }
-/*
+    /*
     public String removeUnsupportedHtml(String text) {
-        text = IFERROR_PATTERN.matcher(text).replaceAll("");
-        return text;
+    text = IFERROR_PATTERN.matcher(text).replaceAll("");
+    return text;
     }
-*/
+     */
+
     /**
      * Returns a HTML representation of the given wiki raw text for online
      * representation.
@@ -166,25 +183,27 @@ public class BlikiProxyParser extends AbstractParser {
 
         long start = System.currentTimeMillis();
         String output = null;
-        //if (!StringUtils.isBlank(this.isRedirect(parserInput, raw, JFlexParser.MODE_LAYOUT))) {
-        // redirects are parsed differently
-        //    output = this.parseRedirect(parserOutput, raw);
-        //} else {
-        String context = parserInput.getContext();
-        if (context == null) {
-            context = "";
+        if (!StringUtils.isBlank(this.isRedirect(parserInput, raw))) {
+            // redirects are parsed differently
+            output = this.parseRedirect(parserOutput, raw);
+        } else {
+            String context = parserInput.getContext();
+            if (context == null) {
+                context = "";
+            }
+            JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
+
+            raw = this.removeUnsupportedMediaWikiMarkup(raw);
+
+            output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
+            //output = this.removeUnsupportedHtml(output);
+            output = output == null ? "" : output;
+
         }
-        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
-
-        raw = this.removeUnsupportedMediaWikiMarkup(raw);
-
-        output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
-        //output = this.removeUnsupportedHtml(output);
-        output = output == null ? "" : output;
-
-        //}
-        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-        logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        if (logger.isInfoEnabled()) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        }
         return output;
     }
 
@@ -229,8 +248,10 @@ public class BlikiProxyParser extends AbstractParser {
             }
         }
 
-        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-        logger.info("Parse time (parseMetadata) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        if (logger.isInfoEnabled()) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            logger.info("Parse time (parseMetadata) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        }
     }
 
     /**
@@ -248,7 +269,17 @@ public class BlikiProxyParser extends AbstractParser {
      * @throws ParserException Thrown if any error occurs during parsing.
      */
     public String parseSlice(ParserOutput parserOutput, String raw, int targetSection) throws ParserException {
-        return "";
+        long start = System.currentTimeMillis();
+        StringReader reader = toStringReader(raw);
+        JAMWikiSpliceProcessor lexer = new JAMWikiSpliceProcessor(reader);
+        lexer.setTargetSection(targetSection);
+        String output = this.lex(lexer, raw, parserOutput, MODE_SLICE);
+
+        if (logger.isInfoEnabled()) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            logger.info("Parse time (parseSlice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        }
+        return output;
     }
 
     /**
@@ -266,6 +297,119 @@ public class BlikiProxyParser extends AbstractParser {
      * @throws ParserException Thrown if any error occurs during parsing.
      */
     public String parseSplice(ParserOutput parserOutput, String raw, int targetSection, String replacementText) throws ParserException {
-        return "";
+        long start = System.currentTimeMillis();
+        StringReader reader = toStringReader(raw);
+        JAMWikiSpliceProcessor lexer = new JAMWikiSpliceProcessor(reader);
+        lexer.setReplacementText(replacementText);
+        lexer.setTargetSection(targetSection);
+        String output = this.lex(lexer, raw, parserOutput, MODE_SPLICE);
+
+        if (logger.isInfoEnabled()) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            logger.info("Parse time (parseSplice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+        }
+        return output;
+    }
+
+    /**
+     *
+     */
+    protected String isRedirect(ParserInput parserInput, String raw) throws ParserException {
+        if (StringUtils.isBlank(raw)) {
+            return null;
+        }
+        // pre-process parse to handle categories, HTML comments, etc.
+        String preprocessed = BlikiProxyParserUtil.parseFragment(parserInput, raw);
+        Matcher m = REDIRECT_PATTERN.matcher(preprocessed.trim());
+        return (m.matches()) ? Utilities.decodeAndEscapeTopicName(m.group(1).trim(), true) : null;
+    }
+
+    /**
+     * Parse a topic that is a redirect.  Ordinarily the contents of the redirected
+     * topic would be displayed, but in some cases (such as when explicitly viewing
+     * a redirect) the redirect page contents need to be displayed.
+     *
+     * @param parserOutput A ParserOutput object containing parser
+     *  metadata output.
+     * @param raw The raw Wiki syntax to be converted into HTML.
+     * @return The parsed content.
+     * @throws ParserException Thrown if any error occurs during parsing.
+     */
+    protected String parseRedirect(ParserOutput parserOutput, String raw) throws ParserException {
+        String redirect = this.isRedirect(parserInput, raw);
+        WikiLink wikiLink = BlikiProxyParserUtil.parseWikiLink("[[" + redirect + "]]");
+        String style = "redirect";
+        String virtualWiki = this.parserInput.getVirtualWiki();
+        try {
+            // see if the redirect link starts with a virtual wiki
+            if (wikiLink.getColon() && !StringUtils.isBlank(wikiLink.getNamespace())) {
+                if (WikiBase.getDataHandler().lookupVirtualWiki(wikiLink.getNamespace()) != null) {
+                    virtualWiki = wikiLink.getNamespace();
+                    wikiLink.setDestination(wikiLink.getDestination().substring(virtualWiki.length() + NamespaceHandler.NAMESPACE_SEPARATOR.length()));
+                }
+            }
+            if (!LinkUtil.isExistingArticle(virtualWiki, wikiLink.getDestination())) {
+                style = "edit redirect";
+            }
+            return LinkUtil.buildInternalLinkHtml(this.parserInput.getContext(), virtualWiki, wikiLink, null, style, null, false);
+        } catch (DataAccessException e) {
+            throw new ParserException(e);
+        }
+    }
+
+    /**
+     * Convert a string of text to be parsed into a StringReader, performing any
+     * preprocessing, such as removing linefeeds, in the process.
+     */
+    private StringReader toStringReader(String raw) {
+        return new StringReader(StringUtils.remove(raw, '\r'));
+    }
+
+    /**
+     * Utility method for executing a lexer parse.
+     */
+    private String lex(JFlexLexer lexer, String raw, ParserOutput parserOutput, int mode) throws ParserException {
+        lexer.init(this.parserInput, parserOutput, mode);
+        validate(lexer);
+        this.parserInput.incrementDepth();
+        // avoid infinite loops
+        if (this.parserInput.getDepth() > 100) {
+            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+            throw new ParserException("Infinite parsing loop - over " + this.parserInput.getDepth() + " parser iterations while parsing topic " + topicName);
+        }
+        try {
+            while (true) {
+                String line = lexer.yylex();
+                if (line == null) {
+                    break;
+                }
+                lexer.append(line);
+            }
+        } catch (Exception e) {
+            throw new ParserException(e);
+        }
+        this.parserInput.decrementDepth();
+        return lexer.popAllTags();
+    }
+
+    /**
+     * Validate that all settings required for the parser have been set, and if
+     * not throw an exception.
+     *
+     * @throws ParserException Thrown if the parser is not initialized properly,
+     *  usually due to a parser input field not being set.
+     */
+    private static void validate(JFlexLexer lexer) throws ParserException {
+        // validate parser settings
+        boolean validated = true;
+        if (lexer.getMode() == MODE_SPLICE || lexer.getMode() == MODE_SLICE) {
+            if (lexer.getParserInput().getTopicName() == null) {
+                logger.warn("Failure while initializing parser: topic name is null.");
+                validated = false;
+            }
+        }
+        if (!validated) {
+            throw new ParserException("Parser info not properly initialized");
+        }
     }
 }

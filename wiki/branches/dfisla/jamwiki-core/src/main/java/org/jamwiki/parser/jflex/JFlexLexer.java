@@ -46,7 +46,7 @@ public abstract class JFlexLexer {
 	 * Utility method used to indicate whether HTML tags are allowed in wiki syntax
 	 * or not.
 	 */
-	protected boolean allowHTML() {
+	public boolean allowHTML() {
 		return Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_HTML);
 	}
 
@@ -54,7 +54,7 @@ public abstract class JFlexLexer {
 	 * Utility method used to indicate whether Javascript is allowed in wiki syntax
 	 * or not.
 	 */
-	protected boolean allowJavascript() {
+	public boolean allowJavascript() {
 		return Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_JAVASCRIPT);
 	}
 
@@ -62,14 +62,14 @@ public abstract class JFlexLexer {
 	 * Utility method used to indicate whether templates are allowed in wiki syntax
 	 * or not.
 	 */
-	protected boolean allowTemplates() {
+	public boolean allowTemplates() {
 		return Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_TEMPLATES);
 	}
 
 	/**
 	 * Append content to the current tag in the tag stack.
 	 */
-	protected void append(String content) {
+	public void append(String content) {
 		JFlexTagItem currentTag = this.tagStack.peek();
 		currentTag.getTagContent().append(content);
 	}
@@ -79,7 +79,7 @@ public abstract class JFlexLexer {
 	 *
 	 * @param state The new parsing state that is being entered.
 	 */
-	protected void beginState(int state) {
+	public void beginState(int state) {
 		// store current state
 		states.push(yystate());
 		// switch to new state
@@ -89,7 +89,7 @@ public abstract class JFlexLexer {
 	/**
 	 * End processing of a parser state and switch to the previous parser state.
 	 */
-	protected void endState() {
+	public void endState() {
 		// revert to previous state
 		if (states.empty()) {
 			logger.warn("Attempt to call endState for an empty stack with text: " + yytext());
@@ -132,14 +132,14 @@ public abstract class JFlexLexer {
 	 * Peek at the current tag from the lexer stack and see if it matches
 	 * the given tag type.
 	 */
-	protected JFlexTagItem peekTag() {
+	public JFlexTagItem peekTag() {
 		return (JFlexTagItem)this.tagStack.peek();
 	}
 
 	/**
 	 * Pop the most recent HTML tag from the lexer stack.
 	 */
-	protected JFlexTagItem popTag(String tagType) {
+	public JFlexTagItem popTag(String tagType) {
 		if (this.tagStack.size() <= 1) {
 			logger.warn("popTag called on an empty tag stack or on the root stack element.  Please report this error on jamwiki.org, and provide the wiki syntax for the topic being parsed.");
 		}
@@ -196,7 +196,7 @@ public abstract class JFlexLexer {
 	/**
 	 * Pop all tags off of the stack and return a string representation.
 	 */
-	protected String popAllTags() {
+	public String popAllTags() {
 		// pop the stack down to (but not including) the root tag
 		while (this.tagStack.size() > 1) {
 			JFlexTagItem currentTag = this.tagStack.peek();
@@ -210,7 +210,7 @@ public abstract class JFlexLexer {
 	/**
 	 * Push a new HTML tag onto the lexer stack.
 	 */
-	protected void pushTag(String tagType, String tagAttributes) {
+	public void pushTag(String tagType, String tagAttributes) {
 		JFlexTagItem tag = new JFlexTagItem(tagType);
 		tag.setTagAttributes(tagAttributes);
 		// many HTML tags cannot nest (ie "<li><li></li></li>" is invalid), so if a non-nesting
@@ -225,7 +225,7 @@ public abstract class JFlexLexer {
 	 * Utility method used when parsing list tags to determine the current
 	 * list nesting level.
 	 */
-	protected int currentListDepth() {
+	public int currentListDepth() {
 		int depth = 0;
 		int currentPos = this.tagStack.size() - 1;
 		while (currentPos >= 0) {
@@ -243,7 +243,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected String calculateListItemType(char wikiSyntax) {
+	public String calculateListItemType(char wikiSyntax) {
 		if (wikiSyntax == '*' || wikiSyntax == '#') {
 			return "li";
 		}
@@ -259,7 +259,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected String calculateListType(char wikiSyntax) {
+	public String calculateListType(char wikiSyntax) {
 		if (wikiSyntax == ';' || wikiSyntax == ':') {
 			return "dl";
 		}
@@ -275,7 +275,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected void processListStack(String wikiSyntax) {
+	public void processListStack(String wikiSyntax) {
 		int previousDepth = this.currentListDepth();
 		int currentDepth = wikiSyntax.length();
 		String tagType;
@@ -337,7 +337,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected void popListTags(int depth) {
+	public void popListTags(int depth) {
 		if (depth < 0) {
 			throw new IllegalArgumentException("Cannot pop a negative number: " + depth);
 		}
@@ -359,7 +359,7 @@ public abstract class JFlexLexer {
 	 * @param tagType The HTML tag type, either "td" or "th".
 	 * @param markup The Wiki markup for the tag, either "|", "|+" or "!"
 	 */
-	protected void parseTableCell(String text, String tagType, String markup) {
+	public void parseTableCell(String text, String tagType, String markup) {
 		if (text == null) {
 			throw new IllegalArgumentException("No text specified while parsing table cell");
 		}
@@ -380,7 +380,7 @@ public abstract class JFlexLexer {
 	/**
 	 * Make sure any open table tags that need to be closed are closed.
 	 */
-	protected void processTableStack() {
+	public void processTableStack() {
 		String previousTagType = this.peekTag().getTagType();
 		if (!previousTagType.equals("caption") && !previousTagType.equals("th") && !previousTagType.equals("td")) {
 			// no table cell was open, so nothing to close
@@ -396,7 +396,7 @@ public abstract class JFlexLexer {
 	 * @param tagType The tag type being parsed - either "i", "b", or <code>null</code>
 	 *  if a bolditalic tag is being parsed.
 	 */
-	protected void processBoldItalic(String tagType) {
+	public void processBoldItalic(String tagType) {
 		if (tagType == null) {
 			// bold-italic
 			if (this.peekTag().getTagType().equals("i")) {
@@ -441,7 +441,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected void parseParagraphEnd(String raw) {
+	public void parseParagraphEnd(String raw) {
 		if (this.mode >= JFlexParser.MODE_LAYOUT && this.peekTag().getTagType().equals("p")) {
 			// only perform processing if a paragraph is open - tag may have been already been
 			// closed explicitly with a "</p>".
@@ -459,7 +459,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected void parseParagraphStart(String raw) {
+	public void parseParagraphStart(String raw) {
 		int pushback = raw.length();
 		if (this.mode >= JFlexParser.MODE_LAYOUT) {
 			this.pushTag("p", null);
@@ -478,7 +478,7 @@ public abstract class JFlexLexer {
 	/**
 	 *
 	 */
-	protected void parseParagraphEmpty(String raw) {
+	public void parseParagraphEmpty(String raw) {
 		// push back everything up to the last of the opening newlines that were matched
 		yypushback(StringUtils.stripStart(raw, " \n\r\t").length() + 1);
 		if (this.mode < JFlexParser.MODE_LAYOUT) {
@@ -526,4 +526,13 @@ public abstract class JFlexLexer {
 	 * yylex() method.
 	 */
 	public abstract String yytext();
+
+        public int getMode() {
+            return mode;
+        }
+
+        public ParserInput getParserInput() {
+            return parserInput;
+        }
+       
 }
