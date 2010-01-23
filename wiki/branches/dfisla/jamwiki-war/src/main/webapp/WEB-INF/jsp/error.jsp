@@ -34,7 +34,7 @@ called it means that a catastrophic error has occurred.
 
 <html>
 <head>
-<title><fmt:message key="common.sitename" /> - <fmt:message key="error.title" /></title>
+<title><fmt:message key="error.title" /></title>
 <script type="text/javascript">
 function cancel() {
 	history.go(-1);
@@ -43,11 +43,10 @@ function cancel() {
 </head>
 <body>
 <%
-// FIXME Daniel
-WikiLogger logger = Logger.getLogger("org.jamwiki.jsp");
+WikiLogger logger = WikiLogger.getLogger("org.jamwiki.jsp");
 String errorMessage = "";
 if (exception != null) {
-	logger.fatal("Error in JSP page", exception);
+	logger.severe("Error in JSP page", exception);
 	errorMessage = exception.toString();
 }
 %>

@@ -38,9 +38,8 @@ import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
-import org.apache.log4j.Logger;
 import org.jamwiki.model.ParsedTopic;
-
+import org.jamwiki.utils.WikiLogger;
 /**
  * Default implementation of the QueryHandler implementation for retrieving, inserting,
  * and updating data in the database.  This method uses ANSI SQL and should therefore
@@ -48,7 +47,7 @@ import org.jamwiki.model.ParsedTopic;
  */
 public class AnsiQueryHandler implements QueryHandler {
 
-    private static final Logger logger = Logger.getLogger(AnsiQueryHandler.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(AnsiQueryHandler.class.getName());
     protected static final String SQL_PROPERTY_FILE_NAME = "sql.ansi.properties";
     protected static String STATEMENT_CONNECTION_VALIDATION_QUERY = null;
     protected static String STATEMENT_CREATE_AUTHORITIES_TABLE = null;
@@ -287,87 +286,87 @@ public class AnsiQueryHandler implements QueryHandler {
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_WATCHLIST_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_RECENT_CHANGE_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_AUTHORITIES_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_AUTHORITIES_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_ROLE_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_MEMBERS_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_CATEGORY_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_VERSION_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_VERSION_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_USER_LOGIN_INDEX, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_USER_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_USERS_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_VIRTUAL_WIKI_TABLE, conn);
         } catch (SQLException e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
         }
     }
 
@@ -727,7 +726,7 @@ public class AnsiQueryHandler implements QueryHandler {
             try {
                 rs.close();
             } catch (Exception ex) {
-                logger.warn("Could not close ResultSet!", ex);
+                logger.warning("Could not close ResultSet!", ex);
             }
         }
     }
@@ -844,7 +843,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setString(8, topic.getRedirectTo());
 
             //stmt.logParams();
-            logger.debug("SQL-QUERY-STRING =>: " + stmt.toString());
+            logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
             rv = stmt.executeUpdate();
 
             if (rv > 0) {
@@ -855,14 +854,14 @@ public class AnsiQueryHandler implements QueryHandler {
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage(), e);
             throw e;
         } finally {
             if(rs != null){
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn, stmt, rs);
@@ -902,7 +901,7 @@ public class AnsiQueryHandler implements QueryHandler {
                 }
 
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.severe(e.getMessage(), e);
             }
             if (topicVersion.getAuthorId() == null) {
                 stmt.setNull(4, Types.INTEGER);
@@ -922,7 +921,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setString(11, topicVersion.getVersionContentShort());
 
             //stmt.logParams();
-            logger.debug("SQL-QUERY-STRING =>: " + stmt.toString());
+            logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
 
             rv = stmt.executeUpdate();
 
@@ -941,14 +940,14 @@ public class AnsiQueryHandler implements QueryHandler {
                 rv = stmt.executeUpdate();
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage(), e);
             throw e;
         } finally {
             if(rs != null){
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn, stmt, rs);
@@ -1404,7 +1403,7 @@ public class AnsiQueryHandler implements QueryHandler {
                 stmt.setBytes(3, (byte[]) topicContent.getBytes("UTF-8"));
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage(), e);
         }
         if (topicVersion.getAuthorId() == null) {
             stmt.setNull(4, Types.INTEGER);
@@ -1435,7 +1434,7 @@ public class AnsiQueryHandler implements QueryHandler {
                 stmt.setBytes(10, (byte[]) topicContentClean.getBytes("UTF-8"));
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage(), e);
         }
 
         stmt.setString(11, topicVersion.getVersionContentShort());
@@ -1453,7 +1452,7 @@ public class AnsiQueryHandler implements QueryHandler {
         rv = stmt.executeUpdate();
 
         if (rv < 1) {
-            logger.error("Failed to update TopicVersion =>: " + topicVersion.getTopicVersionId());
+            logger.severe("Failed to update TopicVersion =>: " + topicVersion.getTopicVersionId());
         }
         DatabaseConnection.closeStatement(stmt);
     }
@@ -1555,17 +1554,17 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setBytes(4, parsedTopic.toString().getBytes());
        
             //stmt.logParams();
-            logger.debug("SQL-QUERY-STRING =>: " + stmt.toString());
+            logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
             rv = stmt.executeUpdate();
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage(), e);
             throw e;
         } finally {
             if(rs != null){
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn, stmt, rs);
@@ -1598,7 +1597,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.executeUpdate();
             DatabaseConnection.closeStatement(stmt);
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage(), e);
             throw e;
         } finally {
             DatabaseConnection.closeConnection(conn);

@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  *
@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class DataCompression {
 
-    private static final Logger logger = Logger.getLogger(AnsiDataHandler.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
     public static final int PROP_DB_COMPRESSION_NONE = 0;
     public static final int PROP_DB_COMPRESSION_DEFAULT = 1;
 
@@ -44,20 +44,20 @@ public class DataCompression {
                         int count = decompressor.inflate(buf);
                         bos.write(buf, 0, count);
                     } catch (DataFormatException e) {
-                        logger.error(e.getMessage(), e);
+                        logger.severe(e.getMessage(), e);
                     }
                 }
 
                 output = bos.toByteArray();
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.severe(e.getMessage(), e);
             } finally {
                 if (bos != null) {
                     try {
                         bos.close();
                         decompressor = null;
                     } catch (Exception ex) {
-                        logger.warn(ex);
+                        logger.warning(ex.getMessage(), ex);
                     }
                 }
             }
@@ -94,14 +94,14 @@ public class DataCompression {
 
                 output = bos.toByteArray();
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.severe(e.getMessage(), e);
             } finally {
                 if (bos != null) {
                     try {
                         bos.close();
                         compressor = null;
                     } catch (Exception ex) {
-                        logger.warn(ex);
+                        logger.warning(ex.getMessage(), ex);
                     }
                 }
             }

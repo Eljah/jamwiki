@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -29,7 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.apache.log4j.Logger;
 
 /**
  * Provides utility methods useful for parsing and processing XML data.
@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 public class XMLUtil {
 
 	/** Logger */
-	public static final Logger logger = Logger.getLogger(XMLUtil.class.getName());
+	public static final WikiLogger logger = WikiLogger.getLogger(XMLUtil.class.getName());
 
 	/**
 	 *
@@ -58,8 +58,42 @@ public class XMLUtil {
 		if (tagValue == null) {
 			return "";
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append('<').append(tagName).append('>');
+		if (escape) {
+			tagValue = StringEscapeUtils.escapeXml(tagValue);
+		}
+		buffer.append(tagValue);
+		buffer.append("</").append(tagName).append('>');
+		return buffer.toString();
+	}
+
+	/**
+	 * Utiltiy method for building an XML tag of the form &lt;tagName&gt;value&lt;/tagName&gt;.
+	 *
+	 * @param tagName The name of the XML tag, such as &lt;tagName&gt;value&lt;/tagName&gt;.
+	 * @param tagValue The value of the XML tag, such as &lt;tagName&gt;value&lt;/tagName&gt;.
+	 * @param attributes A map of attributes for the tag.
+	 * @param escape If <code>true</code> then any less than, greater than, quotation mark,
+	 *  apostrophe or ampersands in tagValue will be XML-escaped.
+	 * @return An XML representations of the tagName and tagValue parameters.
+	 */
+	public static String buildTag(String tagName, String tagValue, Map<String, String> attributes, boolean escape) {
+		if (tagValue == null) {
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('<').append(tagName);
+		String value = null;
+		for (String key : attributes.keySet()) {
+			value = attributes.get(key);
+			if (escape) {
+				key = StringEscapeUtils.escapeXml(key);
+				value = StringEscapeUtils.escapeXml(value);
+			}
+			buffer.append(" ").append(key).append("=\"").append(value).append("\"");
+		}
+		buffer.append('>');
 		if (escape) {
 			tagValue = StringEscapeUtils.escapeXml(tagValue);
 		}

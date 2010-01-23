@@ -29,7 +29,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.DelegatingDataSource;
@@ -46,7 +46,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  */
 public class DatabaseConnection {
 
-    private static final Logger logger = Logger.getLogger(DatabaseConnection.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(DatabaseConnection.class.getName());
     /** Any queries that take longer than this value (specified in milliseconds) will print a warning to the log. */
     protected static final int SLOW_QUERY_LIMIT = 250;
     private static DataSource dataSource = null;
@@ -73,8 +73,7 @@ public class DatabaseConnection {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException e) {
-            }
+			} catch (SQLException e) {}
         }
         DatabaseConnection.closeConnection(conn, stmt);
     }
@@ -139,7 +138,7 @@ public class DatabaseConnection {
                 ((BasicDataSource) testDataSource).close();
             }
         } catch (SQLException e) {
-            logger.fatal("Unable to close connection pool", e);
+			logger.severe("Unable to close connection pool", e);
             throw e;
         }
         // clear references to prevent them being reused (& allow garbage collection)
@@ -157,8 +156,7 @@ public class DatabaseConnection {
         if (stmt != null) {
             try {
                 stmt.close();
-            } catch (SQLException e) {
-            }
+			} catch (SQLException e) {}
         }
     }
 
@@ -174,12 +172,12 @@ public class DatabaseConnection {
             rs = stmt.executeQuery(sql);
             long execution = System.currentTimeMillis() - start;
             if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
-                logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
+                logger.warning("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
             }
-            logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
+            logger.info("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
             return rs;
         } catch (SQLException e) {
-            logger.fatal("Failure while executing " + sql, e);
+            logger.severe("Failure while executing " + sql, e);
             if (rs != null) {
                 try {
                     rs.close();
@@ -217,16 +215,16 @@ public class DatabaseConnection {
         try {
             long start = System.currentTimeMillis();
             stmt = conn.createStatement();
-            logger.debug("Executing SQL: " + sql);
+			logger.info("Executing SQL: " + sql);
             int result = stmt.executeUpdate(sql);
             long execution = System.currentTimeMillis() - start;
             if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
-                logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
+				logger.warning("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
             }
-            logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
+			logger.fine("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
             return result;
         } catch (SQLException e) {
-            logger.fatal("Failure while executing " + sql, e);
+			logger.severe("Failure while executing " + sql, e);
             throw e;
         } finally {
 
@@ -268,7 +266,7 @@ public class DatabaseConnection {
                 // Use an internal "LocalDataSource" configured from the Environment
                 targetDataSource = new LocalDataSource();
             } catch (ClassNotFoundException e) {
-                logger.fatal("Failure while configuring local data source", e);
+				logger.severe("Failure while configuring local data source", e);
                 throw new SQLException("Failure while configuring local data source: " + e.toString());
             }
         } else {
@@ -278,7 +276,7 @@ public class DatabaseConnection {
                 Context ctx = new InitialContext();
                 targetDataSource = (DataSource) ctx.lookup(url);
             } catch (NamingException e) {
-                logger.fatal("Failure while configuring JNDI data source with URL: " + url, e);
+				logger.severe("Failure while configuring JNDI data source with URL: " + url, e);
                 throw new SQLException("Unable to configure JNDI data source with URL " + url + ": " + e.toString());
             }
         }
@@ -298,11 +296,13 @@ public class DatabaseConnection {
      */
     public static void testDatabase(String driver, String url, String user, String password, boolean existence) throws SQLException, ClassNotFoundException {
         Connection conn = null;
+		Statement stmt = null;
         try {
             conn = getTestConnection(driver, url, user, password);
             if (existence) {
+				stmt = conn.createStatement();
                 // test to see if database exists
-                executeQuery(WikiDatabase.getExistenceValidationQuery(), conn);
+				stmt.executeQuery(WikiDatabase.getExistenceValidationQuery());
             }
         } finally {
             if (conn != null) {
@@ -342,7 +342,7 @@ public class DatabaseConnection {
                 // TODO: Try appending "java:comp/env/" to the JNDI Name if it is missing?
                 testDataSource = (DataSource) ctx.lookup(url);
             } catch (NamingException e) {
-                logger.fatal("Failure while configuring JNDI data source with URL: " + url, e);
+				logger.severe("Failure while configuring JNDI data source with URL: " + url, e);
                 throw new SQLException("Unable to configure JNDI data source with URL " + url + ": " + e.toString());
             }
             return testDataSource.getConnection();
@@ -380,7 +380,7 @@ public class DatabaseConnection {
      * @throws TransactionException in case of a rollback error
      */
     protected static void rollbackOnException(TransactionStatus status, Throwable ex) throws TransactionException {
-        logger.debug("Initiating transaction rollback on application exception", ex);
+		logger.fine("Initiating transaction rollback on application exception", ex);
         if (status == null) {
             logger.info("TransactionStatus is null, unable to rollback");
             return;
@@ -388,14 +388,14 @@ public class DatabaseConnection {
         try {
             transactionManager.rollback(status);
         } catch (TransactionSystemException ex2) {
-            logger.fatal("Application exception overridden by rollback exception", ex);
+			logger.severe("Application exception overridden by rollback exception", ex);
             ex2.initApplicationException(ex);
             throw ex2;
         } catch (RuntimeException ex2) {
-            logger.fatal("Application exception overridden by rollback exception", ex);
+			logger.severe("Application exception overridden by rollback exception", ex);
             throw ex2;
         } catch (Error err) {
-            logger.fatal("Application exception overridden by rollback error", ex);
+			logger.severe("Application exception overridden by rollback error", ex);
             throw err;
         }
     }
@@ -409,7 +409,7 @@ public class DatabaseConnection {
      */
     protected static void commit(TransactionStatus status) {
         if (status == null) {
-            logger.debug("TransactionStatus is null, unable to commit");
+			logger.info("TransactionStatus is null, unable to commit");
             return;
         }
         transactionManager.commit(status);

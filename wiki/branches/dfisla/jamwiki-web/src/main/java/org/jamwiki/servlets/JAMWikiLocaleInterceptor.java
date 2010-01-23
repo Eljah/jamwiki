@@ -20,10 +20,10 @@ import java.util.Locale;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.AuthenticationCredentialsNotFoundException;
-import org.jamwiki.model.WikiUser;
-import org.apache.log4j.Logger;
 import org.apache.commons.lang.LocaleUtils;
+import org.jamwiki.model.WikiUser;
+import org.jamwiki.utils.WikiLogger;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -36,7 +36,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
  */
 public class JAMWikiLocaleInterceptor extends LocaleChangeInterceptor {
 
-	private static final Logger logger = Logger.getLogger(JAMWikiServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiServlet.class.getName());
 
 	/**
 	 * Ensure that the session locale value is set.

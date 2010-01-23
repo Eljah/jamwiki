@@ -20,14 +20,14 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Utility tag for creating HTML text inputs.
  */
 public class TextTag extends TagSupport {
 
-	private static final Logger logger = Logger.getLogger(TextTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(TextTag.class.getName());
 	private String id = null;
 	private String maxlength = null;
 	private String name = null;
@@ -39,7 +39,7 @@ public class TextTag extends TagSupport {
 	 *
 	 */
 	public int doEndTag() throws JspException {
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		output.append("<input type=\"text\"");
 		output.append(" name=\"").append(this.name).append('\"');
 		if (!StringUtils.isBlank(this.id)) {
@@ -60,7 +60,7 @@ public class TextTag extends TagSupport {
 		try {
 			this.pageContext.getOut().print(output.toString());
 		} catch (IOException e) {
-			logger.fatal("Failure in checkbox tag for " + this.id + " / " + this.name + " / " + this.style + " / " + this.value, e);
+			logger.severe("Failure in checkbox tag for " + this.id + " / " + this.name + " / " + this.style + " / " + this.value, e);
 			throw new JspException(e);
 		}
 		return EVAL_PAGE;

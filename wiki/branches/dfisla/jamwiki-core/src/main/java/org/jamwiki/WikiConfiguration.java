@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.model.WikiConfigurationObject;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
 public class WikiConfiguration {
 
 	/** Standard logger. */
-	private static final Logger logger = Logger.getLogger(WikiConfiguration.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiConfiguration.class.getName());
 
 	private static WikiConfiguration instance = null;
 
@@ -192,7 +192,7 @@ public class WikiConfiguration {
 				logUnknownChild(node, child);
 			}
 		}
-		logger.debug("Configuration values loaded from " + file.getPath());
+		logger.config("Configuration values loaded from " + file.getPath());
 	}
 
 	/**
@@ -344,6 +344,6 @@ public class WikiConfiguration {
 	 * @param child
 	 */
 	private void logUnknownChild(Node node, Node child) {
-		logger.debug("Unknown child of " + node.getNodeName() + " tag: " + child.getNodeName() + " / " + child.getNodeValue());
+		logger.finest("Unknown child of " + node.getNodeName() + " tag: " + child.getNodeName() + " / " + child.getNodeValue());
 	}
 }

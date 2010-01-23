@@ -40,7 +40,6 @@ import org.jamwiki.WikiVersion;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
-import org.apache.log4j.Logger;
 
 /**
  * This class provides a variety of general utility methods for handling
@@ -48,8 +47,10 @@ import org.apache.log4j.Logger;
  */
 public class WikiUtil {
 
-	private static final Logger logger = Logger.getLogger(WikiUtil.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiUtil.class.getName());
 
+	/** webapp context path, initialized from JAMWikiFilter. */
+	public static String WEBAPP_CONTEXT_PATH = null;
 	private static Pattern INVALID_ROLE_NAME_PATTERN = null;
 	private static Pattern INVALID_TOPIC_NAME_PATTERN = null;
 	private static Pattern VALID_USER_LOGIN_PATTERN = null;
@@ -63,7 +64,7 @@ public class WikiUtil {
 			INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_NAME));
 			VALID_USER_LOGIN_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_VALID_USER_LOGIN));
 		} catch (PatternSyntaxException e) {
-			logger.fatal("Unable to compile pattern", e);
+			logger.severe("Unable to compile pattern", e);
 		}
 	}
 
@@ -105,7 +106,7 @@ public class WikiUtil {
 	public static DataHandler dataHandlerInstance() throws IOException {
 		if (Environment.getValue(Environment.PROP_DB_TYPE) == null) {
 			// this is a problem, but it should never occur
-			logger.warn("WikiUtil.dataHandlerInstance called without a valid PROP_DB_TYPE value");
+			logger.warning("WikiUtil.dataHandlerInstance called without a valid PROP_DB_TYPE value");
 		}
 		String dataHandlerClass = Environment.getValue(Environment.PROP_DB_TYPE);
 		try {
@@ -195,7 +196,7 @@ public class WikiUtil {
 			VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
 			target = virtualWiki.getDefaultTopicName();
 		} catch (DataAccessException e) {
-			logger.warn("Unable to retrieve default topic for virtual wiki", e);
+			logger.warning("Unable to retrieve default topic for virtual wiki", e);
 		}
 		return "/" + virtualWikiName + "/" + target;
 	}
@@ -237,7 +238,7 @@ public class WikiUtil {
 		int count = attempts;
 		String target = parent.getRedirectTo();
 		if (parent.getTopicType() != Topic.TYPE_REDIRECT || StringUtils.isBlank(target)) {
-			logger.fatal("getRedirectTarget() called for non-redirect topic " + parent.getName());
+			logger.severe("getRedirectTarget() called for non-redirect topic " + parent.getName());
 			return parent;
 		}
 		// avoid infinite redirection
@@ -289,6 +290,18 @@ public class WikiUtil {
 			}
 		}
 		return Topic.TYPE_ARTICLE;
+	}
+
+
+	/**
+	 * Return the URL of the index page for the wiki.
+	 *
+	 * @throws DataAccessException Thrown if any error occurs while retrieving data.
+	 */
+	public static String getBaseUrl() throws DataAccessException {
+		String url = Environment.getValue(Environment.PROP_SERVER_URL);
+		url += LinkUtil.buildTopicUrl(WEBAPP_CONTEXT_PATH, WikiBase.DEFAULT_VWIKI, Environment.getValue(Environment.PROP_BASE_DEFAULT_TOPIC), true);
+		return url;
 	}
 
 	/**
@@ -370,14 +383,14 @@ public class WikiUtil {
 		// skip one directory, which is the virutal wiki
 		String topic = retrieveDirectoriesFromURI(request, 1);
 		if (topic == null) {
-			logger.warn("No topic in URL: " + request.getRequestURI());
+			logger.warning("No topic in URL: " + request.getRequestURI());
 			return null;
 		}
 		int pos = topic.indexOf('#');
 		if (pos != -1) {
 			// strip everything after and including '#'
 			if (pos == 0) {
-				logger.warn("No topic in URL: " + request.getRequestURI());
+				logger.warning("No topic in URL: " + request.getRequestURI());
 				return null;
 			}
 			topic = topic.substring(0, pos);
@@ -386,7 +399,7 @@ public class WikiUtil {
 		if (pos != -1) {
 			// strip everything after and including '?'
 			if (pos == 0) {
-				logger.warn("No topic in URL: " + request.getRequestURI());
+				logger.warning("No topic in URL: " + request.getRequestURI());
 				return null;
 			}
 			topic = topic.substring(0, pos);
@@ -395,7 +408,7 @@ public class WikiUtil {
 		if (pos != -1) {
 			// some servlet containers return parameters of the form ";jsessionid=1234" when getRequestURI is called.
 			if (pos == 0) {
-				logger.warn("No topic in URL: " + request.getRequestURI());
+				logger.warning("No topic in URL: " + request.getRequestURI());
 				return null;
 			}
 			topic = topic.substring(0, pos);
@@ -436,7 +449,7 @@ public class WikiUtil {
 	public static String getVirtualWikiFromURI(HttpServletRequest request) {
 		String uri = retrieveDirectoriesFromURI(request, 0);
 		if (StringUtils.isBlank(uri)) {
-			logger.warn("No virtual wiki found in URL: " + request.getRequestURI());
+			logger.info("No virtual wiki found in URL: " + request.getRequestURI());
 			return null;
 		}
 		// default the virtual wiki to the URI since the user may have accessed a URL of
@@ -522,7 +535,7 @@ public class WikiUtil {
 				filename = new File(subdirectory, WikiUtil.encodeForFilename(pageName) + ".txt").getPath();
 				contents = Utilities.readFile(filename);
 			} catch (IOException e) {
-				logger.warn("File " + filename + " does not exist");
+				logger.info("File " + filename + " does not exist");
 			}
 		}
 		if (contents == null && !StringUtils.isBlank(language)) {
@@ -531,7 +544,7 @@ public class WikiUtil {
 				filename = new File(subdirectory, WikiUtil.encodeForFilename(pageName) + ".txt").getPath();
 				contents = Utilities.readFile(filename);
 			} catch (IOException e) {
-				logger.warn("File " + filename + " does not exist");
+				logger.info("File " + filename + " does not exist");
 			}
 		}
 		if (contents == null) {
@@ -540,7 +553,7 @@ public class WikiUtil {
 				filename = new File(subdirectory, WikiUtil.encodeForFilename(pageName) + ".txt").getPath();
 				contents = Utilities.readFile(filename);
 			} catch (IOException e) {
-				logger.warn("File " + filename + " could not be read", e);
+				logger.warning("File " + filename + " could not be read", e);
 				throw e;
 			}
 		}
@@ -570,6 +583,9 @@ public class WikiUtil {
 		}
 		// make sure there are no instances of "//" in the URL
 		uri = uri.replaceAll("(/){2,}", "/");
+		if (uri.length() <= contextPath.length()) {
+			return null;
+		}
 		uri = uri.substring(contextPath.length() + 1);
 		int i = 0;
 		while (i < skipCount) {
@@ -699,8 +715,12 @@ public class WikiUtil {
 			throw new WikiException(new WikiMessage("common.exception.pseudotopic", name));
 		}
 		WikiLink wikiLink = LinkUtil.parseWikiLink(name);
-		String namespace = wikiLink.getNamespace();
-		if (namespace != null && namespace.toLowerCase().trim().equals(NamespaceHandler.NAMESPACE_SPECIAL.toLowerCase())) {
+		String namespace = StringUtils.trimToNull(wikiLink.getNamespace());
+		String article = StringUtils.trimToNull(wikiLink.getArticle());
+		if (StringUtils.startsWith(namespace, "/") || StringUtils.startsWith(article, "/")) {
+			throw new WikiException(new WikiMessage("common.exception.name", name));
+		}
+		if (namespace != null && namespace.toLowerCase().equals(NamespaceHandler.NAMESPACE_SPECIAL.toLowerCase())) {
 			throw new WikiException(new WikiMessage("common.exception.name", name));
 		}
 		Matcher m = WikiUtil.INVALID_TOPIC_NAME_PATTERN.matcher(name);

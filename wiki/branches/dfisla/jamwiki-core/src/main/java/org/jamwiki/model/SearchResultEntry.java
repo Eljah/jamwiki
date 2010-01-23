@@ -16,10 +16,14 @@
  */
 package org.jamwiki.model;
 
+import org.jamwiki.utils.WikiLogger;
+
 /**
  * Provides an object that can be used to store search result information.
  */
 public class SearchResultEntry {
+
+	private static final WikiLogger logger = WikiLogger.getLogger(SearchResultEntry.class.getName());
 
 	/** The topic of this entry */
 	private String topic = null;

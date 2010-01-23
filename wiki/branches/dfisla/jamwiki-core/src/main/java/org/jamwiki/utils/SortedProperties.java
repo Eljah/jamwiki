@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
-import org.apache.log4j.Logger;
 
 /**
  * This class acts as a utility class for providing the capability of a property file
@@ -30,7 +29,7 @@ import org.apache.log4j.Logger;
 public class SortedProperties extends Properties {
 
 	/** Logger */
-	public static final Logger logger = Logger.getLogger(SortedProperties.class.getName());
+	public static final WikiLogger logger = WikiLogger.getLogger(SortedProperties.class.getName());
 
 	/**
 	 * Standard constructor for creating a sorted properties file.

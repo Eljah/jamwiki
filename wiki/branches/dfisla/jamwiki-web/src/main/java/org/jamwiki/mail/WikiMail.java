@@ -25,7 +25,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Sends mail via SMTP to the specified host. <b>REDISTRIBUTION:</b> you
@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class WikiMail {
 
-	private static final Logger logger = Logger.getLogger(WikiMail.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiMail.class.getName());
 	private final Session session;
 	private static WikiMail instance;
 
@@ -83,7 +83,7 @@ public class WikiMail {
 			message.saveChanges();
 			Transport.send(message);
 		} catch (MessagingException e) {
-			logger.warn("Mail error", e);
+			logger.warning("Mail error", e);
 		}
 	}
 

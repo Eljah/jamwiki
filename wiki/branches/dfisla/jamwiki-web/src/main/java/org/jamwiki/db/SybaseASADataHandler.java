@@ -16,7 +16,7 @@
  */
 package org.jamwiki.db;
 
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Implementation of the {@link org.jamwiki.DataHandler} interface that is
@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  */
 public class SybaseASADataHandler extends AnsiDataHandler {
 
-	private static final Logger logger = Logger.getLogger(SybaseASADataHandler.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(SybaseASADataHandler.class.getName());
 	private final QueryHandler queryHandler = new SybaseASAQueryHandler();
 
 	/**

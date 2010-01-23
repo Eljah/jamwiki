@@ -16,8 +16,16 @@
  */
 package org.jamwiki.utils;
 
-import org.apache.log4j.Logger;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Properties;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class provides a wrapper around the {@link java.util.logging.Logger}
@@ -31,221 +39,332 @@ import org.apache.log4j.Logger;
  */
 public class WikiLogger {
 
-    private Logger logger = null;
+	private final Logger logger;
 
-    protected WikiLogger(String name) {
-        logger = Logger.getLogger(name);
-    }
+	private static FileHandler DEFAULT_LOG_HANDLER = null;
+	private static Level DEFAULT_LOG_LEVEL = null;
+	/** Log configuration property file. */
+	public final static String LOG_PROPERTIES_FILENAME = "logging.properties";
+	public final static String DEFAULT_LOG_FILENAME = "jamwiki.log.0";
 
-    public static WikiLogger getLoggerInstance(String name) {
-        return new WikiLogger(name);
-    }
+	static {
+		initializeLogParams();
+	}
 
-    /**
-     * Retrieve a named <code>WikiLogger</code> object.
-     *
-     * @param name The name of the log object to retrieve or create.
-     * @return A logger instance for the given name.
-     */
-    public static WikiLogger getLogger(String name) {
-        return new WikiLogger(name);
-    }
+	/**
+	 *
+	 */
+	private WikiLogger(Logger logger) {
+		this.logger = logger;
+	}
 
-    /**
-     * Log a message at the {@link java.util.logging.Level#FINE} level,
-     * provided that the current log level is {@link java.util.logging.Level#FINE}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     */
-    public void fine(String msg) {
-        this.logger.debug(msg);
-    }
+	/**
+	 * Return the current ClassLoader.  First try to get the current thread's
+	 * ClassLoader, and if that fails return the ClassLoader that loaded this
+	 * class instance.
+	 *
+	 * @return An instance of the current ClassLoader.
+	 */
+	private static ClassLoader getClassLoader() {
+		// NOTE: This method duplicates the Utilities.getClassLoader method, but
+		// is copied here to prevent this class from having any dependencies on
+		// other JAMWiki classes.
+		ClassLoader loader = null;
+		try {
+			loader = Thread.currentThread().getContextClassLoader();
+		} catch (Exception e) {
+			// ignore, try the current class's ClassLoader
+		}
+		if (loader == null) {
+			loader = WikiLogger.class.getClassLoader();
+		}
+		return loader;
+	}
 
-    /**
-     * Log a message and an exception at the {@link java.util.logging.Level#FINE}
-     * level, provided that the current log level is {@link java.util.logging.Level#FINE}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     * @param thrown An exception to be written to the log.
-     */
-    public void fine(String msg, Throwable thrown) {
-        this.logger.debug(msg, thrown);
-    }
+	/**
+	 *
+	 */
+	public static String getDefaultLogFile() {
+		System.out.println(System.getProperties());
+		String logFile = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + DEFAULT_LOG_FILENAME;
+		return logFile;
+	}
 
-    /**
-     * Log a message at the {@link java.util.logging.Level#FINER} level,
-     * provided that the current log level is {@link java.util.logging.Level#FINER}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     */
-    public void finer(String msg) {
-        this.logger.debug(msg);
-    }
+	/**
+	 *
+	 */
+	public static String getLogConfigFile() {
+		String logConfig = System.getProperty("file.separator") + "WEB-INF" + System.getProperty("file.separator") + "classes" + System.getProperty("file.separator") + LOG_PROPERTIES_FILENAME;
+		return logConfig;
+	}
 
-    /**
-     * Log a message and an exception at the {@link java.util.logging.Level#FINER}
-     * level, provided that the current log level is {@link java.util.logging.Level#FINER}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     * @param thrown An exception to be written to the log.
-     */
-    public void finer(String msg, Throwable thrown) {
-        this.logger.debug(msg, thrown);
-    }
+	/**
+	 * Retrieve a named <code>WikiLogger</code> object.
+	 *
+	 * @param name The name of the log object to retrieve or create.
+	 * @return A logger instance for the given name.
+	 */
+	public static WikiLogger getLogger(String name) {
+		Logger logger = Logger.getLogger(name);
+		if (WikiLogger.DEFAULT_LOG_HANDLER != null) {
+			logger.addHandler(WikiLogger.DEFAULT_LOG_HANDLER);
+			logger.setLevel(DEFAULT_LOG_LEVEL);
+		}
+		return new WikiLogger(logger);
+	}
 
-    /**
-     * Log a message at the {@link java.util.logging.Level#FINEST} level,
-     * provided that the current log level is {@link java.util.logging.Level#FINEST}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     */
-    public void finest(String msg) {
-        this.logger.trace(msg);
-    }
+	/**
+	 *
+	 */
+	private static void initializeLogParams() {
+		FileInputStream stream = null;
+		try {
+			File propertyFile = WikiLogger.loadProperties();
+			stream = new FileInputStream(propertyFile);
+			Properties properties = new Properties();
+			properties.load(stream);
+			String pattern = properties.getProperty("org.jamwiki.pattern");
+			int limit = Integer.valueOf(properties.getProperty("org.jamwiki.limit"));
+			int count = Integer.valueOf(properties.getProperty("org.jamwiki.count"));
+			boolean append = Boolean.valueOf(properties.getProperty("org.jamwiki.append"));
+			String datePattern = properties.getProperty("org.jamwiki.timestamp");
+			DEFAULT_LOG_LEVEL = Level.parse(properties.getProperty("org.jamwiki.level"));
+			WikiLogger.DEFAULT_LOG_HANDLER = new FileHandler(pattern, limit, count, append);
+			DEFAULT_LOG_HANDLER.setFormatter(new WikiLogFormatter(datePattern));
+			DEFAULT_LOG_HANDLER.setLevel(DEFAULT_LOG_LEVEL);
+			// test the logger to verify permissions are OK
+			Logger logger = Logger.getLogger(WikiLogger.class.getName());
+			logger.addHandler(WikiLogger.DEFAULT_LOG_HANDLER);
+			logger.setLevel(DEFAULT_LOG_LEVEL);
+			logger.config("JAMWiki log initialized from " + propertyFile.getPath() + " with pattern " + pattern);
+		} catch (Exception e) {
+			System.out.println("WARNING: Unable to load custom JAMWiki logging configuration, using system default " + e.getMessage());
+			WikiLogger.DEFAULT_LOG_HANDLER = null;
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (Exception ex) {}
+			}
+		}
+	}
 
-    /**
-     * Log a message and an exception at the {@link java.util.logging.Level#FINEST}
-     * level, provided that the current log level is {@link java.util.logging.Level#FINEST}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     * @param thrown An exception to be written to the log.
-     */
-    public void finest(String msg, Throwable thrown) {
-        this.logger.trace(msg, thrown);
-    }
+	/**
+	 *
+	 */
+	private static File loadProperties() throws FileNotFoundException {
+		ClassLoader loader = WikiLogger.getClassLoader();
+		URL url = loader.getResource(LOG_PROPERTIES_FILENAME);
+		if (url == null) {
+			throw new FileNotFoundException("Log initialization file " + LOG_PROPERTIES_FILENAME + " could not be found");
+		}
+		String fileName = url.getFile();
+		try {
+			fileName = URLDecoder.decode(fileName, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// this should never happen
+			throw new IllegalStateException("Unsupporting encoding UTF-8");
+		} 
+		File propertyFile = new File(fileName);
+		if (!propertyFile.exists()) {
+			throw new FileNotFoundException("Log initialization file " + LOG_PROPERTIES_FILENAME + " could not be found");
+		}
+		return propertyFile;
+	}
 
-    /**
-     * Return <code>true</code> if a log message of level CONFIG can be logged.
-     */
-    public boolean isConfigEnabled() {
-        return true;
-    }
+	/**
+	 * Log a message at the {@link java.util.logging.Level#CONFIG} level,
+	 * provided that the current log level is {@link java.util.logging.Level#CONFIG}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void config(String msg) {
+		this.logger.config(msg);
+	}
 
-    /**
-     * Return <code>true</code> if a log message of level FINE can be logged.
-     */
-    public boolean isFineEnabled() {
-        return this.logger.isDebugEnabled();
-    }
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#CONFIG}
+	 * level, provided that the current log level is {@link java.util.logging.Level#CONFIG}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void config(String msg, Throwable thrown) {
+		this.logger.log(Level.CONFIG, msg, thrown);
+	}
 
-    /**
-     * Return <code>true</code> if a log message of level FINER can be logged.
-     */
-    public boolean isFinerEnabled() {
-        return this.logger.isDebugEnabled();
-    }
+	/**
+	 * Log a message at the {@link java.util.logging.Level#FINE} level,
+	 * provided that the current log level is {@link java.util.logging.Level#FINE}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void fine(String msg) {
+		this.logger.fine(msg);
+	}
 
-    /**
-     * Return <code>true</code> if a log message of level FINEST can be logged.
-     */
-    public boolean isFinestEnabled() {
-        return this.logger.isTraceEnabled();
-    }
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#FINE}
+	 * level, provided that the current log level is {@link java.util.logging.Level#FINE}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void fine(String msg, Throwable thrown) {
+		this.logger.log(Level.FINE, msg, thrown);
+	}
 
-    /**
-     * Return <code>true</code> if a log message of level INFO can be logged.
-     */
-    public boolean isInfoEnabled() {
-        return this.logger.isInfoEnabled();
-    }
+	/**
+	 * Log a message at the {@link java.util.logging.Level#FINER} level,
+	 * provided that the current log level is {@link java.util.logging.Level#FINER}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void finer(String msg) {
+		this.logger.finer(msg);
+	}
 
-    /**
-     * Log a message at the {@link java.util.logging.Level#SEVERE} level,
-     * provided that the current log level is {@link java.util.logging.Level#SEVERE}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     */
-    public void severe(String msg) {
-        this.logger.fatal(msg);
-    }
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#FINER}
+	 * level, provided that the current log level is {@link java.util.logging.Level#FINER}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void finer(String msg, Throwable thrown) {
+		this.logger.log(Level.FINER, msg, thrown);
+	}
 
-    /**
-     * Log a message and an exception at the {@link java.util.logging.Level#SEVERE}
-     * level, provided that the current log level is {@link java.util.logging.Level#SEVERE}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     * @param thrown An exception to be written to the log.
-     */
-    public void severe(String msg, Throwable thrown) {
-        this.logger.fatal(msg, thrown);
-    }
+	/**
+	 * Log a message at the {@link java.util.logging.Level#FINEST} level,
+	 * provided that the current log level is {@link java.util.logging.Level#FINEST}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void finest(String msg) {
+		this.logger.finest(msg);
+	}
 
-    /**
-     * Log a message at the {@link java.util.logging.Level#WARNING} level,
-     * provided that the current log level is {@link java.util.logging.Level#WARNING}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     */
-    public void warning(String msg) {
-        this.logger.warn(msg);
-    }
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#FINEST}
+	 * level, provided that the current log level is {@link java.util.logging.Level#FINEST}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void finest(String msg, Throwable thrown) {
+		this.logger.log(Level.FINEST, msg, thrown);
+	}
 
-    /**
-     * Log a message and an exception at the {@link java.util.logging.Level#WARNING}
-     * level, provided that the current log level is {@link java.util.logging.Level#WARNING}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     * @param thrown An exception to be written to the log.
-     */
-    public void warning(String msg, Throwable thrown) {
-        this.logger.warn(msg, thrown);
-    }
+	/**
+	 * Log a message at the {@link java.util.logging.Level#INFO} level,
+	 * provided that the current log level is {@link java.util.logging.Level#INFO}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void info(String msg) {
+		this.logger.info(msg);
+	}
 
-    //------------------------------------- LOG4J METHODS
-    public void error(String msg) {
-        this.logger.error(msg);
-    }
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#INFO}
+	 * level, provided that the current log level is {@link java.util.logging.Level#INFO}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void info(String msg, Throwable thrown) {
+		this.logger.log(Level.INFO, msg, thrown);
+	}
 
-    public void error(String msg, Throwable thrown) {
-        this.logger.error(msg, thrown);
-    }
+	/**
+	 * Return <code>true</code> if a log message of level CONFIG can be logged.
+	 */
+	public boolean isConfigEnabled() {
+		return this.logger.isLoggable(Level.CONFIG);
+	}
 
-    public void debug(String msg) {
-        this.logger.debug(msg);
-    }
+	/**
+	 * Return <code>true</code> if a log message of level FINE can be logged.
+	 */
+	public boolean isFineEnabled() {
+		return this.logger.isLoggable(Level.FINE);
+	}
 
-    public void debug(String msg, Throwable thrown) {
-        this.logger.debug(msg, thrown);
-    }
+	/**
+	 * Return <code>true</code> if a log message of level FINER can be logged.
+	 */
+	public boolean isFinerEnabled() {
+		return this.logger.isLoggable(Level.FINER);
+	}
 
-    public void fatal(String msg) {
-        this.logger.fatal(msg);
-    }
+	/**
+	 * Return <code>true</code> if a log message of level FINEST can be logged.
+	 */
+	public boolean isFinestEnabled() {
+		return this.logger.isLoggable(Level.FINEST);
+	}
 
-    public void fatal(String msg, Throwable thrown) {
-        this.logger.fatal(msg, thrown);
-    }
+	/**
+	 * Return <code>true</code> if a log message of level INFO can be logged.
+	 */
+	public boolean isInfoEnabled() {
+		return this.logger.isLoggable(Level.INFO);
+	}
 
-   /**
-     * Log a message at the {@link java.util.logging.Level#INFO} level,
-     * provided that the current log level is {@link java.util.logging.Level#INFO}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     */
-    public void info(String msg) {
-        this.logger.info(msg);
-    }
+	/**
+	 * Log a message at the {@link java.util.logging.Level#SEVERE} level,
+	 * provided that the current log level is {@link java.util.logging.Level#SEVERE}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void severe(String msg) {
+		this.logger.severe(msg);
+	}
 
-    /**
-     * Log a message and an exception at the {@link java.util.logging.Level#INFO}
-     * level, provided that the current log level is {@link java.util.logging.Level#INFO}
-     * or greater.
-     *
-     * @param msg The message to be written to the log.
-     * @param thrown An exception to be written to the log.
-     */
-    public void info(String msg, Throwable thrown) {
-        this.logger.info(msg, thrown);
-    }
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#SEVERE}
+	 * level, provided that the current log level is {@link java.util.logging.Level#SEVERE}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void severe(String msg, Throwable thrown) {
+		this.logger.log(Level.SEVERE, msg, thrown);
+	}
+
+	/**
+	 * Log a message at the {@link java.util.logging.Level#WARNING} level,
+	 * provided that the current log level is {@link java.util.logging.Level#WARNING}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 */
+	public void warning(String msg) {
+		this.logger.warning(msg);
+	}
+
+	/**
+	 * Log a message and an exception at the {@link java.util.logging.Level#WARNING}
+	 * level, provided that the current log level is {@link java.util.logging.Level#WARNING}
+	 * or greater.
+	 *
+	 * @param msg The message to be written to the log.
+	 * @param thrown An exception to be written to the log.
+	 */
+	public void warning(String msg, Throwable thrown) {
+		this.logger.log(Level.WARNING, msg, thrown);
+	}
 }

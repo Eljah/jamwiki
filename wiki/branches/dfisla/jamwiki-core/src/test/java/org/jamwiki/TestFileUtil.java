@@ -22,15 +22,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
 
 /**
  *
  */
 public class TestFileUtil {
 
-	private static final Logger logger = Logger.getLogger(TestFileUtil.class.getName());
 	public static final String TEST_RESULTS_DIR = "data/results/";
+	public static final String TEST_JS_RESULTS_DIR = "data/javascript/";
 	public static final String TEST_TOPICS_DIR = "data/topics/";
 
 	/**
@@ -54,10 +53,10 @@ public class TestFileUtil {
 	/**
 	 *
 	 */
-	public static File getClassLoaderFile(String fileName) throws Exception {
+	public static File getClassLoaderFile(String fileName) throws FileNotFoundException {
 		try {
 			return Utilities.getClassLoaderFile(fileName);
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
 			// ignore
 		}
 		return new File(Utilities.getClassLoaderRoot(), fileName);
@@ -71,10 +70,10 @@ public class TestFileUtil {
 		String fullName = directory + fileName;
 		try {
 			return Utilities.getClassLoaderFile(fullName);
-		} catch (Exception e) { }
+		} catch (FileNotFoundException e) { }
 		try {
 			return new File(Utilities.getClassLoaderRoot(), fullName);
-		} catch (Exception e) { }
+		} catch (FileNotFoundException e) { }
 		return null;
 	}
 
@@ -96,7 +95,7 @@ public class TestFileUtil {
 				return null;
 			}
 			reader = new FileReader(file);
-			StringBuffer output = new StringBuffer();
+			StringBuilder output = new StringBuilder();
 			char[] buf = new char[4096];
 			int c;
 			while ((c = reader.read(buf, 0, buf.length)) != -1) {

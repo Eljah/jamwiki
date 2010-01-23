@@ -23,8 +23,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
-import org.apache.log4j.Logger;
-import org.jamwiki.WikiException;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,7 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class TopicServlet extends JAMWikiServlet {
 
 	/** Logger for this class and subclasses. */
-	private static final Logger logger = Logger.getLogger(TopicServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(TopicServlet.class.getName());
 
 	/**
 	 * This method handles the request after its parent class receives control. It gets the topic's name and the
@@ -72,12 +71,6 @@ public class TopicServlet extends JAMWikiServlet {
 			next.addObject("notopic", wikiMessage);
 		}
 		WikiMessage pageTitle = new WikiMessage("topic.title", topicName);
-               
-                try {
-                    ServletUtil.viewTopic(request, next, pageInfo, pageTitle, topic, true, true);
-                } catch (WikiException e) {
-                    logger.fatal("Unable to view topic menu", e);
-                }
-                
+                ServletUtil.viewTopic(request, next, pageInfo, pageTitle, topic, true, true);
 	}
 }

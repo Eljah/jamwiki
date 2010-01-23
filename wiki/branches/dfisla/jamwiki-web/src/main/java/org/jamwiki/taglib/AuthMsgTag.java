@@ -25,14 +25,14 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.authentication.JAMWikiAuthenticationConstants;
 import org.jamwiki.servlets.ServletUtil;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Utility tag for creating HTML checkboxes.
  */
 public class AuthMsgTag extends TagSupport {
 
-	private static final Logger logger = Logger.getLogger(AuthMsgTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(AuthMsgTag.class.getName());
 	private String css = null;
 
 	/**
@@ -44,7 +44,7 @@ public class AuthMsgTag extends TagSupport {
 			try {
 				this.pageContext.getOut().print(output);
 			} catch (IOException e) {
-				logger.fatal("Failure in authmsg tag", e);
+				logger.severe("Failure in authmsg tag", e);
 				throw new JspException(e);
 			}
 		}
@@ -58,7 +58,7 @@ public class AuthMsgTag extends TagSupport {
 		if (message == null) {
 			return null;
 		}
-		StringBuffer output = new StringBuffer("<div");
+		StringBuilder output = new StringBuilder("<div");
 		if (!StringUtils.isBlank(this.css)) {
 			output.append(" class=\"").append(this.css).append('\"');
 		}

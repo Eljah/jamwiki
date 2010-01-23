@@ -24,9 +24,10 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,7 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class RolesServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(RolesServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(RolesServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output when searching. */
 	protected static final String JSP_ADMIN_ROLES = "admin-roles.jsp";
 
@@ -123,9 +124,9 @@ public class RolesServlet extends JAMWikiServlet {
 					int userId = Integer.parseInt(candidateUsers[i]);
 					String username = candidateUsernames[i];
 					List<String> roles = buildRoleArray(userId, -1, userRoles);
-					if (userId == ServletUtil.currentWikiUser().getUserId() && !roles.contains(Role.ROLE_SYSADMIN)) {
+					if (userId == ServletUtil.currentWikiUser().getUserId() && !roles.contains(RoleImpl.ROLE_SYSADMIN)) {
 						errors.add(new WikiMessage("roles.message.sysadminremove"));
-						roles.add(Role.ROLE_SYSADMIN.getAuthority());
+						roles.add(RoleImpl.ROLE_SYSADMIN.getAuthority());
 					}
 					WikiBase.getDataHandler().writeRoleMapUser(username, roles);
 				}
@@ -134,7 +135,7 @@ public class RolesServlet extends JAMWikiServlet {
 		} catch (WikiException e) {
 			errors.add(e.getWikiMessage());
 		} catch (Exception e) {
-			logger.fatal("Failure while adding role", e);
+			logger.severe("Failure while adding role", e);
 			errors.add(new WikiMessage("roles.message.rolefail", e.getMessage()));
 		}
 		if (!errors.isEmpty()) {
@@ -155,7 +156,7 @@ public class RolesServlet extends JAMWikiServlet {
 				// will be disabled in the form.
 				boolean update = StringUtils.isBlank(request.getParameter("roleName"));
 				String roleName = (update) ? updateRole : request.getParameter("roleName");
-				role = new Role(roleName);
+				role = new RoleImpl(roleName);
 				role.setDescription(request.getParameter("roleDescription"));
 				WikiUtil.validateRole(role);
 				WikiBase.getDataHandler().writeRole(role, update);
@@ -167,7 +168,7 @@ public class RolesServlet extends JAMWikiServlet {
 			} catch (WikiException e) {
 				next.addObject("message", e.getWikiMessage());
 			} catch (Exception e) {
-				logger.fatal("Failure while adding role", e);
+				logger.severe("Failure while adding role", e);
 				next.addObject("message", new WikiMessage("roles.message.rolefail", e.getMessage()));
 			}
 		} else if (!StringUtils.isBlank(updateRole)) {
@@ -204,7 +205,7 @@ public class RolesServlet extends JAMWikiServlet {
 			}
 			next.addObject("roleMapUsers", roleMapUsers);
 		} catch (Exception e) {
-			logger.fatal("Failure while retrieving role", e);
+			logger.severe("Failure while retrieving role", e);
 			next.addObject("message", new WikiMessage("roles.message.rolesearchfail", e.getMessage()));
 		}
 		this.view(request, next, pageInfo);

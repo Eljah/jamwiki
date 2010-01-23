@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.incava.util.diff.Diff;
 import org.incava.util.diff.Difference;
 import org.jamwiki.model.WikiDiff;
-import org.apache.log4j.Logger;
 
 /**
  * Utility class for processing the difference between two topics and returing a list
@@ -31,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class DiffUtil {
 
-	private static final Logger logger = Logger.getLogger(DiffUtil.class);//Logger.getLogger(DiffUtil.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(DiffUtil.class.getName());
 	/** The number of lines of unchanged text to display before and after each diff. */
 	// FIXME - make this a property value
 	private static final int DIFF_UNCHANGED_LINE_DISPLAY = 2;
@@ -140,7 +139,7 @@ public class DiffUtil {
 	 * be unique enough.
 	 */
 	private static String generateCacheKey(String newVersion, String oldVersion) {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		if (newVersion == null) {
 			result.append(-1);
 		} else if (newVersion.length() <= 10) {
@@ -184,7 +183,7 @@ public class DiffUtil {
 			for (WikiDiff changedLineWikiDiff : changedLineWikiDiffs) {
 				oldLineArray = DiffUtil.stringToArray(changedLineWikiDiff.getOldText());
 				newLineArray = DiffUtil.stringToArray(changedLineWikiDiff.getNewText());
-				changedLineDiffs = new Diff(oldLineArray, newLineArray).diff();
+				changedLineDiffs = new Diff<String>(oldLineArray, newLineArray).diff();
 				wikiSubDiffs = new ArrayList<WikiDiff>();
 				int j = 0;
 				for (Difference changedLineDiff : changedLineDiffs) {
@@ -264,7 +263,7 @@ public class DiffUtil {
 				addedCurrent++;
 			}
 			if (oldText == null && newText == null) {
-				logger.debug("Possible DIFF bug: no elements post-buffered.  position: " + position + " / deletedCurrent: " + deletedCurrent + " / addedCurrent " + addedCurrent + " / numIterations: " + numIterations);
+				logger.fine("Possible DIFF bug: no elements post-buffered.  position: " + position + " / deletedCurrent: " + deletedCurrent + " / addedCurrent " + addedCurrent + " / numIterations: " + numIterations);
 				break;
 			}
 			wikiDiffs.add(new WikiDiff(oldText, newText, position));
@@ -322,7 +321,7 @@ public class DiffUtil {
 				addedCurrent++;
 			}
 			if (oldText == null && newText == null) {
-				logger.debug("Possible DIFF bug: no elements pre-buffered.  position: " + position + " / deletedCurrent: " + deletedCurrent + " / addedCurrent " + addedCurrent + " / numIterations: " + numIterations);
+				logger.fine("Possible DIFF bug: no elements pre-buffered.  position: " + position + " / deletedCurrent: " + deletedCurrent + " / addedCurrent " + addedCurrent + " / numIterations: " + numIterations);
 				break;
 			}
 			wikiDiffs.add(new WikiDiff(oldText, newText, position));
@@ -335,13 +334,13 @@ public class DiffUtil {
 	 * @param oldVersion The String that is being compared against.
 	 */
 	private static List<WikiDiff> process(String newVersion, String oldVersion) {
-		logger.debug("Diffing: " + oldVersion + " against: " + newVersion);
+		logger.finer("Diffing: " + oldVersion + " against: " + newVersion);
 		if (newVersion.equals(oldVersion)) {
 			return new ArrayList<WikiDiff>();
 		}
 		String[] oldArray = DiffUtil.split(oldVersion);
 		String[] newArray = DiffUtil.split(newVersion);
-		Diff diffObject = new Diff(oldArray, newArray);
+		Diff<String> diffObject = new Diff<String>(oldArray, newArray);
 		List<Difference> diffs = diffObject.diff();
 		return DiffUtil.generateWikiDiffs(diffs, oldArray, newArray);
 	}
@@ -382,7 +381,7 @@ public class DiffUtil {
 			// FIXME - this shouldn't be necessary
 			count++;
 			if (count > 5000) {
-				logger.warn("Infinite loop in DiffUtils.processDifference");
+				logger.warning("Infinite loop in DiffUtils.processDifference");
 				break;
 			}
 		}

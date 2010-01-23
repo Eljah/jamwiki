@@ -39,6 +39,7 @@ import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
 import org.jamwiki.model.Topic;
+import org.jamwiki.model.LogItem;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
@@ -55,11 +56,12 @@ import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
 import org.jamwiki.Environment;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.model.ParsedTopic;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Default implementation of the {@link org.jamwiki.DataHandler} interface for
@@ -70,8 +72,8 @@ public class AnsiDataHandler implements DataHandler {
     private static final String CACHE_TOPICS = "org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS";
     private static final String CACHE_TOPIC_VERSIONS = "org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_VERSIONS";
     private static final String CACHE_VIRTUAL_WIKI = "org.jamwiki.db.AnsiDataHandler.CACHE_VIRTUAL_WIKI";
-    private static final Logger logger = Logger.getLogger(AnsiDataHandler.class.getName());
-    // some constants
+    private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
+// some constants
     public static final String DATA_TOPIC_NAME = "topic_name";
     public static final String DATA_WIKI_USER_ID = "wiki_user_id";
     public static final String DATA_GROUP_ID = "group_id";
@@ -155,7 +157,7 @@ public class AnsiDataHandler implements DataHandler {
             this.validateTopicVersion(topicVersion);
             topicVersionId = this.queryHandler().insertTopicVersion(topicVersion, conn);
         } catch (SQLException e) {
-            logger.error("WRITE-TOPIC-FAILED, TOPIC-ID: " + topicVersion.getTopicId() + " TOPIC-VERSION-ID: " + topicVersionId + " CONTENT: " + topicVersion.getVersionContent());
+            logger.severe("WRITE-TOPIC-FAILED, TOPIC-ID: " + topicVersion.getTopicId() + " TOPIC-VERSION-ID: " + topicVersionId + " CONTENT: " + topicVersion.getVersionContent());
             throw new DataAccessException(e);
         }
         return topicVersionId;
@@ -170,7 +172,7 @@ public class AnsiDataHandler implements DataHandler {
         try {
             rv = this.queryHandler().insertParsedTopic(parsedTopic, virtualWikiId, conn);
         } catch (SQLException e) {
-            logger.error("WRITE-PARSED-TOPIC-FAILED, TOPIC-ID: " + parsedTopic.getTopicId() + " CONTENT: " + parsedTopic.getTopicContent());
+            logger.severe("WRITE-PARSED-TOPIC-FAILED, TOPIC-ID: " + parsedTopic.getTopicId() + " CONTENT: " + parsedTopic.getTopicContent());
             throw new DataAccessException(e);
         }
         return rv;
@@ -329,7 +331,7 @@ public class AnsiDataHandler implements DataHandler {
      */
     private static void checkLength(String value, int maxLength) throws WikiException {
         if (value != null && value.length() > maxLength) {
-            logger.error("error.fieldlength value =>: " + value + " limit: " + Integer.valueOf(maxLength).toString());
+            logger.severe("error.fieldlength value =>: " + value + " limit: " + Integer.valueOf(maxLength).toString());
             throw new WikiException(new WikiMessage("error.fieldlength", value, Integer.valueOf(maxLength).toString()));
         }
     }
@@ -345,6 +347,13 @@ public class AnsiDataHandler implements DataHandler {
         }
     }
 
+    /**
+     * JAMWIKI-NEW
+     */
+     public void deleteTopic(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
+         deleteTopic(topic, topicVersion, true);
+     }
+    
     /**
      *
      */
@@ -414,6 +423,30 @@ public class AnsiDataHandler implements DataHandler {
         }
     }
 
+     /** JAMWIKI-NEW
+     * This method should be called only during upgrades and provides the capability
+     * to execute a SQL query from a QueryHandler-specific property file.
+     *
+     * @param prop The name of the SQL property file value to execute.
+     * @param conn The SQL connection to use when executing the SQL.
+     * @throws SQLException Thrown if any error occurs during execution.
+     */
+    public void executeUpgradeQuery(String prop, Connection conn) throws SQLException{
+        throw new SQLException("Not Implemented!");
+    }
+
+    /** JAMWIKI-NEW
+     * This method should be called only during upgrades and provides the capability
+     * to execute update SQL from a QueryHandler-specific property file.
+     *
+     * @param prop The name of the SQL property file value to execute.
+     * @param conn The SQL connection to use when executing the SQL.
+     * @throws SQLException Thrown if any error occurs during execution.
+     */
+    public void executeUpgradeUpdate(String prop, Connection conn) throws SQLException{
+        throw new SQLException("Not Implemented!");
+    }
+    
     /**
      *
      */
@@ -448,7 +481,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -479,7 +512,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -515,7 +548,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -529,7 +562,7 @@ public class AnsiDataHandler implements DataHandler {
         List<Integer> all = new ArrayList<Integer>();
 
         int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
-        logger.debug("VIRTUAL-WIKI-ID =>: " + virtualWikiId);
+        logger.info("VIRTUAL-WIKI-ID =>: " + virtualWikiId);
         ResultSet rs = null;
         TransactionStatus status = null;
         Connection conn = null;
@@ -551,7 +584,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -592,13 +625,35 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
         }
 
         return all;
+    }
+
+    
+    /** JAMWIKI-NEW
+     * Retrieve a List of all LogItem objects for a given virtual wiki, sorted
+     * chronologically.
+     *
+     * @param virtualWiki The virtual wiki for which log items are being
+     *  retrieved.
+     * @param logType Set to <code>-1</code> if all log items should be returned,
+     *  otherwise set the log type for items to retrieve.
+     * @param pagination A Pagination object indicating the total number of
+     *  results and offset for the results to be retrieved.
+     * @param descending Set to <code>true</code> if the results should be
+     *  sorted with the most recent log items first, <code>false</code> if the
+     *  results should be sorted with the oldest items first.
+     * @return A List of LogItem objects for a given virtual wiki, sorted
+     *  chronologically.
+     * @throws DataAccessException Thrown if any error occurs during method execution.
+     */
+    public List<LogItem> getLogItems(String virtualWiki, int logType, Pagination pagination, boolean descending) throws DataAccessException{
+        throw new DataAccessException("Not Implemented!");
     }
 
     /**
@@ -632,7 +687,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -676,7 +731,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -720,7 +775,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -773,7 +828,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -785,7 +840,7 @@ public class AnsiDataHandler implements DataHandler {
     /**
      *
      */
-    public Role[] getRoleMapGroup(String groupName) throws DataAccessException {
+    public List<Role> getRoleMapGroup(String groupName) throws DataAccessException {
         List<Role> results = new ArrayList<Role>();
         ResultSet rs = null;
         TransactionStatus status = null;
@@ -813,13 +868,14 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
         }
 
-        return results.toArray(new Role[0]);
+        //return results.toArray(new Role[0]);
+        return results;
     }
 
     /**
@@ -853,7 +909,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -865,7 +921,7 @@ public class AnsiDataHandler implements DataHandler {
     /**
      *
      */
-    public Role[] getRoleMapUser(String login) throws DataAccessException {
+    public List<Role> getRoleMapUser(String login) throws DataAccessException {
         List<Role> results = new ArrayList<Role>();
         ResultSet rs = null;
         TransactionStatus status = null;
@@ -893,13 +949,34 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
         }
 
-        return results.toArray(new Role[0]);
+        //return results.toArray(new Role[0]);
+        return results;
+    }
+
+
+    /** JAMWIKI-NEW
+     * Retrieve a List of RecentChange objects representing a topic's history,
+     * sorted chronologically.
+     *
+     * @param virtualWiki The virtual wiki for the topic being queried.
+     * @param topicName The name of the topic being queried.
+     * @param pagination A Pagination object indicating the total number of
+     *  results and offset for the results to be retrieved.
+     * @param descending Set to <code>true</code> if the results should be
+     *  sorted with the most recent changes first, <code>false</code> if the
+     *  results should be sorted with the oldest changes first.
+     * @return A List of all RecentChange objects representing a topic's history,
+     *  sorted chronologically.
+     * @throws DataAccessException Thrown if any error occurs during method execution.
+     */
+    public List<RecentChange> getTopicHistory(String virtualWiki, String topicName, Pagination pagination, boolean descending) throws DataAccessException{
+        throw new DataAccessException("Not Implemented");
     }
 
     /**
@@ -930,7 +1007,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -974,7 +1051,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1012,7 +1089,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1051,7 +1128,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1089,7 +1166,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1123,7 +1200,7 @@ public class AnsiDataHandler implements DataHandler {
             change.setVirtualWiki(rs.getString("virtual_wiki_name"));
             return change;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing recent change", e);
+            logger.severe("Failure while initializing recent change", e);
             throw new DataAccessException(e);
         }
     }
@@ -1133,11 +1210,11 @@ public class AnsiDataHandler implements DataHandler {
      */
     private Role initRole(ResultSet rs) throws DataAccessException {
         try {
-            Role role = new Role(rs.getString("role_name"));
+            Role role = new RoleImpl(rs.getString("role_name"));
             role.setDescription(rs.getString("role_description"));
             return role;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing role", e);
+            logger.severe("Failure while initializing role", e);
             throw new DataAccessException(e);
         }
     }
@@ -1180,9 +1257,9 @@ public class AnsiDataHandler implements DataHandler {
                     topic.setTopicContent(new String(buffer, "UTF-8"));
                 }
             } catch (java.io.UnsupportedEncodingException uee) {
-                logger.error(uee.getMessage(), uee);
+                logger.severe(uee.getMessage(), uee);
             } catch (java.io.IOException ioe) {
-                logger.error(ioe.getMessage(), ioe);
+                logger.severe(ioe.getMessage(), ioe);
             }
 
             try {
@@ -1191,7 +1268,7 @@ public class AnsiDataHandler implements DataHandler {
                     topic.setTopicContentClean(new String(buffer, "UTF-8"));
                 }
             } catch (java.io.UnsupportedEncodingException uee) {
-                logger.error(uee.getMessage(), uee);
+                logger.severe(uee.getMessage(), uee);
             }
             //topic.setTopicContentClean(rs.getString("version_content_clean"));
             topic.setTopicContentShort(rs.getString("version_content_short"));
@@ -1207,7 +1284,7 @@ public class AnsiDataHandler implements DataHandler {
             topic.setRedirectTo(rs.getString("redirect_to"));
             return topic;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing topic", e);
+            logger.severe("Failure while initializing topic", e);
             throw new DataAccessException(e);
         }
     }
@@ -1241,7 +1318,7 @@ public class AnsiDataHandler implements DataHandler {
             topic.setRedirectTo(rs.getString("redirect_to"));
             return topic;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing topic", e);
+            logger.severe("Failure while initializing topic", e);
             throw new DataAccessException(e);
         }
     }
@@ -1270,7 +1347,7 @@ public class AnsiDataHandler implements DataHandler {
                     topicVersion.setVersionContent(new String(buffer, "UTF-8"));
                 }
             } catch (java.io.UnsupportedEncodingException uee) {
-                logger.error(uee.getMessage(), uee);
+                logger.severe(uee.getMessage(), uee);
             }
 
             try {
@@ -1285,7 +1362,7 @@ public class AnsiDataHandler implements DataHandler {
                     topicVersion.setVersionContentClean(new String(buffer, "UTF-8"));
                 }
             } catch (java.io.UnsupportedEncodingException uee) {
-                logger.error(uee.getMessage(), uee);
+                logger.severe(uee.getMessage(), uee);
             }
 
             topicVersion.setVersionContentShort(rs.getString("version_content_short"));
@@ -1309,7 +1386,7 @@ public class AnsiDataHandler implements DataHandler {
             topicVersion.setBzType(rs.getInt("bz_type"));
             return topicVersion;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing topic version", e);
+            logger.severe("Failure while initializing topic version", e);
             throw new DataAccessException(e);
         }
     }
@@ -1330,13 +1407,13 @@ public class AnsiDataHandler implements DataHandler {
                     parsedTopic = new ParsedTopic(new String(buffer));
                 }
             } catch (Exception uee) {
-                logger.error(uee.getMessage(), uee);
+                logger.severe(uee.getMessage(), uee);
             }
 
-            logger.debug("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
+            logger.info("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
             return parsedTopic;
         } catch (Exception e) {
-            logger.fatal("Failure while initializing parsed topic", e);
+            logger.severe("Failure while initializing parsed topic", e);
             throw new DataAccessException(e);
         }
     }
@@ -1352,7 +1429,7 @@ public class AnsiDataHandler implements DataHandler {
             virtualWiki.setDefaultTopicName(rs.getString("default_topic_name"));
             return virtualWiki;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing virtual wiki", e);
+            logger.severe("Failure while initializing virtual wiki", e);
             throw new DataAccessException(e);
         }
     }
@@ -1377,7 +1454,7 @@ public class AnsiDataHandler implements DataHandler {
             wikiFile.setFileSize(rs.getInt("file_size"));
             return wikiFile;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing file", e);
+            logger.severe("Failure while initializing file", e);
             throw new DataAccessException(e);
         }
     }
@@ -1402,7 +1479,7 @@ public class AnsiDataHandler implements DataHandler {
             wikiFileVersion.setFileSize(rs.getInt("file_size"));
             return wikiFileVersion;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing wiki file version", e);
+            logger.severe("Failure while initializing wiki file version", e);
             throw new DataAccessException(e);
         }
     }
@@ -1418,7 +1495,7 @@ public class AnsiDataHandler implements DataHandler {
             wikiGroup.setDescription(rs.getString("group_description"));
             return wikiGroup;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing group", e);
+            logger.severe("Failure while initializing group", e);
             throw new DataAccessException(e);
         }
     }
@@ -1442,7 +1519,7 @@ public class AnsiDataHandler implements DataHandler {
             user.setSignature(rs.getString("signature"));
             return user;
         } catch (SQLException e) {
-            logger.fatal("Failure while initializing user", e);
+            logger.severe("Failure while initializing user", e);
             throw new DataAccessException(e);
         }
     }
@@ -1480,7 +1557,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1551,7 +1628,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1589,7 +1666,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1597,6 +1674,25 @@ public class AnsiDataHandler implements DataHandler {
 
         return result;
     }
+
+    /** JAMWIKI-NEW
+     * Return a List of topic names for all non-deleted topics in the
+     * virtual wiki that match a specific topic type.
+     *
+     * @param virtualWiki The virtual wiki for the topics being queried.
+     * @param topicType1 The type of topics to return.
+     * @param topicType2 The type of topics to return.  Set to the same value
+     *  as topicType1 if only one type is needed.
+     * @param pagination A Pagination object indicating the total number of
+     *  results and offset for the results to be retrieved.
+     * @return A List of topic names for all non-deleted topics in the
+     *  virtual wiki that match a specific topic type.
+     * @throws DataAccessException Thrown if any error occurs during method execution.
+     */
+    public List<String> lookupTopicByType(String virtualWiki, int topicType1, int topicType2, Pagination pagination) throws DataAccessException{
+        throw new DataAccessException("Not Implemented!");
+    }
+    
 
     /**
      *
@@ -1625,7 +1721,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1667,7 +1763,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1709,7 +1805,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1751,7 +1847,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1840,7 +1936,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1877,7 +1973,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1912,7 +2008,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1948,7 +2044,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -1989,7 +2085,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -2018,7 +2114,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -2054,7 +2150,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -2089,7 +2185,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -2166,6 +2262,21 @@ public class AnsiDataHandler implements DataHandler {
 
     }
 
+
+    /** JAMWIKI-NEW
+     * Utility method used when importing to updating the previous topic version ID field
+     * of topic versions, as well as the current version ID field for the topic record.
+     *
+     * @param topic The topic record to update.
+     * @param topicVersionIdList A list of all topic version IDs for the topic, sorted
+     *  chronologically from oldest to newest.
+     * @throws DataAccessException Thrown if any error occurs during method execution.
+     */
+    public void orderTopicVersions(Topic topic, List<Integer> topicVersionIdList) throws DataAccessException {
+        throw new DataAccessException("Not Implemented!");
+    }
+
+
     /**
      *
      * @return
@@ -2173,6 +2284,18 @@ public class AnsiDataHandler implements DataHandler {
     protected QueryHandler queryHandler() {
         return this.queryHandler;
     }
+
+
+    /** JAMWIKI-NEW
+     * Delete all existing log entries and reload the log item table based
+     * on the most recent topic versions, uploads, and user signups.
+     *
+     * @throws DataAccessException Thrown if any error occurs during method execution.
+     */
+    public void reloadLogItems() throws DataAccessException {
+        throw new DataAccessException("Not Implemented!");
+    }
+
 
     /**
      *
@@ -2278,6 +2401,15 @@ public class AnsiDataHandler implements DataHandler {
 
     }
 
+
+    /**
+     * JAMWIKI-NEW
+     */
+    public void undeleteTopic(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
+        
+        undeleteTopic(topic, topicVersion, true);
+    }
+
     /**
      *
      */
@@ -2307,9 +2439,9 @@ public class AnsiDataHandler implements DataHandler {
         } catch (IOException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
-        } catch (ParserException e) {
-            DatabaseConnection.rollbackOnException(status, e);
-            throw new DataAccessException(e);
+        //} catch (ParserException e) {
+          //  DatabaseConnection.rollbackOnException(status, e);
+          //  throw new DataAccessException(e);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
@@ -2932,6 +3064,31 @@ public class AnsiDataHandler implements DataHandler {
 
     }
 
+    /** JAMWIKI-NEW
+     * Add or update a Topic object.  This method will add a new record if
+     * the Topic does not have a topic ID, otherwise it will perform an update.
+     * A TopicVersion object will also be created to capture the author, date,
+     * and other parameters for the topic.
+     *
+     * @param topic The Topic to add or update.  If the Topic does not have
+     *  a topic ID then a new record is created, otherwise an update is
+     *  performed.
+     * @param topicVersion A TopicVersion containing the author, date, and
+     *  other information about the version being added.  If this value is <code>null</code>
+     *  then no version is saved and no recent change record is created.
+     * @param categories A mapping of categories and their associated sort keys (if any)
+     *  for all categories that are associated with the current topic.
+     * @param links A List of all topic names that are linked to from the
+     *  current topic.  These will be passed to the search engine to create
+     *  searchable metadata.
+     * @throws DataAccessException Thrown if any error occurs during method execution.
+     * @throws WikiException Thrown if the topic information is invalid.
+     */
+    public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException{
+        writeTopic(topic, topicVersion, categories, links, true, true);
+    }
+
+
     /**
      * Commit changes to a topic (and its version) to the database or
      * filesystem.
@@ -2998,7 +3155,7 @@ public class AnsiDataHandler implements DataHandler {
 
             if (topicId <= 0) {
                 topicId = addTopic(topic, conn);
-                logger.debug("TOPIC-ID =>: " + topicId);
+                logger.info("TOPIC-ID =>: " + topicId);
                 topic.setTopicId(topicId);
             } else {
                 updateTopic(topic, conn);
@@ -3013,7 +3170,7 @@ public class AnsiDataHandler implements DataHandler {
                 topicVersionId = addTopicVersion(topicVersion, conn);
                 topicVersion.setTopicVersionId(topicVersionId);
                 String authorName = topicVersion.getAuthorDisplay();
-                logger.debug("TOPIC-VERSION-ID =>: " + topicVersionId);
+                logger.info("TOPIC-VERSION-ID =>: " + topicVersionId);
 
                 Integer authorId = topicVersion.getAuthorId();
                 if (authorId != null) {
@@ -3256,7 +3413,7 @@ public class AnsiDataHandler implements DataHandler {
                 try{
                     rs.close();
                 }catch(Exception ex){
-                    logger.warn("Could not close ResultSet!", ex);
+                    logger.warning("Could not close ResultSet!", ex);
                 }
             }
             DatabaseConnection.closeConnection(conn);
@@ -3299,7 +3456,7 @@ public class AnsiDataHandler implements DataHandler {
             conn = DatabaseConnection.getConnection();
 
             topicId = addParsedTopic(parsedTopic, conn);
-            logger.debug("PARSED-TOPIC-ID =>: " + topicId);
+            logger.info("PARSED-TOPIC-ID =>: " + topicId);
 
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {

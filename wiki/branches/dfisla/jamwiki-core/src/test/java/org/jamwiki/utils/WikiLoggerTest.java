@@ -31,8 +31,8 @@ public class WikiLoggerTest {
 	 */
 	@Test
 	public void testGetLogger() throws Throwable {
-		//WikiLogger result = Logger.getLogger("testWikiLoggerName");
-		//assertNotNull("result", result);
+		WikiLogger result = WikiLogger.getLogger("testWikiLoggerName");
+		assertNotNull("result", result);
 	}
 }
 

@@ -4,7 +4,7 @@
 	<groupId>org.jamwiki</groupId>
 	<artifactId>jamwiki</artifactId>
 	<packaging>pom</packaging>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<name>JAMWiki Super POM</name>
 	<description>JAMWiki is a Java-based Wiki engine which offers many of the features of MediaWiki.</description>
 	<url>http://www.jamwiki.org</url>
@@ -24,7 +24,7 @@
 		<connection>scm:svn:https://svn.itmatter.net/svn/itm/jamwiki/trunk</connection>
 		<developerConnection>scm:svn:https://svn.itmatter.net/svn/itm/jamwiki/trunk</developerConnection>
 		<tag>HEAD</tag>
-		<!-- <url>http://jamwiki.svn.sourceforge.net/viewvc/jamwiki/</url> -->
+		<url>https://svn.itmatter.net/svn/itm/jamwiki/trunk</url>
 	</scm>
 	<issueManagement>
 		<system>Wiki</system>
@@ -44,10 +44,20 @@
 		</license>
 	</licenses>
 	<properties>
-		<jamwiki.version>0.8.0-SNAPSHOT</jamwiki.version>
+		<jamwiki.version>0.9.0-SNAPSHOT</jamwiki.version>
+		<dependency.spring.version>3.0.0.RC2</dependency.spring.version>
+		<dependency.spring.security.version>3.0.0.RC1</dependency.spring.security.version>
+		<!--
 		<dependency.spring.version>2.5.6</dependency.spring.version>
 		<dependency.spring.security.version>2.0.4</dependency.spring.security.version>
+		-->
 	</properties>
+	<repositories>
+		<repository>
+			<id>Springframework milestone</id>
+			<url>http://maven.springframework.org/milestone</url>
+		</repository>
+	</repositories>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -55,6 +65,13 @@
 				<artifactId>jamwiki-core</artifactId>
 				<version>${jamwiki.version}</version>
 			</dependency>
+			<!-- <dependency>
+				<groupId>org.jamwiki</groupId>
+				<artifactId>jamwiki-core</artifactId>
+				<scope>test</scope>
+				<classifier>tests</classifier>
+				<version>${jamwiki.version}</version>
+			</dependency> -->
 			<dependency>
 				<groupId>org.jamwiki</groupId>
 				<artifactId>jamwiki-web</artifactId>
@@ -76,9 +93,9 @@
 				<version>1.1.0</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.ldap</groupId>
-				<artifactId>spring-ldap</artifactId>
-				<version>1.2.1</version>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-config</artifactId>
+				<version>${dependency.spring.security.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
@@ -87,7 +104,17 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-ldap</artifactId>
+				<version>${dependency.spring.security.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-taglibs</artifactId>
+				<version>${dependency.spring.security.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-web</artifactId>
 				<version>${dependency.spring.security.version}</version>
 			</dependency>
 			<dependency>
@@ -155,23 +182,23 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.5</version>
+				<version>4.7</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
-				<artifactId>ehcache</artifactId>
-				<version>1.6.0-beta3</version>
+				<artifactId>ehcache-core</artifactId>
+				<version>1.7.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
-				<version>2.4.1</version>
+				<version>3.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-highlighter</artifactId>
-				<version>2.4.1</version>
+				<version>3.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>info.bliki.wiki</groupId>
@@ -252,6 +279,7 @@
 		 -->
 		<developer>
 			<id>dfisla</id>
+			<email>dfisla at itmatter.com</email>
 			<name>Daniel Fisla</name>
 			<roles>
 				<role>project lead</role>

@@ -26,7 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jamwiki.WikiBase;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -36,7 +36,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class JAMWikiFilter implements Filter {
 
-	private static final Logger logger = Logger.getLogger(JAMWikiFilter.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiFilter.class.getName());
 	private String encoding = "UTF-8";
 	private FilterConfig config = null;
 
@@ -53,6 +53,9 @@ public class JAMWikiFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		request.setCharacterEncoding("UTF-8");
+		if (WikiUtil.WEBAPP_CONTEXT_PATH == null && request instanceof HttpServletRequest) {
+			WikiUtil.WEBAPP_CONTEXT_PATH = ((HttpServletRequest)request).getContextPath();
+		}
 		if (redirectNeeded(request, response)) {
 			return;
 		}

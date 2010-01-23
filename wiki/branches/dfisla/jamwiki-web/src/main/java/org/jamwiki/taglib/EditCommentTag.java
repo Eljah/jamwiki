@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -36,7 +36,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class EditCommentTag extends TagSupport {
 
-	private static final Logger logger = Logger.getLogger(EditCommentTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(EditCommentTag.class.getName());
 	private static final Pattern SECTION_NAME_PATTERN = Pattern.compile("(/\\*(.+?)\\*/)(.*)");
 	private static final String CSS_SECTION_COMMENT = "section-link";
 	private String comment = null;
@@ -50,7 +50,7 @@ public class EditCommentTag extends TagSupport {
 		try {
 			this.pageContext.getOut().print(result);
 		} catch (IOException e) {
-			logger.fatal("Failure while building edit comment for comment " + this.comment, e);
+			logger.severe("Failure while building edit comment for comment " + this.comment, e);
 			throw new JspException(e);
 		}
 		return EVAL_PAGE;
@@ -104,12 +104,12 @@ public class EditCommentTag extends TagSupport {
 		HttpServletRequest request = (HttpServletRequest)this.pageContext.getRequest();
 		String virtualWiki = WikiUtil.getVirtualWikiFromRequest(request);
 		WikiLink wikiLink = LinkUtil.parseWikiLink(this.topic + "#" + sectionName);
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		result.append("<span class=\"").append(CSS_SECTION_COMMENT).append("\">");
 		try {
 			result.append(LinkUtil.buildInternalLinkHtml(request.getContextPath(), virtualWiki, wikiLink, "&rarr;", null, null, false));
 		} catch (DataAccessException e) {
-			logger.fatal("Failure while building edit comment for comment " + this.comment, e);
+			logger.severe("Failure while building edit comment for comment " + this.comment, e);
 			throw new JspException(e);
 		}
 		result.append(StringEscapeUtils.escapeXml(sectionName) + (!StringUtils.isBlank(additionalComment) ? " -" : ""));

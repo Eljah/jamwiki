@@ -27,7 +27,7 @@ import org.apache.commons.lang.math.NumberUtils;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.jamwiki.utils.SortedProperties;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.Utilities;
 
 /**
@@ -36,7 +36,7 @@ import org.jamwiki.utils.Utilities;
  * <code>jamwiki.properties</code> file.
  */
 public class Environment {
-	private static final Logger logger = Logger.getLogger(Environment.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(Environment.class.getName());
 
 	public static final String PROP_BASE_COOKIE_EXPIRE = "cookie-expire";
 	public static final String PROP_BASE_DEFAULT_TOPIC = "default-topic";
@@ -82,6 +82,7 @@ public class Environment {
 	public static final String PROP_FILE_SERVER_URL = "file-server-url";
 	public static final String PROP_FILE_WHITELIST = "file-whitelist";
 	public static final String PROP_IMAGE_RESIZE_INCREMENT = "image-resize-increment";
+	public static final String PROP_MAX_TOPIC_VERSION_EXPORT = "max-topic-version-export";
 	public static final String PROP_PARSER_ALLOW_HTML = "allowHTML";
 	public static final String PROP_PARSER_ALLOW_JAVASCRIPT = "allow-javascript";
 	public static final String PROP_PARSER_ALLOW_TEMPLATES = "allow-templates";
@@ -91,6 +92,8 @@ public class Environment {
 	public static final String PROP_PARSER_TOC = "allow-toc";
 	public static final String PROP_PARSER_TOC_DEPTH = "toc-depth";
         public static final String PROP_PARSER_TIME_LIMIT = "parser-time-limit";
+        public static final String PROP_PARSER_PARSE_SIDEBAR = "parser-parse-sidebar";
+        public static final String PROP_PARSER_PARSE_COORD = "parser-parse-coord";
 	public static final String PROP_PATTERN_INVALID_ROLE_NAME = "pattern-role-name-invalid";
 	public static final String PROP_PATTERN_INVALID_TOPIC_NAME = "pattern-topic-name-invalid";
 	public static final String PROP_PATTERN_VALID_USER_LOGIN = "pattern-login-valid";
@@ -99,6 +102,7 @@ public class Environment {
 	public static final String PROP_RSS_ALLOWED = "rss-allowed";
 	public static final String PROP_RSS_TITLE = "rss-title";
 	public static final String PROP_SERVER_URL = "server-url";
+	public static final String PROP_SITE_NAME = "site-name";
 	public static final String PROP_TOPIC_EDITOR = "default-editor";
 	// FIXME - this property can be removed once the abilitity to upgrade to 0.6.0 is removed
 	public static final String PROP_TOPIC_FORCE_USERNAME = "force-username";
@@ -124,12 +128,12 @@ public class Environment {
 	 */
 	private Environment() {
 		initDefaultProperties();
-		logger.debug("Default properties initialized: " + defaults.toString());
+		logger.fine("Default properties initialized: " + defaults.toString());
 		props = loadProperties(PROPERTY_FILE_NAME, defaults);
 		if ("true".equals(System.getProperty("jamwiki.override.file.properties"))) {
 			overrideFromSystemProperties();
 		}
-		logger.debug("JAMWiki properties initialized: " + props.toString());
+		logger.fine("JAMWiki properties initialized: " + props.toString());
 	}
 
 	/**
@@ -163,7 +167,6 @@ public class Environment {
 	 *  be located.
 	 */
 	private static File findProperties(String filename) throws FileNotFoundException {
-                logger.debug("FIND-PROPERTIES-FILE =>: " + filename);
 		// read in properties file
 		File file = new File(filename);
 		if (file.exists()) {
@@ -223,6 +226,7 @@ public class Environment {
 		defaults.setProperty(PROP_FILE_SERVER_URL, "");
 		defaults.setProperty(PROP_FILE_WHITELIST, "bmp,gif,jpeg,jpg,pdf,png,properties,svg,txt,zip");
 		defaults.setProperty(PROP_IMAGE_RESIZE_INCREMENT, "100");
+		defaults.setProperty(PROP_MAX_TOPIC_VERSION_EXPORT, "200");
 		defaults.setProperty(PROP_PARSER_ALLOW_HTML, Boolean.TRUE.toString());
 		defaults.setProperty(PROP_PARSER_ALLOW_JAVASCRIPT, Boolean.FALSE.toString());
 		defaults.setProperty(PROP_PARSER_ALLOW_TEMPLATES, Boolean.TRUE.toString());
@@ -231,6 +235,8 @@ public class Environment {
 		defaults.setProperty(PROP_PARSER_SIGNATURE_USER_PATTERN, "[[{0}|{4}]]");
 		defaults.setProperty(PROP_PARSER_TOC, Boolean.TRUE.toString());
 		defaults.setProperty(PROP_PARSER_TOC_DEPTH, "5");
+                defaults.setProperty(PROP_PARSER_PARSE_SIDEBAR, Boolean.FALSE.toString());
+                defaults.setProperty(PROP_PARSER_PARSE_COORD, Boolean.FALSE.toString());
                 defaults.setProperty(PROP_PARSER_TIME_LIMIT, "20000");
 		defaults.setProperty(PROP_PATTERN_INVALID_ROLE_NAME, "([A-Za-z0-9_]+)");
 		defaults.setProperty(PROP_PATTERN_INVALID_TOPIC_NAME, "([\\n\\r\\\\<>\\[\\]?#]+)");
@@ -240,6 +246,7 @@ public class Environment {
 		defaults.setProperty(PROP_RSS_ALLOWED, Boolean.TRUE.toString());
 		defaults.setProperty(PROP_RSS_TITLE, "Wiki Recent Changes");
 		defaults.setProperty(PROP_SERVER_URL, "");
+		defaults.setProperty(PROP_SITE_NAME, "JAMWiki");
 		// FIXME - hard coding
 		defaults.setProperty(PROP_TOPIC_EDITOR, "toolbar");
 		defaults.setProperty(PROP_TOPIC_SPAM_FILTER, Boolean.TRUE.toString());
@@ -279,7 +286,7 @@ public class Environment {
 	public static int getIntValue(String name) {
 		int value = NumberUtils.toInt(getValue(name), -1);
 		if (value == -1) {
-			logger.warn("Invalid integer property " + name + " with value " + value);
+			logger.warning("Invalid integer property " + name + " with value " + value);
 		}
 		// FIXME - should this otherwise indicate an invalid property?
 		return value;
@@ -294,7 +301,7 @@ public class Environment {
 	public static long getLongValue(String name) {
 		long value = NumberUtils.toLong(getValue(name), -1);
 		if (value == -1) {
-			logger.warn("Invalid long property " + name + " with value " + value);
+			logger.warning("Invalid long property " + name + " with value " + value);
 		}
 		// FIXME - should this otherwise indicate an invalid property?
 		return value;
@@ -339,16 +346,16 @@ public class Environment {
 		try {
 			file = findProperties(propertyFile);
 			if (file == null) {
-				logger.debug("Property file " + propertyFile + " does not exist");
+				logger.warning("Property file " + propertyFile + " does not exist");
 			} else if (!file.exists()) {
-				logger.debug("Property file " + file.getPath() + " does not exist");
+				logger.warning("Property file " + file.getPath() + " does not exist");
 			} else {
-				logger.debug("Loading properties from " + file.getPath());
+				logger.config("Loading properties from " + file.getPath());
 				fis = new FileInputStream(file);
 				properties.load(fis);
 			}
 		} catch (IOException e) {
-			logger.fatal("Failure while trying to load properties file " + file.getPath(), e);
+			logger.severe("Failure while trying to load properties file " + file.getPath(), e);
 		} finally {
 			if (fis != null) {
 				try {
@@ -370,7 +377,7 @@ public class Environment {
 		try {
 			return "/" + Utilities.getWebappRoot().getName() + "/upload/";
 		} catch (FileNotFoundException e) {
-			logger.fatal("Failure while trying to retrieve default file upload directory", e);
+			logger.severe("Failure while trying to retrieve default file upload directory", e);
 		}
 		return "";
 	}
@@ -384,7 +391,7 @@ public class Environment {
 		try {
 			return new File(Utilities.getWebappRoot(), "upload").getPath();
 		} catch (FileNotFoundException e) {
-			logger.fatal("Failure while trying to retrieve default file upload directory", e);
+			logger.severe("Failure while trying to retrieve default file upload directory", e);
 		}
 		return "";
 	}
@@ -400,7 +407,6 @@ public class Environment {
 	 *  the file cannot be found.
 	 */
 	private static File retrievePropertyFile(String filename) {
-                logger.debug("RETRIEVE-PROPERTIES-FILE =>: " + filename);
 		File file = null;
 		try {
 			file = Utilities.getClassLoaderFile(filename);
@@ -412,7 +418,7 @@ public class Environment {
 			file = new File(Utilities.getClassLoaderRoot(), filename);
 			return file;
 		} catch (FileNotFoundException e) {
-			logger.fatal("Error while searching for resource " + filename, e);
+			logger.severe("Error while searching for resource " + filename, e);
 		}
 		return null;
 	}

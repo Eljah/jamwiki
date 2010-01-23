@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -34,7 +34,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class LinkTag extends BodyTagSupport {
 
-	private static final Logger logger = Logger.getLogger(LinkTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(LinkTag.class.getName());
 	private String style = null;
 	private String target = null;
 	private String text = null;
@@ -67,10 +67,10 @@ public class LinkTag extends BodyTagSupport {
 			}
 			this.pageContext.getOut().print(url);
 		} catch (DataAccessException e) {
-			logger.fatal("Failure while building url " + url + " with value " + this.value + " and text " + this.text, e);
+			logger.severe("Failure while building url " + url + " with value " + this.value + " and text " + this.text, e);
 			throw new JspException(e);
 		} catch (IOException e) {
-			logger.fatal("Failure while building url " + url + " with value " + this.value + " and text " + this.text, e);
+			logger.severe("Failure while building url " + url + " with value " + this.value + " and text " + this.text, e);
 			throw new JspException(e);
 		} finally {
 			this.queryParams = "";

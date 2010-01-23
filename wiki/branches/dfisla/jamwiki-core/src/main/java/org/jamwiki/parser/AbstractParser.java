@@ -16,7 +16,7 @@
  */
 package org.jamwiki.parser;
 
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Abstract class to be used when implementing new parsers.  New parsers
@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractParser {
 
-	private static final Logger logger = Logger.getLogger(AbstractParser.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(AbstractParser.class.getName());
 	/** Parser configuration information. */
 	protected ParserInput parserInput = null;
 

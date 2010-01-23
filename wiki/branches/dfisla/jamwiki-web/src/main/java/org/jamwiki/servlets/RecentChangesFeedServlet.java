@@ -35,7 +35,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.RecentChange;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.servlet.ModelAndView;
@@ -58,7 +58,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
  */
 public class RecentChangesFeedServlet extends AbstractController {
 
-	private static final Logger logger = Logger.getLogger(RecentChangesFeedServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(RecentChangesFeedServlet.class.getName());
 	private static final String MIME_TYPE = "application/xml";
 	private static final String FEED_ENCODING = "UTF-8";
 	private static final String DEFAULT_FEED_TYPE = "rss_2.0";
@@ -136,7 +136,7 @@ public class RecentChangesFeedServlet extends AbstractController {
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		try {
 			String feedType = ServletRequestUtils.getStringParameter(request, FEED_TYPE, defaultFeedType);
-			logger.debug("Serving xml feed of type " + feedType);
+			logger.finer("Serving xml feed of type " + feedType);
 			SyndFeed feed = getFeed(request);
 			feed.setFeedType(feedType);
 			response.setContentType(MIME_TYPE);
@@ -144,7 +144,7 @@ public class RecentChangesFeedServlet extends AbstractController {
 			SyndFeedOutput output = new SyndFeedOutput();
 			output.output(feed, response.getWriter());
 		} catch (Exception e) {
-			logger.fatal("Could not generate feed: " + e.getMessage(), e);
+			logger.severe("Could not generate feed: " + e.getMessage(), e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not generate feed: "
 					+ e.getMessage());
 		}
@@ -178,7 +178,8 @@ public class RecentChangesFeedServlet extends AbstractController {
 	private List<SyndEntry> getFeedEntries(List<RecentChange> changes, boolean includeMinorEdits, boolean linkToVersion, String feedURL) {
 		List<SyndEntry> entries = new ArrayList<SyndEntry>();
 		for (RecentChange change : changes) {
-			if (includeMinorEdits || (!change.getMinor())) {
+			// FIXME - add support for log item changes
+			if (!StringUtils.isBlank(change.getTopicName()) && (includeMinorEdits || !change.getMinor())) {
 				entries.add(getFeedEntry(change, linkToVersion, feedURL));
 			}
 		}

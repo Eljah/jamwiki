@@ -26,7 +26,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -35,7 +35,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class WikiPageInfo {
 
-	private static final Logger logger = Logger.getLogger(WikiPageInfo.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiPageInfo.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_TOPIC = "topic.jsp";
 	private boolean admin = false;
@@ -55,7 +55,7 @@ public class WikiPageInfo {
 	protected WikiPageInfo(HttpServletRequest request) {
 		this.virtualWikiName = WikiUtil.getVirtualWikiFromURI(request);
 		if (this.virtualWikiName == null) {
-			logger.fatal("No virtual wiki available for page request " + request.getRequestURI());
+			logger.severe("No virtual wiki available for page request " + request.getRequestURI());
 			this.virtualWikiName = WikiBase.DEFAULT_VWIKI;
 		}
 	}
@@ -215,6 +215,17 @@ public class WikiPageInfo {
 	 */
 	public String getRSSTitle() {
 		return Environment.getValue("rss-title");
+	}
+
+	/**
+	 * Return the property value set for the site name.  This value is appended to
+	 * page titles and used in XML exports.
+	 *
+	 * @return The property value corresponding to the configured name for the
+	 *  wiki.  This value is configurable through the Special:Admin interface.
+	 */
+	public String getSiteName() {
+		return Environment.getValue(Environment.PROP_SITE_NAME);
 	}
 
 	/**

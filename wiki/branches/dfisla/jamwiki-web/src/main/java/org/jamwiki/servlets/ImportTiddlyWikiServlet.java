@@ -26,11 +26,11 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.authentication.WikiUserDetails;
-import org.jamwiki.model.Role;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.TiddlyWikiParser;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -41,7 +41,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 
 
-	private static final Logger logger = Logger.getLogger(ImportTiddlyWikiServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(ImportTiddlyWikiServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_IMPORT = "importtiddly.jsp";
         
@@ -72,7 +72,7 @@ public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 		Iterator iterator = ServletUtil.processMultipartRequest(request, Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE));
 		WikiUserDetails userDetails = ServletUtil.currentUserDetails();
 		WikiUser user = ServletUtil.currentWikiUser();
-		if (userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
+		if (userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS)) {
 			// FIXME - setting the user to null may not be necessary, but it is
 			// consistent with how the code behaved when ServletUtil.currentUserDetails()
 			// returned null for non-logged-in users

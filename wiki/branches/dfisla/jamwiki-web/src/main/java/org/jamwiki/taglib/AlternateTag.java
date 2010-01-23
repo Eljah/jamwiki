@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Utility tag for alternating between two values.  This tag takes as
@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class AlternateTag extends TagSupport {
 
-	private static final Logger logger = Logger.getLogger(AlternateTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(AlternateTag.class.getName());
 	private static final String ATTRIBUTE_ROOT_NAME = "org.jamwiki.taglib.AlternateTag";
 	private String value1 = null;
 	private String value2 = null;
@@ -58,7 +58,7 @@ public class AlternateTag extends TagSupport {
 		try {
 			this.pageContext.getOut().print(output);
 		} catch (IOException e) {
-			logger.fatal("Failure in alternate tag for " + this.value1 + " / " + this.value2 + " / " + this.attributeName, e);
+			logger.severe("Failure in alternate tag for " + this.value1 + " / " + this.value2 + " / " + this.attributeName, e);
 			throw new JspException(e);
 		}
 		return EVAL_PAGE;

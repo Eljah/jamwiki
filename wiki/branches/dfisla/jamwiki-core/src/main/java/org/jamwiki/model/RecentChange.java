@@ -17,17 +17,20 @@
 package org.jamwiki.model;
 
 import java.sql.Timestamp;
-import org.apache.log4j.Logger;
+import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.jamwiki.WikiMessage;
+import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a Wiki recent change.
  */
 public class RecentChange {
 
-	private static final Logger logger = Logger.getLogger(RecentChange.class.getName());
 	private Integer authorId = null;
 	private String authorName = null;
-	private int charactersChanged = 0;
+	private Integer charactersChanged = null;
 	private String editComment = null;
 	private Timestamp editDate = null;
 	private int editType = -1;
@@ -92,9 +95,12 @@ public class RecentChange {
 	 *
 	 */
 	public String getChangeTypeNotification() {
-		StringBuffer changeTypeNotification = new StringBuffer();
+		StringBuilder changeTypeNotification = new StringBuilder();
 		if (this.previousTopicVersionId == null) {
 			changeTypeNotification.append('n');
+		}
+		if (this.editType == -1) {
+			return "";
 		}
 		if (this.editType == TopicVersion.EDIT_MINOR) {
 			changeTypeNotification.append('m');

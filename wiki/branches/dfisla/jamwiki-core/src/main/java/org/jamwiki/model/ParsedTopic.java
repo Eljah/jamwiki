@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  *
@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public class ParsedTopic extends Topic {
 
-    private static final Logger logger = Logger.getLogger(ParsedTopic.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(ParsedTopic.class.getName());
     public int num;
     public int offset;
     public boolean topicImage;
@@ -153,14 +153,14 @@ public class ParsedTopic extends Topic {
                     //logger.debug("CONTENT-BUFFER: " + line);
                     parsedTopicContentBuffer.append(line);
                 } else {
-                    logger.error("UNKNOWN-PARSEDTOPIC-LINE: " + line);
+                    logger.severe("UNKNOWN-PARSEDTOPIC-LINE: " + line);
                 }
             }
 
             this.topicContent = parsedTopicContentBuffer.toString();
 
         } catch (Exception ex) {
-            logger.warn(ex);
+            logger.fine(ex.getMessage(), ex);
             throw new WikiException(new WikiMessage("Could not parse object from data."), ex);
         }
 

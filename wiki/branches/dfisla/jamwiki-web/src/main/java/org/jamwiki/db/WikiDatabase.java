@@ -39,6 +39,7 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
@@ -46,7 +47,8 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Encryption;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
 
@@ -58,7 +60,7 @@ public class WikiDatabase {
 
     private static String CONNECTION_VALIDATION_QUERY = null;
     private static String EXISTENCE_VALIDATION_QUERY = null;
-    private static final Logger logger = Logger.getLogger(WikiDatabase.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(WikiDatabase.class.getName());
     private static final String[][] JAMWIKI_DB_TABLE_INFO = {
         {"jam_virtual_wiki", "virtual_wiki_id"},
         {"jam_users", null},
@@ -120,9 +122,9 @@ public class WikiDatabase {
                 csvFile = new File(csvDirectory, exportTableName + ".csv");
                 if (csvFile.exists()) {
                     if (csvFile.delete()) {
-                        logger.debug("Deleted existing CSV file: " + csvFile.getPath());
+                        logger.info("Deleted existing CSV file: " + csvFile.getPath());
                     } else {
-                        logger.debug("Could not delete existing CSV file: " + csvFile.getPath());
+                        logger.warning("Could not delete existing CSV file: " + csvFile.getPath());
                     }
                 }
                 // create the CSV files
@@ -158,7 +160,7 @@ public class WikiDatabase {
             // use existing DataHandler
             return WikiBase.getDataHandler();
         }
-        logger.debug("Using NEW data handler: " + handlerClassName);
+        logger.fine("Using NEW data handler: " + handlerClassName);
         Class clazz = ClassUtils.getClass(handlerClassName);
         Class[] parameterTypes = new Class[0];
         Constructor constructor = clazz.getConstructor(parameterTypes);
@@ -188,7 +190,7 @@ public class WikiDatabase {
         if (newDataHandler instanceof AnsiDataHandler) {
             AnsiDataHandler dataHandler = (AnsiDataHandler) newDataHandler;
             newQueryHandler = dataHandler.queryHandler();
-            logger.debug("Using NEW query handler: " + newQueryHandler.getClass().getName());
+            logger.fine("Using NEW query handler: " + newQueryHandler.getClass().getName());
         } else {
             newQueryHandler = queryHandler();
         }
@@ -219,10 +221,10 @@ public class WikiDatabase {
                 int topicIdColumn = 0;
                 int currentVersionColumn = 0;
                 int maxIndex = WikiDatabase.retrieveMaximumTableId(JAMWIKI_DB_TABLE_INFO[i][0], JAMWIKI_DB_TABLE_INFO[i][1]);
-                StringBuffer insert;
+				StringBuilder insert;
                 ResultSetMetaData md;
-                StringBuffer values;
-                StringBuffer select;
+				StringBuilder values;
+				StringBuilder select;
                 String columnName;
                 Integer topicId;
                 Integer currentVersionId;
@@ -230,19 +232,19 @@ public class WikiDatabase {
                 // cycle through at most RECORDS_PER_CYCLE records at a time to avoid blowing up the system
                 int RECORDS_PER_CYCLE = 25;
                 for (int j = 0; j <= maxIndex; j += RECORDS_PER_CYCLE) {
-                    select = new StringBuffer("SELECT * FROM ").append(JAMWIKI_DB_TABLE_INFO[i][0]);
+					select = new StringBuilder("SELECT * FROM ").append(JAMWIKI_DB_TABLE_INFO[i][0]);
                     if (!StringUtils.isBlank(JAMWIKI_DB_TABLE_INFO[i][1])) {
                         select.append(" WHERE ").append(JAMWIKI_DB_TABLE_INFO[i][1]).append(" > ").append(j);
                         select.append(" AND ").append(JAMWIKI_DB_TABLE_INFO[i][1]).append(" <= ").append(j + RECORDS_PER_CYCLE);
                         select.append(" ORDER BY ").append(JAMWIKI_DB_TABLE_INFO[i][1]);
                     }
-                    insert = new StringBuffer();
+					insert = new StringBuilder();
                     stmt = from.createStatement();
-                    logger.debug(select.toString());
+					logger.info(select.toString());
                     rs = stmt.executeQuery(select.toString());
                     md = rs.getMetaData();
                     insert.append("INSERT INTO ").append(JAMWIKI_DB_TABLE_INFO[i][0]).append('(');
-                    values = new StringBuffer();
+					values = new StringBuilder();
                     for (int k = 1; k <= md.getColumnCount(); k++) {
                         if (k > 1) {
                             insert.append(',');
@@ -264,7 +266,7 @@ public class WikiDatabase {
                         values.append('?');
                     }
                     insert.append(") VALUES (").append(values).append(')');
-                    logger.debug(insert.toString());
+					logger.info(insert.toString());
                     PreparedStatement insertStmt = conn.prepareStatement(insert.toString());
                     while (rs.next()) {
                         topicId = null;
@@ -299,7 +301,7 @@ public class WikiDatabase {
             }
             // update the jam_topic.current_version_id field that we had to leave blank on initial insert
             String updateSql = "UPDATE jam_topic SET current_version_id = ? WHERE topic_id = ?";
-            logger.debug(updateSql);
+			logger.info(updateSql);
             PreparedStatement update = conn.prepareStatement(updateSql);
             for (Integer topicId : topicVersions.keySet()) {
                 Integer topicVersionId = topicVersions.get(topicId);
@@ -308,19 +310,18 @@ public class WikiDatabase {
                 update.executeUpdate();
             }
         } catch (Exception e) {
-            logger.fatal("Error attempting to migrate the database", e);
+            logger.severe("Error attempting to migrate the database", e);
             errors.add(new WikiMessage("error.unknown", e.getMessage()));
             try {
                 newQueryHandler.dropTables(conn);
             } catch (Exception ex) {
-                logger.warn("Unable to drop tables in NEW database following failed migration", ex);
+                logger.warning("Unable to drop tables in NEW database following failed migration", ex);
             }
         } finally {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException e) {
-                }
+				} catch (SQLException e) {}
             }
             if (from != null) {
                 DatabaseConnection.closeConnection(from, stmt, rs);
@@ -354,7 +355,7 @@ public class WikiDatabase {
             // this clears out any existing connection pool, so that a new one will be created on first access
             DatabaseConnection.closeConnectionPool();
         } catch (Exception e) {
-            logger.fatal("Unable to initialize database", e);
+            logger.severe("Unable to initialize database", e);
         }
     }
 
@@ -375,8 +376,7 @@ public class WikiDatabase {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ex) {
-                }
+				} catch (SQLException ex) {}
             }
             errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
             return null;
@@ -388,29 +388,27 @@ public class WikiDatabase {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ex) {
-                }
+				} catch (SQLException ex) {}
             }
             return null;
         } catch (Exception ex) {
             // we expect this exception as the JAMWiki tables don't exist
-            logger.debug("NEW Database does not contain any JAMWiki instance");
+            logger.fine("NEW Database does not contain any JAMWiki instance");
         }
         try {
             newQueryHandler.createTables(conn);
         } catch (Exception e) {
-            logger.fatal("Error attempting to migrate the database", e);
+            logger.severe("Error attempting to migrate the database", e);
             errors.add(new WikiMessage("error.unknown", e.getMessage()));
             try {
                 newQueryHandler.dropTables(conn);
             } catch (Exception ex) {
-                logger.warn("Unable to drop tables in NEW database following failed migration", ex);
+                logger.warning("Unable to drop tables in NEW database following failed migration", ex);
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ex) {
-                }
+				} catch (SQLException ex) {}
             }
         }
         return conn;
@@ -420,7 +418,7 @@ public class WikiDatabase {
         try {
             DatabaseConnection.closeConnectionPool();
         } catch (Exception e) {
-            logger.fatal("Unable to close the connection pool on shutdown", e);
+            logger.severe("Unable to close the connection pool on shutdown", e);
         }
     }
 
@@ -513,33 +511,30 @@ public class WikiDatabase {
             WikiDatabase.setupSpecialPages(locale, user);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
-            logger.fatal("Unable to set up database tables", e);
+            logger.severe("Unable to set up database tables", e);
             // clean up anything that might have been created
             try {
                 Connection conn = DatabaseConnection.getConnection();
                 WikiDatabase.queryHandler().dropTables(conn);
-            } catch (Exception e2) {
-            }
+			} catch (Exception e2) {}
             throw new DataAccessException(e);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
-            logger.fatal("Unable to set up database tables", e);
+            logger.severe("Unable to set up database tables", e);
             // clean up anything that might have been created
             try {
                 Connection conn = DatabaseConnection.getConnection();
                 WikiDatabase.queryHandler().dropTables(conn);
-            } catch (Exception e2) {
-            }
+			} catch (Exception e2) {}
             throw e;
         } catch (WikiException e) {
             DatabaseConnection.rollbackOnException(status, e);
-            logger.fatal("Unable to set up database tables", e);
+            logger.severe("Unable to set up database tables", e);
             // clean up anything that might have been created
             try {
                 Connection conn = DatabaseConnection.getConnection();
                 WikiDatabase.queryHandler().dropTables(conn);
-            } catch (Exception e2) {
-            }
+			} catch (Exception e2) {}
             throw e;
         }
         DatabaseConnection.commit(status);
@@ -553,14 +548,14 @@ public class WikiDatabase {
             throw new IllegalArgumentException("Cannot pass null or anonymous WikiUser object to setupAdminUser");
         }
         if (WikiBase.getDataHandler().lookupWikiUser(user.getUserId()) != null) {
-            logger.warn("Admin user already exists");
+            logger.warning("Admin user already exists");
         }
         WikiBase.getDataHandler().writeWikiUser(user, username, encryptedPassword);
         List<String> roles = new ArrayList<String>();
-        roles.add(Role.ROLE_ADMIN.getAuthority());
-        roles.add(Role.ROLE_IMPORT.getAuthority());
-        roles.add(Role.ROLE_SYSADMIN.getAuthority());
-        roles.add(Role.ROLE_TRANSLATE.getAuthority());
+		roles.add(RoleImpl.ROLE_ADMIN.getAuthority());
+		roles.add(RoleImpl.ROLE_IMPORT.getAuthority());
+		roles.add(RoleImpl.ROLE_SYSADMIN.getAuthority());
+		roles.add(RoleImpl.ROLE_TRANSLATE.getAuthority());
         WikiBase.getDataHandler().writeRoleMapUser(user.getUsername(), roles);
     }
 
@@ -600,10 +595,10 @@ public class WikiDatabase {
         group.setDescription("All non-logged in users are automatically assigned to the anonymous group.");
         WikiBase.getDataHandler().writeWikiGroup(group);
         List<String> anonymousRoles = new ArrayList<String>();
-        anonymousRoles.add(Role.ROLE_EDIT_EXISTING.getAuthority());
-        anonymousRoles.add(Role.ROLE_EDIT_NEW.getAuthority());
-        anonymousRoles.add(Role.ROLE_UPLOAD.getAuthority());
-        anonymousRoles.add(Role.ROLE_VIEW.getAuthority());
+		anonymousRoles.add(RoleImpl.ROLE_EDIT_EXISTING.getAuthority());
+		anonymousRoles.add(RoleImpl.ROLE_EDIT_NEW.getAuthority());
+		anonymousRoles.add(RoleImpl.ROLE_UPLOAD.getAuthority());
+		anonymousRoles.add(RoleImpl.ROLE_VIEW.getAuthority());
         WikiBase.getDataHandler().writeRoleMapGroup(group.getGroupId(), anonymousRoles);
         group = new WikiGroup();
         group.setName(WikiGroup.GROUP_REGISTERED_USER);
@@ -611,11 +606,11 @@ public class WikiDatabase {
         group.setDescription("All logged in users are automatically assigned to the registered user group.");
         WikiBase.getDataHandler().writeWikiGroup(group);
         List<String> userRoles = new ArrayList<String>();
-        userRoles.add(Role.ROLE_EDIT_EXISTING.getAuthority());
-        userRoles.add(Role.ROLE_EDIT_NEW.getAuthority());
-        userRoles.add(Role.ROLE_MOVE.getAuthority());
-        userRoles.add(Role.ROLE_UPLOAD.getAuthority());
-        userRoles.add(Role.ROLE_VIEW.getAuthority());
+		userRoles.add(RoleImpl.ROLE_EDIT_EXISTING.getAuthority());
+		userRoles.add(RoleImpl.ROLE_EDIT_NEW.getAuthority());
+		userRoles.add(RoleImpl.ROLE_MOVE.getAuthority());
+		userRoles.add(RoleImpl.ROLE_UPLOAD.getAuthority());
+		userRoles.add(RoleImpl.ROLE_VIEW.getAuthority());
         WikiBase.getDataHandler().writeRoleMapGroup(group.getGroupId(), userRoles);
     }
 
@@ -623,39 +618,39 @@ public class WikiDatabase {
      *
      */
     protected static void setupRoles() throws DataAccessException, WikiException {
-        Role role = Role.ROLE_ADMIN;
+		Role role = RoleImpl.ROLE_ADMIN;
         // FIXME - use message key
         role.setDescription("Provides the ability to perform wiki maintenance tasks not available to normal users.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_EDIT_EXISTING;
+		role = RoleImpl.ROLE_EDIT_EXISTING;
         // FIXME - use message key
         role.setDescription("Allows a user to edit an existing topic.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_EDIT_NEW;
+		role = RoleImpl.ROLE_EDIT_NEW;
         // FIXME - use message key
         role.setDescription("Allows a user to create a new topic.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_IMPORT;
+		role = RoleImpl.ROLE_IMPORT;
         // FIXME - use message key
         role.setDescription("Allows a user to import data from a file.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_MOVE;
+		role = RoleImpl.ROLE_MOVE;
         // FIXME - use message key
         role.setDescription("Allows a user to move a topic to a different name.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_SYSADMIN;
+		role = RoleImpl.ROLE_SYSADMIN;
         // FIXME - use message key
         role.setDescription("Allows access to set database parameters, modify parser settings, and set other wiki system settings.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_TRANSLATE;
+		role = RoleImpl.ROLE_TRANSLATE;
         // FIXME - use message key
         role.setDescription("Allows access to the translation tool used for modifying the values of message keys used to display text on the wiki.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_UPLOAD;
+		role = RoleImpl.ROLE_UPLOAD;
         // FIXME - use message key
         role.setDescription("Allows a user to upload a file to the wiki.");
         WikiBase.getDataHandler().writeRole(role, false);
-        role = Role.ROLE_VIEW;
+		role = RoleImpl.ROLE_VIEW;
         // FIXME - use message key
         role.setDescription("Allows a user to view topics on the wiki.");
         WikiBase.getDataHandler().writeRole(role, false);

@@ -16,6 +16,7 @@ import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.apache.log4j.Logger;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.parser.jflex.JAMWikiSpliceProcessor;
 import org.jamwiki.parser.jflex.JFlexLexer;
@@ -49,6 +50,8 @@ public class BlikiProxyParser extends AbstractParser {
     private static final Pattern REDIRECT_PATTERN = Pattern.compile("#REDIRECT[ ]+\\[\\[([^\\n\\r\\]]+)\\]\\]", Pattern.CASE_INSENSITIVE);
     /** Pattern to detect sidebar */
     private static final Pattern SIDEBAR_PATTERN = Pattern.compile("\\{\\{.*sidebar+\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /** Pattern to detect co-ordinates */
+    private static final Pattern COORDINATES_PATTERN = Pattern.compile("\\{\\{coord.*\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     //private static final Pattern IFERROR_PATTERN = Pattern.compile("\\(?\\s*\\{\\{.*iferror+.*\\}\\}\\s*\\)?", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     //private static final Pattern IFERROR_2_PATTERN = Pattern.compile("\\(\\s*\\{\\{.*iferror+.*\\}\\}\\s*\\)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     //private static final boolean SECTION_EDIT = true;
@@ -156,8 +159,20 @@ public class BlikiProxyParser extends AbstractParser {
         return output;
     }
 
+    /**
+     * Removes Mediawiki markup that is unsupported/broken
+     * @param text
+     * @return
+     */
     public String removeUnsupportedMediaWikiMarkup(String text) {
-        text = SIDEBAR_PATTERN.matcher(text).replaceAll("");
+
+        if(!Environment.getBooleanValue(Environment.PROP_PARSER_PARSE_SIDEBAR)){
+            text = SIDEBAR_PATTERN.matcher(text).replaceAll("");
+
+        }
+        if(!Environment.getBooleanValue(Environment.PROP_PARSER_PARSE_COORD)){
+            text = COORDINATES_PATTERN.matcher(text).replaceAll("");
+        }
         return text;
     }
     /*
@@ -196,9 +211,7 @@ public class BlikiProxyParser extends AbstractParser {
             raw = this.removeUnsupportedMediaWikiMarkup(raw);
 
             output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
-            //output = this.removeUnsupportedHtml(output);
             output = output == null ? "" : output;
-
         }
         if (logger.isInfoEnabled()) {
             String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;

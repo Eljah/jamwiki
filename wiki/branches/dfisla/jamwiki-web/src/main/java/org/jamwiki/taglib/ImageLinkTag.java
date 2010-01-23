@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.jamwiki.DataAccessException;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.WikiUtil;
 
@@ -31,7 +31,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class ImageLinkTag extends TagSupport {
 
-	private static final Logger logger = Logger.getLogger(ImageLinkTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(ImageLinkTag.class.getName());
 	private String maxDimension = null;
 	private String style = null;
 	private String value = null;
@@ -51,14 +51,14 @@ public class ImageLinkTag extends TagSupport {
 			try {
 				html = LinkUtil.buildImageLinkHtml(request.getContextPath(), virtualWiki, this.value, false, false, null, null, linkDimension, true, this.style, true);
 			} catch (DataAccessException e) {
-				logger.fatal("Failure while building url " + html + " with value " + this.value, e);
+				logger.severe("Failure while building url " + html + " with value " + this.value, e);
 				throw new JspException(e);
 			}
 			if (html != null) {
 				this.pageContext.getOut().print(html);
 			}
 		} catch (IOException e) {
-			logger.fatal("Failure while building url " + html + " with value " + this.value, e);
+			logger.severe("Failure while building url " + html + " with value " + this.value, e);
 			throw new JspException(e);
 		}
 		return EVAL_PAGE;
@@ -70,7 +70,7 @@ public class ImageLinkTag extends TagSupport {
 	private static String retrieveVirtualWiki(HttpServletRequest request) throws JspException {
 		String virtualWiki = WikiUtil.getVirtualWikiFromRequest(request);
 		if (virtualWiki == null) {
-			logger.fatal("No virtual wiki found for context path: " + request.getContextPath());
+			logger.severe("No virtual wiki found for context path: " + request.getContextPath());
 			throw new JspException("No virtual wiki value found");
 		}
 		return virtualWiki;

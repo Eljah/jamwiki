@@ -19,7 +19,7 @@ package org.jamwiki.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a mapping of a user or group to a set of
@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class RoleMap {
 
-	private static final Logger logger = Logger.getLogger(RoleMap.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(RoleMap.class.getName());
 	private Integer groupId = null;
 	private String groupName = null;
 	private List<String> roleNames = null;
@@ -142,7 +142,7 @@ public class RoleMap {
 	 * user and group id values for use with JSTL.
 	 */
 	public String getUserGroup() {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		if (this.userId != null) {
 			result.append(this.userId);
 		} else {

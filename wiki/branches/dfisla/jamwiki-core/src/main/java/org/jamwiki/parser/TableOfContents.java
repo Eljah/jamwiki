@@ -20,7 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.Utilities;
 
 /**
@@ -29,7 +29,7 @@ import org.jamwiki.utils.Utilities;
  */
 public class TableOfContents {
 
-	private static final Logger logger = Logger.getLogger(TableOfContents.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(TableOfContents.class.getName());
 	/**
 	 * Status indicating that this TOC object has not yet been initialized.  For the JFlex parser
 	 * this will mean no __TOC__ tag has been added to the document being parsed.
@@ -137,14 +137,14 @@ public class TableOfContents {
 			count++;
 			candidate = name + "_" + count;
 		}
-		logger.warn("Unable to find appropriate TOC name after " + count + " iterations for value " + name);
+		logger.warning("Unable to find appropriate TOC name after " + count + " iterations for value " + name);
 		return candidate;
 	}
 
 	/**
 	 * Internal method to close any list tags prior to adding the next entry.
 	 */
-	private void closeList(int level, StringBuffer text, int previousLevel) {
+	private void closeList(int level, StringBuilder text, int previousLevel) {
 		for (int i = previousLevel; i > level; i--) {
 			// close lists to current level
 			text.append("</li>\n</ul>");
@@ -191,7 +191,7 @@ public class TableOfContents {
 	/**
 	 * Internal method to open any list tags prior to adding the next entry.
 	 */
-	private void openList(int level, StringBuffer text, int previousLevel) {
+	private void openList(int level, StringBuilder text, int previousLevel) {
 		if (level <= previousLevel) {
 			// same or lower level as previous item, close previous and open new
 			text.append("</li>\n<li>");
@@ -242,7 +242,7 @@ public class TableOfContents {
 	 * @return An HTML representation of this table of contents object.
 	 */
 	public String toHTML() {
-		StringBuffer text = new StringBuffer();
+		StringBuilder text = new StringBuilder();
 		text.append("<table id=\"toc\">\n<tr>\n<td>\n");
 		int adjustedLevel = 0;
 		int previousLevel = 0;

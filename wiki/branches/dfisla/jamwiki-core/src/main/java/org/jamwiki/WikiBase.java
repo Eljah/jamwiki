@@ -16,12 +16,13 @@
  */
 package org.jamwiki;
 
+import java.io.IOException;
 import java.util.Locale;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.WikiUtil;
 import org.jamwiki.utils.WikiCache;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * <code>WikiBase</code> is loaded as a singleton class and provides access
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
 public class WikiBase {
 
 	/** Standard logger. */
-	private static final Logger logger = Logger.getLogger(WikiBase.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiBase.class.getName());
 	/** The singleton instance of this class. */
 	private static WikiBase instance = null;
 	/** The data handler that looks after read/write operations. */
@@ -79,7 +80,7 @@ public class WikiBase {
 		try {
 			WikiBase.instance = new WikiBase();
 		} catch (Exception e) {
-			logger.fatal("Failure while initializing WikiBase", e);
+			logger.severe("Failure while initializing WikiBase", e);
 		}
 	}
 
@@ -87,9 +88,9 @@ public class WikiBase {
 	 * Creates an instance of <code>WikiBase</code>, initializing the default
 	 * data handler instance and search engine instance.
 	 *
-	 * @throws Exception If the instance cannot be instantiated.
+	 * @throws IOException If the instance cannot be instantiated.
 	 */
-	private WikiBase() throws Exception {
+	private WikiBase() throws IOException {
 		this.reload();
 	}
 
@@ -133,7 +134,7 @@ public class WikiBase {
 	 * Reload the data handler, user handler, and other basic wiki
 	 * data structures.
 	 */
-	public static void reload() throws Exception {
+	public static void reload() throws IOException {
 		WikiBase.dataHandler = WikiUtil.dataHandlerInstance();
 		WikiBase.searchEngine = WikiUtil.searchEngineInstance();
 	}
@@ -149,9 +150,11 @@ public class WikiBase {
 	 * @param username The admin user's username (login).
 	 * @param encryptedPassword The admin user's encrypted password.  This value
 	 *  is only required when creating a new admin user.
-	 * @throws Exception Thrown if an error occurs during re-initialization.
+	 * @throws DataAccessException Thrown if an error occurs during re-initialization.
+	 * @throws IOException Thrown if an error occurs during re-initialization.
+	 * @throws WikiException Thrown if an error occurs during re-initialization.
 	 */
-	public static void reset(Locale locale, WikiUser user, String username, String encryptedPassword) throws Exception {
+	public static void reset(Locale locale, WikiUser user, String username, String encryptedPassword) throws DataAccessException, IOException, WikiException {
 		WikiBase.instance = new WikiBase();
 		WikiCache.initialize();
 		WikiBase.dataHandler.setup(locale, user, username, encryptedPassword);

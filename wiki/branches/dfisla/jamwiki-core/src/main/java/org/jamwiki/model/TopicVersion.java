@@ -16,12 +16,18 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a version of a Wiki topic.
  */
-public class TopicVersion {
+public class TopicVersion implements Serializable {
 
     public static final int EDIT_NORMAL = 1;
     public static final int EDIT_MINOR = 2;
@@ -31,20 +37,27 @@ public class TopicVersion {
     public static final int EDIT_PERMISSION = 6;
     public static final int EDIT_UNDELETE = 7;
     public static final int EDIT_IMPORT = 8;
-
+	public static final int EDIT_UPLOAD = 9;
     private Integer authorId = null;
     private String authorDisplay = null;
     private int charactersChanged = 0;
     private String editComment = null;
     private Timestamp editDate = new Timestamp(System.currentTimeMillis());
     private int editType = EDIT_NORMAL;
+	/** This field is not persisted and is simply used when writing versions to indicate whether the version can be logged. */
+	private boolean loggable = true;
     private Integer previousTopicVersionId = null;
+	/** Some versions should be created without creating a recent change entry.  This field is not persisted. */
+	private boolean recentChangeAllowed = true;
     private int topicId = -1;
     private int topicVersionId = -1;
     private String versionContent = null;
+	private List<String> versionParams = null;
     private String versionContentClean = null;
     private String versionContentShort = null;
     private int bzType = 0;
+	private static final WikiLogger logger = WikiLogger.getLogger(TopicVersion.class.getName());
+
 
     /**
      *
@@ -69,6 +82,40 @@ public class TopicVersion {
         this.versionContent = versionContent;
         this.charactersChanged = charactersChanged;
     }
+
+	/**
+	 * Given a topic associated with this topic version, initialize the version
+	 * parameters field.
+	 */
+	public void initializeVersionParams(Topic topic) {
+		switch (this.editType) {
+			case TopicVersion.EDIT_DELETE:
+			case TopicVersion.EDIT_UNDELETE:
+				// store the name of the deleted topic
+				this.addVersionParam(topic.getName());
+				break;
+			case TopicVersion.EDIT_MOVE:
+				if (!StringUtils.isBlank(topic.getRedirectTo())) {
+					// store the old and new topic names
+					this.addVersionParam(topic.getName());
+					this.addVersionParam(topic.getRedirectTo());
+				}
+				break;
+			case TopicVersion.EDIT_PERMISSION:
+				// store the name of the topic
+				this.addVersionParam(topic.getName());
+				break;
+			case TopicVersion.EDIT_IMPORT:
+				this.addVersionParam(topic.getName());
+				break;
+			case TopicVersion.EDIT_UPLOAD:
+				// store the topic name for uploads
+				this.addVersionParam(topic.getName());
+				break;
+			default:
+				break;
+		}
+	}
 
     /**
      *
@@ -166,6 +213,20 @@ public class TopicVersion {
         this.editType = editType;
     }
 
+	/**
+	 *
+	 */
+	public boolean isLoggable() {
+		return this.loggable;
+	}
+
+	/**
+	 *
+	 */
+	public void setLoggable(boolean loggable) {
+		this.loggable = loggable;
+	}
+
     /**
      *
      * @return
@@ -181,6 +242,21 @@ public class TopicVersion {
     public void setPreviousTopicVersionId(Integer previousTopicVersionId) {
         this.previousTopicVersionId = previousTopicVersionId;
     }
+
+
+	/**
+	 *
+	 */
+	public boolean isRecentChangeAllowed() {
+		return this.recentChangeAllowed;
+	}
+
+	/**
+	 *
+	 */
+	public void setRecentChangeAllowed(boolean recentChangeAllowed) {
+		this.recentChangeAllowed = recentChangeAllowed;
+	}
 
     /**
      *
@@ -229,6 +305,44 @@ public class TopicVersion {
     public void setVersionContent(String versionContent) {
         this.versionContent = versionContent;
     }
+
+	/**
+	 * Utility method for adding a version param.
+	 */
+	private void addVersionParam(String param) {
+		if (this.versionParams == null) {
+			this.versionParams = new ArrayList<String>();
+		}
+		this.versionParams.add(param);
+	}
+
+	/**
+	 *
+	 */
+	public List<String> getVersionParams() {
+		return this.versionParams;
+	}
+
+	/**
+	 *
+	 */
+	public void setVersionParams(List<String> versionParams) {
+		this.versionParams = versionParams;
+	}
+
+	/**
+	 * Utility method for converting the version params to a pipe-delimited string.
+	 */
+	public String getVersionParamString() {
+		return Utilities.listToDelimitedString(this.versionParams, "|");
+	}
+
+	/**
+	 * Utility method for converting a version params pipe-delimited string to a list.
+	 */
+	public void setVersionParamString(String versionParamsString) {
+		this.setVersionParams(Utilities.delimitedStringToList(versionParamsString, "|"));
+	}
 
     /**
      *

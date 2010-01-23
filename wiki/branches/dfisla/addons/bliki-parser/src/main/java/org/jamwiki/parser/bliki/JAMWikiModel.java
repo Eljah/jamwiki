@@ -35,20 +35,26 @@ import org.apache.log4j.Logger;
  */
 public class JAMWikiModel extends AbstractWikiModel {
 	// see: JFlexParser.MODE_MINIMAL
-	protected static final int MODE_MINIMAL = 3;
+        protected static final int MODE_MINIMAL = 3;
 
 	private static final Logger logger = Logger.getLogger(JAMWikiModel.class.getName());
 
-	protected String fContextPath;
-	protected ParserInput fParserInput;
-	protected ParserOutput fParserOutput;
+        protected String fContextPath;
+        protected ParserInput fParserInput;
+        protected ParserOutput fParserOutput;
 
 	static {
 
 		TagNode.addAllowedAttribute("style");
 	}
 
-	public JAMWikiModel(ParserInput parserInput, ParserOutput document, String contextPath) {
+        /**
+         *
+         * @param parserInput
+         * @param document
+         * @param contextPath
+         */
+        public JAMWikiModel(ParserInput parserInput, ParserOutput document, String contextPath) {
 		super(Configuration.DEFAULT_CONFIGURATION);
 
 		fParserInput = parserInput;
@@ -95,13 +101,15 @@ public class JAMWikiModel extends AbstractWikiModel {
 		popNode(); // div
 
 	}
-
+/* JAMWIKI-NEW: BROKEN API
 	@Override
 	public void appendSignature(Appendable writer, int numberOfTildes) throws IOException {
 		WikiSignatureTag parserTag;
 		switch (numberOfTildes) {
 		case 3:
 			parserTag = new WikiSignatureTag();
+                        //parserTag.parse(null, fPageTitle, args)
+                        //JFlexParserUtil.
 			writer.append(parserTag.parse(fParserInput, fParserOutput, MODE_MINIMAL, "~~~"));
 			break;
 		case 4:
@@ -110,11 +118,12 @@ public class JAMWikiModel extends AbstractWikiModel {
 			break;
 		case 5:
 			parserTag = new WikiSignatureTag();
+                        //parserTag.parse(null, fPageTitle, args)
 			writer.append(parserTag.parse(fParserInput, fParserOutput, MODE_MINIMAL, "~~~~~"));
 			break;
 		}
 	}
-
+*/
 	@Override
 	public void appendInternalLink(String topic, String hashSection, String topicDescription, String cssClass, boolean parseRecursive) {
 		try {
@@ -355,6 +364,10 @@ public class JAMWikiModel extends AbstractWikiModel {
 		return buf.toString();
 	}
 
+        /**
+         *
+         * @return
+         */
         public INamespace getNamespace() {
 		return fNamespace;
 	}

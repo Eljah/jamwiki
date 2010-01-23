@@ -25,7 +25,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
 
 /**
  * Provide the capability for filtering content based on a predefined list of
@@ -34,7 +33,7 @@ import org.apache.log4j.Logger;
 public class SpamFilter {
 
 	/** Logger */
-	public static final Logger logger = Logger.getLogger(SpamFilter.class.getName());
+	public static final WikiLogger logger = WikiLogger.getLogger(SpamFilter.class.getName());
 	/** Spam blacklist file name. */
 	public static final String SPAM_BLACKLIST_FILE = "spam-blacklist.txt";
 	private static Pattern spamRegexPattern = null;
@@ -73,7 +72,7 @@ public class SpamFilter {
 			result = m.group(0);
 		}
 		long execution = System.currentTimeMillis() - start;
-		logger.debug("Executed spam filter (" + (execution / 1000.000) + " s.)");
+		logger.fine("Executed spam filter (" + (execution / 1000.000) + " s.)");
 		return result;
 	}
 

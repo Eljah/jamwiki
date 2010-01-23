@@ -29,7 +29,6 @@ import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
 
 /**
  * Provide capability for encrypting and decrypting values.  Inspired by an
@@ -37,7 +36,7 @@ import org.apache.log4j.Logger;
  */
 public class Encryption {
 
-	private static final Logger logger = Logger.getLogger(Encryption.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(Encryption.class.getName());
 	public static final String DES_ALGORITHM = "DES";
 	public static final String ENCRYPTION_KEY = "JAMWiki Key 12345";
 
@@ -76,7 +75,7 @@ public class Encryption {
 		try {
 			md = MessageDigest.getInstance(encryptionAlgorithm);
 		} catch (NoSuchAlgorithmException e) {
-			logger.warn("JDK does not support the " + encryptionAlgorithm + " encryption algorithm.  Weaker encryption will be attempted.");
+			logger.warning("JDK does not support the " + encryptionAlgorithm + " encryption algorithm.  Weaker encryption will be attempted.");
 		}
 		if (md == null) {
 			// fallback to weaker encryption algorithm if nothing better is available
@@ -91,7 +90,7 @@ public class Encryption {
 			try {
 				Environment.saveProperties();
 			} catch (IOException e) {
-				logger.warn("Failure while saving encryption algorithm property", e);
+				logger.info("Failure while saving encryption algorithm property", e);
 			}
 		}
 		try {
@@ -99,7 +98,7 @@ public class Encryption {
 			byte raw[] = md.digest();
 			return encrypt64(raw);
 		} catch (GeneralSecurityException e) {
-			logger.fatal("Encryption failure", e);
+			logger.severe("Encryption failure", e);
 			throw new IllegalStateException("Failure while encrypting value");
 		} catch (UnsupportedEncodingException e) {
 			// this should never happen
@@ -132,7 +131,7 @@ public class Encryption {
 	 * @return A String value created from the byte array that was passed to this method.
 	 */
 	private static String bytes2String(byte[] bytes) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (int i = 0; i < bytes.length; i++) {
 			buffer.append((char)bytes[i]);
 		}
@@ -168,16 +167,16 @@ public class Encryption {
 		} catch (GeneralSecurityException e) {
 			String value = Environment.getValue(name);
 			if (props != null || StringUtils.isBlank(value)) {
-				logger.fatal("Encryption failure or no value available for property: " + name, e);
+				logger.severe("Encryption failure or no value available for property: " + name, e);
 				throw new IllegalStateException("Failure while retrieving encrypted property: " + name);
 			}
 			// the property might have been unencrypted in the property file, so encrypt, save, and return the value
-			logger.warn("Found unencrypted property file value: " + name + ".  Assuming that this value manually un-encrypted in the property file so re-encrypting and re-saving.");
+			logger.warning("Found unencrypted property file value: " + name + ".  Assuming that this value manually un-encrypted in the property file so re-encrypting and re-saving.");
 			Encryption.setEncryptedProperty(name, value, null);
 			try {
 				Environment.saveProperties();
 			} catch (IOException ex) {
-				logger.fatal("Failure while saving properties", ex);
+				logger.severe("Failure while saving properties", ex);
 				throw new IllegalStateException("Failure while saving properties");
 			}
 			return value;
@@ -201,7 +200,7 @@ public class Encryption {
 				unencryptedBytes = value.getBytes("UTF8");
 				encrypted = Encryption.encrypt64(unencryptedBytes);
 			} catch (GeneralSecurityException e) {
-				logger.fatal("Encryption failure", e);
+				logger.severe("Encryption failure", e);
 				throw new IllegalStateException("Failure while encrypting value");
 			} catch (UnsupportedEncodingException e) {
 				// this should never happen

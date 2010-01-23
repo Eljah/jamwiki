@@ -21,7 +21,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
 
 /**
  * Implement utility functions that interact with the cache and provide the
@@ -29,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class WikiCache {
 
-    private static final Logger logger = Logger.getLogger(WikiCache.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiCache.class.getName());
     private static CacheManager cacheManager = null;
     /** Directory for cache files. */
     private static final String CACHE_DIR = "cache";
@@ -54,7 +53,6 @@ public class WikiCache {
      * @param value The object that is being stored in the cache.
      */
     public static void addToCache(String cacheName, Object key, Object value) {
-        logger.debug(String.format("CACHE-ADD-BY-KEY: %s %s %s", cacheName, key, value));
         Cache cache = WikiCache.getCache(cacheName);
         cache.put(new Element(key, value));
     }
@@ -83,13 +81,10 @@ public class WikiCache {
      *  existing cache exists.
      */
     private static Cache getCache(String cacheName) {
-
-        logger.debug(String.format("CACHE-GET: %s", cacheName));
-
         if (!WikiCache.cacheManager.cacheExists(cacheName)) {
 
             // All caches should come from ehcache config file, should not be configured on demand.
-            logger.error("CACHE-DOES-NOT-EXIST: " + cacheName);
+            logger.severe("CACHE-DOES-NOT-EXIST: " + cacheName);
         }
         return WikiCache.cacheManager.getCache(cacheName);
     }
@@ -98,7 +93,7 @@ public class WikiCache {
         try {
             WikiCache.cacheManager.getCache(cacheName).flush();
         } catch (Exception e) {
-            logger.error("Failed to flush cache =>: " + cacheName, e);
+            logger.severe("Failed to flush cache =>: " + cacheName, e);
         }
     }
 
@@ -123,7 +118,7 @@ public class WikiCache {
 
             logger.info("CACHE-INIT-COMPLETE!");
         } catch (Exception e) {
-            logger.fatal("Initialization error in WikiCache", e);
+			logger.severe("Initialization error in WikiCache", e);
         }
     }
 
@@ -132,7 +127,6 @@ public class WikiCache {
             WikiCache.cacheManager.shutdown();
             WikiCache.cacheManager = null;
         }
-        logger.info("CACHE-SHUTDOWN-COMPLETE!");
     }
 
     /**
@@ -154,7 +148,6 @@ public class WikiCache {
      * @param cacheName The name of the cache being removed.
      */
     public static void removeCache(String cacheName) {
-        logger.debug(String.format("CACHE-REMOVE: %s", cacheName));
         WikiCache.cacheManager.removeCache(cacheName);
     }
 
@@ -166,7 +159,6 @@ public class WikiCache {
      * @param key The key for the record that is being removed from the cache.
      */
     public static void removeFromCache(String cacheName, Object key) {
-        logger.debug(String.format("CACHE-REMOVE-BY-KEY: %s %s", cacheName, key));
         Cache cache = WikiCache.getCache(cacheName);
         cache.remove(key);
     }
@@ -198,7 +190,6 @@ public class WikiCache {
      *  object value.
      */
     public static Element retrieveFromCache(String cacheName, Object key) {
-        logger.debug(String.format("CACHE-RETRIEVE-BY-KEY: %s %s", cacheName, key));
         Cache cache = WikiCache.getCache(cacheName);
         return cache.get(key);
     }
@@ -217,7 +208,6 @@ public class WikiCache {
      */
     /* @deprecated, autoboxing should fix this
     public static Element retrieveFromCache(String cacheName, int key) {
-    logger.debug(String.format("CACHE-RETRIEVE-BY-KEY: %s %s", cacheName, Integer.toString(key)));
     return WikiCache.retrieveFromCache(cacheName, Integer.valueOf(key));
     }
      */

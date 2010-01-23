@@ -28,7 +28,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
+import org.jamwiki.DataAccessException;
+import org.jamwiki.WikiException;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.junit.Test;
@@ -40,18 +42,16 @@ public class TiddlyWikiParserTest {
 	private static final String DATUM  = "200701020304";
 	private static final String CONTENT  = "Content"; 
 
-    private static final Logger logger = Logger.getLogger(TiddlyWikiParserTest.class.getName());
-
 	/**
 	 *
 	 */
 	@Test
 	public void testParse() throws Exception {
-		//Handler[] h = Logger.getLogger("").getHandlers();
-		//for (int i = 0; i < h.length; i++) {
-		//	h[i].setLevel(Level.ALL);
-		//}
-		//Logger.getLogger("").setLevel(Level.ALL);
+		Handler[] h = Logger.getLogger("").getHandlers();
+		for (int i = 0; i < h.length; i++) {
+			h[i].setLevel(Level.ALL);
+		}
+		Logger.getLogger("").setLevel(Level.ALL);
 		WikiBaseMock mock = new WikiBaseMock();
 		TiddlyWikiParser parser = new TiddlyWikiParser("myvirtual", null, "", mock);
 		String testLine = "<div tiddler=\""+ NAME + "\" modified=\"" + DATUM + "\">" + CONTENT+ "</div>";
@@ -71,7 +71,7 @@ public class TiddlyWikiParserTest {
 		public ArrayList<Topic> topics = new ArrayList<Topic>();
 		public ArrayList<TopicVersion> versions = new ArrayList<TopicVersion>();
 
-		public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap categories, List<String> links, boolean userVisible, Object transactionObject) throws Exception {
+		public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap categories, List<String> links, Object transactionObject) throws DataAccessException, WikiException {
 			topics.add(topic);
 			versions.add(topicVersion);
 		}

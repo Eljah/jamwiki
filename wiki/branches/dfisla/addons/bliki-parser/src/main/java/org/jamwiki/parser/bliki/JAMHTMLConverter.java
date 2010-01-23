@@ -31,6 +31,10 @@ import org.jamwiki.model.WikiImage;
 import org.jamwiki.utils.ImageUtil;
 import org.jamwiki.utils.WikiLink;
 
+/**
+ *
+ * @author dfisla
+ */
 public class JAMHTMLConverter extends HTMLConverter {
 
     private static final Logger logger = Logger.getLogger(LinkUtil.class.getName());
@@ -39,11 +43,20 @@ public class JAMHTMLConverter extends HTMLConverter {
 
     private final long START_TIME = System.currentTimeMillis();
 
+    /**
+     * Constructor
+     * @param parserInput
+     */
     public JAMHTMLConverter(ParserInput parserInput) {
         super();
         fParserInput = parserInput;
     }
 
+    /**
+     *
+     *
+     * @throws IOException
+     */
     @Override
     public void nodesToText(List<? extends Object> nodes, Appendable resultBuffer, IWikiModel model) throws IOException {
 		if (nodes != null && !nodes.isEmpty()) {
@@ -98,7 +111,12 @@ public class JAMHTMLConverter extends HTMLConverter {
 			}
 		}
 	}
-   
+
+    /**
+     *
+     *
+     * 
+     */
     @Override
     public void imageNodeToText(TagNode imageTagNode, ImageFormat imageFormat, Appendable resultBuffer, IWikiModel model)
             throws IOException {

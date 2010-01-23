@@ -16,6 +16,7 @@
  */
 package org.jamwiki.utils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -26,7 +27,6 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiImage;
-import org.apache.log4j.Logger;
 
 /**
  * General utility methods for handling both wiki topic links and HTML links.
@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class LinkUtil {
 
-	private static final Logger logger = Logger.getLogger(LinkUtil.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(LinkUtil.class.getName());
 
 	/**
 	 *
@@ -166,13 +166,11 @@ public class LinkUtil {
 	public static String buildImageLinkHtml(String context, String virtualWiki, String topicName, boolean frame, boolean thumb, String align, String caption, int maxDimension, boolean suppressLink, String style, boolean escapeHtml) throws DataAccessException, IOException {
 		String url = LinkUtil.buildImageFileUrl(context, virtualWiki, topicName);
 		if (url == null) {
-                        logger.debug("IMAGE-LINK-NULL!");
-			WikiLink uploadLink = LinkUtil.parseWikiLink("Special:Upload");
-			return LinkUtil.buildInternalLinkHtml(context, virtualWiki, uploadLink, topicName, "edit", null, true);
+			return LinkUtil.buildUploadLink(context, virtualWiki, topicName);
 		}
 		WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(virtualWiki, topicName);
 		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
-		StringBuffer html = new StringBuffer();
+		StringBuilder html = new StringBuilder();
 		if (topic.getTopicType() == Topic.TYPE_FILE) {
 			// file, not an image
 			if (StringUtils.isBlank(caption)) {
@@ -187,7 +185,14 @@ public class LinkUtil {
 			html.append("</a>");
 			return html.toString();
 		}
-		WikiImage wikiImage = ImageUtil.initializeImage(wikiFile, maxDimension);
+		WikiImage wikiImage = null;
+		try {
+			wikiImage = ImageUtil.initializeImage(wikiFile, maxDimension);
+		} catch (FileNotFoundException e) {
+			// do not log the full exception as the logs can fill up very for this sort of error, and it is generally due to a bad configuration.  instead log a warning message so that the administrator can try to fix the problem
+			logger.warning("File not found while parsing image link for topic: " + virtualWiki + " / " + topicName + ".  Make sure that the following file exists and is readable by the JAMWiki installation: " + e.getMessage());
+			return LinkUtil.buildUploadLink(context, virtualWiki, topicName);
+		}
 		if (caption == null) {
 			caption = "";
 		}
@@ -206,7 +211,7 @@ public class LinkUtil {
 				// default alignment
 				html.append("image ");
 			}
-			html = new StringBuffer(html.toString().trim()).append("\">");
+			html = new StringBuilder(html.toString().trim()).append("\">");
 		}
 		if (wikiImage.getWidth() > 0) {
 			html.append("<div style=\"width:").append((wikiImage.getWidth() + 2)).append("px;\">");
@@ -291,7 +296,7 @@ public class LinkUtil {
 		if (StringUtils.isBlank(topic) && !StringUtils.isBlank(wikiLink.getSection())) {
 			topic = wikiLink.getSection();
 		}
-		StringBuffer html = new StringBuffer();
+		StringBuilder html = new StringBuilder();
 		html.append("<a href=\"").append(url).append('\"').append(style);
 		html.append(" title=\"").append(StringEscapeUtils.escapeHtml(topic)).append('\"').append(target).append('>');
 		if (escapeHtml) {
@@ -375,7 +380,7 @@ public class LinkUtil {
 		if (StringUtils.isBlank(topicName) && !StringUtils.isBlank(section)) {
 			return "#" + Utilities.encodeAndEscapeTopicName(section);
 		}
-		StringBuffer url = new StringBuffer();
+		StringBuilder url = new StringBuilder();
 		if (context != null) {
 			url.append(context);
 		}
@@ -398,6 +403,14 @@ public class LinkUtil {
 			url.append(Utilities.encodeAndEscapeTopicName(section));
 		}
 		return url.toString();
+	}
+
+	/**
+	 *
+	 */
+	private static String buildUploadLink(String context, String virtualWiki, String topicName) throws DataAccessException {
+		WikiLink uploadLink = LinkUtil.parseWikiLink("Special:Upload?topic=" + topicName);
+		return LinkUtil.buildInternalLinkHtml(context, virtualWiki, uploadLink, topicName, "edit", null, true);
 	}
 
 	/**
@@ -506,13 +519,15 @@ public class LinkUtil {
 		String namespaceString = "";
 		int namespacePos = processed.indexOf(':', 1);
 		if (namespacePos != -1 && namespacePos < processed.length()) {
-			namespaceString = processed.substring(0, namespacePos);
+			namespaceString = processed.substring(0, namespacePos).trim();
 		}
 		wikiLink.setNamespace(namespaceString);
 		String topic = processed;
 		if (namespacePos > 0 && (namespacePos + 1) < processed.length()) {
 			// get namespace, unless topic ends with a colon
-			topic = processed.substring(namespacePos + 1);
+			topic = processed.substring(namespacePos + 1).trim();
+			// update original text in case topic was of the form "namespace: topic"
+			processed = namespaceString + ':' + topic;
 		}
 		wikiLink.setArticle(Utilities.decodeTopicName(topic, true));
 		// destination is namespace + topic

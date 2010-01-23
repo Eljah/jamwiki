@@ -26,7 +26,7 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,7 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class ManageServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(ManageServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(ManageServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_ADMIN_MANAGE = "admin-manage.jsp";
 
@@ -64,8 +64,8 @@ public class ManageServlet extends JAMWikiServlet {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
 		deletePage(request, next, pageInfo, topicName);
-		if (!StringUtils.isBlank(request.getParameter("manageCommentsPage"))) {
-			String manageCommentsPage = Utilities.decodeTopicName(request.getParameter("manageCommentsPage"), true);
+		String manageCommentsPage = WikiUtil.getParameterFromRequest(request, "manageCommentsPage", true);
+		if (!StringUtils.isBlank(manageCommentsPage)) {
 			if (WikiUtil.isCommentsPage(manageCommentsPage) && !manageCommentsPage.equals(topicName)) {
 				deletePage(request, next, pageInfo, manageCommentsPage);
 			}
@@ -81,7 +81,7 @@ public class ManageServlet extends JAMWikiServlet {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, true, null);
 		if (topic.getDeleted()) {
-			logger.warn("Attempt to delete a topic that is already deleted: " + virtualWiki + " / " + topicName);
+			logger.warning("Attempt to delete a topic that is already deleted: " + virtualWiki + " / " + topicName);
 			return;
 		}
 		int charactersChanged = 0 - StringUtils.length(topic.getTopicContent());
@@ -90,7 +90,8 @@ public class ManageServlet extends JAMWikiServlet {
 		WikiUser user = ServletUtil.currentWikiUser();
 		TopicVersion topicVersion = new TopicVersion(user, ServletUtil.getIpAddress(request), request.getParameter("deleteComment"), contents, charactersChanged);
 		topicVersion.setEditType(TopicVersion.EDIT_DELETE);
-		WikiBase.getDataHandler().deleteTopic(topic, topicVersion, true);
+		//WikiBase.getDataHandler().deleteTopic(topic, topicVersion, true);
+                WikiBase.getDataHandler().deleteTopic(topic, topicVersion); // JAMWIKI-NEW
 	}
 
 	/**
@@ -125,8 +126,8 @@ public class ManageServlet extends JAMWikiServlet {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
 		undeletePage(request, next, pageInfo, topicName);
-		if (!StringUtils.isBlank(request.getParameter("manageCommentsPage"))) {
-			String manageCommentsPage = Utilities.decodeTopicName(request.getParameter("manageCommentsPage"), true);
+		String manageCommentsPage = WikiUtil.getParameterFromRequest(request, "manageCommentsPage", true);
+		if (!StringUtils.isBlank(manageCommentsPage)) {
 			if (WikiUtil.isCommentsPage(manageCommentsPage) && !manageCommentsPage.equals(topicName)) {
 				undeletePage(request, next, pageInfo, manageCommentsPage);
 			}
@@ -142,7 +143,7 @@ public class ManageServlet extends JAMWikiServlet {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, true, null);
 		if (!topic.getDeleted()) {
-			logger.warn("Attempt to undelete a topic that is not deleted: " + virtualWiki + " / " + topicName);
+			logger.warning("Attempt to undelete a topic that is not deleted: " + virtualWiki + " / " + topicName);
 			return;
 		}
 		TopicVersion previousVersion = WikiBase.getDataHandler().lookupTopicVersion(topic.getCurrentVersionId());
@@ -156,7 +157,8 @@ public class ManageServlet extends JAMWikiServlet {
 		int charactersChanged = StringUtils.length(contents);
 		TopicVersion topicVersion = new TopicVersion(user, ServletUtil.getIpAddress(request), request.getParameter("undeleteComment"), contents, charactersChanged);
 		topicVersion.setEditType(TopicVersion.EDIT_UNDELETE);
-		WikiBase.getDataHandler().undeleteTopic(topic, topicVersion, true);
+		//WikiBase.getDataHandler().undeleteTopic(topic, topicVersion, true);
+                WikiBase.getDataHandler().undeleteTopic(topic, topicVersion); // JAMWIKI-NEW
 	}
 
 	/**

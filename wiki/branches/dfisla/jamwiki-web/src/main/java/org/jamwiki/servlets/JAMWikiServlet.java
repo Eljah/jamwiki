@@ -25,8 +25,8 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.authentication.WikiUserDetails;
-import org.jamwiki.model.Role;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiUser;
@@ -34,7 +34,7 @@ import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -46,7 +46,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
  */
 public abstract class JAMWikiServlet extends AbstractController {
 
-	private static final Logger logger = Logger.getLogger(JAMWikiServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiServlet.class.getName());
 
 	/** Flag to indicate whether or not the servlet should load the nav bar and other layout elements. */
 	protected boolean layout = true;
@@ -70,7 +70,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 	private void buildLayout(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
 		String virtualWikiName = pageInfo.getVirtualWikiName();
 		if (virtualWikiName == null) {
-			logger.fatal("No virtual wiki available for page request " + request.getRequestURI());
+			logger.severe("No virtual wiki available for page request " + request.getRequestURI());
 			virtualWikiName = WikiBase.DEFAULT_VWIKI;
 		}
 		VirtualWiki virtualWiki = ServletUtil.retrieveVirtualWiki(virtualWikiName);
@@ -100,12 +100,12 @@ public abstract class JAMWikiServlet extends AbstractController {
 		String pageName = pageInfo.getTopicName();
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		if (pageInfo.getAdmin()) {
-			if (userDetails.hasRole(Role.ROLE_SYSADMIN)) {
+			if (userDetails.hasRole(RoleImpl.ROLE_SYSADMIN)) {
 				links.put("Special:Admin", new WikiMessage("tab.admin.configuration"));
 				links.put("Special:Maintenance", new WikiMessage("tab.admin.maintenance"));
 				links.put("Special:Roles", new WikiMessage("tab.admin.roles"));
 			}
-			if (userDetails.hasRole(Role.ROLE_TRANSLATE)) {
+			if (userDetails.hasRole(RoleImpl.ROLE_TRANSLATE)) {
 				links.put("Special:Translation", new WikiMessage("tab.admin.translations"));
 			}
 		} else if (pageInfo.getSpecial()) {
@@ -134,7 +134,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 					String moveLink = "Special:Move?topic=" + Utilities.encodeAndEscapeTopicName(pageName);
 					links.put(moveLink, new WikiMessage("tab.common.move"));
 				}
-				if (!userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
+				if (!userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS)) {
 					Watchlist watchlist = ServletUtil.currentWatchlist(request, virtualWiki);
 					boolean watched = watchlist.containsTopic(pageName);
 					String watchlistLabel = (watched) ? "tab.common.unwatch" : "tab.common.watch";
@@ -148,14 +148,14 @@ public abstract class JAMWikiServlet extends AbstractController {
 				}
 				String linkToLink = "Special:LinkTo?topic=" + Utilities.encodeAndEscapeTopicName(pageName);
 				links.put(linkToLink, new WikiMessage("tab.common.links"));
-				if (userDetails.hasRole(Role.ROLE_ADMIN)) {
+				if (userDetails.hasRole(RoleImpl.ROLE_ADMIN)) {
 					String manageLink = "Special:Manage?topic=" + Utilities.encodeAndEscapeTopicName(pageName);
 					links.put(manageLink, new WikiMessage("tab.common.manage"));
 				}
 				String printLink = "Special:Print?topic=" + Utilities.encodeAndEscapeTopicName(pageName);
 				links.put(printLink, new WikiMessage("tab.common.print"));
 			} catch (WikiException e) {
-				logger.fatal("Unable to build tabbed menu links", e);
+				logger.severe("Unable to build tabbed menu links", e);
 			}
 		}
 		return links;
@@ -168,7 +168,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 	private LinkedHashMap buildUserMenu(WikiPageInfo pageInfo) {
 		LinkedHashMap<String, WikiMessage> links = new LinkedHashMap<String, WikiMessage>();
 		WikiUserDetails userDetails = ServletUtil.currentUserDetails();
-		if (userDetails.hasRole(Role.ROLE_ANONYMOUS) && !userDetails.hasRole(Role.ROLE_EMBEDDED)) {
+		if (userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS) && !userDetails.hasRole(RoleImpl.ROLE_EMBEDDED)) {
 			// include the current page in the login link 
 			String loginLink = "Special:Login";
 			if (!StringUtils.startsWith(pageInfo.getTopicName(), "Special:Login")) {
@@ -177,7 +177,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 			links.put(loginLink, new WikiMessage("common.login"));
 			links.put("Special:Account", new WikiMessage("usermenu.register"));
 		}
-		if (!userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
+		if (!userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS)) {
 			WikiUser user = ServletUtil.currentWikiUser();
 			String userPage = NamespaceHandler.NAMESPACE_USER + NamespaceHandler.NAMESPACE_SEPARATOR + user.getUsername();
 			String userCommentsPage = NamespaceHandler.NAMESPACE_USER_COMMENTS + NamespaceHandler.NAMESPACE_SEPARATOR + user.getUsername();
@@ -192,15 +192,15 @@ public abstract class JAMWikiServlet extends AbstractController {
 			links.put(userCommentsPage, new WikiMessage("usermenu.usercomments"));
 			links.put("Special:Watchlist", new WikiMessage("usermenu.watchlist"));
 		}
-		if (!userDetails.hasRole(Role.ROLE_ANONYMOUS) && !userDetails.hasRole(Role.ROLE_NO_ACCOUNT)) {
+		if (!userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS) && !userDetails.hasRole(RoleImpl.ROLE_NO_ACCOUNT)) {
 			links.put("Special:Account", new WikiMessage("usermenu.account"));
 		}
-		if (!userDetails.hasRole(Role.ROLE_ANONYMOUS) && !userDetails.hasRole(Role.ROLE_EMBEDDED)) {
+		if (!userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS) && !userDetails.hasRole(RoleImpl.ROLE_EMBEDDED)) {
 			links.put("Special:Logout", new WikiMessage("common.logout"));
 		}
-		if (userDetails.hasRole(Role.ROLE_SYSADMIN)) {
+		if (userDetails.hasRole(RoleImpl.ROLE_SYSADMIN)) {
 			links.put("Special:Admin", new WikiMessage("usermenu.admin"));
-		} else if (userDetails.hasRole(Role.ROLE_TRANSLATE)) {
+		} else if (userDetails.hasRole(RoleImpl.ROLE_TRANSLATE)) {
 			links.put("Special:Translation", new WikiMessage("tab.admin.translations"));
 		}
 		return links;
@@ -251,7 +251,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 		}
 		long execution = System.currentTimeMillis() - start;
 		if (execution > JAMWikiServlet.SLOW_PAGE_LIMIT) {
-			logger.warn("Slow page loading time: " + request.getRequestURI() + " (" + (execution / 1000.000) + " s.)");
+			logger.warning("Slow page loading time: " + request.getRequestURI() + " (" + (execution / 1000.000) + " s.)");
 		}
 		if (logger.isInfoEnabled()) {
 			String url = request.getRequestURI() + (!StringUtils.isEmpty(request.getQueryString()) ? "?" + request.getQueryString() : "");
@@ -325,7 +325,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 	 */
 	private ModelAndView viewError(HttpServletRequest request, Throwable t) {
 		if (!(t instanceof WikiException)) {
-			logger.fatal("Servlet error", t);
+			logger.severe("Servlet error", t);
 		}
 		ModelAndView next = new ModelAndView("wiki");
 		WikiPageInfo pageInfo = new WikiPageInfo(request);
@@ -341,7 +341,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 		try {
 			this.loadLayout(request, next, pageInfo);
 		} catch (Exception err) {
-			logger.fatal("Unable to load default layout", err);
+			logger.severe("Unable to load default layout", err);
 		}
 		next.addObject(ServletUtil.PARAMETER_PAGE_INFO, pageInfo);
 		return next;

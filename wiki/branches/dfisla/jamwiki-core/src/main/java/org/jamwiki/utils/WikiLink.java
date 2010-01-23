@@ -15,14 +15,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.jamwiki.utils;
-import org.apache.log4j.Logger;
 
 /**
  * Utility method used in processing Wiki links.
  */
 public class WikiLink {
 
-	private static final Logger logger = Logger.getLogger(WikiLink.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiLink.class.getName());
 	/** Indicator that the link requires special handling, such as links starting with a colon. */
 	private boolean colon = false;
 	/** Article name, not including namespace. */

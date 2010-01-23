@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiVersion;
@@ -32,7 +33,7 @@ import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -40,7 +41,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class MagicWordUtil {
 
-	private static final Logger logger = Logger.getLogger(MagicWordUtil.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(MagicWordUtil.class.getName());
 	// current date values
 	private static final String MAGIC_CURRENT_DAY = "CURRENTDAY";
 	private static final String MAGIC_CURRENT_DAY2 = "CURRENTDAY2";
@@ -208,7 +209,7 @@ public class MagicWordUtil {
 	 * word value.  See http://meta.wikimedia.org/wiki/Help:Magic_words for a
 	 * list of Mediawiki magic words.
 	 */
-	protected static String processMagicWord(ParserInput parserInput, String name) throws Exception {
+	protected static String processMagicWord(ParserInput parserInput, String name) throws DataAccessException {
 		SimpleDateFormat formatter = new SimpleDateFormat();
 		TimeZone utc = TimeZone.getTimeZone("GMT+00");
 		Date current = new Date(System.currentTimeMillis());

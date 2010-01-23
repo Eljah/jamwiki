@@ -43,12 +43,12 @@ public class Main {
 
         Options options = new Options();
         options.addOption("h", "help", false, "Print this usage information");
-        options.addOption("r", "rebuild", false, "Rebuild all topics");
-        options.addOption("c", "category-rebuild", false, "Rebuild all topic categories");
-        options.addOption("l", "load", false, "Load all pages");
-        options.addOption("n", "number", true, "Number of pages to import");
-        options.addOption("f", "file", true, "File name and path");
-        options.addOption("p", "partitions", true, "Partition 1,2,3,4 file name and path");
+        options.addOption("r", "rebuild", false, "Rebuild all topics, parses content, generates clean/txt content, partitions must be specified");
+        options.addOption("c", "category-rebuild", false, "Rebuild all topic categories only, no topic loading, partitions must be specified");
+        options.addOption("l", "load", false, "Load all topics only, no category building");
+        options.addOption("n", "number", true, "Limit the number of pages to import");
+        options.addOption("f", "file", true, "File name and path of XML file");
+        options.addOption("p", "partitions", true, "Partition [1,2,3,...] file names, where each p contains a list of '\\n' delimited Topic IDs");
 
         CommandLineParser parser = null;
         CommandLine cmd = null;

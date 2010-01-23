@@ -19,7 +19,7 @@ package org.jamwiki.taglib;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * JSP tag used within {@link org.jamwiki.taglib.LinkTag} tags to add query
@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class LinkParamTag extends BodyTagSupport {
 
-	private static final Logger logger = Logger.getLogger(LinkParamTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(LinkParamTag.class.getName());
 	private String value = null;
 	private String key = null;
 
@@ -49,7 +49,7 @@ public class LinkParamTag extends BodyTagSupport {
 			}
 			parent.addQueryParam(this.key, tagValue);
 		} catch (JspException e) {
-			logger.fatal("Failure in link param tag for " + this.value, e);
+			logger.severe("Failure in link param tag for " + this.value, e);
 			throw e;
 		}
 		return EVAL_PAGE;

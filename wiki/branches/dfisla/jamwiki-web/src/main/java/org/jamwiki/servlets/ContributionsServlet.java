@@ -23,7 +23,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.RecentChange;
 import org.jamwiki.utils.Pagination;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,7 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class ContributionsServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(ContributionsServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(ContributionsServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_CONTRIBUTIONS = "contributions.jsp";
 

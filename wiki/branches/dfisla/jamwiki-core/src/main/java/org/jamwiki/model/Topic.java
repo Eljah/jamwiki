@@ -16,12 +16,14 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a Wiki topic.
  */
-public class Topic {
+public class Topic implements Serializable {
 
     /* Standard topic type. */
     public static final int TYPE_ARTICLE = 1;
@@ -50,6 +52,7 @@ public class Topic {
     protected int topicId = -1;
     protected int topicType = TYPE_ARTICLE;
     protected String virtualWiki = null;
+	private static final WikiLogger logger = WikiLogger.getLogger(Topic.class.getName());
 
     /**
      *

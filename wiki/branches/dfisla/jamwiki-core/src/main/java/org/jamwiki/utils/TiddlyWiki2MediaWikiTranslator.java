@@ -21,7 +21,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.StringTokenizer;
-import org.apache.log4j.Logger;
 
 /**
  * This class translates TiddlyWiki markup to MediaWiki markup.
@@ -29,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class TiddlyWiki2MediaWikiTranslator {
     
-	private static final Logger logger = Logger.getLogger(TiddlyWiki2MediaWikiTranslator.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(TiddlyWiki2MediaWikiTranslator.class.getName());
 
 	public static String newline = System.getProperty("line.separator");
 
@@ -43,7 +42,7 @@ public class TiddlyWiki2MediaWikiTranslator {
 
 	private String tables(String wikicode) throws IOException {
 		BufferedReader reader = new BufferedReader(new StringReader(wikicode));
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		boolean inTable = false;
 		String line = reader.readLine();
 		while (line != null) {
@@ -82,7 +81,7 @@ public class TiddlyWiki2MediaWikiTranslator {
 
 	private String translateTableLine(String line) {
 		String[] tokens = line.split("\\|");
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		output.append('|');
 		for (int i = 0; i < tokens.length; i++) {
 			String token = tokens[i];
@@ -103,7 +102,7 @@ public class TiddlyWiki2MediaWikiTranslator {
 	private String headers(String wikicode) throws IOException {
 		BufferedReader reader = new BufferedReader(new StringReader(wikicode));
 		String line = null;
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		while ((line = reader.readLine()) != null) {
 			int i = 0;
 			while (line.length()>i && line.charAt(i) == '!') {
@@ -120,7 +119,7 @@ public class TiddlyWiki2MediaWikiTranslator {
 	}
 
 	public String wikiLinks(String wikicode) {
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer(wikicode, " \t\n\r\f<>", true);
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
@@ -142,7 +141,7 @@ public class TiddlyWiki2MediaWikiTranslator {
 
 	public String insertBreaks(String wikicode) throws IOException {
 		BufferedReader reader = new BufferedReader(new StringReader(wikicode));
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		boolean isLetterLast = false;
 		boolean isLetterNow = false;
 		String line = reader.readLine();

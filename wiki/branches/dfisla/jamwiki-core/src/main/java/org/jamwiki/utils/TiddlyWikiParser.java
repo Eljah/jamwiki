@@ -19,15 +19,18 @@ package org.jamwiki.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
+import org.jamwiki.WikiException;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiUser;
@@ -47,7 +50,7 @@ public class TiddlyWikiParser {
 	private static final String MODIFIED = "modified";
 	//private static final String TAGS = "tags";
 	private static final SimpleDateFormat formater = new SimpleDateFormat("yyyyMMddHHmm");
-	private StringBuffer messages = new StringBuffer();
+	private StringBuilder messages = new StringBuilder();
 	private String virtualWiki;
 	private WikiUser user;
 	private String authorDisplay;
@@ -57,15 +60,15 @@ public class TiddlyWikiParser {
 	 * @author Michael Greifeneder mikegr@gmx.net
 	 */
 	public interface WikiBaseFascade {
-		public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap categories, List<String> links, boolean userVisible, Object transactionObject) throws Exception;
+		public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap categories, List<String> links, Object transactionObject) throws DataAccessException, WikiException;
 	}
 
 	/**
 	 * Defaul WikiBaseFascade for production.
 	 */
 	private WikiBaseFascade wikiBase = new WikiBaseFascade() {
-		public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap categories, List<String> links, boolean userVisible, Object transactionObject) throws Exception {
-			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null, true);
+		public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap categories, List<String> links, Object transactionObject) throws DataAccessException, WikiException {
+			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
 		}
 	};
 
@@ -73,6 +76,7 @@ public class TiddlyWikiParser {
 
 	/**
 	 * Main constructor
+	 *
 	 * @param virtualWiki virtualWiki
 	 * @param user user who is currently logged in
 	 * @param authorDisplay A display value for the importing user, typically the IP address.
@@ -85,6 +89,7 @@ public class TiddlyWikiParser {
 
 	/**
 	 * Use this contructor for test cases
+	 *
 	 * @param virtualWiki Name of VirtualWiki
 	 * @param user User who is logged in.
 	 * @param authorDisplay A display value for the importing user, typically the IP address.
@@ -95,33 +100,37 @@ public class TiddlyWikiParser {
 		this.wikiBase = wikiBase;
 	}
 
-	/** Parses file and returns default topic.
+	/**
+	 * Parses file and returns default topic.
+	 *
 	 * @param file TiddlyWiki file
 	 * @return main topic for this TiddlyWiki
 	 */
-	public String parse(File file) throws Exception {
+	public String parse(File file) throws DataAccessException, IOException, WikiException {
 		Reader r = new FileReader(file);
 		BufferedReader br = new BufferedReader(r);
 		return parse(br);
 	}
 
-	/** Parses TiddlyWiki content and returns default topic.
+	/**
+	 * Parses TiddlyWiki content and returns default topic.
+	 *
 	 * @param br TiddlyWiki file content
 	 * @return main topic for this TiddlyWiki
 	 */
-	public String parse(BufferedReader br) throws Exception {
+	public String parse(BufferedReader br) throws DataAccessException, IOException, WikiException {
 		String line = br.readLine();
 		boolean inTiddler = false;
 		int start = 0;
 		int end = 0;
-		StringBuffer content = new StringBuffer();
+		StringBuilder content = new StringBuilder();
 		while (line != null) {
 			if (inTiddler) {
 				end = line.indexOf(DIV_END);
 				if (end != -1) {
 					inTiddler = false;
 					content.append(line.substring(0, end));
-					proecessContent(content.toString());
+					processContent(content.toString());
 					content.setLength(0);
 					line = line.substring(end);
 				} else {
@@ -132,10 +141,10 @@ public class TiddlyWikiParser {
 				start = line.indexOf(DIV_START);
 				if (start != -1 && (line.indexOf("<div tiddler=\"%0\"") == -1)) {
 					inTiddler = true;
-					logger.debug("Ignoring:\n" + line.substring(0, start));
+					logger.fine("Ignoring:\n" + line.substring(0, start));
 					line = line.substring(start);
 				} else {
-					logger.debug("Div tiddler not found in: \n" + line);
+					logger.fine("Div tiddler not found in: \n" + line);
 					line = br.readLine();
 				}
 			}
@@ -143,8 +152,11 @@ public class TiddlyWikiParser {
 		return "DefaultTiddlers";
 	}
 
-	private void proecessContent(String content) throws Exception {
-		logger.debug("Content: " + content);
+	/**
+	 *
+	 */
+	private void processContent(String content) throws DataAccessException, IOException, WikiException {
+		logger.fine("Content: " + content);
 		String name = findName(content, TIDLLER);
 		if (name == null|| "%0".equals(user)) {
 			return;
@@ -173,7 +185,7 @@ public class TiddlyWikiParser {
 		*/
 		int idx = content.indexOf('>');
 		if (idx == -1) {
-			logger.warn("No closing of tag");
+			logger.warning("No closing of tag");
 			messages.append("WARNING: corrupt line: ").append(content);
 			return;
 		}
@@ -181,10 +193,13 @@ public class TiddlyWikiParser {
 		wikicode = translator.translate(wikicode);
 		messages.append("Adding topic " + name + "\n");
 		saveTopic(name, lastMod, wikicode);
-		logger.debug("Code:" + wikicode);
+		logger.fine("Code:" + wikicode);
 	}
 
-	private void saveTopic(String name, Date lastMod, String content) throws Exception {
+	/**
+	 *
+	 */
+	private void saveTopic(String name, Date lastMod, String content) throws DataAccessException, WikiException {
 		Topic topic = new Topic();
 		topic.setName(name);
 		topic.setVirtualWiki(virtualWiki);
@@ -195,22 +210,28 @@ public class TiddlyWikiParser {
 		// manage mapping bitween MediaWiki and JAMWiki namespaces
 		topic.setTopicType(Topic.TYPE_ARTICLE);
 		// Store topic in database
-		wikiBase.writeTopic(topic, topicVersion, null, null, true, null);
+		wikiBase.writeTopic(topic, topicVersion, null, null, null);
 	}
 
+	/**
+	 *
+	 */
 	private String findName(String content, String name) {
 		int startIdx = content.indexOf(name);
 		if (startIdx == -1) {
-			logger.warn("no tiddler name found");
+			logger.warning("no tiddler name found");
 			return null;
 		}
 		startIdx = content.indexOf('\"', startIdx);
 		int endIdx = content.indexOf('\"', startIdx+1);
 		String value = content.substring(startIdx+1, endIdx);
-		logger.debug(name + ":" + value);
+		logger.fine(name + ":" + value);
 		return value;
 	}
 
+	/**
+	 *
+	 */
 	public String getOutput() {
 		return messages.toString();
 	}

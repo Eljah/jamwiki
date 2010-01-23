@@ -113,11 +113,7 @@ public class JAMWikiRebuildHandler implements java.lang.Runnable {
                         }
 
                         // ParserOutput parserOutput = ParserUtil.parserOutput(pageText, virtualWiki, pageName);
-
-                        if ((pageText != null) && (!pageText.startsWith("#REDIRECT")) && (this.updateCleanContent)) {
-                            //topicVersion.setVersionContentClean(this.parseCleanArticleContent(pageText, pageName, virtualWiki, user));
-                            throw new Exception("Not Implemented!");
-                        } else if ((pageText != null) && (!pageText.startsWith("#redirect")) && (this.updateCleanContent)) {
+                        if ((pageText != null) && (this.updateCleanContent)) {
                             //topicVersion.setVersionContentClean(this.parseCleanArticleContent(pageText, pageName, virtualWiki, user));
                             throw new Exception("Not Implemented!");
                         }

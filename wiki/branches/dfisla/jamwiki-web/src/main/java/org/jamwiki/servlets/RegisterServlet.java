@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.ui.WebAuthenticationDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.WikiBase;
@@ -33,12 +33,12 @@ import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.authentication.JAMWikiAuthenticationConfiguration;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.authentication.WikiUserDetails;
-import org.jamwiki.model.Role;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Encryption;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -48,7 +48,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
  */
 public class RegisterServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(RegisterServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(RegisterServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output when searching. */
 	protected static final String JSP_REGISTER = "register.jsp";
 
@@ -219,7 +219,7 @@ public class RegisterServlet extends JAMWikiServlet {
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// FIXME - i suspect initializing with a null login is bad
 		WikiUser user = new WikiUser();
-		if (!ServletUtil.currentUserDetails().hasRole(Role.ROLE_ANONYMOUS)) {
+		if (!ServletUtil.currentUserDetails().hasRole(RoleImpl.ROLE_ANONYMOUS)) {
 			user = ServletUtil.currentWikiUser();
 		}
 		this.loadDefaults(request, next, pageInfo, user);

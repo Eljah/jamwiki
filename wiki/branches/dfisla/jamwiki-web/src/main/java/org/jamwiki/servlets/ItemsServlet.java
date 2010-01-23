@@ -31,7 +31,7 @@ import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Pagination;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -41,7 +41,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ItemsServlet extends JAMWikiServlet {
 
 	/** Logger for this class and subclasses. */
-	private static final Logger logger = Logger.getLogger(ItemsServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(ItemsServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_ITEMS = "items.jsp";
 
@@ -100,7 +100,7 @@ public class ItemsServlet extends JAMWikiServlet {
 		for (String topicName : unlinkedTopics) {
 			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, true, new Object());
 			if (topic == null) {
-				logger.warn("No topic found: " + virtualWiki + " / " + topicName);
+				logger.warning("No topic found: " + virtualWiki + " / " + topicName);
 				continue;
 			}
 			if (topic.getTopicType() != Topic.TYPE_ARTICLE) {

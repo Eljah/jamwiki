@@ -25,7 +25,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiDiff;
 import org.jamwiki.utils.DiffUtil;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,7 +34,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class DiffServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(DiffServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(DiffServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_DIFF = "diff.jsp";
 
@@ -63,14 +63,14 @@ public class DiffServlet extends JAMWikiServlet {
 		TopicVersion version2 = WikiBase.getDataHandler().lookupTopicVersion(topicVersionId2);
 		if (version1 == null && version2 == null) {
 			String msg = "Versions " + topicVersionId1 + " and " + topicVersionId2 + " not found for " + topicName;
-			logger.fatal(msg);
+			logger.severe(msg);
 			throw new Exception(msg);
 		}
 		String contents1 = (version1 != null) ? version1.getVersionContent() : null;
 		String contents2 = (version2 != null) ? version2.getVersionContent() : null;
 		if (contents1 == null && contents2 == null) {
 			String msg = "No versions found for " + topicVersionId1 + " against " + topicVersionId2;
-			logger.fatal(msg);
+			logger.severe(msg);
 			throw new Exception(msg);
 		}
 		List<WikiDiff> diffs = DiffUtil.diff(contents1, contents2);

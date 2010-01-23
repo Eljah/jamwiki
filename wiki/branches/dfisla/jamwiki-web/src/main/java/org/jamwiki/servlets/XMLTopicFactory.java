@@ -30,7 +30,7 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.NamespaceHandler;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.authentication.WikiUserDetails;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
@@ -59,7 +59,7 @@ public class XMLTopicFactory extends DefaultHandler {
     String pageText = null;
     private String processedTopicName = null;
     private static String lineEnd = System.getProperty("line.separator");
-    private static final Logger logger = Logger.getLogger(XMLTopicFactory.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(XMLTopicFactory.class.getName());
 
     private boolean updateSearchIndex = true;
     private boolean updateCleanContent = false;
@@ -95,7 +95,7 @@ public class XMLTopicFactory extends DefaultHandler {
             SAXParser saxParser = factory.newSAXParser();
             saxParser.parse(file, this);
         } catch (Throwable t) {
-            logger.fatal("Error by importing " + ((XMLTopicFactory) this).pageName, t);
+            logger.severe("Error by importing " + ((XMLTopicFactory) this).pageName, t);
             throw new Exception("Error by import: " + t.getMessage(), t);
         }
         return this.processedTopicName;
@@ -234,18 +234,20 @@ public class XMLTopicFactory extends DefaultHandler {
 
                 ParserOutput parserOutput = ParserUtil.parserOutput(pageText, virtualWiki, pageName);
                 
-                if ((pageText != null) && (!pageText.startsWith("#REDIRECT")) && (this.updateCleanContent)) {
+                if ((pageText != null) && (this.updateCleanContent)) {
                     topicVersion.setVersionContentClean(this.parseCleanArticleContent(pageText, pageName, virtualWiki, user));
                 }
 
-                if(this.updateSearchIndex)
+                if(this.updateSearchIndex){
                     WikiBase.getDataHandler().writeTopic(topic, topicVersion, parserOutput.getCategories(), parserOutput.getLinks(), true);
-                else
+                }
+                else{
                     WikiBase.getDataHandler().writeTopic(topic, topicVersion, parserOutput.getCategories(), parserOutput.getLinks(), true, false);
+                }
                 this.processedTopicName = topic.getName();
 
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.severe(e.getMessage(), e);
                 //throw new SAXException(e);
             }
             pageCount++;
@@ -264,16 +266,16 @@ public class XMLTopicFactory extends DefaultHandler {
      * Wrap I/O exceptions in SAX exceptions, to suit handler signature requirements.
      */
     private void emit(String s) throws SAXException {
-        logger.debug(s);
+        logger.info(s);
     }
 
     /**
      * Start a new line and indent the next line appropriately.
      */
     private void nl() throws SAXException {
-        logger.debug(lineEnd);
+        logger.info(lineEnd);
         for (int i = 0; i < indentLevel; i++) {
-            logger.debug(XML_INDENT);
+            logger.info(XML_INDENT);
         }
     }
 
@@ -345,8 +347,8 @@ public class XMLTopicFactory extends DefaultHandler {
             content = ParserUtil.parse(parserInput, parserOutput, topicContent);
             ret = this.removeHtmlTags(content);
         } catch (ParserException e) {
-            logger.error("Could not remove HTML tags, recovering...");
-            logger.error(e.getMessage(), e);
+            logger.severe("Could not remove HTML tags, recovering...");
+            logger.severe(e.getMessage(), e);
             ret = content;
         }
 

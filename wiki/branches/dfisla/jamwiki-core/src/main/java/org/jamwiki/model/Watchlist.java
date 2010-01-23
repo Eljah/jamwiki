@@ -18,7 +18,7 @@ package org.jamwiki.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a watchlist object consisting of a virtual
@@ -28,7 +28,7 @@ public class Watchlist {
 
 	private String virtualWiki = null;
 	private List<String> topics = new ArrayList<String>();
-	private static final Logger logger = Logger.getLogger(Watchlist.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(Watchlist.class.getName());
 
 	/**
 	 *

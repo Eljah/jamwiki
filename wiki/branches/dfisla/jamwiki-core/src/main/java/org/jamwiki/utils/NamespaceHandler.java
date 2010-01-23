@@ -19,7 +19,6 @@ package org.jamwiki.utils;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.WikiConfiguration;
-import org.apache.log4j.Logger;
 
 /**
  * Class for controlling "namespace". Namespaces allow the organization of
@@ -33,7 +32,7 @@ import org.apache.log4j.Logger;
 public class NamespaceHandler {
 
 	/** Logger */
-	private static final Logger logger = Logger.getLogger(NamespaceHandler.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(NamespaceHandler.class.getName());
 
 	public static final String NAMESPACE_SEPARATOR = ":";
 	public static final String NAMESPACE_SPECIAL = initializeNamespace("special", false);
@@ -115,7 +114,7 @@ public class NamespaceHandler {
 				return (isComments) ? comments : main;
 			}
 		}
-		logger.warn("Namespace not found in configuration: " + name);
+		logger.warning("Namespace not found in configuration: " + name);
 		return null;
 	}
 }

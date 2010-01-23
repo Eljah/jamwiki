@@ -18,7 +18,7 @@ package org.jamwiki.db;
 
 import java.util.Properties;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Microsoft SQL Server-specific implementation of the QueryHandler interface.
@@ -27,17 +27,15 @@ import org.apache.log4j.Logger;
  */
 public class MSSqlQueryHandler extends AnsiQueryHandler {
 
-	private static final Logger logger = Logger.getLogger(MSSqlQueryHandler.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(MSSqlQueryHandler.class.getName());
 	private static final String SQL_PROPERTY_FILE_NAME = "sql.mssql.properties";
-	private static Properties props = null;
-	private static Properties defaults = null;
 
 	/**
 	 *
 	 */
 	protected MSSqlQueryHandler() {
-		defaults = Environment.loadProperties(AnsiQueryHandler.SQL_PROPERTY_FILE_NAME);
-		props = Environment.loadProperties(SQL_PROPERTY_FILE_NAME, defaults);
+		Properties defaults = Environment.loadProperties(AnsiQueryHandler.SQL_PROPERTY_FILE_NAME);
+		Properties props = Environment.loadProperties(SQL_PROPERTY_FILE_NAME, defaults);
 		super.init(props);
 	}
 }

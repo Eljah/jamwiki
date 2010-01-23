@@ -4,8 +4,6 @@
  */
 package com.itmatter.jamwiki.analyzer;
 
-import info.bliki.wiki.filter.ITextConverter;
-import info.bliki.wiki.model.IWikiModel;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +24,7 @@ import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.bliki.BlikiProxyParser;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLogger;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -34,7 +32,7 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class Main {
 
-    private static final WikiLogger logger = WikiLogger.getLogger(Main.class.getName());
+    private static Logger logger = Logger.getLogger(Main.class);
     private static final String USAGE = "[-h] [-t <string:topic name> -w <string:wiki name>] -c <string:all,wiki,txt,html>| [-r <string:regex>]";
     private static final String HEADER = "JAM Wiki Content Analyzer - Parses and Transforms article content.";
     private static final String FOOTER = "";
@@ -78,26 +76,12 @@ public class Main {
 
     }
 
-    public static void render(IWikiModel fModel, ITextConverter converter, Appendable appendable, String fHeader, Topic topic) throws IOException {
-
-        if (fHeader != null) {
-            appendable.append(fHeader);
-        }
-
-        // print page information
-        String rawWikiText = topic.getTopicContent();
-        fModel.setPageName(topic.getName());
-        // System.out.println(rawWikiText);
-        appendable.append(fModel.render(converter, rawWikiText));
-
-    }
-
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
-        logger.fine("Started...");
+        logger.debug("Started...");
         Options options = new Options();
         options.addOption("h", "help", false, "Print this usage information");
         options.addOption("w", "wiki", true, "Wiki name");

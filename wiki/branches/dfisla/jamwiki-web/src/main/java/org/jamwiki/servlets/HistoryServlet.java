@@ -28,7 +28,7 @@ import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.utils.Pagination;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -37,7 +37,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class HistoryServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(HistoryServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(HistoryServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_HISTORY = "history.jsp";
 

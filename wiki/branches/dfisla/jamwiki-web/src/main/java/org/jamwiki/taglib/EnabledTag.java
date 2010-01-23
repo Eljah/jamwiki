@@ -19,7 +19,7 @@ package org.jamwiki.taglib;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * JSP tag that executes its tag content only if the specified property has
@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  */
 public class EnabledTag extends BodyTagSupport {
 
-	private static final Logger logger = Logger.getLogger(EnabledTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(EnabledTag.class.getName());
 	private String property = null;
 
 	/**
@@ -38,10 +38,10 @@ public class EnabledTag extends BodyTagSupport {
 		try {
 			propertyName = (String)Environment.class.getField(this.property).get(null);
 		} catch (NoSuchFieldException e) {
-			logger.fatal("Failure in enabled tag for " + this.property, e);
+			logger.severe("Failure in enabled tag for " + this.property, e);
 			throw new JspException(e);
 		} catch (IllegalAccessException e) {
-			logger.fatal("Failure in enabled tag for " + this.property, e);
+			logger.severe("Failure in enabled tag for " + this.property, e);
 			throw new JspException(e);
 		}
 		if (Environment.getBooleanValue(propertyName)) {

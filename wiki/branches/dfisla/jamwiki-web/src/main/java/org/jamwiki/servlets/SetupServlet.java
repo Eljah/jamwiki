@@ -19,7 +19,7 @@ package org.jamwiki.servlets;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.jamwiki.Environment;
@@ -35,7 +35,7 @@ import org.jamwiki.model.WikiConfigurationObject;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Utilities;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -47,10 +47,10 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class SetupServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(SetupServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(SetupServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_SETUP = "setup.jsp";
-	private static final int MINIMUM_JDK_VERSION = 140;
+	private static final int MINIMUM_JDK_VERSION = 150;
 
 	/**
 	 * This method handles the request after its parent class receives control.
@@ -89,12 +89,12 @@ public class SetupServlet extends JAMWikiServlet {
 		// reset properties
 		Environment.setBooleanValue(Environment.PROP_BASE_INITIALIZED, false);
 		if (!(e instanceof WikiException)) {
-			logger.fatal("Setup error", e);
+			logger.severe("Setup error", e);
 		}
 		try {
 			this.view(request, next, pageInfo);
 		} catch (Exception ex) {
-			logger.fatal("Unable to set up page view object for setup.jsp", ex);
+			logger.severe("Unable to set up page view object for setup.jsp", ex);
 		}
 		if (e instanceof WikiException) {
 			WikiException we = (WikiException)e;
@@ -233,7 +233,7 @@ public class SetupServlet extends JAMWikiServlet {
 		pageInfo.setPageTitle(new WikiMessage("setup.title", WikiVersion.CURRENT_WIKI_VERSION));
 		List<WikiConfigurationObject> dataHandlers = WikiConfiguration.getInstance().getDataHandlers();
 		next.addObject("dataHandlers", dataHandlers);
-		WikiMessage logMessage =  new WikiMessage("setup.help.logfile", "Using log4j refer to config files." );
+		WikiMessage logMessage = new WikiMessage("setup.help.logfile", WikiLogger.getDefaultLogFile(), WikiLogger.getLogConfigFile());
 		next.addObject("logMessage", logMessage);
 	}
 }

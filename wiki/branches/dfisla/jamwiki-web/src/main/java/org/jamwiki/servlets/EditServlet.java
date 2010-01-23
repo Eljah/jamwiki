@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.authentication.WikiUserDetails;
-import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.Watchlist;
@@ -37,7 +37,7 @@ import org.jamwiki.utils.DiffUtil;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -47,7 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class EditServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(EditServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(EditServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_EDIT = "edit.jsp";
 
@@ -190,11 +190,11 @@ public class EditServlet extends JAMWikiServlet {
 		if (ServletUtil.isEditable(virtualWiki, topicName, user)) {
 			return null;
 		}
-		if (!user.hasRole(Role.ROLE_EDIT_EXISTING)) {
+		if (!user.hasRole(RoleImpl.ROLE_EDIT_EXISTING)) {
 			WikiMessage messageObject = new WikiMessage("login.message.edit");
 			return ServletUtil.viewLogin(request, pageInfo, WikiUtil.getTopicFromURI(request), messageObject);
 		}
-		if (!user.hasRole(Role.ROLE_EDIT_NEW) && WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null) == null) {
+		if (!user.hasRole(RoleImpl.ROLE_EDIT_NEW) && WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null) == null) {
 			WikiMessage messageObject = new WikiMessage("login.message.editnew");
 			return ServletUtil.viewLogin(request, pageInfo, WikiUtil.getTopicFromURI(request), messageObject);
 		}
@@ -276,7 +276,7 @@ public class EditServlet extends JAMWikiServlet {
 			sectionName = parserOutput.getSectionName();
 		}
 		if (contents == null) {
-			logger.warn("The topic " + topicName + " has no content");
+			logger.warning("The topic " + topicName + " has no content");
 			throw new WikiException(new WikiMessage("edit.exception.nocontent", topicName));
 		}
 		// strip line feeds
@@ -321,7 +321,7 @@ public class EditServlet extends JAMWikiServlet {
 		WikiBase.getDataHandler().writeTopic(topic, topicVersion, parserOutput.getCategories(), parserOutput.getLinks(), true);
 		// update watchlist
 		WikiUserDetails userDetails = ServletUtil.currentUserDetails();
-		if (!userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
+		if (!userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS)) {
 			Watchlist watchlist = ServletUtil.currentWatchlist(request, virtualWiki);
 			boolean watchTopic = (request.getParameter("watchTopic") != null);
 			if (watchlist.containsTopic(topicName) != watchTopic) {

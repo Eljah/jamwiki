@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.authentication.JAMWikiAuthenticationConstants;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -33,7 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoginServlet extends JAMWikiServlet {
 
 	/** Logger */
-	private static final Logger logger = Logger.getLogger(LoginServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(LoginServlet.class.getName());
 
 	/**
 	 *
@@ -64,7 +64,7 @@ public class LoginServlet extends JAMWikiServlet {
 			// this should never happen
 			throw new IllegalStateException("Unsupporting encoding UTF-8");
 		}
-		StringBuffer springSecurityLogoutUrl = new StringBuffer();
+		StringBuilder springSecurityLogoutUrl = new StringBuilder();
 		if (!StringUtils.equals(request.getContextPath(), "/")) {
 			springSecurityLogoutUrl.append(request.getContextPath());
 		}

@@ -26,8 +26,10 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -40,7 +42,6 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 /**
  * This class provides a variety of basic utility methods that are not
@@ -48,7 +49,7 @@ import org.apache.log4j.Logger;
  */
 public class Utilities {
 
-	private static final Logger logger = Logger.getLogger(Utilities.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(Utilities.class.getName());
 
 	private static Pattern VALID_IPV4_PATTERN = null;
 	private static Pattern VALID_IPV6_PATTERN = null;
@@ -60,7 +61,7 @@ public class Utilities {
 			VALID_IPV4_PATTERN = Pattern.compile(ipv4Pattern, Pattern.CASE_INSENSITIVE);
 			VALID_IPV6_PATTERN = Pattern.compile(ipv6Pattern, Pattern.CASE_INSENSITIVE);
 		} catch (PatternSyntaxException e) {
-			logger.fatal("Unable to compile pattern", e);
+			logger.severe("Unable to compile pattern", e);
 		}
 	}
 
@@ -83,18 +84,18 @@ public class Utilities {
 			return text;
 		}
 		if (StringUtils.isBlank(fromEncoding)) {
-			logger.warn("No character encoding specified to convert from, using UTF-8");
+			logger.warning("No character encoding specified to convert from, using UTF-8");
 			fromEncoding = "UTF-8";
 		}
 		if (StringUtils.isBlank(toEncoding)) {
-			logger.warn("No character encoding specified to convert to, using UTF-8");
+			logger.warning("No character encoding specified to convert to, using UTF-8");
 			toEncoding = "UTF-8";
 		}
 		try {
 			text = new String(text.getBytes(fromEncoding), toEncoding);
 		} catch (UnsupportedEncodingException e) {
 			// bad encoding
-			logger.warn("Unable to convert value " + text + " from " + fromEncoding + " to " + toEncoding, e);
+			logger.warning("Unable to convert value " + text + " from " + fromEncoding + " to " + toEncoding, e);
 		}
 		return text;
 	}
@@ -139,6 +140,24 @@ public class Utilities {
 			throw new IllegalStateException("Unsupporting encoding UTF-8");
 		}
 		return Utilities.decodeTopicName(result, decodeUnderlines);
+	}
+
+	/**
+	 * Convert a delimited string to a list.
+	 *
+	 * @param delimitedString A string consisting of the delimited list items.
+	 * @param delimiter The string used as the delimiter.
+	 * @return A list consisting of the delimited string items, or <code>null</code> if the
+	 *  string is <code>null</code> or empty.
+	 */
+	public static List<String> delimitedStringToList(String delimitedString, String delimiter) {
+		if (delimiter == null) {
+			throw new IllegalArgumentException("Attempt to call Utilities.delimitedStringToList with no delimiter specified");
+		}
+		if (StringUtils.isBlank(delimitedString)) {
+			return null;
+		}
+		return Arrays.asList(StringUtils.splitByWholeSeparator(delimitedString, delimiter));
 	}
 
 	/**
@@ -197,8 +216,8 @@ public class Utilities {
 	 * @return -1 if no matching end tag is found, or the index within the string of the first
 	 *  character immediately following the end tag.
 	 */
-	public static int findMatchingEndTag(String content, int start, String startToken, String endToken) {
-		return Utilities.findMatchingTag(content, start, startToken, endToken, false);
+	public static int findMatchingEndTag(CharSequence content, int start, String startToken, String endToken) {
+		return Utilities.findMatchingTag(content.toString(), start, startToken, endToken, false);
 	}
 
 	/**
@@ -217,8 +236,8 @@ public class Utilities {
 	 * @return -1 if no matching start tag is found, or the index within the string of the first
 	 *  character immediately preceding the start tag.
 	 */
-	public static int findMatchingStartTag(String content, int start, String startToken, String endToken) {
-		return Utilities.findMatchingTag(content, start, startToken, endToken, true);
+	public static int findMatchingStartTag(CharSequence content, int start, String startToken, String endToken) {
+		return Utilities.findMatchingTag(content.toString(), start, startToken, endToken, true);
 	}
 
 	/**
@@ -274,7 +293,7 @@ public class Utilities {
 			Class.forName(className, true, Thread.currentThread().getContextClassLoader());
 			return;
 		} catch (ClassNotFoundException e) {
-			logger.error("Unable to load class " + className + " using the thread class loader, now trying the default class loader");
+			logger.info("Unable to load class " + className + " using the thread class loader, now trying the default class loader");
 		}
 		Class.forName(className);
 	}
@@ -323,7 +342,7 @@ public class Utilities {
 		try {
 			loader = Thread.currentThread().getContextClassLoader();
 		} catch (SecurityException e) {
-			logger.debug("Unable to retrieve thread class loader, trying default");
+			logger.fine("Unable to retrieve thread class loader, trying default");
 		}
 		if (loader == null) {
 			loader = Utilities.class.getClassLoader();
@@ -418,7 +437,7 @@ public class Utilities {
 		if (StringUtils.isBlank(className)) {
 			throw new IllegalArgumentException("Cannot call instantiateClass with an empty class name");
 		}
-		logger.debug("Instantiating class: " + className);
+		logger.fine("Instantiating class: " + className);
 		try {
 			Class clazz = ClassUtils.getClass(className);
 			Class[] parameterTypes = new Class[0];
@@ -426,15 +445,15 @@ public class Utilities {
 			Object[] initArgs = new Object[0];
 			return constructor.newInstance(initArgs);
 		} catch (ClassNotFoundException e) {
-			throw new IllegalStateException("Invalid class name specified: " + className);
+			throw new IllegalStateException("Invalid class name specified: " + className, e);
 		} catch (NoSuchMethodException e) {
-			throw new IllegalStateException("Specified class does not have a valid constructor: " + className);
+			throw new IllegalStateException("Specified class does not have a valid constructor: " + className, e);
 		} catch (IllegalAccessException e) {
-			throw new IllegalStateException("Specified class does not have a valid constructor: " + className);
+			throw new IllegalStateException("Specified class does not have a valid constructor: " + className, e);
 		} catch (InvocationTargetException e) {
-			throw new IllegalStateException("Specified class does not have a valid constructor: " + className);
+			throw new IllegalStateException("Specified class does not have a valid constructor: " + className, e);
 		} catch (InstantiationException e) {
-			throw new IllegalStateException("Specified class could not be instantiated: " + className);
+			throw new IllegalStateException("Specified class could not be instantiated: " + className, e);
 		}
 	}
 
@@ -467,9 +486,8 @@ public class Utilities {
 		if (text == null) {
 			return false;
 		}
-		String unescaped = StringEscapeUtils.unescapeHtml(text);
 		// see if it was successfully converted, in which case it is an entity
-		return (!text.equals(unescaped));
+		return (!text.equals(StringEscapeUtils.unescapeHtml(text)));
 	}
 
 	/**
@@ -491,6 +509,31 @@ public class Utilities {
 		}
 		Matcher m2 = Utilities.VALID_IPV6_PATTERN.matcher(ipAddress);
 		return m2.matches();
+	}
+
+	/**
+	 * Convert a list to a delimited string.
+	 *
+	 * @param list The list to convert to a string.
+	 * @param delimiter The string to use as a delimiter.
+	 * @return A string consisting of the delimited list items, or <code>null</code> if the
+	 *  list is <code>null</code> or empty.
+	 */
+	public static String listToDelimitedString(List<String> list, String delimiter) {
+		if (delimiter == null) {
+			throw new IllegalArgumentException("Attempt to call Utilities.delimitedStringToList with no delimiter specified");
+		}
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
+		String result = "";
+		for (String item : list) {
+			if (result.length() > 0) {
+				result += delimiter;
+			}
+			result += item;
+		}
+		return result;
 	}
 
 	/**

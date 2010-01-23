@@ -17,7 +17,7 @@
 package org.jamwiki;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Utility class that holds the current Wiki version constant and provides
@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
  */
 public class WikiVersion {
 
-	private static final Logger logger = Logger.getLogger(WikiVersion.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiVersion.class.getName());
 	private final int major;
 	private final int minor;
 	private final int patch;
 
 	/** Current software version.  If this differs from the version in the properties an upgrade is performed. */
-	public final static String CURRENT_WIKI_VERSION = "0.8.0";
+	public final static String CURRENT_WIKI_VERSION = "0.9.0";
 
 	/**
 	 * Constructor to create a new Wiki version object using a version string of

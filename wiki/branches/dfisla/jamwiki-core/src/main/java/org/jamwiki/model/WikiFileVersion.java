@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a version of a file uploaded to the Wiki.
@@ -34,8 +35,9 @@ public class WikiFileVersion {
     private int fileVersionId = -1;
     private String mimeType = WikiFile.UNKNOWN_MIME_TYPE;
     private String uploadComment = null;
-    private Timestamp uploadDate = new Timestamp(System.currentTimeMillis()); //2009-11-28 00:31:39.82
+    private Timestamp uploadDate = new Timestamp(System.currentTimeMillis());
     private String url = null;
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiFileVersion.class.getName());
 
     /**
      *

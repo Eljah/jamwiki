@@ -41,10 +41,10 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.authentication.JAMWikiAuthenticationConstants;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.authentication.WikiUserDetails;
 import org.jamwiki.db.DatabaseConnection;
 import org.jamwiki.model.Category;
-import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
@@ -62,13 +62,13 @@ import org.jamwiki.utils.SpamFilter;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.DataHandler;
 import org.jamwiki.model.ParsedTopic;
 import org.jamwiki.utils.WikiUtil;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -76,7 +76,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class ServletUtil {
 
-    private static final Logger logger = Logger.getLogger(ServletUtil.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(ServletUtil.class.getName());
     /** The name of the JSP file used to render the servlet output for logins. */
     protected static final String JSP_LOGIN = "login.jsp";
     /** The name of the output parameter used to store page information. */
@@ -136,12 +136,9 @@ public class ServletUtil {
 
                 topic.setTopicContent(content);
             }
-            //ParsedTopic topicCacheObject = new ParsedTopic();
-            //topicCacheObject.initialize(topic);
-
             WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key, content);
         } catch (Exception e) {
-            logger.error("error getting cached page " + virtualWiki + " / " + topicName, e);
+			logger.warning("error getting cached page " + virtualWiki + " / " + topicName, e);
             return null;
         }
         return content;
@@ -167,7 +164,7 @@ public class ServletUtil {
         }
         String message = "SPAM found in topic " + topicName + " (";
         WikiUserDetails user = ServletUtil.currentUserDetails();
-        if (!user.hasRole(Role.ROLE_ANONYMOUS)) {
+		if (!user.hasRole(RoleImpl.ROLE_ANONYMOUS)) {
             message += user.getUsername() + " / ";
         }
         message += ServletUtil.getIpAddress(request) + "): " + result;
@@ -213,13 +210,13 @@ public class ServletUtil {
                 // FIXME - do not lookup the user every time this method is called, that will kill performance
                 user = WikiBase.getDataHandler().lookupWikiUser(username);
             } catch (DataAccessException e) {
-                logger.fatal("Failure while retrieving user from database with login: " + username, e);
+				logger.severe("Failure while retrieving user from database with login: " + username, e);
                 return user;
             }
             if (user == null) {
                 // invalid user.  someone has either spoofed a cookie or the user account is no longer in
                 // the database.
-                logger.warn("No user exists for principal found in security context authentication: " + username);
+				logger.warning("No user exists for principal found in security context authentication: " + username);
                 SecurityContextHolder.clearContext();
                 throw new AuthenticationCredentialsNotFoundException("Invalid user credentials found - username " + username + " does not exist in this wiki installation");
             }
@@ -248,7 +245,7 @@ public class ServletUtil {
         // no watchlist in session, retrieve from database
         WikiUserDetails userDetails = ServletUtil.currentUserDetails();
         Watchlist watchlist = new Watchlist();
-        if (userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
+		if (userDetails.hasRole(RoleImpl.ROLE_ANONYMOUS)) {
             return watchlist;
         }
         WikiUser user = ServletUtil.currentWikiUser();
@@ -283,7 +280,7 @@ public class ServletUtil {
             ipAddress = ipAddress.substring(0, pos);
         }
         if (!Utilities.isIpAddress(ipAddress)) {
-            logger.warn("Invalid IP address found in request: " + ipAddress);
+			logger.info("Invalid IP address found in request: " + ipAddress);
             ipAddress = "0.0.0.0";
         }
         return ipAddress;
@@ -337,13 +334,13 @@ public class ServletUtil {
      * @throws WikiException Thrown if any error occurs during processing.
      */
     protected static boolean isEditable(String virtualWiki, String topicName, WikiUserDetails user) throws WikiException {
-        if (user == null || !user.hasRole(Role.ROLE_EDIT_EXISTING)) {
+		if (user == null || !user.hasRole(RoleImpl.ROLE_EDIT_EXISTING)) {
             // user does not have appropriate permissions
             return false;
         }
         Topic topic = null;
         try {
-            if (!user.hasRole(Role.ROLE_EDIT_NEW) && WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null) == null) {
+			if (!user.hasRole(RoleImpl.ROLE_EDIT_NEW) && WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null) == null) {
                 // user does not have appropriate permissions
                 return false;
             }
@@ -355,7 +352,7 @@ public class ServletUtil {
             // new topic, edit away...
             return true;
         }
-        if (topic.getAdminOnly() && !user.hasRole(Role.ROLE_ADMIN)) {
+		if (topic.getAdminOnly() && !user.hasRole(RoleImpl.ROLE_ADMIN)) {
             return false;
         }
         if (topic.getReadOnly()) {
@@ -376,7 +373,7 @@ public class ServletUtil {
      * @throws WikiException Thrown if any error occurs during processing.
      */
     protected static boolean isMoveable(String virtualWiki, String topicName, WikiUserDetails user) throws WikiException {
-        if (user == null || !user.hasRole(Role.ROLE_MOVE)) {
+		if (user == null || !user.hasRole(RoleImpl.ROLE_MOVE)) {
             // no permission granted to move pages
             return false;
         }
@@ -393,7 +390,7 @@ public class ServletUtil {
         if (topic.getReadOnly()) {
             return false;
         }
-        if (topic.getAdminOnly() && !user.hasRole(Role.ROLE_ADMIN)) {
+		if (topic.getAdminOnly() && !user.hasRole(RoleImpl.ROLE_ADMIN)) {
             return false;
         }
         return true;
@@ -579,11 +576,10 @@ public class ServletUtil {
         if (Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
             try {
                 virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
-            } catch (DataAccessException e) {
-            }
+			} catch (DataAccessException e) {}
         }
         if (virtualWiki == null) {
-            logger.fatal("No virtual wiki found for " + virtualWikiName);
+			logger.severe("No virtual wiki found for " + virtualWikiName);
             virtualWiki = new VirtualWiki();
             virtualWiki.setName(WikiBase.DEFAULT_VWIKI);
             virtualWiki.setDefaultTopicName(Environment.getValue(Environment.PROP_BASE_DEFAULT_TOPIC));
@@ -628,10 +624,10 @@ public class ServletUtil {
         try {
             DatabaseConnection.testDatabase(driver, url, userName, password, false);
         } catch (ClassNotFoundException e) {
-            logger.fatal("Invalid database settings", e);
+			logger.severe("Invalid database settings", e);
             errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
         } catch (SQLException e) {
-            logger.fatal("Invalid database settings", e);
+			logger.severe("Invalid database settings", e);
             errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
         }
         // verify valid parser class
@@ -766,18 +762,18 @@ public class ServletUtil {
         String virtualWiki = topic.getVirtualWiki();
         String topicName = topic.getName();
 
-        DataHandler dataHandler = WikiBase.getDataHandler();
+        //DataHandler dataHandler = WikiBase.getDataHandler();
         ParsedTopic parsedTopic = null;
 
         try {
 
-            //String cacheKey = WikiCache.key(virtualWiki, topicName);
-            //Element cacheElement = WikiCache.retrieveFromCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey);
+            String cacheKey = WikiCache.key(virtualWiki, topicName);
+            Element cacheElement = WikiCache.retrieveFromCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey);
 
-            parsedTopic = dataHandler.lookupParsedTopic(virtualWiki, topicName, null);
+            //topicCacheObject = dataHandler.lookupParsedTopic(virtualWiki, topicName, null);
 
-            //if (cacheElement == null) {
-            if (parsedTopic == null) {
+            if (cacheElement == null) {
+
                 parsedTopic = new ParsedTopic();
 
                 WikiUserDetails userDetails = ServletUtil.currentUserDetails();
@@ -814,8 +810,7 @@ public class ServletUtil {
                         content = html.toString();
                     }
                 } catch (ParserException e) {
-                    logger.error(e);
-                    //throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+                    throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
                 }
 
                 // ADD-CATEGORIES
@@ -842,11 +837,24 @@ public class ServletUtil {
                     } catch (DataAccessException e) {
                         throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
                     }
+			WikiUser wikiUser;
                     for (WikiFileVersion fileVersion : fileVersions) {
                         // update version urls to include web root path
                         String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + fileVersion.getUrl());
                         url = FilenameUtils.separatorsToUnix(url);
                         fileVersion.setUrl(url);
+				// make sure the authorDisplay field is equal to the login for non-anonymous uploads
+				if (fileVersion.getAuthorId() != null) {
+					try {
+						wikiUser = WikiBase.getDataHandler().lookupWikiUser(fileVersion.getAuthorId());
+					} catch (DataAccessException e) {
+						throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+					}
+					if (wikiUser != null) {
+						// wikiUser should never be null unless the data in the database is somehow corrupt
+						fileVersion.setAuthorDisplay(wikiUser.getUsername());
+					}
+				}
                     }
                     // ADD FILE-VERSIONS & FILE/IMAGE
                     next.addObject("fileVersions", fileVersions);
@@ -872,15 +880,15 @@ public class ServletUtil {
                         (!topicName.equals(WikiBase.SPECIAL_PAGE_BOTTOM_AREA)) &&
                         (!timeLimited) &&
                         (!content.startsWith("<span class=\"error\">ERROR"))) {
-                    dataHandler.writeParsedTopic(parsedTopic);
-                    //WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey, parsedTopic.toString());
-                    logger.debug("CACHE_PARSED_TOPIC_CONTENT WRITE =>: TOPIC-NAME: " + parsedTopic.getName() + " CONTENT: " + parsedTopic.getTopicContent());
+                    //dataHandler.writeParsedTopic(topicCacheObject);
+                    WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey, parsedTopic.toString());
+                    logger.info("CACHE_PARSED_TOPIC_CONTENT WRITE =>: TOPIC-NAME: " + parsedTopic.getName() + " CONTENT: " + parsedTopic.getTopicContent());
                 }
 
             } else {
 
                 //logger.debug("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
-                //parsedTopic = new ParsedTopic((String) cacheElement.getObjectValue());
+                parsedTopic = new ParsedTopic((String) cacheElement.getObjectValue());
                 topic = (Topic) parsedTopic;
 
                 next.addObject("categories", parsedTopic.categories);
@@ -905,13 +913,13 @@ public class ServletUtil {
                     }
                 }
 
-                logger.debug("WikiBase.CACHE_PARSED_TOPIC_CONTENT GET <=: TOPIC-NAME: " + topic.getName() + " CONTENT: " + topic.getTopicContent());
+                logger.fine("WikiBase.CACHE_PARSED_TOPIC_CONTENT GET <=: TOPIC-NAME: " + topic.getName() + " CONTENT: " + topic.getTopicContent());
             }
 
             next.addObject(ServletUtil.PARAMETER_TOPIC_OBJECT, topic);
 
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.severe(ex.getMessage(), ex);
         }
 
         if (pageTitle != null) {

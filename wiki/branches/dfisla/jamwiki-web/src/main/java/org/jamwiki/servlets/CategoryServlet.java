@@ -25,7 +25,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Category;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Pagination;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -35,7 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class CategoryServlet extends JAMWikiServlet {
 
 	/** Logger for this class and subclasses. */
-	private static final Logger logger = Logger.getLogger(CategoryServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(CategoryServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_CATEGORIES = "categories.jsp";
 

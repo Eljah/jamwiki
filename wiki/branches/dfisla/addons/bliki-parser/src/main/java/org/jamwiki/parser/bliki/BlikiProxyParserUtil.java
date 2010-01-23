@@ -30,6 +30,10 @@ public class BlikiProxyParserUtil {
      * Provide a way to run the pre-processor against a fragment of text, such
      * as an image caption.  This method should be used sparingly since it is
      * not very efficient.
+     * @param parserInput 
+     * @param raw 
+     * @return HTML string representation of input
+     * @throws ParserException
      */
     protected static String parseFragment(ParserInput parserInput, String raw) throws ParserException {
         if (StringUtils.isBlank(raw)) {
@@ -51,6 +55,11 @@ public class BlikiProxyParserUtil {
         return output;
     }
 
+    /**
+     * Parse Mediawiki Link
+     * @param raw
+     * @return WikiLink object
+     */
     protected static WikiLink parseWikiLink(String raw) {
         if (StringUtils.isBlank(raw)) {
             return new WikiLink();

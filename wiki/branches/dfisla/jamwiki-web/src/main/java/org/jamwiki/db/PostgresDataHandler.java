@@ -16,7 +16,7 @@
  */
 package org.jamwiki.db;
 
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Implementation of the {@link org.jamwiki.DataHandler} interface that is
@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  */
 public class PostgresDataHandler extends AnsiDataHandler {
 
-	private static final Logger logger = Logger.getLogger(PostgresDataHandler.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(PostgresDataHandler.class.getName());
 	private final QueryHandler queryHandler = new PostgresQueryHandler();
 
 	/**

@@ -22,16 +22,15 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.authentication.WikiUserDetails;
-import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
-import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -40,7 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class MoveServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(MoveServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(MoveServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_MOVE = "move.jsp";
 
@@ -49,7 +48,7 @@ public class MoveServlet extends JAMWikiServlet {
 	 */
 	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		WikiUserDetails userDetails = ServletUtil.currentUserDetails();
-		if (!userDetails.hasRole(Role.ROLE_MOVE)) {
+		if (!userDetails.hasRole(RoleImpl.ROLE_MOVE)) {
 			WikiMessage messageObject = new WikiMessage("login.message.move");
 			return ServletUtil.viewLogin(request, pageInfo, WikiUtil.getTopicFromURI(request), messageObject);
 		}
@@ -76,8 +75,8 @@ public class MoveServlet extends JAMWikiServlet {
 		if (!movePage(request, next, pageInfo, topicName, moveDestination)) {
 			return;
 		}
-		if (!StringUtils.isBlank(request.getParameter("moveCommentsPage"))) {
-			String moveCommentsPage = Utilities.decodeTopicName(request.getParameter("moveCommentsPage"), true);
+		String moveCommentsPage = WikiUtil.getParameterFromRequest(request, "moveCommentsPage", true);
+		if (!StringUtils.isBlank(moveCommentsPage)) {
 			String commentsDestination = WikiUtil.extractCommentsLink(moveDestination);
 			if (WikiUtil.isCommentsPage(moveCommentsPage) && !moveCommentsPage.equals(topicName) && !commentsDestination.equals(moveDestination)) {
 				if (!movePage(request, next, pageInfo, moveCommentsPage, commentsDestination)) {
@@ -136,10 +135,7 @@ public class MoveServlet extends JAMWikiServlet {
 			next.addObject("messageObject", new WikiMessage("move.exception.destinationexists", moveDestination));
 			return false;
 		}
-		String moveComment = Utilities.formatMessage("move.editcomment", request.getLocale(), new String[]{moveFrom, moveDestination});
-		if (!StringUtils.isBlank(request.getParameter("moveComment"))) {
-			moveComment += " (" + request.getParameter("moveComment") + ")";
-		}
+		String moveComment = request.getParameter("moveComment");
 		WikiUser user = ServletUtil.currentWikiUser();
 		TopicVersion topicVersion = new TopicVersion(user, ServletUtil.getIpAddress(request), moveComment, fromTopic.getTopicContent(), 0);
 		topicVersion.setEditType(TopicVersion.EDIT_MOVE);

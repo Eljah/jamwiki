@@ -17,12 +17,16 @@
 package org.jamwiki;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.LogItem;
+import org.jamwiki.model.ParsedTopic;
 import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
@@ -35,489 +39,570 @@ import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
-import org.apache.log4j.Logger;
-import org.jamwiki.model.ParsedTopic;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  *
  */
 public class TestDataHandler implements DataHandler {
 
-	private static final Logger logger = Logger.getLogger(TestDataHandler.class.getName());
-	/** Keep a map of topic name and topic object in memory to support the writeTopic method. */
-	private Map<String, Topic> topics = new LinkedHashMap<String, Topic>();
+    private static final WikiLogger logger = WikiLogger.getLogger(TestDataHandler.class.getName());
+    /** Keep a map of topic name and topic object in memory to support the writeTopic method. */
+    private Map<String, Topic> topics = new LinkedHashMap<String, Topic>();
+
+    /**
+     *
+     */
+    public boolean authenticate(String username, String password) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public boolean canMoveTopic(Topic fromTopic, String destination) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void deleteTopic(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void executeUpgradeQuery(String prop, Connection conn) throws SQLException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<Category> getAllCategories(String virtualWiki, Pagination pagination) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<Role> getAllRoles() throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<String> getAllTopicNames(String virtualWiki) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    // PERFORMANCE-EXPERIMENTAL
+    public List<Integer> getAllTopicIdentifiers(String virtualWiki) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<WikiFileVersion> getAllWikiFileVersions(String virtualWiki, String topicName, boolean descending) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<LogItem> getLogItems(String virtualWiki, int logType, Pagination pagination, boolean descending) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<RecentChange> getRecentChanges(String virtualWiki, Pagination pagination, boolean descending) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<RecentChange> getRecentChanges(String virtualWiki, String topicName, Pagination pagination, boolean descending) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<RoleMap> getRoleMapByLogin(String loginFragment) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<RoleMap> getRoleMapByRole(String roleName) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<Role> getRoleMapGroup(String groupName) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<RoleMap> getRoleMapGroups() throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<Role> getRoleMapUser(String login) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
 	/**
 	 *
 	 */
-	public boolean authenticate(String username, String password) throws DataAccessException {
+	public List<RecentChange> getTopicHistory(String virtualWiki, String topicName, Pagination pagination, boolean descending) throws DataAccessException {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 *
-	 */
-	public boolean canMoveTopic(Topic fromTopic, String destination) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public List<String> getTopicsAdmin(String virtualWiki, Pagination pagination) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-	/**
-	 *
-	 */
-	public void deleteTopic(Topic topic, TopicVersion topicVersion, boolean userVisible) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public List<RecentChange> getUserContributions(String virtualWiki, String userString, Pagination pagination, boolean descending) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-	/**
-	 *
-	 */
-	public List<Category> getAllCategories(String virtualWiki, Pagination pagination) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public List<VirtualWiki> getVirtualWikiList() throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-	/**
-	 *
-	 */
-	public List<Role> getAllRoles() throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public Watchlist getWatchlist(String virtualWiki, int userId) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-	/**
-	 *
-	 */
-	public List<String> getAllTopicNames(String virtualWiki) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public List<RecentChange> getWatchlist(String virtualWiki, int userId, Pagination pagination) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-        // PERFORMANCE-EXPERIMENTAL
-        public List<Integer> getAllTopicIdentifiers(String virtualWiki) throws DataAccessException{
-            throw new UnsupportedOperationException();
+    /**
+     *
+     */
+    public List<Category> lookupCategoryTopics(String virtualWiki, String categoryName) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public Topic lookupTopic(String virtualWiki, String topicName, boolean deleteOK, Object transactionObject) throws DataAccessException {
+        String content = null;
+        if (topics.get(topicName) != null) {
+            // first check the memory store created by writeTopic
+            return topics.get(topicName);
         }
-
-	/**
-	 *
-	 */
-	public List<WikiFileVersion> getAllWikiFileVersions(String virtualWiki, String topicName, boolean descending) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RecentChange> getRecentChanges(String virtualWiki, Pagination pagination, boolean descending) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RecentChange> getRecentChanges(String virtualWiki, String topicName, Pagination pagination, boolean descending) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RoleMap> getRoleMapByLogin(String loginFragment) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RoleMap> getRoleMapByRole(String roleName) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public Role[] getRoleMapGroup(String groupName) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RoleMap> getRoleMapGroups() throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public Role[] getRoleMapUser(String login) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<String> getTopicsAdmin(String virtualWiki, Pagination pagination) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RecentChange> getUserContributions(String virtualWiki, String userString, Pagination pagination, boolean descending) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<VirtualWiki> getVirtualWikiList() throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public Watchlist getWatchlist(String virtualWiki, int userId) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<RecentChange> getWatchlist(String virtualWiki, int userId, Pagination pagination) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<Category> lookupCategoryTopics(String virtualWiki, String categoryName) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public Topic lookupTopic(String virtualWiki, String topicName, boolean deleteOK, Object transactionObject) throws DataAccessException {
-		String content = null;
-		if (topics.get(topicName) != null) {
-			// first check the memory store created by writeTopic
-			return topics.get(topicName);
-		}
-		try {
-			content = TestFileUtil.retrieveFileContent(TestFileUtil.TEST_TOPICS_DIR, topicName);
-		} catch (IOException e) {
-			throw new DataAccessException(e);
-		}
-		if (content == null) {
-			return null;
-		}
-		Topic topic = new Topic();
-		topic.setName(topicName);
-		topic.setVirtualWiki(virtualWiki);
-		topic.setTopicContent(content);
-		return topic;
-	}
-
-	/**
-	 *
-	 */
-	public int lookupTopicCount(String virtualWiki) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-    
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public Topic lookupTopicMetaDataById(String virtualWiki, int topicId) throws DataAccessException {
-                throw new UnsupportedOperationException();
+        try {
+            content = TestFileUtil.retrieveFileContent(TestFileUtil.TEST_TOPICS_DIR, topicName);
+        } catch (IOException e) {
+            throw new DataAccessException(e);
         }
-	/**
-	 *
-	 */
-	public List<String> lookupTopicByType(String virtualWiki, int topicType, Pagination pagination) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public TopicVersion lookupTopicVersion(int topicVersionId) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public VirtualWiki lookupVirtualWiki(String virtualWikiName) throws DataAccessException {
-		if (!StringUtils.equals(virtualWikiName, "en")) {
-			// test handler, so hard-code "en" as the only valid virtual wiki
-			return null;
-		}
-		VirtualWiki virtualWiki = new VirtualWiki();
-		virtualWiki.setName(virtualWikiName);
-		return virtualWiki;
-	}
-
-	/**
-	 *
-	 */
-	public WikiFile lookupWikiFile(String virtualWiki, String fileName) throws DataAccessException {
-		String content = null;
-		try {
-			content = TestFileUtil.retrieveFileContent(TestFileUtil.TEST_TOPICS_DIR, fileName);
-		} catch (IOException e) {
-			throw new DataAccessException(e);
-		}
-		if (content == null) {
-			return null;
-		}
-		WikiFile wikiFile = new WikiFile();
-		wikiFile.setFileName(fileName);
-		wikiFile.setVirtualWiki(virtualWiki);
-		wikiFile.setUrl(StringUtils.trim(content));
-		return wikiFile;
-	}
-
-	/**
-	 *
-	 */
-	public int lookupWikiFileCount(String virtualWiki) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public WikiGroup lookupWikiGroup(String groupName) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public WikiUser lookupWikiUser(int userId) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public WikiUser lookupWikiUser(String username) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public int lookupWikiUserCount() throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public String lookupWikiUserEncryptedPassword(String username) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public List<String> lookupWikiUsers(Pagination pagination) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void moveTopic(Topic fromTopic, TopicVersion fromVersion, String destination) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void reloadRecentChanges() throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void setup(Locale locale, WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void setupSpecialPages(Locale locale, WikiUser user, VirtualWiki virtualWiki) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void undeleteTopic(Topic topic, TopicVersion topicVersion, boolean userVisible) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, String userDisplay) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void updateTopic(Topic topic) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
+        if (content == null) {
+            return null;
         }
+        Topic topic = new Topic();
+        topic.setName(topicName);
+        topic.setVirtualWiki(virtualWiki);
+        topic.setTopicContent(content);
+        return topic;
+    }
 
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void updateTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
-        }
+    /**
+     *
+     */
+    public int lookupTopicCount(String virtualWiki) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void updateTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
-        }
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void importTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki, int virtualWikiId) throws DataAccessException, WikiException{
-            throw new UnsupportedOperationException();
-        }
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public Topic lookupTopicMetaDataById(String virtualWiki, int topicId) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean updateSearchIndex) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void  buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * PERFORMANCE-EXPERIMENTAL
-         */
-        public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, int topicId, String virtualWiki) throws DataAccessException, WikiException {
-            throw new UnsupportedOperationException();
-        }
+    /**
+     *
+     */
+    public List<String> lookupTopicByType(String virtualWiki, int topicType, Pagination pagination) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
 	/**
 	 *
 	 */
-	public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion) throws DataAccessException, WikiException {
+	public List<String> lookupTopicByType(String virtualWiki, int topicType1, int topicType2, Pagination pagination) throws DataAccessException {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 *
-	 */
-	public void writeRole(Role role, boolean update) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public TopicVersion lookupTopicVersion(int topicVersionId) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
 
-	/**
-	 *
-	 */
-	public void writeRoleMapGroup(int groupId, List<String> roles) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void writeRoleMapUser(String username, List<String> roles) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *
-	 */
-	public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean userVisible) throws DataAccessException, WikiException {
-		// store topics in a local map.  not very sophisticated, but enough to support testing.
-		this.topics.put(topic.getName(), topic);
-	}
-
-	/**
-	 * PERFORMANCE-EXPERIMENTAL
-	 */
-        public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean userVisible, boolean updateSearchIndex){
-                throw new UnsupportedOperationException();
+    /**
+     *
+     */
+    public VirtualWiki lookupVirtualWiki(String virtualWikiName) throws DataAccessException {
+        if (!StringUtils.equals(virtualWikiName, "en")) {
+            // test handler, so hard-code "en" as the only valid virtual wiki
+            return null;
         }
-    
+        VirtualWiki virtualWiki = new VirtualWiki();
+        virtualWiki.setName(virtualWikiName);
+        return virtualWiki;
+    }
+
+    /**
+     *
+     */
+    public WikiFile lookupWikiFile(String virtualWiki, String fileName) throws DataAccessException {
+        String content = null;
+        try {
+            content = TestFileUtil.retrieveFileContent(TestFileUtil.TEST_TOPICS_DIR, fileName);
+        } catch (IOException e) {
+            throw new DataAccessException(e);
+        }
+        if (content == null) {
+            return null;
+        }
+        WikiFile wikiFile = new WikiFile();
+        wikiFile.setFileName(fileName);
+        wikiFile.setVirtualWiki(virtualWiki);
+        wikiFile.setUrl(StringUtils.trim(content));
+        return wikiFile;
+    }
+
+    /**
+     *
+     */
+    public int lookupWikiFileCount(String virtualWiki) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public WikiGroup lookupWikiGroup(String groupName) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public WikiUser lookupWikiUser(int userId) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public WikiUser lookupWikiUser(String username) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public int lookupWikiUserCount() throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public String lookupWikiUserEncryptedPassword(String username) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public List<String> lookupWikiUsers(Pagination pagination) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void moveTopic(Topic fromTopic, TopicVersion fromVersion, String destination) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void orderTopicVersions(Topic topic, List<Integer> topicVersionIdList) throws DataAccessException {
+        topic.setCurrentVersionId(topicVersionIdList.get(topicVersionIdList.size() - 1));
+        this.topics.put(topic.getName(), topic);
+    }
+
+    /**
+     *
+     */
+    public void reloadRecentChanges() throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
 	/**
 	 *
 	 */
-	public void writeVirtualWiki(VirtualWiki virtualWiki) throws DataAccessException, WikiException {
+	public void reloadLogItems() throws DataAccessException {
 		throw new UnsupportedOperationException();
 	}
+
+    /**
+     *
+     */
+    public void setup(Locale locale, WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void setupSpecialPages(Locale locale, WikiUser user, VirtualWiki virtualWiki) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void undeleteTopic(Topic topic, TopicVersion topicVersion, boolean userVisible) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 
 	/**
 	 *
 	 */
-	public void writeWatchlistEntry(Watchlist watchlist, String virtualWiki, String topicName, int userId) throws DataAccessException, WikiException {
+	public void undeleteTopic(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 *
-	 */
-	public void writeWikiGroup(WikiGroup group) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     */
+    public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, String userDisplay) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 
-	/**
-	 *
-	 */
-	public void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void updateTopic(Topic topic) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 
-        // EXPERIMENTAL
-        public void deleteParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException{
-            throw new UnsupportedOperationException();
-        }
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void updateTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 
-        // EXPERIMENTAL
-        public ParsedTopic lookupParsedTopic(String virtualWiki, String topicName, Object transactionObject) throws DataAccessException{
-            throw new UnsupportedOperationException();
-        }
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void updateTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 
-        // EXPERIMENTAL
-        public void updateParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException{
-            throw new UnsupportedOperationException();
-        }
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void importTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki, int virtualWikiId) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 
-        // EXPERIMENTAL
-        public void writeParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException{
-            throw new UnsupportedOperationException();
-        }
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean updateSearchIndex) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, int topicId, String virtualWiki) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeRole(Role role, boolean update) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeRoleMapGroup(int groupId, List<String> roles) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeRoleMapUser(String username, List<String> roles) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean userVisible) throws DataAccessException, WikiException {
+        // store topics in a local map.  not very sophisticated, but enough to support testing.
+        this.topics.put(topic.getName(), topic);
+    }
+
+    /**
+     *
+     */
+    public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
+        // store topics in a local map.  not very sophisticated, but enough to support testing.
+        this.topics.put(topic.getName(), topic);
+    }
+
+    /**
+     *
+     */
+    public void writeTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
+        // store topics in a local map.  not very sophisticated, but enough to support testing.
+        this.topics.put(topic.getName(), topic);
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links, boolean userVisible, boolean updateSearchIndex) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeVirtualWiki(VirtualWiki virtualWiki) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeWatchlistEntry(Watchlist watchlist, String virtualWiki, String topicName, int userId) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeWikiGroup(WikiGroup group) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     */
+    public void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void deleteParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public ParsedTopic lookupParsedTopic(String virtualWiki, String topicName, Object transactionObject) throws DataAccessException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void updateParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
+    public void writeParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
 }

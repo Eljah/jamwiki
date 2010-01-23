@@ -16,18 +16,19 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing Wiki-specific information about a user of
  * the Wiki.
  */
-public class WikiUser {
+public class WikiUser implements Serializable {
 
-	private static final Logger logger = Logger.getLogger(WikiUser.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WikiUser.class.getName());
 	private Timestamp createDate = new Timestamp(System.currentTimeMillis());
 	private String createIpAddress = "0.0.0.0";
 	private String defaultLocale = null;

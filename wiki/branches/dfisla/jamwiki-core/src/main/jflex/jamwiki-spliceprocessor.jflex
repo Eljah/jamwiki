@@ -6,7 +6,7 @@
  */
 package org.jamwiki.parser.jflex;
 
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 %%
 
@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 /* code copied verbatim into the generated .java file */
 %{
-    private static final Logger logger = Logger.getLogger(JAMWikiSpliceProcessor.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiSpliceProcessor.class.getName());
     protected int section = 0;
     protected int sectionDepth = 0;
     protected int targetSection = 0;
@@ -34,8 +34,7 @@ import org.apache.log4j.Logger;
         if (inTargetSection && this.sectionDepth >= level) {
             inTargetSection = false;
         } else if (this.targetSection == this.section) {
-            WikiHeadingTag parserTag = new WikiHeadingTag();
-            parserTag.parse(this.parserInput, this.parserOutput, this.mode, headingText);
+            this.parse(TAG_TYPE_WIKI_HEADING, headingText, level);
             inTargetSection = true;
             this.sectionDepth = level;
             if (this.mode == JFlexParser.MODE_SPLICE) return this.replacementText;
@@ -80,12 +79,15 @@ h2                 = "==" [^=\n]+ ~"=="
 h3                 = "===" [^=\n]+ ~"==="
 h4                 = "====" [^=\n]+ ~"===="
 h5                 = "=====" [^=\n]+ ~"====="
+h6                 = "======" [^=\n]+ ~"======"
 
 /* nowiki */
 nowiki             = (<[ ]*nowiki[ ]*>) ~(<[ ]*\/[ ]*nowiki[ ]*>)
 
 /* pre */
-htmlprestart       = (<[ ]*pre[ ]*>)
+htmlpreattributes  = class|dir|id|lang|style|title
+htmlpreattribute   = ([ ]+) {htmlpreattributes} ([ ]*=[^>\n]+[ ]*)*
+htmlprestart       = (<[ ]*pre ({htmlpreattribute})* [ ]* (\/)? [ ]*>)
 htmlpreend         = (<[ ]*\/[ ]*pre[ ]*>)
 
 /* comments */
@@ -98,7 +100,7 @@ htmlcomment        = "<!--" ~"-->"
 /* ----- parsing tags ----- */
 
 <YYINITIAL, PRE>{nowiki} {
-    logger.debug("nowiki: " + yytext() + " (" + yystate() + ")");
+    if (logger.isFinerEnabled()) logger.finer("nowiki: " + yytext() + " (" + yystate() + ")");
     return returnText(yytext());
 }
 
@@ -143,6 +145,10 @@ htmlcomment        = "<!--" ~"-->"
 
 <YYINITIAL>^{h5} {
     return processHeading(5, yytext());
+}
+
+<YYINITIAL>^{h6} {
+    return processHeading(6, yytext());
 }
 
 /* ----- default ----- */

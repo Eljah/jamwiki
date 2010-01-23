@@ -30,17 +30,16 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.migrate.MigrationException;
 import org.jamwiki.migrate.MigrationUtil;
 import org.jamwiki.model.WikiUser;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Used to import an XML file (in MediaWiki format), creating or updating a
- * topic as a result.
+ * Used to import an XML file creating a topic as a result.
  */
 public class ImportServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(ImportServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(ImportServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_IMPORT = "import.jsp";
 
@@ -65,7 +64,8 @@ public class ImportServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void importFile(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
-		List<WikiMessage> errors = new ArrayList<WikiMessage>();
+	/*
+            List<WikiMessage> errors = new ArrayList<WikiMessage>();
 		try {
 			Iterator iterator = ServletUtil.processMultipartRequest(request, Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE));
 			while (iterator.hasNext()) {
@@ -84,14 +84,15 @@ public class ImportServlet extends JAMWikiServlet {
 				break;
 			}
 		} catch (MigrationException e) {
-			logger.fatal("Failure while importing from file", e);
+			logger.severe("Failure while importing from file", e);
 			errors.add(new WikiMessage("import.error.migration", e.getMessage()));
 		} catch (WikiException e) {
-			logger.fatal("Failure while importing from file", e);
+			logger.severe("Failure while importing from file", e);
 			errors.add(e.getWikiMessage());
 		}
 		next.addObject("errors", errors);
 		view(request, next, pageInfo);
+         */
 	}
 
 	/**
@@ -119,7 +120,7 @@ public class ImportServlet extends JAMWikiServlet {
 		try {
 			item.write(xmlFile);
 		} catch (Exception e) {
-			logger.fatal("Failure while saving uploaded file item", e);
+			logger.severe("Failure while saving uploaded file item", e);
 			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()));
 		}
 		return xmlFile;

@@ -27,14 +27,14 @@ import org.jamwiki.Environment;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * This class provides utility methods for use with the parser functions.
  */
 public class ParserUtil {
 
-    private static final Logger logger = Logger.getLogger(ParserUtil.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(ParserUtil.class.getName());
 
     private static final Pattern CATEGORY_PATTERN = Pattern.compile("\\[\\[(Category\\s*):(.*)(\\|)+(.*)\\]\\]", Pattern.UNICODE_CASE);
 
@@ -167,7 +167,7 @@ public class ParserUtil {
      */
     private static AbstractParser parserInstance(ParserInput parserInput) throws ParserException {
         String parserClass = Environment.getValue(Environment.PROP_PARSER_CLASS);
-        logger.debug("Using parser: " + parserClass);
+		logger.fine("Using parser: " + parserClass);
         try {
             Class clazz = ClassUtils.getClass(parserClass);
             Class[] parameterTypes = new Class[1];

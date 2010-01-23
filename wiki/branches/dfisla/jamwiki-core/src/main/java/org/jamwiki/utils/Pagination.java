@@ -15,7 +15,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.jamwiki.utils;
-import org.apache.log4j.Logger;
 
 /**
  * Utility class useful for paginating through a result set.
@@ -23,7 +22,7 @@ import org.apache.log4j.Logger;
 public class Pagination {
 
 	/** Logger */
-	public static final Logger logger = Logger.getLogger(Pagination.class.getName());
+	public static final WikiLogger logger = WikiLogger.getLogger(Pagination.class.getName());
 
 	private final int numResults;
 	private final int offset;

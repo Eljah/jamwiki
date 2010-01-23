@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
@@ -34,7 +34,7 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -46,7 +46,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class UpgradeServlet extends JAMWikiServlet {
 
-	private static final Logger logger = Logger.getLogger(UpgradeServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(UpgradeServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_UPGRADE = "upgrade.jsp";
 
@@ -105,14 +105,28 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			// first perform database upgrades
 			this.upgradeDatabase(true, messages);
-			// upgrade stylesheet
-			if (this.upgradeStyleSheetRequired()) {
-				this.upgradeStyleSheet(request, messages);
-			}
 			// perform any additional upgrades required
 			if (oldVersion.before(0, 7, 0)) {
 				Environment.setValue(Environment.PROP_FILE_SERVER_URL, Utilities.getServerUrl(request));
 				Environment.setValue(Environment.PROP_SERVER_URL, Utilities.getServerUrl(request));
+			}
+			if (oldVersion.before(0, 8, 0)) {
+				try {
+					WikiBase.getDataHandler().reloadLogItems();
+				} catch (DataAccessException e) {
+					logger.warning("Failure during upgrade while reloading log items.  Please use the Special:Maintenance page to complete this step.", e);
+					messages.add(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
+				}
+				try {
+					WikiBase.getDataHandler().reloadRecentChanges();
+				} catch (DataAccessException e) {
+					logger.warning("Failure during upgrade while reloading recent changes.  Please use the Special:Maintenance page to complete this step.", e);
+					messages.add(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
+				}
+			}
+			// upgrade stylesheet
+			if (this.upgradeStyleSheetRequired()) {
+				this.upgradeStyleSheet(request, messages);
 			}
 			errors = ServletUtil.validateSystemSettings(Environment.getInstance());
 			try {
@@ -123,7 +137,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 				// where that might be...
 				WikiBase.reload();
 			} catch (Exception e) {
-				logger.fatal("Failure during upgrade while saving properties and executing WikiBase.reload()", e);
+				logger.severe("Failure during upgrade while saving properties and executing WikiBase.reload()", e);
 				throw new WikiException(new WikiMessage("upgrade.error.nonfatal", e.toString()));
 			}
 		} catch (WikiException e) {
@@ -155,7 +169,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 		} catch (DataAccessException e) {
 			// building a link to the start page shouldn't fail, but if it does display a message
 			wm = new WikiMessage("upgrade.error.nonfatal", e.toString());
-			logger.warn("Upgrade complete, but unable to build redirect link to the start page.", e);
+			logger.warning("Upgrade complete, but unable to build redirect link to the start page.", e);
 		}
 		next.addObject("successMessage", wm);
 		// force logout to ensure current user will be re-validated.  this is
@@ -211,12 +225,12 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			return true;
 		} catch (WikiException e) {
-			logger.warn("Failure while updating JAMWiki stylesheet", e);
+			logger.warning("Failure while updating JAMWiki stylesheet", e);
 			messages.add(e.getWikiMessage());
 			messages.add(new WikiMessage("upgrade.message.stylesheet.failure",  e.getMessage()));
 			return false;
 		} catch (DataAccessException e) {
-			logger.warn("Failure while updating JAMWiki stylesheet", e);
+			logger.warning("Failure while updating JAMWiki stylesheet", e);
 			messages.add(new WikiMessage("upgrade.message.stylesheet.failure",  e.getMessage()));
 			return false;
 		}
@@ -227,24 +241,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 	 */
 	private boolean upgradeStyleSheetRequired() {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		if (oldVersion.before(0, 6, 1)) {
-			return true;
-		}
-		if (oldVersion.before(0, 6, 2)) {
-			return true;
-		}
-		if (oldVersion.before(0, 6, 3)) {
-			return true;
-		}
-		if (oldVersion.before(0, 6, 6)) {
-			return true;
-		}
-		if (oldVersion.before(0, 6, 7)) {
-			return true;
-		}
-		if (oldVersion.before(0, 7, 0)) {
-			return true;
-		}
 		if (oldVersion.before(0, 8, 0)) {
 			return true;
 		}

@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * This abstract class implements functionality for both the "radio" tag and
@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractButtonTag extends TagSupport {
 
-	private static final Logger logger = Logger.getLogger(AbstractButtonTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(AbstractButtonTag.class.getName());
 	private String checked = null;
 	private String id = null;
 	private String name = null;
@@ -51,7 +51,7 @@ public abstract class AbstractButtonTag extends TagSupport {
 	 * Generate the tag HTML output.
 	 */
 	public int doEndTag() throws JspException {
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		output.append("<input type=\"").append(this.getButtonType()).append('\"');
 		output.append(" value=\"").append(this.value).append('\"');
 		output.append(" name=\"").append(this.name).append('\"');
@@ -74,7 +74,7 @@ public abstract class AbstractButtonTag extends TagSupport {
 		try {
 			this.pageContext.getOut().print(output.toString());
 		} catch (IOException e) {
-			logger.fatal("Failure in " + getButtonType() + " tag for " + this.id + " / " + this.name + " / " + this.style + " / " + this.value, e);
+			logger.severe("Failure in " + getButtonType() + " tag for " + this.id + " / " + this.name + " / " + this.style + " / " + this.value, e);
 			throw new JspException(e);
 		}
 		return EVAL_PAGE;

@@ -23,7 +23,7 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
 import org.jamwiki.WikiException;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.servlets.ServletUtil;
-import org.apache.log4j.Logger;
+import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -32,7 +32,7 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class WatchlistTag extends BodyTagSupport {
 
-	private static final Logger logger = Logger.getLogger(WatchlistTag.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(WatchlistTag.class.getName());
 	private String topic = null;
 
 	/**
@@ -43,7 +43,7 @@ public class WatchlistTag extends BodyTagSupport {
 			try {
 				this.pageContext.getOut().print("<strong>");
 			} catch (IOException e) {
-				logger.fatal("Failure processing watchlist item " + this.topic, e);
+				logger.severe("Failure processing watchlist item " + this.topic, e);
 				throw new JspException(e);
 			}
 		}
@@ -58,7 +58,7 @@ public class WatchlistTag extends BodyTagSupport {
 			try {
 				this.pageContext.getOut().print("</strong>");
 			} catch (IOException e) {
-				logger.fatal("Failure processing watchlist item " + this.topic, e);
+				logger.severe("Failure processing watchlist item " + this.topic, e);
 				throw new JspException(e);
 			}
 		}
@@ -75,7 +75,7 @@ public class WatchlistTag extends BodyTagSupport {
 			Watchlist watchlist = ServletUtil.currentWatchlist(request, virtualWiki);
 			return (watchlist.containsTopic(this.topic));
 		} catch (WikiException e) {
-			logger.fatal("Failure processing watchlist item " + this.topic, e);
+			logger.severe("Failure processing watchlist item " + this.topic, e);
 			throw new JspException(e);
 		}
 	}

@@ -48,8 +48,6 @@ public class LocalDataSource extends BasicDataSource {
 		setPassword(Encryption.getEncryptedProperty(Environment.PROP_DB_PASSWORD, null));
 		setDefaultReadOnly(false);
 		// AutoCommit should NOT be set to true
-                //this.defaultAutoCommit = false;
-
 		// set pool properties
 		setMaxActive(Environment.getIntValue(Environment.PROP_DBCP_MAX_ACTIVE));
 		setMaxIdle(Environment.getIntValue(Environment.PROP_DBCP_MAX_IDLE));
