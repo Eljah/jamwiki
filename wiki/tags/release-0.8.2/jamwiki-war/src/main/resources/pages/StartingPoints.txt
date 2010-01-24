@@ -1,0 +1,17 @@
+<div style="text-align:center;font-weight:bold;color:green;font-size:150%">JAMWiki has been successfully installed!</div>
+
+=== Next steps ===
+
+# Customize the look and feel of your wiki by editing the [[LeftMenu|left navigation]], [[BottomArea|footer]] and (for advanced users) [[StyleSheet|CSS styles]].
+# Update configuration settings from the [[Special:Admin]] page.  From this page a vast number of options can be changed, including the site name, description, and default settings.
+# Visit http://jamwiki.org/ for detailed documentation, to report bugs, and to provide feedback.
+# Go to https://lists.sourceforge.net/lists/listinfo/jamwiki-announce and sign up for the jamwiki-announce mailing list to be notified of future JAMWiki releases.
+
+=== Other useful pages ===
+
+* [[Special:Specialpages]] - An index of wiki "Special" pages.
+* [[Special:RecentChanges]] - A list of recently modified Wiki topics.
+* [[Special:Upload]] - Used to upload files and images to the Wiki.
+* [[Special:Search]] - Search the Wiki.
+* [[Special:Account]] - Create an account so that edits are properly credited.
+* [[Special:Allpages]] - A list of all the topics in the Wiki.
