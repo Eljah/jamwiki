@@ -66,9 +66,9 @@
 	The authentication provider is the element which is passed user login attempts for verification.
 	-->
 	<authentication-manager alias="authenticationManager">
-	<authentication-provider user-service-ref="jamWikiAuthenticationDao">
-		<password-encoder ref="jamwikiPasswordEncoder" />
-	</authentication-provider>
+		<authentication-provider user-service-ref="jamWikiAuthenticationDao">
+			<password-encoder ref="jamwikiPasswordEncoder" />
+		</authentication-provider>
 	</authentication-manager>
 	<b:bean id="jamWikiAuthenticationDao" class="org.jamwiki.authentication.JAMWikiDaoImpl" />
 	<b:bean id="jamwikiPasswordEncoder" class="org.jamwiki.authentication.JAMWikiPasswordEncoder" />

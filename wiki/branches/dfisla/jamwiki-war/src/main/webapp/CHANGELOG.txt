@@ -1,9 +1,98 @@
-﻿0.8.0
+﻿0.9.0
+=====
+
+New Features:
+
+  * Signficant updates to the syntax parser, including support for additional
+    HTML tags and XHTML transitional validation of tag attributes.
+  * Support the #if: parser function.  Usage: {{#if: test | true | false}}.
+  * Basic support for the #expr: parser function.  Only basic operations are
+    supported (+, -, /, *) and parentheses must be used to ensure that the
+    order of operations is followed.
+  * Add the ability for sysadmins to create user accounts (hanspeterklapf).
+  * Topic add/update is now significantly faster due to query refactoring
+    and changes so that the search index is not re-optimized after every
+    add/update.
+  * Search engine optimizations.  Existing JAMWiki installs may want to
+    rebuild their search index.
+  * Automatically populate sample JDBC values based on database type on the
+    setup and admin pages.
+  * Remove all dependencies on Spring from the jamwiki-core project by
+    converting org.jamwiki.model.Role to an interface and creating a new
+    org.jamwiki.authentication.RoleImpl class.
+  * Upgrade to Spring Framework 3.0.0.RELEASE.
+  * Upgrade to Spring Security 3.0.1.RELEASE.
+  * Upgrade to Lucene Search 3.0.0.
+  * Upgrade to ehcache 1.7.0.
+  * Upgrade to commons-pool 1.5.4.
+  * Upgrade to JUnit 4.7.
+
+Bugfixes:
+
+  * Leading whitespace should be trimmed from category names such as
+    "Category: Test" or "Category : Test".
+  * Special:Import and Special:Export code refactored to avoid OOM errors with
+    topics that have extensive history.
+  * Properly parse template parameters that are themselves templates, such as
+    "{{{{{template_name}}}}}".
+
+Translation Updates:
+
+  * Updated Russian translations (shar).
+
+
+0.8.2
+=====
+
+New Features:
+
+  * Updated spam filter patterns.
+  * Update the default StartingPoints page with additional help info.
+
+Bugfixes:
+
+  * Fix MS SQL errors (hanspeterklapf).
+
+Translation Updates:
+
+  * Updated French translations (Guillaume_FRANCOIS55).
+  * Updated German translations (axelclk).
+
+
+0.8.1
+=====
+
+Bugfixes:
+
+  * A link from a topic page to itself should be formatted as plain bold text,
+    not as a link.  Reported by floatingworld.
+  * XML imports of redirect topics were not redirecting properly.
+  * Fix non-fatal MySQL upgrade warnings.  Reported by an anonymous user.
+  * Fix code that could potentially leave database connections open during
+    authentication.
+  * Fix an issue that caused the Special:Maintance "database migration"
+    functionality to fail.
+  * Templates will now be listed on Special:Allpages.  Reported by
+    floatingworld.
+
+Translation Updates:
+
+  * Updated Chinese translations (tan9).
+  * Updated Polish translations (dlpa).
+
+
+0.8.0
 =====
 
 New Features:
 
   * Drop support for JDK 1.4.  Java 5 or later is now required to run JAMWiki.
+  * Special:Import can now import Mediawiki files with full history, edit
+    dates, and edit comments.
+  * Special:Export can now export topics in Mediawiki format with full history,
+    edit dates, and edit comments.
+  * Mediawiki-style logs for uploads, user creation, etc are now available via
+    the Special:Log page.
   * Add an optional "Show Changes" button during editing to display a diff
     view of the current edit.
   * Add diff highlighting for the portion of the line that changed (if any),
@@ -12,32 +101,72 @@ New Features:
     when uploading, similar to Mediawiki.
   * Add links to the edited section in edit summaries on recent changes,
     history, etc, similar to Mediawiki.
+  * Localize several messages in the upgrade process that were previously
+    hard-coded in English.
   * Remove ability to automatically upgrade from versions prior to 0.6.0.
-  * Implement caching for diffs and topic versions to speed up page rendering.
+  * For databases that support it use auto incrementing primary keys during
+    inserts to improve performance.  Suggested by Daniel Fisla (dfisla).
+  * Implement caching for diffs, user information and topic versions to speed
+    up page rendering.
+  * Allow the HTML pre tag to be used with attributes (suggested by Skotty).
   * Refactor exception handling to throw and catch exceptions at a more
     granular level.
   * Allow JAMWiki properties to be read from outside of the WAR file or from
     system properties (urpi).
   * Allow authentication with pluggable Spring authentication modules that
     do not implement UserDetailService such as existing JAAS modules (urpi).
+  * When a password or other value is found un-encrypted in a properties file
+    automatically encrypt it to allow for changing database passwords, etc.
+    Reported by rebecca and an anonymous user.
+  * Move upgrade SQL to property files rather than hard-coding in Java code.
+  * Make the site name a configurable property rather than a message key.
+  * Upgrade to Spring Security 2.0.5.
+  * Upgrade to javadiff 1.1.0.
   * Upgrade to JFlex 1.4.3.
   * Upgrade to JUnit 4.5.
   * Upgrade to JSTL standard taglib 1.1.2.
-  * Upgrade to ehcache 1.6.0-beta3.
+  * Upgrade to ehcache 1.6.0.
 
 Bugfixes:
 
   * Update Spring Security configuration to remove reliance on the deprecated
     FilterInvocationDefinitionSourceEditor class.
   * Fix the Bliki local Maven repository metadata to resolve build warnings.
-  * When a password or other value is found un-encrypted in a properties file
-    automatically encrypt it to allow for changing database passwords, etc.
-    Reported by rebecca and an anonymous user.
+  * Do not use the category sort key for display purposes, only for sorting,
+    which is consistent with Mediawiki.  Reported by hanspeterklapf.
+  * Allow use of magic words and templates in category sort keys, such as
+    [[Category:Test|{{PAGENAME}}]].
+  * Throw an error when trying to rename images or categories with topic names
+    that do not contain the "Image:" or "Category:" namespace.
+  * Viewing a topic that is currently a redirect from its history page should
+    not redirect.
+  * Templates containing signature were displaying the signature for the user
+    viewing the page, rather than the user who saved the page.  Example:
+    {{template-name|~~~~}}
+  * Use the wiki system directory for temp file storage in ImageIO processing
+    to prevent errors on misconfigured systems.  Reported by jfbraz.
+  * Validate that properties which must be numeric are set as numbers from
+    Special:Admin.
+  * When deleting, undeleting, or moving a page, if the "delete associated
+    comments page" box was checked a NullPointerException would be generated
+    for topics with non-ASCII topic names.
+  * Template parameter names should ignore whitespace so that
+    {{template|name=foo}} is the same as {{template|  name = foo}}.  Reported
+    by floatingworld.
+  * Do not allow creation of topics that start with "/" or that are of the form
+    Namespace:/Topic.
+  * Category topics displayed inconsistently in the topic view, print view and
+    editing preview view.
+  * "File History" on Image: pages should also display author information.
 
 Translation Updates:
 
+  * Updated Chinese translations (hfl).
   * Updated French translations (Guillaume_FRANCOIS55).
+  * Updated German translations (axelclk).
+  * Updated Japanese translations (nattolover).
   * Updated Polish translations (dlpa).
+  * Updated Russian translations (shar).
 
 
 0.7.2
@@ -153,6 +282,9 @@ Bugfixes:
   * Fix issues with the database migration code that could cause failures
     when migrating categories or migrating very large data sets.
   * Fix a case-sensitivity issue when building on UNIX machines (marcust).
+  * If the file for an Image: link cannot be found on the filesystem generate
+    an upload link rather than throwing an exception and silently hiding the
+    image from the front-end.
 
 Translation Updates:
 
