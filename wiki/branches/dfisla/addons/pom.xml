@@ -13,10 +13,6 @@
 	<packaging>pom</packaging>
 	<name>JAMWiki Addons</name>
 	<modules>
-	 <module>bliki-parser</module>
+		<module>bliki-parser</module>
 	</modules>
 </project>
-
-
-
-

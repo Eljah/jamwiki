@@ -292,7 +292,6 @@ public class WikiUtil {
 		return Topic.TYPE_ARTICLE;
 	}
 
-
 	/**
 	 * Return the URL of the index page for the wiki.
 	 *
