@@ -1,0 +1,8 @@
+#!/bin/bash
+/etc/init.d/apache2 stop
+sleep 5
+/etc/init.d/tomcat stop
+sleep 5
+/etc/init.d/tomcat start
+sleep 5
+/etc/init.d/apache2 start
