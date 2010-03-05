@@ -1,9 +1,0 @@
-Start:	15:48:25
-End:	16:39:20
-
-51 mins approx
-
-13609 topics / 3060 secs = 4.45 topics/sec
-209,652,822 bytes / 3060 secs = 68514 bytes/sec OR 0.0653400421142578125 MB/sec
-
-22,000 MB ~ 3.89 Days
