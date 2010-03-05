@@ -2422,6 +2422,8 @@ public class AnsiDataHandler implements DataHandler {
             String key = WikiCache.key(virtualWiki, topicName);
             WikiCache.removeFromCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
 
+            
+
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
             String contents = WikiUtil.readSpecialPage(locale, topicName);
@@ -2433,6 +2435,14 @@ public class AnsiDataHandler implements DataHandler {
             ParserOutput parserOutput = ParserUtil.parserOutput(topic.getTopicContent(), virtualWiki, topicName);
             writeTopic(topic, topicVersion, parserOutput.getCategories(), parserOutput.getLinks(), true);
             DatabaseConnection.commit(status);
+
+            if(topic != null){
+                ParsedTopic parsedTopic = new ParsedTopic();
+                parsedTopic.setVirtualWiki(virtualWiki);
+                parsedTopic.setTopicId(topic.getTopicId());
+                parsedTopic.setCurrentVersionId(topic.getCurrentVersionId());
+                this.deleteParsedTopic(parsedTopic);
+            }
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw e;
@@ -2470,6 +2480,14 @@ public class AnsiDataHandler implements DataHandler {
             conn = DatabaseConnection.getConnection();
             updateTopic(topic, conn);
             DatabaseConnection.commit(status);
+
+             if(topic != null){
+                ParsedTopic parsedTopic = new ParsedTopic();
+                parsedTopic.setVirtualWiki(topic.getVirtualWiki());
+                parsedTopic.setTopicId(topic.getTopicId());
+                parsedTopic.setCurrentVersionId(topic.getCurrentVersionId());
+                this.deleteParsedTopic(parsedTopic);
+            }
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw e;
@@ -2517,6 +2535,7 @@ public class AnsiDataHandler implements DataHandler {
             String key = WikiCache.key(topic.getVirtualWiki(), topic.getName());
             WikiCache.removeFromCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
             WikiCache.removeFromCache(CACHE_TOPICS, key);
+
             conn = DatabaseConnection.getConnection();
             WikiUtil.validateTopicName(topic.getName());
 
@@ -2546,6 +2565,14 @@ public class AnsiDataHandler implements DataHandler {
             if ((links != null) && (updateSearchIndex)) {
                 WikiBase.getSearchEngine().deleteFromIndex(topic);
                 WikiBase.getSearchEngine().addToIndex(topic, links);
+            }
+
+             if(topic != null){
+                ParsedTopic parsedTopic = new ParsedTopic();
+                parsedTopic.setVirtualWiki(topic.getVirtualWiki());
+                parsedTopic.setTopicId(topic.getTopicId());
+                parsedTopic.setCurrentVersionId(topic.getCurrentVersionId());
+                this.deleteParsedTopic(parsedTopic);
             }
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -2697,10 +2724,19 @@ public class AnsiDataHandler implements DataHandler {
             String key = WikiCache.key(topic.getVirtualWiki(), topic.getName());
             WikiCache.removeFromCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
             WikiCache.removeFromCache(CACHE_TOPICS, key);
+            
             conn = DatabaseConnection.getConnection();
 
             updateTopicVersion(topic, topicVersion, conn);
             DatabaseConnection.commit(status);
+
+             if(topic != null){
+                ParsedTopic parsedTopic = new ParsedTopic();
+                parsedTopic.setVirtualWiki(topic.getVirtualWiki());
+                parsedTopic.setTopicId(topic.getTopicId());
+                parsedTopic.setCurrentVersionId(topic.getCurrentVersionId());
+                this.deleteParsedTopic(parsedTopic);
+            }
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw e;
@@ -3148,6 +3184,7 @@ public class AnsiDataHandler implements DataHandler {
             String key = WikiCache.key(topic.getVirtualWiki(), topic.getName());
             WikiCache.removeFromCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
             WikiCache.removeFromCache(CACHE_TOPICS, key);
+            
             conn = DatabaseConnection.getConnection();
             WikiUtil.validateTopicName(topic.getName());
 
@@ -3197,6 +3234,7 @@ public class AnsiDataHandler implements DataHandler {
                 WikiBase.getSearchEngine().deleteFromIndex(topic);
                 WikiBase.getSearchEngine().addToIndex(topic, links);
             }
+
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw e;
@@ -3371,7 +3409,7 @@ public class AnsiDataHandler implements DataHandler {
             conn = DatabaseConnection.getConnection();
 
             int virtualWikiId = this.lookupVirtualWikiId(parsedTopic.getVirtualWiki());
-            this.queryHandler().deleteParsedTopic(virtualWikiId, parsedTopic.getTopicId(), conn);
+            this.queryHandler().deleteParsedTopic(virtualWikiId, parsedTopic.getTopicId(), parsedTopic.getCurrentVersionId(), conn);
         } catch (DataAccessException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw e;
@@ -3381,7 +3419,6 @@ public class AnsiDataHandler implements DataHandler {
         } finally {
             DatabaseConnection.closeConnection(conn);
         }
-
     }
 
     // EXPERIMENTAL
@@ -3397,6 +3434,7 @@ public class AnsiDataHandler implements DataHandler {
 
             int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
             rs = this.queryHandler().lookupParsedTopic(virtualWikiId, topicName, conn);
+            // Grab the first result
             if (rs.next()) {
                 result = this.initParsedTopic(rs);
             }
@@ -3423,25 +3461,41 @@ public class AnsiDataHandler implements DataHandler {
     }
 
     // EXPERIMENTAL
-    public void updateParsedTopic(ParsedTopic parsedTopic) throws DataAccessException, WikiException{
+    public ParsedTopic lookupParsedTopic(String virtualWiki, int topicId, int topicVersionId, Object transactionObject) throws DataAccessException {
 
-        int virtualWikiId = this.lookupVirtualWikiId(parsedTopic.getVirtualWiki());
-
+        ParsedTopic result = null;
         TransactionStatus status = null;
         Connection conn = null;
+        ResultSet rs = null;
         try {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            this.queryHandler().updateParsedTopic(parsedTopic, virtualWikiId, conn);
+            int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
+            rs = this.queryHandler().lookupParsedTopic(virtualWikiId, topicId, topicVersionId, conn);
+            if (rs.next()) {
+                result = this.initParsedTopic(rs);
+            }
+            rs.close();
             DatabaseConnection.commit(status);
-
+        } catch (DataAccessException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw e;
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
             throw new DataAccessException(e);
         } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warning("Could not close ResultSet!", ex);
+                }
+            }
             DatabaseConnection.closeConnection(conn);
         }
+
+        return result;
     }
 
     // EXPERIMENTAL

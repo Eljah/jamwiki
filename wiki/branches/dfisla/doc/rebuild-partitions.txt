@@ -1,0 +1,7 @@
+topics: 8250828
+split -l 1000000 topic_ids.txt yeilds 9 partitions
+
+srv2:  ./app -p xaa,xab,xac -c &
+vpn: ./app -p xad,xae -c &
+super1: ./app -p xaf,xag -c & -heap crash
+super2: ./app -p xah,xai -c & -heap crash

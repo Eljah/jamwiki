@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jamwiki</groupId>
@@ -70,6 +70,24 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-ext</artifactId>
+
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-site</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -157,7 +175,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.0</version>
+            <version>1.2</version>
             <scope>compile</scope>
         </dependency>
         <!--
@@ -168,47 +186,47 @@
             <scope>compile</scope>
         </dependency>
         -->
-		<!--
-		<dependency>
-			<groupId>org.apache.directory.server</groupId>
-			<artifactId>apacheds-core</artifactId>
-			<version>1.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.directory.server</groupId>
-			<artifactId>apacheds-server-jndi</artifactId>
-			<version>1.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.4.3</version>
-			<scope>runtime</scope>
-		</dependency>
-		-->
+                <!--
+                <dependency>
+                        <groupId>org.apache.directory.server</groupId>
+                        <artifactId>apacheds-core</artifactId>
+                        <version>1.0.2</version>
+                </dependency>
+                <dependency>
+                        <groupId>org.apache.directory.server</groupId>
+                        <artifactId>apacheds-server-jndi</artifactId>
+                        <version>1.0.2</version>
+                </dependency>
+                <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <version>1.4.3</version>
+                        <scope>runtime</scope>
+                </dependency>
+                -->
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-        <!-- <version>2.2</version> -->
+                <!-- <version>2.2</version> -->
                 <configuration>
                     <archive>
-            <!--
+                        <!--
             <index>true</index>
-            -->                                                
+            -->
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>com.itmatter.jamwiki.analyzer.Main</mainClass>
-              <!--
+                            <!--
               <packageName>com.itmatter.jamwiki.analyzer</packageName> -->
               <!-- options
               <addExtensions/>
               <classpathPrefix/>
               -->
                         </manifest>
-            <!--
+                        <!--
             <manifestEntries>
               <mode>development</mode>
               <url>${pom.url}</url>
@@ -218,31 +236,31 @@
                     </archive>
                 </configuration>
             </plugin>
-      <!--
+            <!--
       <plugin>
-      	<groupId>org.apache.maven.plugins</groupId> 
-  			<artifactId>maven-assembly-plugin</artifactId>
-  			<executions>
-    			<execution>
-      			<phase>package</phase>
-      			<goals>
-        			<goal>single</goal>
-      			</goals>
-    			</execution>
-  			</executions>
-  			<configuration>
-    			<archive>
-      			<manifest>
-        			<addClasspath>true</addClasspath>
-        			<mainClass>com.itmatter.jamwiki.analyzer.Main</mainClass>
-      			</manifest>
-    			</archive>
-    			<descriptorRefs>
-      			<descriptorRef>jar-with-dependencies</descriptorRef>
-    			</descriptorRefs>
-  			</configuration>
-			</plugin>
-			-->
+        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                        <execution>
+                        <phase>package</phase>
+                        <goals>
+                                <goal>single</goal>
+                        </goals>
+                        </execution>
+                        </executions>
+                        <configuration>
+                        <archive>
+                        <manifest>
+                                <addClasspath>true</addClasspath>
+                                <mainClass>com.itmatter.jamwiki.analyzer.Main</mainClass>
+                        </manifest>
+                        </archive>
+                        <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        </configuration>
+                        </plugin>
+                        -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
@@ -258,7 +276,7 @@
                     <generateRepository>true</generateRepository>
                     <repositoryName>lib</repositoryName>
                     <repositoryLayout>flat</repositoryLayout>
-					<!-- <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>-->
+                    <!-- <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>-->
                     <platforms>
                         <platform>windows</platform>
                         <platform>unix</platform>

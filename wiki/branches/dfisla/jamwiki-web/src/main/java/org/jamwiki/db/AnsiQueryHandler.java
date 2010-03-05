@@ -163,11 +163,10 @@ public class AnsiQueryHandler implements QueryHandler {
     protected static String STATEMENT_UPDATE_WIKI_USER = null;
 
     protected static String STATEMENT_CREATE_TOPIC_CACHE_TABLE = null;
-    protected static String STATEMENT_DELETE_TOPIC_CACHE = null;
-    protected static String STATEMENT_INSERT_TOPIC_CACHE = null;
-    protected static String STATEMENT_SELECT_TOPIC_CACHE = null;
-    protected static String STATEMENT_SELECT_TOPIC_CACHE_BY_ID = null;
-    protected static String STATEMENT_UPDATE_TOPIC_CACHE = null;
+    protected static String STATEMENT_DELETE_TOPIC_VERSION_CACHE = null;
+    protected static String STATEMENT_INSERT_TOPIC_VERSION_CACHE = null;
+    protected static String STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME = null;
+    protected static String STATEMENT_SELECT_TOPIC_VERSION_CACHE = null;
 
     private static Properties props = null;
 
@@ -692,11 +691,10 @@ public class AnsiQueryHandler implements QueryHandler {
         STATEMENT_UPDATE_WIKI_USER = props.getProperty("STATEMENT_UPDATE_WIKI_USER");
 
         STATEMENT_CREATE_TOPIC_CACHE_TABLE = props.getProperty("STATEMENT_CREATE_TOPIC_CACHE_TABLE");
-        STATEMENT_DELETE_TOPIC_CACHE = props.getProperty("STATEMENT_DELETE_TOPIC_CACHE");
-        STATEMENT_INSERT_TOPIC_CACHE = props.getProperty("STATEMENT_INSERT_TOPIC_CACHE");
-        STATEMENT_SELECT_TOPIC_CACHE = props.getProperty("STATEMENT_SELECT_TOPIC_CACHE");
-        STATEMENT_SELECT_TOPIC_CACHE_BY_ID = props.getProperty("STATEMENT_SELECT_TOPIC_CACHE_BY_ID");
-        STATEMENT_UPDATE_TOPIC_CACHE = props.getProperty("STATEMENT_UPDATE_TOPIC_CACHE");
+        STATEMENT_DELETE_TOPIC_VERSION_CACHE = props.getProperty("STATEMENT_DELETE_TOPIC_VERSION_CACHE");
+        STATEMENT_INSERT_TOPIC_VERSION_CACHE = props.getProperty("STATEMENT_INSERT_TOPIC_VERSION_CACHE");
+        STATEMENT_SELECT_TOPIC_VERSION_CACHE = props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_CACHE");
+        STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME= props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME");
     }
 
     /**
@@ -1530,10 +1528,11 @@ public class AnsiQueryHandler implements QueryHandler {
     }
 
     // EXPERIMENTAL
-    public void deleteParsedTopic(int virtualWikiId, int topicId, Connection conn) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(STATEMENT_DELETE_TOPIC_CACHE);
+    public void deleteParsedTopic(int virtualWikiId, int topicId, int topicVersionId, Connection conn) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_DELETE_TOPIC_VERSION_CACHE);
         stmt.setInt(1, virtualWikiId);
         stmt.setInt(2, topicId);
+        stmt.setInt(3, topicVersionId);
         stmt.executeUpdate();
         DatabaseConnection.closeStatement(stmt);
     }
@@ -1546,12 +1545,13 @@ public class AnsiQueryHandler implements QueryHandler {
         PreparedStatement stmt = null;
 
         try {
-            stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_CACHE);
+            stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_VERSION_CACHE);
 
             stmt.setInt(1, parsedTopic.getTopicId());
-            stmt.setInt(2, virtualWikiId);
-            stmt.setString(3, parsedTopic.getName());
-            stmt.setBytes(4, parsedTopic.toString().getBytes());
+            stmt.setInt(2, parsedTopic.getCurrentVersionId());
+            stmt.setInt(3, virtualWikiId);
+            stmt.setString(4, parsedTopic.getName());
+            stmt.setBytes(5, parsedTopic.toString().getBytes());
        
             //stmt.logParams();
             logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
@@ -1573,35 +1573,25 @@ public class AnsiQueryHandler implements QueryHandler {
     }
 
     // EXPERIMENTAL
-    public ResultSet lookupParsedTopic(int virtualWikiId, String topicName, Connection conn) throws SQLException {
+    public ResultSet lookupParsedTopic(int virtualWikiId, int topicId, int topicVersionId, Connection conn) throws SQLException {
 
         PreparedStatement stmt = null;
-        stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_CACHE);
+        stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_VERSION_CACHE);
 
         stmt.setInt(1, virtualWikiId);
-        stmt.setString(2, topicName);
+        stmt.setInt(2, topicId);
+        stmt.setInt(3, topicVersionId);
         return stmt.executeQuery();
     }
 
     // EXPERIMENTAL
-    public void updateParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException {
+    public ResultSet lookupParsedTopic(int virtualWikiId, String topicName, Connection conn) throws SQLException {
 
-        try {
-            PreparedStatement stmt = conn.prepareStatement(STATEMENT_UPDATE_TOPIC_CACHE);
+        PreparedStatement stmt = null;
+        stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME);
 
-            stmt.setInt(1, virtualWikiId);
-            stmt.setString(2, parsedTopic.getName());
-            stmt.setBytes(3, parsedTopic.toString().getBytes());
-            stmt.setInt(4, parsedTopic.getTopicId());
-
-            stmt.executeUpdate();
-            DatabaseConnection.closeStatement(stmt);
-        } catch (SQLException e) {
-            logger.severe(e.getMessage(), e);
-            throw e;
-        } finally {
-            DatabaseConnection.closeConnection(conn);
-        }
-
+        stmt.setInt(1, virtualWikiId);
+        stmt.setString(2, topicName);
+        return stmt.executeQuery();
     }
 }

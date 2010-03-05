@@ -38,7 +38,7 @@
 
 <c:if test="${newuser.userId < 1}">
 <div class="formentry">
-	<span class="formcaption"><label for="registerLogin"><fmt:message key="login.username" /></label>:</span>
+	<span class="formcaption"><label for="registerLogin"><fmt:message key="common.login" /></label>:</span>
 	<span class="formelement"><input type="text" name="login" value="<c:out value="${newuser.username}" />" id="registerLogin" size="50" /></span>
 </div>
 <div class="formentry">
@@ -56,7 +56,7 @@
 <c:if test="${newuser.userId > 0}">
 <div class="formentry">
 	<input type="hidden" name="login" value="<c:out value="${newuser.username}" />" />
-	<span class="formcaption"><fmt:message key="login.username" />:</span>
+	<span class="formcaption"><fmt:message key="common.login" />:</span>
 	<span class="formelement"><c:out value="${newuser.username}" /></span>
 </div>
 </c:if>

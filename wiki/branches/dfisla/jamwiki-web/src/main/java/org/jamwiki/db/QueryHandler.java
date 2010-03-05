@@ -133,7 +133,8 @@ public interface QueryHandler {
 	void deleteWatchlistEntry(int virtualWikiId, String topicName, int userId, Connection conn) throws SQLException;
 
         // EXPERIMENTAL
-        void deleteParsedTopic(int virtualWikiId, int topicId, Connection conn) throws SQLException;
+        void deleteParsedTopic(int virtualWikiId, int topicId, int topicVersionId, Connection conn) throws SQLException;
+
 	/**
 	 * Drop all JAMWiki database objects.  This method drops tables, indexes, and
 	 * any database objects, as well as all data in those objects.  Note that if
@@ -460,6 +461,9 @@ public interface QueryHandler {
 	 */
 	int insertTopic(Topic topic, int virtualWikiId, Connection conn) throws SQLException;
 
+        /*
+         * EXPERIMENTAL
+         */
         int insertParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException;
 
         /**
@@ -609,6 +613,9 @@ public interface QueryHandler {
 
         // EXPERIMENTAL
         ResultSet lookupParsedTopic(int virtualWikiId, String topicName, Connection conn) throws SQLException;
+
+        // EXPERIMENTAL
+        ResultSet lookupParsedTopic(int virtualWikiId, int topicId, int topicVersionId, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a result set of all topics of a given type within a virtual wiki.
@@ -819,9 +826,6 @@ public interface QueryHandler {
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
 	void updateTopic(Topic topic, int virtualWikiId, Connection conn) throws SQLException;
-
-        // EXPERIMENTAL
-        void updateParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException;
 
         void updateTopicVersion(TopicVersion topicVersion, int virtualWikiId, Connection conn) throws SQLException;
 

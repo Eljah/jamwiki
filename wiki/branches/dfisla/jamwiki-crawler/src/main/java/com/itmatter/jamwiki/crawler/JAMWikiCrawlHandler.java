@@ -5,6 +5,8 @@
 package com.itmatter.jamwiki.crawler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,6 +53,9 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
     private DataHandler dataHandler = null;
     private String appUrl = null;
     private String fetchMode = "web";
+    private String parserLogger = null;
+    private BufferedWriter pLogger = null;
+    private long threadId = -1;
 
     /**
      *
@@ -61,7 +66,7 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
      * @param ids
      * @throws DataAccessException
      */
-    public JAMWikiCrawlHandler(String mode, String virtualWiki, int virtualWikiId, WikiUser user, String authorIpAddress, List<String> topics) throws DataAccessException {
+    public JAMWikiCrawlHandler(String mode, String logFile, String virtualWiki, int virtualWikiId, WikiUser user, String authorIpAddress, List<String> topics) throws DataAccessException {
 
         this.virtualWiki = virtualWiki;
         this.virtualWikiId = virtualWikiId;
@@ -75,18 +80,23 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
         if (dataHandler == null) {
             throw new DataAccessException("Could not initialize DataHandler!");
         }
+
+        this.threadId = Thread.currentThread().getId();
+        this.parserLogger = this.threadId + "-" + logFile;
     }
 
     /*
      *
      */
-    public void fetchFromDb(String virtualWiki, String topicName) {
+    public boolean fetchFromDb(String virtualWiki, String topicName) {
 
         ParsedTopic parsedTopic = null;
         ParserInput parserInput = null;
         ParserOutput parserOutput = null;
         BlikiProxyParser wikiParser = null;
         Topic topic = null;
+
+        boolean hasErrors = false;
 
         try {
 
@@ -123,6 +133,9 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
                 String wikiContent = topic.getTopicContent();
                 content = wikiParser.parseHTML(parserOutput, wikiContent);
 
+                if ((content != null) && (content.startsWith("<span class=\"error\">"))) {
+                    hasErrors = true;
+                }
 
                 if ((content != null) && (content.startsWith("<span class=\"error\">TIME"))) {
                     timeLimited = true;
@@ -174,12 +187,12 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
                 parsedTopic.initialize(topic);
 
                 // Let's make it safe!
-                if ((topicName != null) && (content != null) &&
-                        (!topicName.equals(WikiBase.SPECIAL_PAGE_STYLESHEET)) &&
-                        (!topicName.equals(WikiBase.SPECIAL_PAGE_LEFT_MENU)) &&
-                        (!topicName.equals(WikiBase.SPECIAL_PAGE_BOTTOM_AREA)) &&
-                        (!timeLimited) &&
-                        (!content.startsWith("<span class=\"error\">ERROR"))) {
+                if ((topicName != null) && (content != null)
+                        && (!topicName.equals(WikiBase.SPECIAL_PAGE_STYLESHEET))
+                        && (!topicName.equals(WikiBase.SPECIAL_PAGE_LEFT_MENU))
+                        && (!topicName.equals(WikiBase.SPECIAL_PAGE_BOTTOM_AREA))
+                        && (!timeLimited)
+                        && (!content.startsWith("<span class=\"error\">ERROR"))) {
                     dataHandler.writeParsedTopic(parsedTopic);
                     //WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey, parsedTopic.toString());
                     logger.debug("CACHE_PARSED_TOPIC_CONTENT WRITE =>: TOPIC-NAME: " + parsedTopic.getName() + " CONTENT: " + parsedTopic.getTopicContent());
@@ -204,6 +217,7 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
 
         }
 
+        return hasErrors;
     }
 
     public void fetchFromWeb(String path) {
@@ -219,7 +233,7 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
             is = u.openStream();
             br = new BufferedReader(new InputStreamReader(is));
 
-            while ((s = br.readLine()) != null) {;
+            while ((s = br.readLine()) != null) {
                 s = null;
             }
 
@@ -228,7 +242,7 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
         } catch (IOException ioe) {
             logger.error("Oops- an IOException happened.", ioe);
         } finally {
-                //System.out.println(s)
+            //System.out.println(s)
             try {
                 br.close();
                 is.close();
@@ -244,29 +258,38 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
         try {
             logger.info("Retrieved Wiki Names =>: " + topicNames.size());
 
-            long threadId = Thread.currentThread().getId();
+            
+            pLogger = new BufferedWriter(new FileWriter(this.parserLogger));
 
             for (String topicName : topicNames) {
 
                 //WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
-                Date startDate = new Date();
+                long startTime = System.currentTimeMillis();
                 //HtmlPage page = webClient.getPage(requestUrl);
                 if (this.fetchMode.equalsIgnoreCase("web")) {
                     String requestUrl = String.format("%s/%s/%s", appUrl, virtualWiki, Utilities.encodeAndEscapeTopicName(topicName));
                     logger.info(String.format("Thread[%d] Requesting Web Page: %s", threadId, requestUrl));
                     fetchFromWeb(requestUrl);
-                    Date endDate = new Date();
+                    long endTime = System.currentTimeMillis();
                     //webClient.closeAllWindows();
 
-                    long fetchTime = endDate.getTime() - startDate.getTime();
+                    long fetchTime = endTime - startTime;
                     logger.info(String.format("Thread[%d] Retrieved Web Page: %s in: %s ms", threadId, requestUrl, fetchTime));
                     System.out.println(String.format("Thread[%d] Retrieved Web Page: %s in: %s ms", threadId, requestUrl, fetchTime));
                 } else if (this.fetchMode.equalsIgnoreCase("db")) {
                     logger.info("Thread[%d] Requesting Topic: " + topicName);
-                    fetchFromDb(virtualWiki, topicName);
-                    Date endDate = new Date();
+                    boolean rv = fetchFromDb(virtualWiki, topicName);
+                    long endTime = System.currentTimeMillis();
 
-                    long fetchTime = endDate.getTime() - startDate.getTime();
+                    long fetchTime = endTime - startTime;
+
+                    if (!rv) {
+                        pLogger.write("OK|" + threadId + "|" + topicName + "|" + fetchTime + "\n");
+                    } else {
+                        pLogger.write("ERROR|" + threadId + "|" + topicName + "|" + fetchTime + "\n");
+                    }
+
+                    pLogger.flush();
                     logger.info(String.format("Thread[%d] Retrieved Topic: %s in: %s ms", threadId, topicName, fetchTime));
                     System.out.println(String.format("Thread[%d] Retrieved Topic: %s in: %s ms", threadId, topicName, fetchTime));
                 } else {
@@ -276,8 +299,15 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
 
 
             }
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        } finally {
+            try {
+                pLogger.flush();
+                pLogger.close();
+            } catch (Exception ex) {
+            }
         }
 
     }

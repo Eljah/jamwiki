@@ -1,0 +1,21 @@
+258868	1	MediaWiki:Copyrightpagename	\N	0	0	258870	-1	\N
+2702778	1	Template:PAGENAMEU	\N	0	0	2702780	8	\N
+2707644	1	Template:PAGENAMEEE	\N	0	0	2707646	8	\N
+4027034	1	Template:PAGENAMEU/doc	\N	0	0	4027036	8	\N
+4118295	1	Template:Pagename	\N	0	0	4118297	8	\N
+4160398	1	Template:PAGENAME-T	\N	0	0	4160400	8	\N
+4160407	1	Template:PAGENAME-T/doc	\N	0	0	4160409	8	\N
+4367598	1	Template:TemplatePAGENAME	\N	0	0	4367600	8	\N
+4367621	1	Template:TemplatePAGENAME/doc	\N	0	0	4367623	8	\N
+5434600	1	Template:IsValidPageName	\N	0	0	5434602	8	\N
+5647393	1	Wikipedia:PAGENAME	\N	0	0	5647395	-1	\N
+6275722	1	Help:PAGENAME	\N	0	0	6275724	-1	\N
+6654603	1	Wikipedia:WikiProject History/Review/Peer review/PAGENAME	\N	0	0	6654605	-1	\N
+6696303	1	Wikipedia:Articles for deletion/PageName	\N	0	0	6696305	-1	\N
+6739116	1	Template:FULLBASEPAGENAME	\N	0	0	6739118	8	\N
+6890372	1	Template:PageName:Fiesta in a box	\N	0	0	6890374	8	\N
+7332892	1	Template:Editnotice pagename	\N	0	0	7332894	8	\N
+7333039	1	Template:Editnotice pagename/doc	\N	0	0	7333041	8	\N
+7342797	1	Template:Editnotice fullpagename	\N	0	0	7342799	8	\N
+7342818	1	Template:Editnotice talkpagename	\N	0	0	7342820	8	\N
+7342865	1	Template:Editnotice talkpagename/doc	\N	0	0	7342867	8	\N

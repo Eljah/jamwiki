@@ -337,13 +337,13 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 CREATE TABLE `jam_topic_cache` (
   `topic_id` int(11) NOT NULL,
+  `topic_version_id` int(11) NOT NULL,
   `virtual_wiki_id` int(11) NOT NULL,
   `topic_name` varchar(200) NOT NULL,
   `data` mediumblob,
-  PRIMARY KEY (`topic_id`,`virtual_wiki_id`),
-  UNIQUE KEY `jam_u_topic_name` (`topic_name`,`virtual_wiki_id`),
-  UNIQUE KEY `jam_u_topic_id` (`topic_id`,`virtual_wiki_id`),
-  KEY `jam_f_topic_vwiki` (`virtual_wiki_id`)
+  PRIMARY KEY (`topic_id`,`topic_version_id`,`virtual_wiki_id`),
+  KEY `jam_f_topic_vwiki` (`virtual_wiki_id`),
+  KEY `jam_u_topic_name` (`topic_name`,`virtual_wiki_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=0;
 SET character_set_client = @saved_cs_client;
 

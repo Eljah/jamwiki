@@ -1,0 +1,36 @@
+StartingPoints -> 621 bytes
+"C" Is for Corpse -> 1140 bytes
+Large denominations of United States currency -> 2144
+Gold certificate -> 3016
+
+mysql> select count(*) from jam_topic t, jam_topic_version tv where t.current_version_id = tv.topic_version_id and length(tv.version_content) > 5000;
++----------+
+| count(*) |
++----------+
+|   219530 | 
++----------+
+1 row in set (2 min 1.81 sec)
+
+mysql> select count(*) from jam_topic t, jam_topic_version tv where t.current_version_id = tv.topic_version_id and length(tv.version_content) > 2000;
++----------+
+| count(*) |
++----------+
+|   827143 | 
++----------+
+1 row in set (1 min 53.01 sec)
+
+mysql> select count(*) from jam_topic t, jam_topic_version tv where t.current_version_id = tv.topic_version_id and length(tv.version_content) > 3000;
++----------+
+| count(*) |
++----------+
+|   467769 | 
++----------+
+1 row in set (1 min 52.71 sec)
+
+mysql> select count(*) from jam_topic t, jam_topic_version tv where t.current_version_id = tv.topic_version_id and length(tv.version_content) > 2500;
++----------+
+| count(*) |
++----------+
+|   609220 | 
++----------+
+1 row in set (1 min 54.61 sec)

@@ -156,7 +156,7 @@ public class WikiMessage {
 	public void setParamsWithoutEscaping(String[] params) {
 		this.params = params;
 	}
-	
+
 	/**
 	 * Escape HTML.  StringEscapeUtils.escapeHtml should be used for this functionality,
 	 * but the current version escapes unicode characters as well as HTML entities

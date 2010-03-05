@@ -436,6 +436,11 @@ public interface DataHandler {
      */
     ParsedTopic lookupParsedTopic(String virtualWiki, String topicName, Object transactionObject) throws DataAccessException;
 
+      /**
+     * EXPERIMENTAL
+     */
+    ParsedTopic lookupParsedTopic(String virtualWiki, int topicId, int topicVersionId, Object transactionObject) throws DataAccessException;
+
     /**
      * Return a count of all topics, including redirects, comments pages and
      * templates, for the given virtual wiki.  Deleted topics are not included
@@ -722,8 +727,6 @@ public interface DataHandler {
      * @throws WikiException
      */
     void updateTopic(Topic topic) throws DataAccessException, WikiException;
-
-    void updateParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException;
 
     /**
      * Exposed from private to public, this should be only used for ETL/loading purposes!

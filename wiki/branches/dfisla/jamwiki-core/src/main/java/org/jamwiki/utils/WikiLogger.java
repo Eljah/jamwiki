@@ -41,9 +41,10 @@ public class WikiLogger {
 
 	private final Logger logger;
 
-	private static FileHandler DEFAULT_LOG_HANDLER = null;
-	private static Level DEFAULT_LOG_LEVEL = null;
+	//private static FileHandler DEFAULT_LOG_HANDLER = null;
+	//private static Level DEFAULT_LOG_LEVEL = null;
 	/** Log configuration property file. */
+        /* @deprecated */
 	public final static String LOG_PROPERTIES_FILENAME = "logging.properties";
 	public final static String DEFAULT_LOG_FILENAME = "jamwiki.log.0";
 
@@ -82,22 +83,22 @@ public class WikiLogger {
 	}
 
 	/**
-	 *
+	 * @deprecated
 	 */
 	public static String getDefaultLogFile() {
 		System.out.println(System.getProperties());
 		String logFile = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + DEFAULT_LOG_FILENAME;
 		return logFile;
 	}
-
+      
 	/**
-	 *
+	 * @deprecated
 	 */
 	public static String getLogConfigFile() {
 		String logConfig = System.getProperty("file.separator") + "WEB-INF" + System.getProperty("file.separator") + "classes" + System.getProperty("file.separator") + LOG_PROPERTIES_FILENAME;
 		return logConfig;
 	}
-
+     
 	/**
 	 * Retrieve a named <code>WikiLogger</code> object.
 	 *
@@ -106,10 +107,12 @@ public class WikiLogger {
 	 */
 	public static WikiLogger getLogger(String name) {
 		Logger logger = Logger.getLogger(name);
+                /*
 		if (WikiLogger.DEFAULT_LOG_HANDLER != null) {
 			logger.addHandler(WikiLogger.DEFAULT_LOG_HANDLER);
 			logger.setLevel(DEFAULT_LOG_LEVEL);
 		}
+                */
 		return new WikiLogger(logger);
 	}
 
@@ -119,27 +122,28 @@ public class WikiLogger {
 	private static void initializeLogParams() {
 		FileInputStream stream = null;
 		try {
-			File propertyFile = WikiLogger.loadProperties();
-			stream = new FileInputStream(propertyFile);
-			Properties properties = new Properties();
-			properties.load(stream);
-			String pattern = properties.getProperty("org.jamwiki.pattern");
-			int limit = Integer.valueOf(properties.getProperty("org.jamwiki.limit"));
-			int count = Integer.valueOf(properties.getProperty("org.jamwiki.count"));
-			boolean append = Boolean.valueOf(properties.getProperty("org.jamwiki.append"));
-			String datePattern = properties.getProperty("org.jamwiki.timestamp");
-			DEFAULT_LOG_LEVEL = Level.parse(properties.getProperty("org.jamwiki.level"));
-			WikiLogger.DEFAULT_LOG_HANDLER = new FileHandler(pattern, limit, count, append);
-			DEFAULT_LOG_HANDLER.setFormatter(new WikiLogFormatter(datePattern));
-			DEFAULT_LOG_HANDLER.setLevel(DEFAULT_LOG_LEVEL);
+			//File propertyFile = WikiLogger.loadProperties();
+			//stream = new FileInputStream(propertyFile);
+			//Properties properties = new Properties();
+			//properties.load(stream);
+			//String pattern = properties.getProperty("org.jamwiki.pattern");
+			//int limit = Integer.valueOf(properties.getProperty("org.jamwiki.limit"));
+			//int count = Integer.valueOf(properties.getProperty("org.jamwiki.count"));
+			//boolean append = Boolean.valueOf(properties.getProperty("org.jamwiki.append"));
+			//String datePattern = properties.getProperty("org.jamwiki.timestamp");
+			//DEFAULT_LOG_LEVEL = Level.parse(properties.getProperty("org.jamwiki.level"));
+			//WikiLogger.DEFAULT_LOG_HANDLER = new FileHandler(pattern, limit, count, append);
+			//DEFAULT_LOG_HANDLER.setFormatter(new WikiLogFormatter(datePattern));
+			//DEFAULT_LOG_HANDLER.setLevel(DEFAULT_LOG_LEVEL);
 			// test the logger to verify permissions are OK
 			Logger logger = Logger.getLogger(WikiLogger.class.getName());
-			logger.addHandler(WikiLogger.DEFAULT_LOG_HANDLER);
-			logger.setLevel(DEFAULT_LOG_LEVEL);
-			logger.config("JAMWiki log initialized from " + propertyFile.getPath() + " with pattern " + pattern);
+
+			//logger.addHandler(WikiLogger.DEFAULT_LOG_HANDLER);
+			//logger.setLevel(DEFAULT_LOG_LEVEL);
+			//logger.config("JAMWiki log initialized from " + propertyFile.getPath() + " with pattern " + pattern);
 		} catch (Exception e) {
 			System.out.println("WARNING: Unable to load custom JAMWiki logging configuration, using system default " + e.getMessage());
-			WikiLogger.DEFAULT_LOG_HANDLER = null;
+			//WikiLogger.DEFAULT_LOG_HANDLER = null;
 		} finally {
 			if (stream != null) {
 				try {
@@ -152,6 +156,7 @@ public class WikiLogger {
 	/**
 	 *
 	 */
+        /*
 	private static File loadProperties() throws FileNotFoundException {
 		ClassLoader loader = WikiLogger.getClassLoader();
 		URL url = loader.getResource(LOG_PROPERTIES_FILENAME);
@@ -171,7 +176,7 @@ public class WikiLogger {
 		}
 		return propertyFile;
 	}
-
+        */
 	/**
 	 * Log a message at the {@link java.util.logging.Level#CONFIG} level,
 	 * provided that the current log level is {@link java.util.logging.Level#CONFIG}

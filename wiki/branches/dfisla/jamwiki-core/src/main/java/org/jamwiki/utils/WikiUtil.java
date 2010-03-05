@@ -292,6 +292,7 @@ public class WikiUtil {
 		return Topic.TYPE_ARTICLE;
 	}
 
+
 	/**
 	 * Return the URL of the index page for the wiki.
 	 *
@@ -724,6 +725,7 @@ public class WikiUtil {
 		}
 		Matcher m = WikiUtil.INVALID_TOPIC_NAME_PATTERN.matcher(name);
 		if (m.find()) {
+                        logger.severe("INVALID-TOPIC-NAME =>: " + name);
 			throw new WikiException(new WikiMessage("common.exception.name", name));
 		}
 	}

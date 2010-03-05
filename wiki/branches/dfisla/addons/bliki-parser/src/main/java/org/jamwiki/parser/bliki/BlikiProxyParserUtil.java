@@ -35,6 +35,7 @@ public class BlikiProxyParserUtil {
      * @return HTML string representation of input
      * @throws ParserException
      */
+    /*
     protected static String parseFragment(ParserInput parserInput, String raw) throws ParserException {
         if (StringUtils.isBlank(raw)) {
             return raw;
@@ -50,11 +51,12 @@ public class BlikiProxyParserUtil {
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
 
         output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
+        logger.debug("RAW: " + raw + " OUTPUT: " + output);
         output = output == null ? "" : output;
 
         return output;
     }
-
+    */
     /**
      * Parse Mediawiki Link
      * @param raw

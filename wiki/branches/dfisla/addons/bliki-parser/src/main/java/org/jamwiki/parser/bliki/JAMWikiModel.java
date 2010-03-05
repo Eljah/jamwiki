@@ -44,7 +44,6 @@ public class JAMWikiModel extends AbstractWikiModel {
         protected ParserOutput fParserOutput;
 
 	static {
-
 		TagNode.addAllowedAttribute("style");
 	}
 

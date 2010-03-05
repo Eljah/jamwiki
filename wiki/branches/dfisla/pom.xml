@@ -47,16 +47,22 @@
 		<jamwiki.version>0.9.0-SNAPSHOT</jamwiki.version>
 		<dependency.spring.version>3.0.0.RC2</dependency.spring.version>
 		<dependency.spring.security.version>3.0.0.RC1</dependency.spring.security.version>
-		<!--
-		<dependency.spring.version>2.5.6</dependency.spring.version>
-		<dependency.spring.security.version>2.0.4</dependency.spring.security.version>
-		-->
 	</properties>
 	<repositories>
 		<repository>
 			<id>Springframework milestone</id>
 			<url>http://maven.springframework.org/milestone</url>
 		</repository>
+		<repository>
+    			<id>sourceforge</id>
+    			<url>http://oss.sonatype.org/content/groups/sourceforge/</url>
+    			<releases>
+      				<enabled>true</enabled>
+    			</releases>
+    			<snapshots>
+      				<enabled>true</enabled>
+    			</snapshots>
+  		</repository>
 	</repositories>
 	<dependencyManagement>
 		<dependencies>
@@ -188,8 +194,33 @@
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
 				<artifactId>ehcache-core</artifactId>
-				<version>1.7.0</version>
+				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
+			<dependency>
+                		<groupId>net.sf.ehcache</groupId>
+                		<artifactId>ehcache-web</artifactId>
+                		<version>2.0-SNAPSHOT</version>
+        		</dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                		<artifactId>slf4j-api</artifactId>
+                		<version>1.5.10</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                		<artifactId>slf4j-ext</artifactId>
+                		<version>1.5.10</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                		<artifactId>slf4j-simple</artifactId>
+                		<version>1.5.10</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                		<artifactId>slf4j-site</artifactId>
+                		<version>1.5.10</version>
+                        </dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>

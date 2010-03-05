@@ -5,102 +5,272 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
     <!--
-	NOTE: do not use the context-param element to initialize the
-	ApplicationResources resource bundle here due to a bug in the JSTL and
-	Tomcat4 that causes response encoding to be finalized and thus prevents
-	setting page encoding to UTF-8.  Instead, load the resource bundle in
-	page-init.jsp.
-	-->
+        NOTE: do not use the context-param element to initialize the
+        ApplicationResources resource bundle here due to a bug in the JSTL and
+        Tomcat4 that causes response encoding to be finalized and thus prevents
+        setting page encoding to UTF-8.  Instead, load the resource bundle in
+        page-init.jsp.
+        -->
 
-	<!--
-		- Location of the XML file that defines the root application context.
-		- Applied by ContextLoaderServlet.
-	-->
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/applicationContext-security.xml</param-value>
-	</context-param>
+    <filter>
+        <filter-name>Cache.Special.AllPages.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.AllPages</param-value>
+        </init-param>
+    </filter>
 
-	<!--
-		- Loads the root application context of this web app at startup,
-		- by default from "/WEB-INF/applicationContext.xml".
-		-
-		- Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
-		- to access it anywhere in the web application, outside of the framework.
-		-
-		- The root context is the parent of all servlet-specific contexts.
-		- This means that its beans are automatically available in these child contexts,
-		- both for getBean(name) calls and (external) bean references.
-	-->
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
+    <filter>
+        <filter-name>Cache.Special.ListUsers.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.ListUsers</param-value>
+        </init-param>
+    </filter>
 
-	<!-- set encoding, cache headers, etc. -->
-	<filter>
-		<filter-name>JAMWikiFilter</filter-name>
-		<filter-class>org.jamwiki.servlets.JAMWikiFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-	</filter>
-	<filter>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>JAMWikiFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>Cache.Special.RecentChanges.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.RecentChanges</param-value>
+        </init-param>
+    </filter>
 
-	<listener>
-		<listener-class>org.jamwiki.servlets.JAMWikiListener</listener-class>
-	</listener>
+    <filter>
+        <filter-name>Cache.Special.Contributions.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.Contributions</param-value>
+        </init-param>
+    </filter>
 
-	<!--
-		- Spring web MVC servlet that dispatches requests to registered handlers.
-		- Has its own application context, by default defined in "{servlet-name}-servlet.xml",
-		- i.e. "jamwiki-servlet.xml" in this case.
-		-
-		- A web app can contain any number of such servlets.
-		- Note that this web app has a shared root application context, serving as parent
-		- of all DispatcherServlet contexts.
-	-->
-	<servlet>
-		<servlet-name>jamwiki</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <filter>
+        <filter-name>Cache.Special.History.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.History</param-value>
+        </init-param>
+    </filter>
 
-	<!-- virtual wiki mapping(s) -->
-	<servlet-mapping>
-		<servlet-name>jamwiki</servlet-name>
-		<url-pattern>/en/*</url-pattern>
-	</servlet-mapping>
+    <filter>
+        <filter-name>Cache.Special.Watchlist.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.Watchlist</param-value>
+        </init-param>
+    </filter>
 
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
+    <filter>
+        <filter-name>Cache.Special.Linkto.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.Linkto</param-value>
+        </init-param>
+    </filter>
 
-	<error-page>
-		<error-code>403</error-code>
-		<location>/403.jsp</location>
-	</error-page>
+    <filter>
+        <filter-name>Cache.Special.Print.Filter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+        <init-param>
+            <param-name>suppressStackTraces</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cacheName</param-name>
+            <param-value>Cache.Special.Print</param-value>
+        </init-param>
+    </filter>
 
-	<jsp-config>
-		<taglib>
-			<taglib-uri>http://jamwiki.org/taglib</taglib-uri>
-			<taglib-location>/WEB-INF/jamwiki.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://www.springframework.org/security/tags</taglib-uri>
-			<taglib-location>/WEB-INF/security.tld</taglib-location>
-		</taglib>
-	</jsp-config>
+    <!--
+                - Location of the XML file that defines the root application context.
+                - Applied by ContextLoaderServlet.
+        -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext-security.xml</param-value>
+    </context-param>
+
+    <!--
+                - Loads the root application context of this web app at startup,
+                - by default from "/WEB-INF/applicationContext.xml".
+                -
+                - Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
+                - to access it anywhere in the web application, outside of the framework.
+                -
+                - The root context is the parent of all servlet-specific contexts.
+                - This means that its beans are automatically available in these child contexts,
+                - both for getBean(name) calls and (external) bean references.
+        -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- set encoding, cache headers, etc. -->
+    <filter>
+        <filter-name>JAMWikiFilter</filter-name>
+        <filter-class>org.jamwiki.servlets.JAMWikiFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
+    <!-- This is a filter chain. They are executed in the order below. Do not change the order. -->
+    <filter-mapping>
+        <filter-name>Cache.Special.AllPages.Filter</filter-name>
+        <url-pattern>/en/Special:Allpages</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.ListUsers.Filter</filter-name>
+        <url-pattern>/en/Special:Listusers</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.RecentChanges.Filter</filter-name>
+        <url-pattern>/en/Special:RecentChanges</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.Contributions.Filter</filter-name>
+        <url-pattern>/en/Special:Contributions</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.History.Filter</filter-name>
+        <url-pattern>/en/Special:History</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.Watchlist.Filter</filter-name>
+        <url-pattern>/en/Special:Watchlist</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.Linkto.Filter</filter-name>
+        <url-pattern>/en/Special:Linkto</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>Cache.Special.Print.Filter</filter-name>
+        <url-pattern>/en/Special:Print</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>JAMWikiFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>org.jamwiki.servlets.JAMWikiListener</listener-class>
+    </listener>
+
+    <!--
+                - Spring web MVC servlet that dispatches requests to registered handlers.
+                - Has its own application context, by default defined in "{servlet-name}-servlet.xml",
+                - i.e. "jamwiki-servlet.xml" in this case.
+                -
+                - A web app can contain any number of such servlets.
+                - Note that this web app has a shared root application context, serving as parent
+                - of all DispatcherServlet contexts.
+        -->
+    <servlet>
+        <servlet-name>jamwiki</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- virtual wiki mapping(s) -->
+    <servlet-mapping>
+        <servlet-name>jamwiki</servlet-name>
+        <url-pattern>/en/*</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/403.jsp</location>
+    </error-page>
+
+    <jsp-config>
+        <taglib>
+            <taglib-uri>http://jamwiki.org/taglib</taglib-uri>
+            <taglib-location>/WEB-INF/jamwiki.tld</taglib-location>
+        </taglib>
+        <taglib>
+            <taglib-uri>http://www.springframework.org/security/tags</taglib-uri>
+            <taglib-location>/WEB-INF/security.tld</taglib-location>
+        </taglib>
+    </jsp-config>
 
 </web-app>

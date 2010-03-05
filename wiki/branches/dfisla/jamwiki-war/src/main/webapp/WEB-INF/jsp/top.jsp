@@ -22,7 +22,9 @@
 <head>
 	<title><fmt:message key="${pageInfo.pageTitle.key}"><fmt:param value="${pageInfo.pageTitle.params[0]}" /></fmt:message> - <fmt:message key="common.sitename" /></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-      
+        <meta name="google-site-verification" content="ebqQu76but6QywpD1hlCETbnohb0wWTv74yJAiAIig4" />
+        <meta name="verify-v1" content="FRBo/Nh6uKHIh62vuuy5CNExevAANYz1k2Y7zIwV2UA=" />
+        <meta name="msvalidate.01" content="60478B3CCA677B8646C3904F351BB7A4" />
 	<meta name="DC.Title" content="<fmt:message key="${pageInfo.pageTitle.key}"><fmt:param value="${pageInfo.pageTitle.params[0]}" /></fmt:message> - <fmt:message key="common.sitename" />" />
 <c:if test="${!empty pageInfo.metaDescription}">
 	<meta name="description" content="<c:out value="${pageInfo.metaDescription}" />" />

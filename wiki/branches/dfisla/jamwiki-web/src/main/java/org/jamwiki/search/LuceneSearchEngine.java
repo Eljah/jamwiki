@@ -88,7 +88,7 @@ public class LuceneSearchEngine implements SearchEngine {
     private static final Version USE_LUCENE_VERSION = Version.LUCENE_CURRENT;
     /** Maximum number of results to return per search. */
     // FIXME - make this configurable
-    private static final int MAXIMUM_RESULTS_PER_SEARCH = 200;
+    //private static final int MAXIMUM_RESULTS_PER_SEARCH = 200;
     /** Store Searchers (once opened) for re-use for performance reasons. */
     private Map<String, Searcher> searchers = new HashMap<String, Searcher>();
     /** Store Writers (once opened) for re-use for performance reasons. */
@@ -232,7 +232,7 @@ public class LuceneSearchEngine implements SearchEngine {
             query.add(term);
             Searcher searcher = this.retrieveIndexSearcher(virtualWiki);
             // actually perform the search
-            TopScoreDocCollector collector = TopScoreDocCollector.create(MAXIMUM_RESULTS_PER_SEARCH, true);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(Environment.getIntValue(Environment.PROP_SEARCH_RESULTS_LIMIT), true);
             searcher.search(query, collector);
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
             for (int i = 0; i < hits.length; i++) {
@@ -273,7 +273,7 @@ public class LuceneSearchEngine implements SearchEngine {
             // rewrite the query to expand it - required for wildcards to work with highlighter
             Query rewrittenQuery = searcher.rewrite(query);
             // actually perform the search
-            TopScoreDocCollector collector = TopScoreDocCollector.create(MAXIMUM_RESULTS_PER_SEARCH, true);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(Environment.getIntValue(Environment.PROP_SEARCH_RESULTS_LIMIT), true);
             searcher.search(rewrittenQuery, collector);
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<span class=\"highlight\">", "</span>"), new SimpleHTMLEncoder(), new QueryScorer(rewrittenQuery));
             ScoreDoc[] hits = collector.topDocs().scoreDocs;

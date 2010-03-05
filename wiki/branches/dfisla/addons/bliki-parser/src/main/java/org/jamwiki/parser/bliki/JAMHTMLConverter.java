@@ -23,6 +23,7 @@ import org.jamwiki.utils.NamespaceHandler;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
@@ -32,7 +33,8 @@ import org.jamwiki.utils.ImageUtil;
 import org.jamwiki.utils.WikiLink;
 
 /**
- *
+ * Serves mainly to added error messages and re-try links for topics that were aborted in parsing (i.e. recursion limit, or parsing time).
+ * Also, serves to override image link building to provide additional link to upload an image.
  * @author dfisla
  */
 public class JAMHTMLConverter extends HTMLConverter {
@@ -40,6 +42,7 @@ public class JAMHTMLConverter extends HTMLConverter {
     private static final Logger logger = Logger.getLogger(LinkUtil.class.getName());
     private static final int DEFAULT_THUMBNAIL_SIZE = 180;
     private ParserInput fParserInput;
+    private DataHandler dataHandler;
 
     private final long START_TIME = System.currentTimeMillis();
 
@@ -50,6 +53,7 @@ public class JAMHTMLConverter extends HTMLConverter {
     public JAMHTMLConverter(ParserInput parserInput) {
         super();
         fParserInput = parserInput;
+        dataHandler = WikiBase.getDataHandler();
     }
 
     /**
@@ -214,8 +218,8 @@ public class JAMHTMLConverter extends HTMLConverter {
             return sb.toString();
         }
 
-        WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(virtualWiki, topicName);
-        Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
+        WikiFile wikiFile = dataHandler.lookupWikiFile(virtualWiki, topicName);
+        Topic topic = dataHandler.lookupTopic(virtualWiki, topicName, false, null);
 
         StringBuffer html = new StringBuffer();
         // Topics can be files

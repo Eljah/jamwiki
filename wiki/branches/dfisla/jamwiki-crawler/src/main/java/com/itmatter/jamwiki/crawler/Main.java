@@ -24,7 +24,7 @@ import org.apache.log4j.*;
 public class Main {
 
     static Logger logger = Logger.getLogger(Main.class.getName());
-    private static final String USAGE = "[-h] [-f <file> -l] [-p <file1,file2,...> -c]";
+    private static final String USAGE = "[-h] [-f <file>] [-l <file>] [-p <file1,file2,...> -c]";
     private static final String HEADER = "JAM Wiki Web Crawler - Imports MediaWiki wikipedia XML exports to JAMWiki.";
     private static final String FOOTER = "";
 
@@ -47,6 +47,7 @@ public class Main {
         options.addOption("c", "crawl", false, "Rebuild all cached topic and topic version content");
         options.addOption("m", "mode", true, "Fetch using 'web' or 'db' modes.");
         options.addOption("f", "file", true, "File name and path");
+        options.addOption("l", "log", true, "File name and path");
         options.addOption("u", "url", true, "Application Root URL Prefix");
         options.addOption("p", "partitions", true, "Partition 1,2,3,4 file name and path");
 
@@ -65,6 +66,7 @@ public class Main {
             String fileName = null;
             String appUrl = null;
             String fetchMode = "web";
+            String logFile = "parser-log.txt";
 
             List<String> partitions = null;
 
@@ -92,6 +94,11 @@ public class Main {
                 logger.debug("FETCH-MODE =>: " + fetchMode);
             }
 
+            if (cmd.hasOption("l")) {
+                logFile = cmd.getOptionValue("l");
+                logger.debug("LOG-FILE =>: " + logFile);
+            }
+
             if (cmd.hasOption("p")) {
                 String pfileNames = cmd.getOptionValue("p");
                 logger.info("PARTITION-LIST =>: " + pfileNames);
@@ -117,7 +124,7 @@ public class Main {
                 logger.info("Starting Topic Crawling Process...");
 
                 WikiUser user = new WikiUser("admin");
-                crawlContent(fetchMode, "en", 1, user, "127.0.0.1", partitions, appUrl);
+                crawlContent(fetchMode, logFile, "en", 1, user, "127.0.0.1", partitions, appUrl);
             } else {
                 printUsage(options);
                 System.exit(1);
@@ -127,7 +134,7 @@ public class Main {
         }
     }
 
-    private static void crawlContent(String fetchMode, String virtualWikiName, int virtualWikiId, WikiUser user, String ip, List<String> partitions, String url) {
+    private static void crawlContent(String fetchMode, String logFile, String virtualWikiName, int virtualWikiId, WikiUser user, String ip, List<String> partitions, String url) {
         try {
             int size = partitions.size();
 
@@ -139,7 +146,7 @@ public class Main {
             for (String pName : partitions) {
                 List<String> pTopicIds = initTopicNames(pName);
 
-                JAMWikiCrawlHandler rebuildHandler = new JAMWikiCrawlHandler(fetchMode, virtualWikiName, virtualWikiId, user, ip, pTopicIds);
+                JAMWikiCrawlHandler rebuildHandler = new JAMWikiCrawlHandler(fetchMode, logFile, virtualWikiName, virtualWikiId, user, ip, pTopicIds);
                 rebuildHandler.setAppUrl(url);
                 blpe.runTask(rebuildHandler);
 

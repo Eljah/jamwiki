@@ -595,7 +595,7 @@ public class TestDataHandler implements DataHandler {
     /**
      * PERFORMANCE-EXPERIMENTAL
      */
-    public void updateParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException {
+    public ParsedTopic lookupParsedTopic(String virtualWiki, int topicId, int topicVersionId, Object transactionObject) throws DataAccessException {
         throw new UnsupportedOperationException();
     }
 

@@ -762,17 +762,18 @@ public class ServletUtil {
         String virtualWiki = topic.getVirtualWiki();
         String topicName = topic.getName();
 
-        //DataHandler dataHandler = WikiBase.getDataHandler();
+        DataHandler dataHandler = WikiBase.getDataHandler();
         ParsedTopic parsedTopic = null;
 
         try {
 
-            String cacheKey = WikiCache.key(virtualWiki, topicName);
-            Element cacheElement = WikiCache.retrieveFromCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey);
+            //String cacheKey = WikiCache.key(virtualWiki, topicName);
+            //Element cacheElement = WikiCache.retrieveFromCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey);
 
-            //topicCacheObject = dataHandler.lookupParsedTopic(virtualWiki, topicName, null);
+            parsedTopic = dataHandler.lookupParsedTopic(virtualWiki, topic.getTopicId(), topic.getCurrentVersionId(), null);
 
-            if (cacheElement == null) {
+            if(parsedTopic == null){
+            //if (cacheElement == null) {
 
                 parsedTopic = new ParsedTopic();
 
@@ -880,15 +881,15 @@ public class ServletUtil {
                         (!topicName.equals(WikiBase.SPECIAL_PAGE_BOTTOM_AREA)) &&
                         (!timeLimited) &&
                         (!content.startsWith("<span class=\"error\">ERROR"))) {
-                    //dataHandler.writeParsedTopic(topicCacheObject);
-                    WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey, parsedTopic.toString());
+                    dataHandler.writeParsedTopic(parsedTopic);
+                    //WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_DATA, cacheKey, parsedTopic.toString());
                     logger.info("CACHE_PARSED_TOPIC_CONTENT WRITE =>: TOPIC-NAME: " + parsedTopic.getName() + " CONTENT: " + parsedTopic.getTopicContent());
                 }
 
             } else {
 
                 //logger.debug("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
-                parsedTopic = new ParsedTopic((String) cacheElement.getObjectValue());
+                //parsedTopic = new ParsedTopic((String) cacheElement.getObjectValue());
                 topic = (Topic) parsedTopic;
 
                 next.addObject("categories", parsedTopic.categories);

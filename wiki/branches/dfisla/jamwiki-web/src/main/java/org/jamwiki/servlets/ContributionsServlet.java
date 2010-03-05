@@ -16,6 +16,7 @@
  */
 package org.jamwiki.servlets;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,7 +52,17 @@ public class ContributionsServlet extends JAMWikiServlet {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		String userString = WikiUtil.getParameterFromRequest(request, "contributor", false);
 		Pagination pagination = ServletUtil.loadPagination(request, next);
-		List<RecentChange> contributions = WikiBase.getDataHandler().getUserContributions(virtualWiki, userString, pagination, true);
+
+
+		List<RecentChange> contributions = new ArrayList<RecentChange>();
+                
+                if((userString != null) && 
+                        ((!userString.trim().equalsIgnoreCase("admin")) &&
+                        (!userString.trim().equals("127.0.0.1")))
+                        )
+                        {
+                    WikiBase.getDataHandler().getUserContributions(virtualWiki, userString, pagination, true);
+                }
 		next.addObject("contributions", contributions);
 		next.addObject("numContributions", contributions.size());
 		next.addObject("contributor", userString);

@@ -4,6 +4,9 @@
  */
 package com.itmatter.jamwiki.analyzer;
 
+import info.bliki.wiki.filter.HTMLConverter;
+import info.bliki.wiki.filter.PlainTextConverter;
+import info.bliki.wiki.model.WikiModel;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +28,7 @@ import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.bliki.BlikiProxyParser;
 import org.jamwiki.utils.Utilities;
 import org.apache.log4j.Logger;
+import org.jamwiki.parser.jflex.JFlexParser;
 
 /**
  *
@@ -33,7 +37,7 @@ import org.apache.log4j.Logger;
 public class Main {
 
     private static Logger logger = Logger.getLogger(Main.class);
-    private static final String USAGE = "[-h] [-t <string:topic name> -w <string:wiki name>] -c <string:all,wiki,txt,html>| [-r <string:regex>]";
+    private static final String USAGE = "[-h] [-t <string:topic name> -w <string:wiki name>] -c <string:all,wiki,txt,html> -p <bliki,blikiproxy,jflex>| [-r <string:regex>]";
     private static final String HEADER = "JAM Wiki Content Analyzer - Parses and Transforms article content.";
     private static final String FOOTER = "";
 
@@ -86,6 +90,8 @@ public class Main {
         options.addOption("h", "help", false, "Print this usage information");
         options.addOption("w", "wiki", true, "Wiki name");
         options.addOption("t", "topic", true, "Topic name");
+        options.addOption("f", "file", true, "Source file");
+        options.addOption("p", "parser", true, "Parser type");
         options.addOption("c", "content", true, "Content type");
 
         CommandLineParser parser = null;
@@ -103,6 +109,8 @@ public class Main {
 
             String wikiName = null;
             String topicName = null;
+            String sourceFile = null;
+            String parserType = new String("blikiproxy");
             String contentType = new String("all");
 
             if (cmd.hasOption("h")) {
@@ -118,8 +126,16 @@ public class Main {
                 topicName = cmd.getOptionValue("t");
             }
 
+            if (cmd.hasOption("f")) {
+                sourceFile = cmd.getOptionValue("f");
+            }
+
             if (cmd.hasOption("c")) {
                 contentType = cmd.getOptionValue("c");
+            }
+
+            if (cmd.hasOption("p")) {
+                parserType = cmd.getOptionValue("p");
             }
 
             DataHandler dh = WikiBase.getDataHandler();
@@ -129,55 +145,115 @@ public class Main {
                 Topic topic = dh.lookupTopic(wikiName, topicName, true, null);
                 Locale locale = new Locale("en", "US");
 
-                //TODO: Switch to new BlikiProxyParser
-                /*
-                WikiModel wikiModel = new WikiModel("${image}", "${title}");
+                if ((parserType != null) & (parserType.equalsIgnoreCase("blikiproxy"))) {
 
-                String wikiContent = topic.getTopicContent();
-                String htmlContent = wikiModel.render(wikiContent);
-                writeToFile(topicName + ".wiki.txt", wikiContent);
-                writeToHtmlFile(topicName + ".html", htmlContent);
+                    ParserInput parserInput = new ParserInput();
+                    parserInput.setContext("");
+                    parserInput.setLocale(locale);
+                    //parserInput.setWikiUser(user);
+                    parserInput.setTopicName(topicName);
+                    //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
+                    parserInput.setVirtualWiki(wikiName);
 
-                String content = Utilities.stripMarkup(htmlContent);
-                writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
-                 */
+                    BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
 
-                ParserInput parserInput = new ParserInput();
-                parserInput.setContext("/wiki");
-                parserInput.setLocale(locale);
-                //parserInput.setWikiUser(user);
-                parserInput.setTopicName(topicName);
-                //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
-                parserInput.setVirtualWiki(wikiName);
-                parserInput.setAllowSectionEdit(true);
-                BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
+                    ParserOutput parserOutput = new ParserOutput();
 
-                ParserOutput parserOutput = new ParserOutput();
+                    if (contentType.equalsIgnoreCase("all")) {
+                        String wikiContent = topic.getTopicContent();
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
-                if (contentType.equalsIgnoreCase("all")) {
-                    String wikiContent = topic.getTopicContent();
-                    String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+                        writeToFile(topicName + ".wiki.txt", wikiContent);
+                        writeToHtmlFile(topicName + ".blikiproxy.html", htmlContent);
 
-                    writeToFile(topicName + ".wiki.txt", wikiContent);
-                    writeToHtmlFile(topicName + ".html", htmlContent);
+                        String content = Utilities.stripMarkup(htmlContent);
+                        writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+                    } else if (contentType.equalsIgnoreCase("html")) {
+                        String wikiContent = topic.getTopicContent();
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
-                    String content = Utilities.stripMarkup(htmlContent);
-                    writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
-                } else if (contentType.equalsIgnoreCase("html")) {
-                    String wikiContent = topic.getTopicContent();
-                    String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+                        writeToHtmlFile(topicName + ".blikiproxy.html", htmlContent);
+                    } else if (contentType.equalsIgnoreCase("wiki")) {
+                        String wikiContent = topic.getTopicContent();
 
-                    writeToHtmlFile(topicName + ".html", htmlContent);
-                } else if (contentType.equalsIgnoreCase("wiki")) {
-                    String wikiContent = topic.getTopicContent();
+                        writeToFile(topicName + ".wiki.txt", wikiContent);
+                    } else if (contentType.equalsIgnoreCase("txt")) {
+                        String wikiContent = topic.getTopicContent();
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
-                    writeToFile(topicName + ".wiki.txt", wikiContent);
-                } else if (contentType.equalsIgnoreCase("txt")) {
-                    String wikiContent = topic.getTopicContent();
-                    String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+                        String content = Utilities.stripMarkup(htmlContent);
+                        writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+                    }
+                } else if ((parserType != null) & (parserType.equalsIgnoreCase("bliki"))) {
 
-                    String content = Utilities.stripMarkup(htmlContent);
-                    writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+                    if (contentType.equalsIgnoreCase("all")) {
+                        String wikiContent = topic.getTopicContent();
+                        WikiModel wikiModel = new WikiModel("${image}", "${title}");
+                        String htmlContent = wikiModel.render(new HTMLConverter(), wikiContent);
+
+                        writeToFile(topicName + ".wiki.txt", wikiContent);
+                        writeToHtmlFile(topicName + ".bliki.html", htmlContent);
+
+                        String plainContent = wikiModel.render(new PlainTextConverter(), wikiContent);
+                        writeToFile(topicName + ".clean.txt", plainContent);
+                    } else if (contentType.equalsIgnoreCase("html")) {
+                        String wikiContent = topic.getTopicContent();
+                        WikiModel wikiModel = new WikiModel("${image}", "${title}");
+                        String htmlContent = wikiModel.render(new HTMLConverter(), wikiContent);
+
+                        writeToHtmlFile(topicName + ".bliki.html", htmlContent);
+                    } else if (contentType.equalsIgnoreCase("wiki")) {
+                        String wikiContent = topic.getTopicContent();
+
+                        writeToFile(topicName + ".wiki.txt", wikiContent);
+                    } else if (contentType.equalsIgnoreCase("txt")) {
+                        String wikiContent = topic.getTopicContent();
+                        WikiModel wikiModel = new WikiModel("${image}", "${title}");
+
+                        String plainContent = wikiModel.render(new PlainTextConverter(), wikiContent);
+                        writeToFile(topicName + ".clean.txt", plainContent);
+                    }
+                } else if ((parserType != null) & (parserType.equalsIgnoreCase("jflex"))) {
+
+                    ParserInput parserInput = new ParserInput();
+                    parserInput.setContext("");
+                    parserInput.setLocale(locale);
+                    //parserInput.setWikiUser(user);
+                    parserInput.setTopicName(topicName);
+                    //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
+                    parserInput.setVirtualWiki(wikiName);
+
+                    JFlexParser wikiParser = new JFlexParser(parserInput);
+
+                    ParserOutput parserOutput = new ParserOutput();
+
+                    if (contentType.equalsIgnoreCase("all")) {
+                        String wikiContent = topic.getTopicContent();
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+
+                        writeToFile(topicName + ".wiki.txt", wikiContent);
+                        writeToHtmlFile(topicName + ".jflex.html", htmlContent);
+
+                        String content = Utilities.stripMarkup(htmlContent);
+                        writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+                    } else if (contentType.equalsIgnoreCase("html")) {
+                        String wikiContent = topic.getTopicContent();
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+
+                        writeToHtmlFile(topicName + ".jflex.html", htmlContent);
+                    } else if (contentType.equalsIgnoreCase("wiki")) {
+                        String wikiContent = topic.getTopicContent();
+
+                        writeToFile(topicName + ".wiki.txt", wikiContent);
+                    } else if (contentType.equalsIgnoreCase("txt")) {
+                        String wikiContent = topic.getTopicContent();
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+
+                        String content = Utilities.stripMarkup(htmlContent);
+                        writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+                    }else{
+                        logger.error("Incorrect parser type!");
+                    }
                 }
             }
 

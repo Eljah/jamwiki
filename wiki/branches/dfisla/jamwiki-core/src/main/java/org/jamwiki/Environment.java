@@ -84,6 +84,9 @@ public class Environment {
 	public static final String PROP_IMAGE_RESIZE_INCREMENT = "image-resize-increment";
 	public static final String PROP_MAX_TOPIC_VERSION_EXPORT = "max-topic-version-export";
 	public static final String PROP_PARSER_ALLOW_HTML = "allowHTML";
+        public static final String PROP_PARSER_SECTION_EDIT = "section-edit";
+        public static final String PROP_PARSER_REMOVE_UNSUPPORTED = "remove-unsupported";
+        public static final String PROP_PARSER_CLEAN_HTML = "clean-html";
 	public static final String PROP_PARSER_ALLOW_JAVASCRIPT = "allow-javascript";
 	public static final String PROP_PARSER_ALLOW_TEMPLATES = "allow-templates";
 	public static final String PROP_PARSER_CLASS = "parser";
@@ -102,6 +105,7 @@ public class Environment {
 	public static final String PROP_RSS_ALLOWED = "rss-allowed";
 	public static final String PROP_RSS_TITLE = "rss-title";
 	public static final String PROP_SERVER_URL = "server-url";
+        public static final String PROP_SEARCH_RESULTS_LIMIT = "search-results-limit";
 	public static final String PROP_SITE_NAME = "site-name";
 	public static final String PROP_TOPIC_EDITOR = "default-editor";
 	// FIXME - this property can be removed once the abilitity to upgrade to 0.6.0 is removed
@@ -228,6 +232,7 @@ public class Environment {
 		defaults.setProperty(PROP_IMAGE_RESIZE_INCREMENT, "100");
 		defaults.setProperty(PROP_MAX_TOPIC_VERSION_EXPORT, "200");
 		defaults.setProperty(PROP_PARSER_ALLOW_HTML, Boolean.TRUE.toString());
+                defaults.setProperty(PROP_PARSER_SECTION_EDIT, Boolean.TRUE.toString());
 		defaults.setProperty(PROP_PARSER_ALLOW_JAVASCRIPT, Boolean.FALSE.toString());
 		defaults.setProperty(PROP_PARSER_ALLOW_TEMPLATES, Boolean.TRUE.toString());
 		defaults.setProperty(PROP_PARSER_CLASS, "org.jamwiki.parser.jflex.JFlexParser");
@@ -237,6 +242,8 @@ public class Environment {
 		defaults.setProperty(PROP_PARSER_TOC_DEPTH, "5");
                 defaults.setProperty(PROP_PARSER_PARSE_SIDEBAR, Boolean.FALSE.toString());
                 defaults.setProperty(PROP_PARSER_PARSE_COORD, Boolean.FALSE.toString());
+                defaults.setProperty(PROP_PARSER_REMOVE_UNSUPPORTED, Boolean.FALSE.toString());
+                defaults.setProperty(PROP_PARSER_CLEAN_HTML, Boolean.FALSE.toString());
                 defaults.setProperty(PROP_PARSER_TIME_LIMIT, "20000");
 		defaults.setProperty(PROP_PATTERN_INVALID_ROLE_NAME, "([A-Za-z0-9_]+)");
 		defaults.setProperty(PROP_PATTERN_INVALID_TOPIC_NAME, "([\\n\\r\\\\<>\\[\\]?#]+)");
@@ -245,7 +252,8 @@ public class Environment {
 		defaults.setProperty(PROP_RECENT_CHANGES_NUM, "100");
 		defaults.setProperty(PROP_RSS_ALLOWED, Boolean.TRUE.toString());
 		defaults.setProperty(PROP_RSS_TITLE, "Wiki Recent Changes");
-		defaults.setProperty(PROP_SERVER_URL, "");
+		defaults.setProperty(PROP_SEARCH_RESULTS_LIMIT, "25");
+                defaults.setProperty(PROP_SERVER_URL, "");
 		defaults.setProperty(PROP_SITE_NAME, "JAMWiki");
 		// FIXME - hard coding
 		defaults.setProperty(PROP_TOPIC_EDITOR, "toolbar");
