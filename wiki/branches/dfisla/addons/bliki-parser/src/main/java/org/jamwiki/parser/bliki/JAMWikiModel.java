@@ -232,6 +232,22 @@ public class JAMWikiModel extends AbstractWikiModel {
             }
 	}
 
+        public Map<String,String> getCategories() {
+            if(fParserOutput != null){
+		return fParserOutput.getCategories();
+            }else{
+                return null;
+            }
+	}
+
+        public Set<String> getTemplates() {
+            if(fParserOutput != null){
+		return (Set<String>) fParserOutput.getTemplates();
+            }else{
+                return null;
+            }
+	}
+
 	@Override
 	public void appendInterWikiLink(String namespace, String title, String topicDescription) {
 		String hrefLink = getInterwikiMap().get(namespace.toLowerCase());

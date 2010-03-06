@@ -108,19 +108,12 @@ public class BlikiProxyParser extends AbstractParser {
         String output = raw;
         ParserOutput parserOutput = new ParserOutput();
 
-       // if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
-       //     raw = this.removeUnsupportedMediaWikiMarkup(raw);
-       // }
-
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
         output = wikiModel.parseTemplates(raw, true);
 
-        //if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-        //    raw = this.removeUnsupportedMediaWikiMarkup(raw);
-        //}
-        //output = this.cleanupHtmlParserError(output);
-
-        output = output == null ? "" : output;
+        if (output == null) {
+            output = "";
+        }
 
         if (logger.isInfoEnabled()) {
             String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
@@ -154,26 +147,37 @@ public class BlikiProxyParser extends AbstractParser {
             raw = this.removeUnsupportedMediaWikiMarkup(raw);
         }
 
-        WikiModel wikiModel = new WikiModel("${image}", "${title}");
-        output = wikiModel.render(raw);
+        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
+        output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
+            if (output == null) {
+                output = "";
+            } else {
 
-        String context = parserInput.getContext();
-        if (context == null) {
-            context = "";
-        }
+                if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
+                    output = this.cleanupHtmlParserError(output);
+                }
+            }
+
+        //WikiModel wikiModel = new WikiModel("${image}", "${title}");
+        //output = wikiModel.render(raw);
+
+        //String context = parserInput.getContext();
+        //if (context == null) {
+        //    context = "";
+        //}
         //JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
         //output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
 
-        if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-            output = this.cleanupHtmlParserError(output);
-        }
+        //if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
+        //    output = this.cleanupHtmlParserError(output);
+        //}
 
         for (String link : wikiModel.getLinks()) {
             parserOutput.addLink(link);
             logger.debug("PARSER-OUTPUT-LINK: " + link);
         }
 
-
+      
         for (String template : wikiModel.getTemplates()) {
             parserOutput.addTemplate(template);
             logger.debug("PARSER-OUTPUT-TEMPLATE: " + template);
@@ -187,7 +191,7 @@ public class BlikiProxyParser extends AbstractParser {
                 logger.debug("PARSER-OUTPUT-CATEGORY: " + key);
             }
         }
-
+        
         if (logger.isInfoEnabled()) {
             String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
             logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
@@ -275,49 +279,6 @@ public class BlikiProxyParser extends AbstractParser {
     }
 
     /**
-     * EXPERIMENTAL
-     *
-     * @param raw
-     *          The raw Wiki syntax to be converted into HTML.
-     * @return The parsed content.
-     * @throws ParserException
-     *           Thrown if any error occurs during parsing.
-     */
-    public String parseHTMLFragment(ParserOutput parserOutput, String raw) throws ParserException {
-
-        long start = System.currentTimeMillis();
-        logger.debug("RAW: " + raw);
-        String output = null;
-
-        String context = parserInput.getContext();
-        if (context == null) {
-            context = "";
-        }
-        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
-        //WikiModel wikiModel = new WikiModel(parserInput, parserOutput);
-
-        if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
-            raw = this.removeUnsupportedMediaWikiMarkup(raw);
-        }
-
-        output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
-        if (output == null) {
-            output = "";
-        } else {
-
-            if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-                output = this.cleanupHtmlParserError(output);
-            }
-        }
-
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-        }
-        return output;
-    }
-
-    /**
      * This method provides a way to parse content and set all output metadata,
      * such as link values used by the search engine.
      *
@@ -328,7 +289,7 @@ public class BlikiProxyParser extends AbstractParser {
         long start = System.currentTimeMillis();
         // FIXME - set a bogus context value to avoid parser errors
         if (this.parserInput.getContext() == null) {
-            this.parserInput.setContext("/wiki");
+            this.parserInput.setContext("/en");
         }
         // some parser expressions require that lines end in a newline, so add a newline
         // to the end of the content for good measure
