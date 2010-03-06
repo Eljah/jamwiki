@@ -82,16 +82,13 @@ public class BlikiProxyParser extends AbstractParser {
     
     public String buildRedirectContent(String topicName) {
 
-        String redirectHtml = "";
+        String output = "";
         try {
-            //redirectHtml = this.parseHTML(new ParserOutput(), topicName);
-            //logger.debug("REDIRECT-HTML: " + redirectHtml);
-            redirectHtml = this.parseRedirect(new ParserOutput(), "#REDIRECT [[" + topicName + "]]");
+            output = this.parseRedirect(new ParserOutput(), "#REDIRECT [[" + topicName + "]]");
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
-
-        return redirectHtml;//"#REDIRECT [[" + topicName + "]]";
+        return output;
     }
     
     /**
@@ -111,17 +108,17 @@ public class BlikiProxyParser extends AbstractParser {
         String output = raw;
         ParserOutput parserOutput = new ParserOutput();
 
-        if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
-            raw = this.removeUnsupportedMediaWikiMarkup(raw);
-        }
+       // if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
+       //     raw = this.removeUnsupportedMediaWikiMarkup(raw);
+       // }
 
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
         output = wikiModel.parseTemplates(raw, true);
 
-        if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-            raw = this.removeUnsupportedMediaWikiMarkup(raw);
-        }
-        output = this.cleanupHtmlParserError(output);
+        //if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
+        //    raw = this.removeUnsupportedMediaWikiMarkup(raw);
+        //}
+        //output = this.cleanupHtmlParserError(output);
 
         output = output == null ? "" : output;
 
@@ -132,6 +129,15 @@ public class BlikiProxyParser extends AbstractParser {
         return output;
     }
 
+    /**
+     *
+     *
+     * @param raw
+     *          The raw Wiki syntax to be converted into HTML.
+     * @return The parsed content.
+     * @throws ParserException
+     *           Thrown if any error occurs during parsing.
+     */
     public String parseFragment(ParserOutput parserOutput, String raw, int mode) throws ParserException {
 
         long start = System.currentTimeMillis();
@@ -151,11 +157,11 @@ public class BlikiProxyParser extends AbstractParser {
         WikiModel wikiModel = new WikiModel("${image}", "${title}");
         output = wikiModel.render(raw);
 
-        //String context = parserInput.getContext();
-        //if (context == null) {
-        //    context = "";
-        //}
-        //JexAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
+        String context = parserInput.getContext();
+        if (context == null) {
+            context = "";
+        }
+        //JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
         //output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
 
         if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
@@ -246,7 +252,6 @@ public class BlikiProxyParser extends AbstractParser {
                 context = "";
             }
             JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
-            //WikiModel wikiModel = new WikiModel(parserInput, parserOutput);
 
             if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
                 raw = this.removeUnsupportedMediaWikiMarkup(raw);
@@ -269,36 +274,41 @@ public class BlikiProxyParser extends AbstractParser {
         return output;
     }
 
-    // EXPERIMENTAL
-     public String parseHTMLFragment(ParserOutput parserOutput, String raw) throws ParserException {
+    /**
+     * EXPERIMENTAL
+     *
+     * @param raw
+     *          The raw Wiki syntax to be converted into HTML.
+     * @return The parsed content.
+     * @throws ParserException
+     *           Thrown if any error occurs during parsing.
+     */
+    public String parseHTMLFragment(ParserOutput parserOutput, String raw) throws ParserException {
 
         long start = System.currentTimeMillis();
         logger.debug("RAW: " + raw);
         String output = null;
 
+        String context = parserInput.getContext();
+        if (context == null) {
+            context = "";
+        }
+        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
+        //WikiModel wikiModel = new WikiModel(parserInput, parserOutput);
 
+        if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
+            raw = this.removeUnsupportedMediaWikiMarkup(raw);
+        }
 
+        output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
+        if (output == null) {
+            output = "";
+        } else {
 
-            String context = parserInput.getContext();
-            if (context == null) {
-                context = "";
+            if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
+                output = this.cleanupHtmlParserError(output);
             }
-            JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
-            //WikiModel wikiModel = new WikiModel(parserInput, parserOutput);
-
-            if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
-                raw = this.removeUnsupportedMediaWikiMarkup(raw);
-            }
-
-            output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
-            if (output == null) {
-                output = "";
-            } else {
-
-                if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-                    output = this.cleanupHtmlParserError(output);
-                }
-            }
+        }
 
         if (logger.isInfoEnabled()) {
             String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
@@ -420,13 +430,6 @@ public class BlikiProxyParser extends AbstractParser {
         if (StringUtils.isBlank(raw)) {
             return null;
         }
-        // pre-process parse to handle categories, HTML comments, etc.
-        //String preprocessed = BlikiProxyParserUtil.parseFragment(parserInput, raw);
-        //logger.debug("PRE-PROCESSED: " + preprocessed.trim());
-        //Matcher m = REDIRECT_PATTERN.matcher(preprocessed.trim());
-
-        //String preprocessed = this.parseHTMLFragment(new ParserOutput(), raw);
-        //logger.debug("PRE-PROCESSED: " + preprocessed.trim());
 
         Matcher m = REDIRECT_PATTERN.matcher(raw);
         return (m.matches()) ? Utilities.decodeAndEscapeTopicName(m.group(1).trim(), true) : null;

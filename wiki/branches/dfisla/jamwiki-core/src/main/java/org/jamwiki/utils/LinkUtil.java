@@ -376,7 +376,7 @@ public class LinkUtil {
 	 * @param queryString Query string parameters to append to the link.
 	 * @throws Exception Thrown if any error occurs while builing the link URL.
 	 */
-	private static String buildTopicUrlNoEdit(String context, String virtualWiki, String topicName, String section, String queryString) {
+	public static String buildTopicUrlNoEdit(String context, String virtualWiki, String topicName, String section, String queryString) {
 		if (StringUtils.isBlank(topicName) && !StringUtils.isBlank(section)) {
 			return "#" + Utilities.encodeAndEscapeTopicName(section);
 		}

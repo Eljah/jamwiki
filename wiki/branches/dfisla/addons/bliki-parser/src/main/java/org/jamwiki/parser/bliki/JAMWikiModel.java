@@ -12,7 +12,6 @@ import info.bliki.wiki.tags.util.TagStack;
 
 import info.bliki.wiki.namespaces.INamespace;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +21,6 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
-import org.jamwiki.parser.jflex.WikiSignatureTag;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.Utilities;
@@ -34,8 +32,6 @@ import org.apache.log4j.Logger;
  * 
  */
 public class JAMWikiModel extends AbstractWikiModel {
-	// see: JFlexParser.MODE_MINIMAL
-        protected static final int MODE_MINIMAL = 3;
 
 	private static final Logger logger = Logger.getLogger(JAMWikiModel.class.getName());
 
@@ -100,29 +96,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		popNode(); // div
 
 	}
-/* JAMWIKI-NEW: BROKEN API
-	@Override
-	public void appendSignature(Appendable writer, int numberOfTildes) throws IOException {
-		WikiSignatureTag parserTag;
-		switch (numberOfTildes) {
-		case 3:
-			parserTag = new WikiSignatureTag();
-                        //parserTag.parse(null, fPageTitle, args)
-                        //JFlexParserUtil.
-			writer.append(parserTag.parse(fParserInput, fParserOutput, MODE_MINIMAL, "~~~"));
-			break;
-		case 4:
-			parserTag = new WikiSignatureTag();
-			writer.append(parserTag.parse(fParserInput, fParserOutput, MODE_MINIMAL, "~~~~"));
-			break;
-		case 5:
-			parserTag = new WikiSignatureTag();
-                        //parserTag.parse(null, fPageTitle, args)
-			writer.append(parserTag.parse(fParserInput, fParserOutput, MODE_MINIMAL, "~~~~~"));
-			break;
-		}
-	}
-*/
+
 	@Override
 	public void appendInternalLink(String topic, String hashSection, String topicDescription, String cssClass, boolean parseRecursive) {
 		try {
@@ -136,7 +110,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 			String virtualWiki = fParserInput.getVirtualWiki();
 			String section = wikiLink.getSection();
 			String query = wikiLink.getQuery();
-			String href = buildTopicUrlNoEdit(fContextPath, virtualWiki, destination, section, query);
+			String href = LinkUtil.buildTopicUrlNoEdit(fContextPath, virtualWiki, destination, section, query);
 			String style = "";
 			if (StringUtils.isBlank(topic) && !StringUtils.isBlank(section)) {
 				// do not check existence for section links
@@ -164,58 +138,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 			append(new ContentToken(topicDescription));
 		}
 	}
-
-	/**
-	 * Build a URL to the topic page for a given topic. This method does NOT
-	 * verify if the topic exists or if it is a "Special:" page, simply returning
-	 * the URL for the topic and virtual wiki.
-	 * 
-	 * @param context
-	 *          The servlet context path. If this value is <code>null</code> then
-	 *          the resulting URL will NOT include context path, which breaks HTML
-	 *          links but is useful for servlet redirection URLs.
-	 * @param virtualWiki
-	 *          The virtual wiki for the link that is being created.
-	 * @param topicName
-	 *          The name of the topic for which a link is being built.
-	 * @param section
-	 *          The section of the page (#section) for which a link is being
-	 *          built.
-	 * @param queryString
-	 *          Query string parameters to append to the link.
-	 * @throws Exception
-	 *           Thrown if any error occurs while builing the link URL.
-	 */
-	private static String buildTopicUrlNoEdit(String context, String virtualWiki, String topicName, String section, String queryString) {
-		// TODO same as LinkUtil#buildTopicUrlNoEdit()
-		if (StringUtils.isBlank(topicName) && !StringUtils.isBlank(section)) {
-			return "#" + Utilities.encodeAndEscapeTopicName(section);
-		}
-		StringBuffer url = new StringBuffer();
-		if (context != null) {
-			url.append(context);
-		}
-		// context never ends with a "/" per servlet specification
-		url.append('/');
-		// get the virtual wiki, which should have been set by the parent servlet
-		url.append(Utilities.encodeAndEscapeTopicName(virtualWiki));
-		url.append('/');
-		url.append(Utilities.encodeAndEscapeTopicName(topicName));
-		if (!StringUtils.isBlank(queryString)) {
-			if (queryString.charAt(0) != '?') {
-				url.append('?');
-			}
-			url.append(queryString);
-		}
-		if (!StringUtils.isBlank(section)) {
-			if (section.charAt(0) != '#') {
-				url.append('#');
-			}
-			url.append(Utilities.encodeAndEscapeTopicName(section));
-		}
-		return url.toString();
-	}
-
+        
 	@Override
 	public void addCategory(String categoryName, String sortKey) {
 		fParserOutput.addCategory(getCategoryNamespace() + NamespaceHandler.NAMESPACE_SEPARATOR + categoryName, sortKey);
@@ -302,7 +225,11 @@ public class JAMWikiModel extends AbstractWikiModel {
 	}
 
 	public Set<String> getLinks() {
-		return null;
+            if(fParserOutput != null){
+		return (Set<String>) fParserOutput.getLinks();
+            }else{
+                return null;
+            }
 	}
 
 	@Override

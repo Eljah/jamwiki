@@ -43,7 +43,6 @@ public class JAMHTMLConverter extends HTMLConverter {
     private static final int DEFAULT_THUMBNAIL_SIZE = 180;
     private ParserInput fParserInput;
     private DataHandler dataHandler;
-
     private final long START_TIME = System.currentTimeMillis();
 
     /**
@@ -61,61 +60,62 @@ public class JAMHTMLConverter extends HTMLConverter {
      *
      * @throws IOException
      */
+
     @Override
     public void nodesToText(List<? extends Object> nodes, Appendable resultBuffer, IWikiModel model) throws IOException {
-		if (nodes != null && !nodes.isEmpty()) {
-			try {
-				int level = model.incrementRecursionLevel();
+        if (nodes != null && !nodes.isEmpty()) {
+            try {
+                int level = model.incrementRecursionLevel();
 
-				if (level > Configuration.RENDERER_RECURSION_LIMIT) {
-					resultBuffer.append("<span class=\"error\">ERROR - Processing recursion limit exceeded rendering tags count " + Configuration.RENDERER_RECURSION_LIMIT +".</span>");
-					return;
-				}
+                if (level > Configuration.RENDERER_RECURSION_LIMIT) {
+                    resultBuffer.append("<span class=\"error\">ERROR - Processing recursion limit exceeded rendering tags count " + Configuration.RENDERER_RECURSION_LIMIT + ".</span>");
+                    return;
+                }
 
-                                if (System.currentTimeMillis() - START_TIME > Environment.getLongValue(Environment.PROP_PARSER_TIME_LIMIT)) {
-                                        logger.error("Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms");
-                                        resultBuffer.append("<span class=\"error\">TIME - Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms.</span>");
-					return;
-				}
+                if (System.currentTimeMillis() - START_TIME > Environment.getLongValue(Environment.PROP_PARSER_TIME_LIMIT)) {
+                    logger.error("Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms");
+                    resultBuffer.append("<span class=\"error\">TIME - Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms.</span>");
+                    return;
+                }
 
-				Iterator<? extends Object> childrenIt = nodes.iterator();
-				while (childrenIt.hasNext()) {
-					Object item = childrenIt.next();
-					if (item != null) {
-						if (item instanceof List) {
-							nodesToText((List) item, resultBuffer, model);
-						} else if (item instanceof ContentToken) {
-							ContentToken contentToken = (ContentToken) item;
-							String content = contentToken.getContent();
-							content = Utils.escapeXml(content, true, true, true);
-							resultBuffer.append(content);
-						} else if (item instanceof HTMLTag) {
-							((HTMLTag) item).renderHTML(this, resultBuffer, model);
-						} else if (item instanceof TagNode) {
-							TagNode node = (TagNode) item;
-							Map<String, Object> map = node.getObjectAttributes();
-							if (map != null && map.size() > 0) {
-								Object attValue = map.get("wikiobject");
-								if (attValue instanceof ImageFormat) {
-									imageNodeToText(node, (ImageFormat) attValue, resultBuffer, model);
-								}
-							} else {
-								nodeToHTML(node, resultBuffer, model);
-							}
-						} else if (item instanceof EndTagToken) {
-							EndTagToken node = (EndTagToken) item;
-							resultBuffer.append('<');
-							resultBuffer.append(node.getName());
-							resultBuffer.append("/>");
-						}
-					}
-				}
-			} finally {
-				model.decrementRecursionLevel();
-			}
-		}
-	}
-
+                Iterator<? extends Object> childrenIt = nodes.iterator();
+                while (childrenIt.hasNext()) {
+                    Object item = childrenIt.next();
+                    if (item != null) {
+                        if (item instanceof List) {
+                            nodesToText((List) item, resultBuffer, model);
+                        } else if (item instanceof ContentToken) {
+                            ContentToken contentToken = (ContentToken) item;
+                            String content = contentToken.getContent();
+                            content = Utils.escapeXml(content, true, true, true);
+                            resultBuffer.append(content);
+                        } else if (item instanceof HTMLTag) {
+                            ((HTMLTag) item).renderHTML(this, resultBuffer, model);
+                        } else if (item instanceof TagNode) {
+                            TagNode node = (TagNode) item;
+                            Map<String, Object> map = node.getObjectAttributes();
+                            if (map != null && map.size() > 0) {
+                                Object attValue = map.get("wikiobject");
+                                if (attValue instanceof ImageFormat) {
+                                    imageNodeToText(node, (ImageFormat) attValue, resultBuffer, model);
+                                }
+                            } else {
+                                nodeToHTML(node, resultBuffer, model);
+                            }
+                        } else if (item instanceof EndTagToken) {
+                            EndTagToken node = (EndTagToken) item;
+                            resultBuffer.append('<');
+                            resultBuffer.append(node.getName());
+                            resultBuffer.append("/>");
+                        }
+                    }
+                }
+            } finally {
+                model.decrementRecursionLevel();
+            }
+        }
+    }
+    
     /**
      *
      *
@@ -157,7 +157,7 @@ public class JAMHTMLConverter extends HTMLConverter {
         }
 
     }
-    
+
     /**
      * Utility method for building an anchor tag that links to an image page
      * and includes the HTML image tag to display the image.
@@ -193,6 +193,7 @@ public class JAMHTMLConverter extends HTMLConverter {
      *  information.
      * @throws IOException Thrown if any error occurs while reading image information.
      */
+    
     public String buildImageLinkHtml(String context, String virtualWiki, String topicName, boolean frame, boolean thumb, String align, String caption, int maxDimension, boolean suppressLink, String style, boolean escapeHtml) throws DataAccessException, IOException {
         String url = LinkUtil.buildImageFileUrl(context, virtualWiki, topicName);
         if (url == null) {
@@ -203,7 +204,7 @@ public class JAMHTMLConverter extends HTMLConverter {
 
             String imageName = topicName.trim().replaceAll(" ", "_").replaceFirst("Image:", "File:");
 
-            if(caption == null){
+            if (caption == null) {
                 caption = "Wikipedia " + topicName;
             }
 
@@ -295,4 +296,5 @@ public class JAMHTMLConverter extends HTMLConverter {
         }
         return html.toString();
     }
+    
 }

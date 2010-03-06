@@ -25,9 +25,10 @@ import org.jamwiki.model.Topic;
 
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
-import org.jamwiki.parser.bliki.BlikiProxyParser;
 import org.jamwiki.utils.Utilities;
 import org.apache.log4j.Logger;
+import org.jamwiki.parser.bliki.JAMHTMLConverter;
+import org.jamwiki.parser.bliki.JAMWikiModel;
 import org.jamwiki.parser.jflex.JFlexParser;
 
 /**
@@ -154,14 +155,20 @@ public class Main {
                     parserInput.setTopicName(topicName);
                     //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
                     parserInput.setVirtualWiki(wikiName);
+                    parserInput.setAllowSectionEdit(false);
 
-                    BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
+
+                    //BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
 
                     ParserOutput parserOutput = new ParserOutput();
 
                     if (contentType.equalsIgnoreCase("all")) {
                         String wikiContent = topic.getTopicContent();
-                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+
+                        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
+                        String htmlContent = wikiModel.render(new JAMHTMLConverter(parserInput), wikiContent);
+
+                        //String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
                         writeToFile(topicName + ".wiki.txt", wikiContent);
                         writeToHtmlFile(topicName + ".blikiproxy.html", htmlContent);
@@ -170,7 +177,11 @@ public class Main {
                         writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
                     } else if (contentType.equalsIgnoreCase("html")) {
                         String wikiContent = topic.getTopicContent();
-                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+                        
+                        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
+                        String htmlContent = wikiModel.render(new JAMHTMLConverter(parserInput), wikiContent);
+                        
+                        //String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
                         writeToHtmlFile(topicName + ".blikiproxy.html", htmlContent);
                     } else if (contentType.equalsIgnoreCase("wiki")) {
@@ -179,7 +190,11 @@ public class Main {
                         writeToFile(topicName + ".wiki.txt", wikiContent);
                     } else if (contentType.equalsIgnoreCase("txt")) {
                         String wikiContent = topic.getTopicContent();
-                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
+                        
+                        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
+                        String htmlContent = wikiModel.render(new JAMHTMLConverter(parserInput), wikiContent);
+                        
+                        //String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
                         String content = Utilities.stripMarkup(htmlContent);
                         writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
