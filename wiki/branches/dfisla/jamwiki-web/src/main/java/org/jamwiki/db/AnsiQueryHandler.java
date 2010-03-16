@@ -841,7 +841,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setString(8, topic.getRedirectTo());
 
             //stmt.logParams();
-            logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
+            logger.fine("SQL-QUERY-STRING =>: " + stmt.toString());
             rv = stmt.executeUpdate();
 
             if (rv > 0) {
@@ -919,7 +919,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setString(11, topicVersion.getVersionContentShort());
 
             //stmt.logParams();
-            logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
+            logger.fine("SQL-QUERY-STRING =>: " + stmt.toString());
 
             rv = stmt.executeUpdate();
 
@@ -1554,7 +1554,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setBytes(5, parsedTopic.toString().getBytes());
        
             //stmt.logParams();
-            logger.info("SQL-QUERY-STRING =>: " + stmt.toString());
+            logger.fine("SQL-QUERY-STRING =>: " + stmt.toString());
             rv = stmt.executeUpdate();
         } catch (SQLException e) {
             logger.severe(e.getMessage(), e);

@@ -103,6 +103,12 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
             WikiUtil.validateTopicName(topicName);
 
             topic = dataHandler.lookupTopic(virtualWiki, topicName, true, null);
+
+            if(topic == null){
+                logger.warn("Could not retrieve topic name +>: " + topicName);
+                return false;
+            }
+
             Locale locale = new Locale("en", "US");
 
             //String cacheKey = WikiCache.key(virtualWiki, topicName);
@@ -277,7 +283,7 @@ public class JAMWikiCrawlHandler implements java.lang.Runnable {
                     logger.info(String.format("Thread[%d] Retrieved Web Page: %s in: %s ms", threadId, requestUrl, fetchTime));
                     System.out.println(String.format("Thread[%d] Retrieved Web Page: %s in: %s ms", threadId, requestUrl, fetchTime));
                 } else if (this.fetchMode.equalsIgnoreCase("db")) {
-                    logger.info("Thread[%d] Requesting Topic: " + topicName);
+                    logger.info(String.format("Thread[%d] Requesting Topic: %s",threadId, topicName));
                     boolean rv = fetchFromDb(virtualWiki, topicName);
                     long endTime = System.currentTimeMillis();
 

@@ -562,7 +562,7 @@ public class AnsiDataHandler implements DataHandler {
         List<Integer> all = new ArrayList<Integer>();
 
         int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
-        logger.info("VIRTUAL-WIKI-ID =>: " + virtualWikiId);
+        logger.fine("VIRTUAL-WIKI-ID =>: " + virtualWikiId);
         ResultSet rs = null;
         TransactionStatus status = null;
         Connection conn = null;
@@ -1410,7 +1410,7 @@ public class AnsiDataHandler implements DataHandler {
                 logger.severe(uee.getMessage(), uee);
             }
 
-            logger.info("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
+            logger.fine("PARSEDTOPIC-CONTENT: " + parsedTopic.getTopicContent());
             return parsedTopic;
         } catch (Exception e) {
             logger.severe("Failure while initializing parsed topic", e);
@@ -2414,7 +2414,7 @@ public class AnsiDataHandler implements DataHandler {
      *
      */
     public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, String userDisplay) throws DataAccessException, WikiException {
-        logger.info("Updating special page " + virtualWiki + " / " + topicName);
+        logger.fine("Updating special page " + virtualWiki + " / " + topicName);
         TransactionStatus status = null;
         Connection conn = null;
         try {
@@ -3192,7 +3192,7 @@ public class AnsiDataHandler implements DataHandler {
 
             if (topicId <= 0) {
                 topicId = addTopic(topic, conn);
-                logger.info("TOPIC-ID =>: " + topicId);
+                logger.fine("TOPIC-ID =>: " + topicId);
                 topic.setTopicId(topicId);
             } else {
                 updateTopic(topic, conn);
@@ -3207,7 +3207,7 @@ public class AnsiDataHandler implements DataHandler {
                 topicVersionId = addTopicVersion(topicVersion, conn);
                 topicVersion.setTopicVersionId(topicVersionId);
                 String authorName = topicVersion.getAuthorDisplay();
-                logger.info("TOPIC-VERSION-ID =>: " + topicVersionId);
+                logger.fine("TOPIC-VERSION-ID =>: " + topicVersionId);
 
                 Integer authorId = topicVersion.getAuthorId();
                 if (authorId != null) {
@@ -3510,7 +3510,7 @@ public class AnsiDataHandler implements DataHandler {
             conn = DatabaseConnection.getConnection();
 
             topicId = addParsedTopic(parsedTopic, conn);
-            logger.info("PARSED-TOPIC-ID =>: " + topicId);
+            logger.fine("PARSED-TOPIC-ID =>: " + topicId);
 
             DatabaseConnection.commit(status);
         } catch (DataAccessException e) {

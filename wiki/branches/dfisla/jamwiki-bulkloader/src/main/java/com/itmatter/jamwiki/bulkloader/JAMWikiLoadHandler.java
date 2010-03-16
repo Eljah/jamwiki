@@ -23,6 +23,7 @@ import org.xml.sax.SAXParseException;
 import java.util.Stack;
 import org.jamwiki.DataHandler;
 import org.jamwiki.WikiBase;
+import org.jamwiki.parser.bliki.BlikiProxyParserUtil;
 
 /**
  *
@@ -49,6 +50,9 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
     private Date startDate = new Date();
     private Date endDate = new Date();
     private DataHandler dataHandler = null;
+    public String includePrefix = null;
+    public String excludePrefix = null;
+    public boolean excludeRedirects;
 
     /**
      *
@@ -64,6 +68,7 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
         this.user = user;
 
         this.dataHandler = WikiBase.getDataHandler();
+        this.excludeRedirects = false;
     }
 
     public void startDocument() throws org.xml.sax.SAXException {
@@ -189,20 +194,42 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
             }
 
             try {
-
+                // TODO: Remove HTML Comments
                 pageText = preprocessText(pageText);
+                pageName = convertArticleNameFromWikipediaToJAMWiki(pageName);
 
-                Topic topic = new Topic();
-                topic.setName(convertArticleNameFromWikipediaToJAMWiki(pageName));
-                topic.setVirtualWiki(virtualWiki);
-                topic.setTopicContent(pageText);
-                int charactersChanged = StringUtils.length(pageText);
+                boolean passChecks = true;
 
-                TopicVersion topicVersion = new TopicVersion(user, authorIpAddress, pageComment, pageText, charactersChanged);
-                // manage mapping between MediaWiki and JAMWiki namespaces
-                topic.setTopicType(convertNamespaceFromMediaWikiToJAMWiki(namespace));
+                if ((this.excludePrefix != null) && (pageName != null) && (pageName.toLowerCase().startsWith(this.excludePrefix))) {
+                    passChecks = false;
+                }
+                // includePrefix overrides excludePrefix
+                if ((this.includePrefix != null) && (pageName != null) && (pageName.toLowerCase().startsWith(this.includePrefix))) {
+                    passChecks = true;
+                }
+                // excludeRedirects overrides All
+                String redirectTo = BlikiProxyParserUtil.isRedirect(pageText);
 
-                dataHandler.writeTopic(topic, topicVersion, null, null, true, false);
+                if ((redirectTo != null) && (this.excludeRedirects)) {
+                    passChecks = false;
+                }
+
+                if (passChecks) {
+                    Topic topic = new Topic();
+                    topic.setName(pageName);
+                    if (redirectTo != null) {
+                        topic.setRedirectTo(redirectTo);
+                    }
+                    topic.setVirtualWiki(virtualWiki);
+                    topic.setTopicContent(pageText);
+                    int charactersChanged = StringUtils.length(pageText);
+
+                    TopicVersion topicVersion = new TopicVersion(user, authorIpAddress, pageComment, pageText, charactersChanged);
+                    // manage mapping between MediaWiki and JAMWiki namespaces
+                    topic.setTopicType(convertNamespaceFromMediaWikiToJAMWiki(namespace));
+
+                    dataHandler.writeTopic(topic, topicVersion, null, null, true, false);
+                }
 
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -326,4 +353,32 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
         logger.error("FATAL ERROR!", x);
     }
 
+    public String getExcludePrefix() {
+        return excludePrefix;
+    }
+
+    public void setExcludePrefix(String excludePrefix) {
+        if (excludePrefix != null) {
+            this.excludePrefix = excludePrefix.trim().toLowerCase();
+        }
+    }
+
+    public boolean isExcludeRedirects() {
+        return excludeRedirects;
+    }
+
+    public void setExcludeRedirects(boolean excludeRedirects) {
+
+        this.excludeRedirects = excludeRedirects;
+    }
+
+    public String getIncludePrefix() {
+        return includePrefix;
+    }
+
+    public void setIncludePrefix(String includePrefix) {
+        if (includePrefix != null) {
+            this.includePrefix = includePrefix.trim().toLowerCase();
+        }
+    }
 }

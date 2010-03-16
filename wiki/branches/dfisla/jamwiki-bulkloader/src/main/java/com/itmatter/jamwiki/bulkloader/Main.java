@@ -49,6 +49,9 @@ public class Main {
         options.addOption("n", "number", true, "Limit the number of pages to import");
         options.addOption("f", "file", true, "File name and path of XML file");
         options.addOption("p", "partitions", true, "Partition [1,2,3,...] file names, where each p contains a list of '\\n' delimited Topic IDs");
+        options.addOption("xr", "exclude-redirects", false, "Exclude Redirects");
+        options.addOption("xp", "exclude-prefix", true, "Exclude topics with title prefix matching");
+        options.addOption("ip", "include-prefix", true, "Include topics with title prefix matching only");
 
         CommandLineParser parser = null;
         CommandLine cmd = null;
@@ -64,6 +67,9 @@ public class Main {
 
             int pageLimit = Integer.MAX_VALUE;
             String fileName = null;
+            String includePrefix = null;
+            String excludePrefix = null;
+            boolean excludeRedirects = false;
 
             List<String> partitions = null;
 
@@ -80,11 +86,11 @@ public class Main {
 
             if (cmd.hasOption("n")) {
                 pageLimit = Integer.parseInt(cmd.getOptionValue("n"));
-                logger.debug("PAGE-LIMIT =>: " + pageLimit);
+                logger.info("PAGE-LIMIT =>: " + pageLimit);
             }
             if (cmd.hasOption("f")) {
                 fileName = cmd.getOptionValue("f");
-                logger.debug("XML-FILE =>: " + fileName);
+                logger.info("XML-FILE =>: " + fileName);
             }
 
             if (cmd.hasOption("p")) {
@@ -104,23 +110,38 @@ public class Main {
             }
 
             if (cmd.hasOption("r")) {
-                logger.debug("REBUILD-ALL");
+                logger.info("REBUILD-ALL");
                 rebuild = true;
             }
             if (cmd.hasOption("l")) {
-                logger.debug("LOAD-ALL");
+                logger.info("LOAD-ALL");
                 load = true;
             }
             if (cmd.hasOption("c")) {
-                logger.debug("CATEGORY-ALL");
+                logger.info("CATEGORY-ALL");
                 category = true;
+            }
+
+            if (cmd.hasOption("xr")) {
+                logger.info("EXCLUDE-REDIRECTS");
+                excludeRedirects = true;
+            }
+
+            if (cmd.hasOption("xp")) {
+                excludePrefix = cmd.getOptionValue("xp");
+                logger.info("EXCLUDE-PREFIX =>: " + excludePrefix);
+            }
+
+            if (cmd.hasOption("ip")) {
+                includePrefix = cmd.getOptionValue("ip");
+                logger.info("INCLUDE-PREFIX =>: " + includePrefix);
             }
 
             if ((fileName != null) && (load)) {
                 logger.info("Starting Loading Process...");
 
                 WikiUser user = new WikiUser("admin");
-                parseXml("en", 1, user, "127.0.0.1", fileName);
+                parseXml("en", 1, user, "127.0.0.1", fileName, excludePrefix, includePrefix, excludeRedirects);
             } else if ((concurrent) && (rebuild)) {
                 logger.info("Starting Rebuilding Process...");
 
@@ -140,7 +161,7 @@ public class Main {
         }
     }
 
-    private static void parseXml(String virtualWikiName, int virtualWikiId, WikiUser user, String ip, String file) {
+    private static void parseXml(String virtualWikiName, int virtualWikiId, WikiUser user, String ip, String file, String excludePrefix, String includePrefix, boolean excludeRedirects) {
 
         SAXParserFactory spf = null;
         try {
@@ -150,6 +171,10 @@ public class Main {
             InputSource is = new InputSource(new java.io.FileInputStream(file));
 
             JAMWikiLoadHandler loadHandler = new JAMWikiLoadHandler(virtualWikiName, user, ip);
+            loadHandler.setExcludeRedirects(excludeRedirects);
+            loadHandler.setExcludePrefix(excludePrefix);
+            loadHandler.setIncludePrefix(includePrefix);
+
             sp.parse(is, loadHandler);
         } catch (Exception ex) {
             ex.printStackTrace();
