@@ -1404,7 +1404,7 @@ public class AnsiDataHandler implements DataHandler {
             try {
                 buffer = (byte[]) rs.getObject("data");
                 if (buffer != null) {
-                    parsedTopic = new ParsedTopic(new String(buffer));
+                    parsedTopic = new ParsedTopic(new String(buffer, "UTF-8"));
                 }
             } catch (Exception uee) {
                 logger.severe(uee.getMessage(), uee);

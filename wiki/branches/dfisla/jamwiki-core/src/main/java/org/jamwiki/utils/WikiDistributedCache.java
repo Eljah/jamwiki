@@ -49,7 +49,7 @@ public class WikiDistributedCache {
             connection.setRequestMethod("PUT");
             connection.connect();
             String sampleData = (String) value;
-            byte[] sampleBytes = sampleData.getBytes();
+            byte[] sampleBytes = sampleData.getBytes("UTF-8");
             os = connection.getOutputStream();
             os.write(sampleBytes, 0, sampleBytes.length);
             os.flush();
@@ -118,7 +118,7 @@ public class WikiDistributedCache {
             connection.setRequestMethod("DELETE");
             connection.connect();
             String sampleData = "";
-            byte[] sampleBytes = sampleData.getBytes();
+            byte[] sampleBytes = sampleData.getBytes("UTF-8");
             os = connection.getOutputStream();
             os.write(sampleBytes, 0, sampleBytes.length);
             os.flush();

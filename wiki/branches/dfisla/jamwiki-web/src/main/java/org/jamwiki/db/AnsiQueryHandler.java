@@ -16,6 +16,7 @@
  */
 package org.jamwiki.db;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -1551,7 +1552,7 @@ public class AnsiQueryHandler implements QueryHandler {
             stmt.setInt(2, parsedTopic.getCurrentVersionId());
             stmt.setInt(3, virtualWikiId);
             stmt.setString(4, parsedTopic.getName());
-            stmt.setBytes(5, parsedTopic.toString().getBytes());
+            stmt.setBytes(5, parsedTopic.toString().getBytes("UTF-8"));
        
             //stmt.logParams();
             logger.fine("SQL-QUERY-STRING =>: " + stmt.toString());
@@ -1559,7 +1560,10 @@ public class AnsiQueryHandler implements QueryHandler {
         } catch (SQLException e) {
             logger.severe(e.getMessage(), e);
             throw e;
-        } finally {
+        } catch(UnsupportedEncodingException uee){
+            logger.severe(uee.getMessage(), uee);
+        }
+        finally {
             if(rs != null){
                 try{
                     rs.close();
