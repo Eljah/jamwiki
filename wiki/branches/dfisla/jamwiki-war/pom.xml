@@ -38,12 +38,12 @@
 	<dependency>
 		<groupId>net.sf.ehcache</groupId>
 		<artifactId>ehcache-core</artifactId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>2.0.0</version>
 	</dependency>
 	<dependency>
                 <groupId>net.sf.ehcache</groupId>
                 <artifactId>ehcache-web</artifactId>
-                <version>2.0-SNAPSHOT</version>
+                <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -81,11 +81,18 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
+                                        <!-- handle jamwiki config files -->
                                         <delete file="${project.build.outputDirectory}/jamwiki.properties"/>
                                         <copy file="src/main/resources/jamwiki.dev.properties"
                                               tofile="${project.build.outputDirectory}/jamwiki.properties"/>
                                         <delete file="${project.build.outputDirectory}/jamwiki.dev.properties"/>
                                         <delete file="${project.build.outputDirectory}/jamwiki.prod.properties"/>
+                                        <!-- handle ehcache files -->
+                                        <delete file="${project.build.outputDirectory}/ehcache.xml"/>
+                                        <copy file="src/main/resources/ehcache.dev.xml"
+                                              tofile="${project.build.outputDirectory}/ehcache.xml"/>
+                                        <delete file="${project.build.outputDirectory}/ehcache.dev.xml"/>
+                                        <delete file="${project.build.outputDirectory}/ehcache.prod.xml"/>
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -117,11 +124,18 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
+                                        <!-- handle jamwiki config files -->
                                         <delete file="${project.build.outputDirectory}/jamwiki.properties"/>
                                         <copy file="src/main/resources/jamwiki.prod.properties"
                                               tofile="${project.build.outputDirectory}/jamwiki.properties"/>
                                         <delete file="${project.build.outputDirectory}/jamwiki.dev.properties"/>
                                         <delete file="${project.build.outputDirectory}/jamwiki.prod.properties"/>
+                                        <!-- handle ehcache files -->
+                                        <delete file="${project.build.outputDirectory}/ehcache.xml"/>
+                                        <copy file="src/main/resources/ehcache.prod.xml"
+                                              tofile="${project.build.outputDirectory}/ehcache.xml"/>
+                                        <delete file="${project.build.outputDirectory}/ehcache.dev.xml"/>
+                                        <delete file="${project.build.outputDirectory}/ehcache.prod.xml"/>
                                     </tasks>
                                 </configuration>
                             </execution>

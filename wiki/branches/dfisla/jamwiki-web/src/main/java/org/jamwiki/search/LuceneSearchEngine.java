@@ -297,7 +297,16 @@ public class LuceneSearchEngine implements SearchEngine {
      * Get the path, which holds all index files
      */
     private File getSearchIndexPath(String virtualWiki) throws IOException {
-        File parent = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), SEARCH_DIR);
+
+        File parent = null;
+        
+        if( (SEARCH_DIR_OVERRIDE) && (CUSTOM_DATA_PATH != null)){
+            parent = new File(CUSTOM_DATA_PATH, SEARCH_DIR);
+        }
+        else{
+            parent = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), SEARCH_DIR);
+        }
+
         try {
             if (System.getProperty("org.apache.lucene.lockdir") == null) {
                 // set the Lucene lock directory.  this defaults to java.io.tmpdir,

@@ -12,7 +12,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -27,8 +29,7 @@ import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.utils.Utilities;
 import org.apache.log4j.Logger;
-import org.jamwiki.Environment;
-import org.jamwiki.parser.bliki.BlikiProxyParserUtil;
+import org.jamwiki.parser.bliki.BlikiProxyParser;
 import org.jamwiki.parser.bliki.JAMHTMLConverter;
 import org.jamwiki.parser.bliki.JAMWikiModel;
 import org.jamwiki.parser.jflex.JFlexParser;
@@ -153,38 +154,39 @@ public class Main {
                     ParserInput parserInput = new ParserInput();
                     parserInput.setContext("");
                     parserInput.setLocale(locale);
-                    //parserInput.setWikiUser(user);
                     parserInput.setTopicName(topicName);
-                    //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
                     parserInput.setVirtualWiki(wikiName);
                     parserInput.setAllowSectionEdit(false);
 
                     ParserOutput parserOutput = new ParserOutput();
+                    BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
 
                     if (contentType.equalsIgnoreCase("all")) {
                         String wikiContent = topic.getTopicContent();
-
-                        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
-
-                        if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
-                            wikiContent = BlikiProxyParserUtil.parseUnsupportedMediaWikiMarkup(parserInput, wikiContent);
-                        }
-
-                        String htmlContent = wikiModel.render(new JAMHTMLConverter(parserInput), wikiContent);
-                        if (htmlContent == null) {
-                            htmlContent = "";
-                        } else {
-
-                            if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-                                htmlContent = BlikiProxyParserUtil.cleanupHtmlParserError(parserInput, htmlContent);
-                            }
-                        }
+                        String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);
 
                         writeToFile(topicName + ".wiki.txt", wikiContent);
                         writeToHtmlFile(topicName + ".blikiproxy.html", htmlContent);
 
                         String content = Utilities.stripMarkup(htmlContent);
                         writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+
+                        System.out.println("============== LINKS =============");
+                        for (String link : parserOutput.getLinks()) {
+                            System.out.println("LINK: " + link);
+                            }
+
+                        System.out.println("============== TEMPLATES =============");
+                        for (String template : parserOutput.getTemplates()) {
+                            System.out.println("TEMPLATE: " + template);
+                        }
+
+                        LinkedHashMap<String, String> categories = parserOutput.getCategories();
+                        System.out.println("============== CATEGORIES =============");
+                        for (String key : categories.keySet()) {
+                            System.out.println("CATEGORY: " + categories.get(key));
+                        }
+
                     } else if (contentType.equalsIgnoreCase("html")) {
                         String wikiContent = topic.getTopicContent();
 
@@ -217,6 +219,23 @@ public class Main {
 
                         String plainContent = wikiModel.render(new PlainTextConverter(), wikiContent);
                         writeToFile(topicName + ".clean.txt", plainContent);
+
+                        System.out.println("============== LINKS =============");
+                        for (String link : wikiModel.getLinks()) {
+                            System.out.println("LINK: " + link);
+                        }
+
+                        System.out.println("============== TEMPLATES =============");
+                        for (String template : wikiModel.getTemplates()) {
+                            System.out.println("TEMPLATE: " + template);
+                        }
+
+                        Map<String, String> categories = wikiModel.getCategories();
+                        System.out.println("============== CATEGORIES =============");
+                        for (String key : categories.keySet()) {
+                            System.out.println("CATEGORY: " + categories.get(key));
+                        }
+
                     } else if (contentType.equalsIgnoreCase("html")) {
                         String wikiContent = topic.getTopicContent();
                         WikiModel wikiModel = new WikiModel("${image}", "${title}");
@@ -239,9 +258,7 @@ public class Main {
                     ParserInput parserInput = new ParserInput();
                     parserInput.setContext("");
                     parserInput.setLocale(locale);
-                    //parserInput.setWikiUser(user);
                     parserInput.setTopicName(topicName);
-                    //parserInput.setUserIpAddress(ServletUtil.getIpAddress(request));
                     parserInput.setVirtualWiki(wikiName);
 
                     JFlexParser wikiParser = new JFlexParser(parserInput);
@@ -257,6 +274,22 @@ public class Main {
 
                         String content = Utilities.stripMarkup(htmlContent);
                         writeToFile(topicName + ".clean.txt", StringEscapeUtils.unescapeHtml(content));
+
+                        System.out.println("============== LINKS =============");
+                        for (String link : parserOutput.getLinks()) {
+                            System.out.println("LINK: " + link);
+                        }
+
+                        System.out.println("============== TEMPLATES =============");
+                        for (String template : parserOutput.getTemplates()) {
+                            System.out.println("TEMPLATE: " + template);
+                        }
+
+                        LinkedHashMap<String, String> categories = parserOutput.getCategories();
+                        System.out.println("============== CATEGORIES =============");
+                        for (String key : categories.keySet()) {
+                            System.out.println("CATEGORY: " + categories.get(key));
+                        }
                     } else if (contentType.equalsIgnoreCase("html")) {
                         String wikiContent = topic.getTopicContent();
                         String htmlContent = wikiParser.parseHTML(parserOutput, wikiContent);

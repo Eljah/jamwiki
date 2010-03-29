@@ -11,6 +11,7 @@ import info.bliki.wiki.tags.WPATag;
 import info.bliki.wiki.tags.util.TagStack;
 
 import info.bliki.wiki.namespaces.INamespace;
+import java.util.HashSet;
 
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +40,18 @@ public class JAMWikiModel extends AbstractWikiModel {
         protected ParserInput fParserInput;
         protected ParserOutput fParserOutput;
 
+        protected Set<String> links = null;
+		protected Set<String> templates = null;
+
 	static {
 		TagNode.addAllowedAttribute("style");
+	}
+
+        @Override
+	public void setUp() {
+		super.setUp();
+		links = new HashSet<String>();
+		templates = new HashSet<String>();
 	}
 
         /**
@@ -146,12 +157,19 @@ public class JAMWikiModel extends AbstractWikiModel {
 
 	@Override
 	public void addLink(String topic) {
+
+            if(!this.links.contains(topic)){
+                this.links.add(topic);
 		fParserOutput.addLink(topic);
+	}
 	}
 
 	@Override
 	public void addTemplate(String template) {
+            if(!this.templates.contains(template)){
+                this.templates.add(template);
 		fParserOutput.addTemplate(template);
+            }
 	}
 
 	@Override

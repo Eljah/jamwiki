@@ -65,7 +65,6 @@ public class BlikiProxyParser extends AbstractParser {
      * @return A parser-specific value that can be used as the content of a
      *  topic representing a redirect.
      */
-    
     public String buildRedirectContent(String topicName) {
 
         String output = "";
@@ -94,8 +93,8 @@ public class BlikiProxyParser extends AbstractParser {
         String output = raw;
         ParserOutput parserOutput = new ParserOutput();
 
-        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,parserInput.getTopicName()));
-        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,raw);
+        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
+        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
 
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
         output = wikiModel.parseTemplates(raw, true);
@@ -132,11 +131,11 @@ public class BlikiProxyParser extends AbstractParser {
             return this.parseRedirect(parserOutput, raw);
         }
 
-        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,parserInput.getTopicName()));
-        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,raw);
+        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
+        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
 
         if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
-            raw = BlikiProxyParserUtil.parseUnsupportedMediaWikiMarkup(parserInput,raw);
+            raw = BlikiProxyParserUtil.parseUnsupportedMediaWikiMarkup(parserInput, raw);
         }
 
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
@@ -149,20 +148,6 @@ public class BlikiProxyParser extends AbstractParser {
                     output = BlikiProxyParserUtil.cleanupHtmlParserError(parserInput, output);
                 }
             }
-
-        //WikiModel wikiModel = new WikiModel("${image}", "${title}");
-        //output = wikiModel.render(raw);
-
-        //String context = parserInput.getContext();
-        //if (context == null) {
-        //    context = "";
-        //}
-        //JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
-        //output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
-
-        //if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-        //    output = this.cleanupHtmlParserError(output);
-        //}
 
         for (String link : wikiModel.getLinks()) {
             parserOutput.addLink(link);
@@ -223,8 +208,8 @@ public class BlikiProxyParser extends AbstractParser {
             if (context == null) {
                 context = "";
             }
-            parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,parserInput.getTopicName()));
-            raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,raw);
+            parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
+            raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
 
             JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
 
@@ -267,8 +252,8 @@ public class BlikiProxyParser extends AbstractParser {
             raw = BlikiProxyParserUtil.parseUnsupportedMediaWikiMarkup(parserInput, raw);
         }
 
-        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,parserInput.getTopicName()));
-        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput,raw);
+        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
+        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
         
         WikiModel wikiModel = new WikiModel("${image}", "${title}");
         wikiModel.render(raw);
@@ -288,7 +273,7 @@ public class BlikiProxyParser extends AbstractParser {
         if ((cats != null) && (!cats.isEmpty())) {
             for (String key : cats.keySet()) {
                 parserOutput.addCategory(key, cats.get(key));
-                logger.debug("PARSER-OUTPUT-CATEGORY: " + key);
+                logger.debug("PARSER-OUTPUT-CATEGORY: " + cats.get(key));
             }
         }
 
@@ -354,8 +339,6 @@ public class BlikiProxyParser extends AbstractParser {
         }
         return output;
     }
-
-   
 
     /**
      * Parse a topic that is a redirect.  Ordinarily the contents of the redirected

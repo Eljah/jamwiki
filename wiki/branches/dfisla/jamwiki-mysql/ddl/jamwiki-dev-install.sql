@@ -28,8 +28,8 @@ CREATE TABLE `jam_authorities` (
   UNIQUE KEY `jam_u_auth` (`username`,`authority`),
   KEY `jam_i_auth_username` (`username`),
   KEY `jam_i_auth_authority` (`authority`),
-  CONSTRAINT `jam_f_auth_username` FOREIGN KEY (`username`) REFERENCES `jam_users` (`username`),
-  CONSTRAINT `jam_f_auth_authority` FOREIGN KEY (`authority`) REFERENCES `jam_role` (`role_name`)
+  CONSTRAINT `jam_f_auth_authority` FOREIGN KEY (`authority`) REFERENCES `jam_role` (`role_name`),
+  CONSTRAINT `jam_f_auth_username` FOREIGN KEY (`username`) REFERENCES `jam_users` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
 
@@ -179,8 +179,8 @@ CREATE TABLE `jam_group_authorities` (
   UNIQUE KEY `jam_u_gauth` (`group_id`,`authority`),
   KEY `jam_i_gauth_group` (`group_id`),
   KEY `jam_i_gauth_authority` (`authority`),
-  CONSTRAINT `jam_f_gauth_group` FOREIGN KEY (`group_id`) REFERENCES `jam_group` (`group_id`),
-  CONSTRAINT `jam_f_gauth_authority` FOREIGN KEY (`authority`) REFERENCES `jam_role` (`role_name`)  
+  CONSTRAINT `jam_f_gauth_authority` FOREIGN KEY (`authority`) REFERENCES `jam_role` (`role_name`),
+  CONSTRAINT `jam_f_gauth_group` FOREIGN KEY (`group_id`) REFERENCES `jam_group` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
 
@@ -208,8 +208,8 @@ CREATE TABLE `jam_group_members` (
   PRIMARY KEY (`id`),
   KEY `jam_f_gmemb_username` (`username`),
   KEY `jam_f_gmemb_group` (`group_id`),
-  CONSTRAINT `jam_f_gmemb_username` FOREIGN KEY (`username`) REFERENCES `jam_users` (`username`),
-  CONSTRAINT `jam_f_gmemb_group` FOREIGN KEY (`group_id`) REFERENCES `jam_group` (`group_id`)
+  CONSTRAINT `jam_f_gmemb_group` FOREIGN KEY (`group_id`) REFERENCES `jam_group` (`group_id`),
+  CONSTRAINT `jam_f_gmemb_username` FOREIGN KEY (`username`) REFERENCES `jam_users` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
 
@@ -309,6 +309,7 @@ CREATE TABLE `jam_topic` (
   `current_version_id` int(11) DEFAULT NULL,
   `topic_type` int(11) NOT NULL,
   `redirect_to` varchar(200) DEFAULT NULL,
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`topic_id`),
   UNIQUE KEY `jam_u_topic_id` (`topic_id`),
   UNIQUE KEY `jam_u_topic_name` (`topic_name`,`virtual_wiki_id`,`delete_date`),
@@ -341,6 +342,7 @@ CREATE TABLE `jam_topic_cache` (
   `virtual_wiki_id` int(11) NOT NULL,
   `topic_name` varchar(200) NOT NULL,
   `data` mediumblob,
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`topic_id`,`topic_version_id`,`virtual_wiki_id`),
   KEY `jam_f_topic_vwiki` (`virtual_wiki_id`),
   KEY `jam_u_topic_name` (`topic_name`,`virtual_wiki_id`) USING BTREE

@@ -11,6 +11,7 @@ import info.bliki.wiki.model.IWikiModel;
 import info.bliki.wiki.model.ImageFormat;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -193,7 +194,6 @@ public class JAMHTMLConverter extends HTMLConverter {
      *  information.
      * @throws IOException Thrown if any error occurs while reading image information.
      */
-    
     public String buildImageLinkHtml(String context, String virtualWiki, String topicName, boolean frame, boolean thumb, String align, String caption, int maxDimension, boolean suppressLink, String style, boolean escapeHtml) throws DataAccessException, IOException {
         String url = LinkUtil.buildImageFileUrl(context, virtualWiki, topicName);
         if (url == null) {
@@ -212,10 +212,9 @@ public class JAMHTMLConverter extends HTMLConverter {
             String wikipediaLinkHtml = String.format("<a href=\"http://%s.wikipedia.org/wiki/%s\" class=\"%s\" title=\"%s\" target=\"_new\">%s</a>", virtualWiki, imageName, "image", topicName, caption);
 
             sb.append(wikipediaLinkHtml);
-            sb.append("<br/>");
-            sb.append(uploadLinkHtml);
-            //logger.debug("UPLOAD-LINK-HTML: " + uploadLinkHtml);
-            ///<a href="/wiki/en/Special:Upload" class="edit" title="Special:Upload">Image:Anarchy-symbol.svg</a>
+            //sb.append("<br/>");
+            //sb.append(uploadLinkHtml);
+            logger.debug("UPLOAD-LINK-HTML: " + uploadLinkHtml);
             return sb.toString();
         }
 
@@ -296,5 +295,4 @@ public class JAMHTMLConverter extends HTMLConverter {
         }
         return html.toString();
     }
-    
 }

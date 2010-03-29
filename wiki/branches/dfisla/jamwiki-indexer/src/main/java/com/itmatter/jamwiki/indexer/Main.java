@@ -136,8 +136,18 @@ public class Main {
 
             for (String pName : partitions) {
                 List<Integer> pTopicIds = initTopicIds(pName);
+                String partitionPath = null;
+                // Move to a util method
+                if((customDataPath != null) && (!customDataPath.endsWith("/"))){
+                    partitionPath = customDataPath + "/" + pName;
+                }else if((customDataPath != null) && (customDataPath.endsWith("/"))){
+                    partitionPath = customDataPath + pName;
+                }else{
+                    partitionPath = customDataPath;
+                }
 
-                LuceneRebuildHandler rebuildHandler = new LuceneRebuildHandler(virtualWikiName, virtualWikiId, user, ip, pTopicIds, customDataPath);
+
+                LuceneRebuildHandler rebuildHandler = new LuceneRebuildHandler(virtualWikiName, virtualWikiId, user, ip, pTopicIds, partitionPath);
                 rebuildHandler.setUpdateCleanContent(false);
                 rebuildHandler.setUpdateSearchIndex(false);
                 blpe.runTask(rebuildHandler);

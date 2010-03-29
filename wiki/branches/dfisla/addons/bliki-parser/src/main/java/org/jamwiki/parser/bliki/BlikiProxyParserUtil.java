@@ -23,7 +23,7 @@ public class BlikiProxyParserUtil {
     private static final Logger logger = Logger.getLogger(BlikiProxyParserUtil.class.getName());
     private static final Pattern WIKI_LINK_PATTERN = Pattern.compile("\\[\\[[ ]*(\\:[ ]*)?[ ]*([^\\n\\r\\|]+)([ ]*\\|[ ]*([^\\n\\r]+))?[ ]*\\]\\]([a-z]*)");
     /** Pattern to determine if the topic is a redirect. */
-    private static final Pattern REDIRECT_PATTERN = Pattern.compile(".*#REDIRECT[ ]+\\[\\[(.*)\\]\\].*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern REDIRECT_PATTERN = Pattern.compile(".*#REDIRECT[ ]*\\[\\[(.*)\\]\\].*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /** Pattern to detect sidebar */
     private static final Pattern SIDEBAR_PATTERN = Pattern.compile("\\{\\{[^{}]*sidebar+\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     /** Pattern to detect co-ordinates */
@@ -36,6 +36,8 @@ public class BlikiProxyParserUtil {
     private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN1 = Pattern.compile("\\{\\{[A-Z]*\\}\\}", Pattern.DOTALL);
     /** MediaWiki variables with {{... :page name}} suffix pattern */
     private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN2 = Pattern.compile("\\{\\{[A-Z]*:page name\\}\\}", Pattern.DOTALL);
+    /** MediaWiki variables with __NOTOC__,... suffix pattern */
+    private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN3 = Pattern.compile("__[A-Z]+__", Pattern.DOTALL);
     /** Revision MediaWiki variables */
     private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN_REVISION = Pattern.compile("\\{\\{REVISION[A-Z,0-9]*\\}\\}", Pattern.DOTALL);
     private static final Pattern PROTECTED_PATTERN = Pattern.compile("\\{\\{pp-[^{}]*\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -44,6 +46,8 @@ public class BlikiProxyParserUtil {
 
     /**
      *
+     * @param raw
+     * @return 
      */
     public static String isRedirect(String raw) {
         if (StringUtils.isBlank(raw)) {
@@ -56,6 +60,7 @@ public class BlikiProxyParserUtil {
 
     /**
      * Removes Mediawiki markup that is unsupported/broken
+     * @param parserInput
      * @param text
      * @return
      */
@@ -77,16 +82,32 @@ public class BlikiProxyParserUtil {
         return text;
     }
 
+    /**
+     *
+     * @param parserInput
+     * @param text
+     * @return
+     */
     public static String parseMediaWikiVariables(ParserInput parserInput, String text) {
 
+        if((parserInput != null) && (parserInput.getTopicName() != null)){
         text = MEDIAWIKI_VAR_PAGENAME.matcher(text).replaceAll(parserInput.getTopicName());
+        }else{
+            text = MEDIAWIKI_VAR_PAGENAME.matcher(text).replaceAll("");
+        }
         text = UNSUPPORTED_MEDIAWIKI_PATTERN1.matcher(text).replaceAll("");
         text = UNSUPPORTED_MEDIAWIKI_PATTERN2.matcher(text).replaceAll("");
+        text = UNSUPPORTED_MEDIAWIKI_PATTERN3.matcher(text).replaceAll("");
         text = UNSUPPORTED_MEDIAWIKI_PATTERN_REVISION.matcher(text).replaceAll("");
         return text;
     }
 
-    /// HACK, this needs to go into parser and template parser
+    /**
+     *
+     * @param parserInput
+     * @param text
+     * @return
+     */
     public static String cleanupHtmlParserError(ParserInput parserInput, String text) {
 
         // first try this for URL

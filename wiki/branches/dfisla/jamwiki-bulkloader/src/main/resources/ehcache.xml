@@ -531,7 +531,7 @@
    -->
   <!--
     Sample cache named sampleCache3. This cache overflows to disk. The disk store is
-    persistent between cache and VM restarts. The disk expiry thread interval is set to 10
+    persistent between cache and trueVM restarts. The disk expiry thread interval is set to 10
     minutes, overriding the default of 2 minutes.
     -->
     <cache name="org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_CONTENT"
@@ -594,7 +594,7 @@
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="FIFO"
             />

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        
+
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" updateCheck="false"
          xsi:noNamespaceSchemaLocation="ehcache.xsd" >
 
@@ -7,7 +7,7 @@
     CacheManager Configuration
     ==========================
     An ehcache.xml corresponds to a single CacheManager.
-    
+
     See instructions below or the ehcache schema (ehcache.xsd) on how to configure.
 
     System property tokens can be specified in this file which are replaced when the configuration
@@ -135,7 +135,7 @@
 
     The hostname is the hostname of the remote CacheManager peer. The port is the listening
     port of the RMICacheManagerPeerListener of the remote CacheManager peer.
-    
+
     JGroupsCacheManagerPeerProvider
     +++++++++++++++++++++++++++++++
     <cacheManagerPeerProviderFactory class="net.sf.ehcache.distribution.jgroups.JGroupsCacheManagerPeerProviderFactory"
@@ -153,7 +153,7 @@
             />
      The only property necessary is the connect String used by jgroups to configure itself. Refer to the Jgroups documentation for explanation
      of all the protocols. The example above uses UDP multicast. If the connect property is not specified the default JGroups connection will be
-     used.       
+     used.
 
 
     JMSCacheManagerPeerProviderFactory
@@ -286,7 +286,7 @@
     to this area and then asynchronously written to disk. The default size is 30MB.
     Each spool buffer is used only by its cache. If you get OutOfMemory errors consider
     lowering this value. To improve DiskStore performance consider increasing it. Trace level
-    logging in the DiskStore will show if put back ups are occurring. 
+    logging in the DiskStore will show if put back ups are occurring.
 
     memoryStoreEvictionPolicy:
     Policy would be enforced upon reaching the maxElementsInMemory limit. Default
@@ -338,7 +338,7 @@
       replicated to others. Defaults to true.
 
     * replicatePutsViaCopy=true|false - whether the new elements are
-      copied to other caches (true), or whether a remove message is sent. Defaults to true.  
+      copied to other caches (true), or whether a remove message is sent. Defaults to true.
 
     * replicateUpdates=true|false - whether new elements which override an
       element already existing with the same key are replicated. Defaults to true.
@@ -382,7 +382,7 @@
            propertySeparator=","/>
 
     This listener supports the same properties as the RMICacheReplicationFactory.
-    
+
     Cluster Bootstrapping
     +++++++++++++++++++++
     (RMI clusters only)
@@ -458,16 +458,16 @@
     The defaultCache has an implicit name "default" which is a reserved cache name.
     -->
     <defaultCache
-            maxElementsInMemory="1000"
-            eternal="true"
+            maxElementsInMemory="100"
+            eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
+            memoryStoreEvictionPolicy="FIFO"
             />
 
     <!--
@@ -535,77 +535,77 @@
     minutes, overriding the default of 2 minutes.
     -->
     <cache name="org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_CONTENT"
-            maxElementsInMemory="1000"
-            eternal="true"
+            maxElementsInMemory="100"
+            eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
+            memoryStoreEvictionPolicy="FIFO"
             />
 
     <cache name="org.jamwiki.utils.DiffUtil.CACHE_DIFF_INFORMATION"
-            maxElementsInMemory="1000"
-            eternal="true"
+            maxElementsInMemory="100"
+            eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
+            memoryStoreEvictionPolicy="FIFO"
             />
 
      <cache name="org.jamwiki.utils.ImageUtil.CACHE_IMAGE_DIMENSIONS"
-            maxElementsInMemory="1000"
-            eternal="true"
+            maxElementsInMemory="100"
+            eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
+            memoryStoreEvictionPolicy="FIFO"
             />
 
      <cache name="org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS"
-            maxElementsInMemory="1000"
-            eternal="true"
+            maxElementsInMemory="100"
+            eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
+            memoryStoreEvictionPolicy="FIFO"
             />
 
      <cache name="org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_VERSIONS"
-            maxElementsInMemory="1000"
+            maxElementsInMemory="100"
             eternal="true"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="30"
             maxElementsOnDisk="1000000"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
+            memoryStoreEvictionPolicy="FIFO"
             />
 
       <cache name="org.jamwiki.db.AnsiDataHandler.CACHE_VIRTUAL_WIKI"
             maxElementsInMemory="10"
-            eternal="true"
+            eternal="false"
             overflowToDisk="true"
             diskSpoolBufferSizeMB="1"
             maxElementsOnDisk="100"
-            diskPersistent="true"
+            diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LRU"
             />
@@ -665,7 +665,7 @@
                 properties="asynchronousReplicationIntervalMillis=200"/>
     </cache>
 -->
-    
+
 
 
 </ehcache>
