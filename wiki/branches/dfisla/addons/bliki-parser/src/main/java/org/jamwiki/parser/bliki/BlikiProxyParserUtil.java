@@ -20,29 +20,20 @@ import org.jamwiki.utils.WikiLink;
  */
 public class BlikiProxyParserUtil {
 
+    //---------------------------------------------- SUPPORTED: Links & Redirects ----------------------
     private static final Logger logger = Logger.getLogger(BlikiProxyParserUtil.class.getName());
     private static final Pattern WIKI_LINK_PATTERN = Pattern.compile("\\[\\[[ ]*(\\:[ ]*)?[ ]*([^\\n\\r\\|]+)([ ]*\\|[ ]*([^\\n\\r]+))?[ ]*\\]\\]([a-z]*)");
     /** Pattern to determine if the topic is a redirect. */
     private static final Pattern REDIRECT_PATTERN = Pattern.compile(".*#REDIRECT[ ]*\\[\\[(.*)\\]\\].*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    /** Pattern to detect sidebar */
+    //---------------------------------------------- NOT SUPPORTED: Hacks ----------------------
     private static final Pattern SIDEBAR_PATTERN = Pattern.compile("\\{\\{[^{}]*sidebar+\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    /** Pattern to detect co-ordinates */
     private static final Pattern COORDINATES_PATTERN = Pattern.compile("\\{\\{coord[^{}]*\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    /** Pattern to detect citation(s) */
     private static final Pattern CITATIONS_PATTERN = Pattern.compile("\\{\\{citation[^{}]*\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    /** MediaWiki variables with i.e. {{NAMESPACE}} suffix pattern */
-    private static final Pattern MEDIAWIKI_VAR_PAGENAME = Pattern.compile("\\{\\{PAGENAME\\}\\}", Pattern.DOTALL);
-    /** MediaWiki variables with i.e. {{NAMESPACE}} suffix pattern */
-    private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN1 = Pattern.compile("\\{\\{[A-Z]*\\}\\}", Pattern.DOTALL);
-    /** MediaWiki variables with {{... :page name}} suffix pattern */
-    private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN2 = Pattern.compile("\\{\\{[A-Z]*:page name\\}\\}", Pattern.DOTALL);
-    /** MediaWiki variables with __NOTOC__,... suffix pattern */
-    private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN3 = Pattern.compile("__[A-Z]+__", Pattern.DOTALL);
-    /** Revision MediaWiki variables */
-    private static final Pattern UNSUPPORTED_MEDIAWIKI_PATTERN_REVISION = Pattern.compile("\\{\\{REVISION[A-Z,0-9]*\\}\\}", Pattern.DOTALL);
     private static final Pattern PROTECTED_PATTERN = Pattern.compile("\\{\\{pp-[^{}]*\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    private static final Pattern UNPARSED_ERROR_PATTERN = Pattern.compile("\\{\\{[^{}]*\\}\\}", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern HTML_COMMENTS = Pattern.compile("(?s)<!--.*?-->", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    /** MediaWiki variables with __NOTOC__,... suffix pattern */
+    private static final Pattern UNSUPPORTED_VAR_UNDERSCORE = Pattern.compile("__[A-Z]+__", Pattern.DOTALL);
+    private static final Pattern UNPARSED_ERROR_PATTERN = Pattern.compile("\\{\\{[^{}]*\\}\\}", Pattern.DOTALL);
 
     /**
      *
@@ -78,27 +69,8 @@ public class BlikiProxyParserUtil {
 
         text = HTML_COMMENTS.matcher(text).replaceAll("");
         text = PROTECTED_PATTERN.matcher(text).replaceAll("");
+        text = UNSUPPORTED_VAR_UNDERSCORE.matcher(text).replaceAll("");
 
-        return text;
-    }
-
-    /**
-     *
-     * @param parserInput
-     * @param text
-     * @return
-     */
-    public static String parseMediaWikiVariables(ParserInput parserInput, String text) {
-
-        if((parserInput != null) && (parserInput.getTopicName() != null)){
-        text = MEDIAWIKI_VAR_PAGENAME.matcher(text).replaceAll(parserInput.getTopicName());
-        }else{
-            text = MEDIAWIKI_VAR_PAGENAME.matcher(text).replaceAll("");
-        }
-        text = UNSUPPORTED_MEDIAWIKI_PATTERN1.matcher(text).replaceAll("");
-        text = UNSUPPORTED_MEDIAWIKI_PATTERN2.matcher(text).replaceAll("");
-        text = UNSUPPORTED_MEDIAWIKI_PATTERN3.matcher(text).replaceAll("");
-        text = UNSUPPORTED_MEDIAWIKI_PATTERN_REVISION.matcher(text).replaceAll("");
         return text;
     }
 
@@ -110,17 +82,12 @@ public class BlikiProxyParserUtil {
      */
     public static String cleanupHtmlParserError(ParserInput parserInput, String text) {
 
-        // first try this for URL
-        text = text.replace("Special:Edit?topic=PAGENAME", parserInput.getTopicName());
-
         // then also this for URL title
         if (!UNPARSED_ERROR_PATTERN.matcher(text).find()) {
-            text = text.replaceAll("PAGENAME", parserInput.getTopicName());
             return text;
         }
 
         text = UNPARSED_ERROR_PATTERN.matcher(text).replaceAll("");
-
         return cleanupHtmlParserError(parserInput,text);
     }
 

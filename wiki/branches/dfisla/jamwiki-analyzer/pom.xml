@@ -272,7 +272,7 @@
                             <name>app</name>
                         </program>
                     </programs>
-                    <extraJvmArguments>-Xms256m -Xmx2048m</extraJvmArguments>
+                    <extraJvmArguments>-Xms256m -Xmx1248m</extraJvmArguments>
                     <generateRepository>true</generateRepository>
                     <repositoryName>lib</repositoryName>
                     <repositoryLayout>flat</repositoryLayout>

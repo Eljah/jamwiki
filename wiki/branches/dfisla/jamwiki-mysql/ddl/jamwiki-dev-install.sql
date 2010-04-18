@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.4.1-beta, for unknown-linux-gnu (x86_64)
 --
--- Host: localhost    Database: jamwikidev
+-- Host: localhost    Database: jamwiki
 -- ------------------------------------------------------
 -- Server version	5.4.1-beta-log
 
@@ -92,7 +92,7 @@ CREATE TABLE `jam_file` (
   UNIQUE KEY `jam_u_file_topic` (`virtual_wiki_id`,`topic_id`),
   KEY `jam_f_file_topic` (`topic_id`),
   CONSTRAINT `jam_f_file_vwiki` FOREIGN KEY (`virtual_wiki_id`) REFERENCES `jam_virtual_wiki` (`virtual_wiki_id`),
-  CONSTRAINT `jam_f_file_topic` FOREIGN KEY (`topic_id`) REFERENCES `jam_topic` (`topic_id`)  
+  CONSTRAINT `jam_f_file_topic` FOREIGN KEY (`topic_id`) REFERENCES `jam_topic` (`topic_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
 
@@ -325,7 +325,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `jam_topic` WRITE;
 /*!40000 ALTER TABLE `jam_topic` DISABLE KEYS */;
-INSERT INTO `jam_topic` VALUES (1,1,'StartingPoints',NULL,0,0,1,1,NULL),(2,1,'LeftMenu',NULL,0,1,2,1,NULL),(3,1,'BottomArea',NULL,0,1,3,1,NULL),(4,1,'StyleSheet',NULL,0,1,4,1,NULL),(5,1,'HelloWorld',NULL,0,0,7,1,NULL);
+INSERT INTO `jam_topic` (topic_id,virtual_wiki_id,topic_name,delete_date,topic_read_only,topic_admin_only,current_version_id,topic_type,redirect_to) VALUES (1,1,'StartingPoints',NULL,0,0,1,1,NULL),(2,1,'LeftMenu',NULL,0,1,2,1,NULL),(3,1,'BottomArea',NULL,0,1,3,1,NULL),(4,1,'StyleSheet',NULL,0,1,4,1,NULL),(5,1,'HelloWorld',NULL,0,0,7,1,NULL);
 /*!40000 ALTER TABLE `jam_topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -501,6 +501,26 @@ LOCK TABLES `jam_wiki_user` WRITE;
 INSERT INTO `jam_wiki_user` VALUES (1,'admin',NULL,'2009-06-16 19:13:02','2009-06-16 19:13:02','127.0.0.1','127.0.0.1',NULL,NULL,'toolbar',NULL);
 /*!40000 ALTER TABLE `jam_wiki_user` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `jam_wp_image`
+--
+
+DROP TABLE IF EXISTS `jam_wp_image`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `jam_wp_image` (
+  `image_id` int(11) NOT NULL AUTO_INCREMENT,
+  `path` varchar(512) CHARACTER SET utf8 NOT NULL,
+  `image_name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `parent_name` varchar(255) COLLATE utf8_bin NOT NULL,
+  `thumb` int(11) NOT NULL DEFAULT '0',
+  `size` int(11) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`image_id`),
+  KEY `jam_f_image_name` (`image_name`) USING BTREE,
+  KEY `jam_f_parent_name` (`parent_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+SET character_set_client = @saved_cs_client;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -511,4 +531,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-01-17  3:42:32
+-- Dump completed on 2010-03-28 16:50:17

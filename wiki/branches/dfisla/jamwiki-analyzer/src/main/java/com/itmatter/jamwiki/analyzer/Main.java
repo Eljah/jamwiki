@@ -157,6 +157,8 @@ public class Main {
                     parserInput.setTopicName(topicName);
                     parserInput.setVirtualWiki(wikiName);
                     parserInput.setAllowSectionEdit(false);
+                    parserInput.setRevisionId(topic.getCurrentVersionId());
+                    parserInput.setRevisionDate(topic.getEditDate());
 
                     ParserOutput parserOutput = new ParserOutput();
                     BlikiProxyParser wikiParser = new BlikiProxyParser(parserInput);
@@ -174,7 +176,7 @@ public class Main {
                         System.out.println("============== LINKS =============");
                         for (String link : parserOutput.getLinks()) {
                             System.out.println("LINK: " + link);
-                            }
+                        }
 
                         System.out.println("============== TEMPLATES =============");
                         for (String template : parserOutput.getTemplates()) {

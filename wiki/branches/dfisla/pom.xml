@@ -15,7 +15,7 @@
 		<module>addons</module>
 		<module>jamwiki-war</module>
 		<module>jamwiki-indexer</module>
-		<module>jamwiki-loader</module>
+		<!-- deprecated <module>jamwiki-loader</module> -->
 		<module>jamwiki-bulkloader</module>
 		<module>jamwiki-analyzer</module>
 		<module>jamwiki-crawler</module>

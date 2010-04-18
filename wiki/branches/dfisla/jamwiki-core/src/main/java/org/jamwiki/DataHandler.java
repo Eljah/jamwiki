@@ -34,6 +34,7 @@ import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
+import org.jamwiki.model.WikiImageResource;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
 
@@ -442,6 +443,12 @@ public interface DataHandler {
     ParsedTopic lookupParsedTopic(String virtualWiki, int topicId, int topicVersionId, Object transactionObject) throws DataAccessException;
 
     /**
+     * EXPERIMENTAL
+     */
+    List<WikiImageResource> lookupWikipediaImage(String imageName, String parentName) throws DataAccessException;
+
+
+    /**
      * Return a count of all topics, including redirects, comments pages and
      * templates, for the given virtual wiki.  Deleted topics are not included
      * in the count.
@@ -784,6 +791,7 @@ public interface DataHandler {
      */
     void importTopicVersion(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, String virtualWiki, int virtualWikiId) throws DataAccessException, WikiException;
 
+    void importWikipediaImage(WikiImageResource imgResource) throws DataAccessException, WikiException;
     /**
      * Build TopicVersion's categories only. Primarily to be used after importing content and rebuilding categories from an empty table.
      * @param topicVersion

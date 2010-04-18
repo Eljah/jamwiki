@@ -37,6 +37,7 @@ import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
+import org.jamwiki.model.WikiImageResource;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
@@ -466,6 +467,13 @@ public class TestDataHandler implements DataHandler {
     /**
      * PERFORMANCE-EXPERIMENTAL
      */
+    public void importWikipediaImage(WikiImageResource imgResource) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * PERFORMANCE-EXPERIMENTAL
+     */
     public void updateTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
         throw new UnsupportedOperationException();
     }
@@ -603,6 +611,13 @@ public class TestDataHandler implements DataHandler {
      * PERFORMANCE-EXPERIMENTAL
      */
     public void writeParsedTopic(ParsedTopic topic) throws DataAccessException, WikiException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * EXPERIMENTAL
+     */
+    public List<WikiImageResource> lookupWikipediaImage(String imageName, String parentName) throws DataAccessException {
         throw new UnsupportedOperationException();
     }
 }

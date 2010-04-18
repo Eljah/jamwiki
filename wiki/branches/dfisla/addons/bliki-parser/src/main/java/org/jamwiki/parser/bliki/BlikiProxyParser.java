@@ -4,20 +4,19 @@
  */
 package org.jamwiki.parser.bliki;
 
-import info.bliki.wiki.model.WikiModel;
 import java.io.StringReader;
-import java.util.Map;
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.parser.AbstractParser;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
-import org.apache.log4j.Logger;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.parser.jflex.JAMWikiSpliceProcessor;
 import org.jamwiki.parser.jflex.JFlexLexer;
+import org.jamwiki.parser.jflex.MagicWordUtil;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
 import org.jamwiki.utils.WikiLink;
@@ -43,7 +42,7 @@ public class BlikiProxyParser extends AbstractParser {
     protected static final int MODE_LAYOUT = 6;
     /** Post-process mode indicates that the pre-processor, processor and post-processor should be run in full, parsing all Wiki syntax into formatted output and adding layout tags such as paragraphs and TOC. */
     protected static final int MODE_POSTPROCESS = 7;
-   
+
     /**
      * The constructor creates a parser instance, initialized with the
      * specified parser input settings.
@@ -71,11 +70,11 @@ public class BlikiProxyParser extends AbstractParser {
         try {
             output = this.parseRedirect(new ParserOutput(), "#REDIRECT [[" + topicName + "]]");
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.severe(ex.getMessage() + " TRACE: " + ex.getStackTrace());
         }
         return output;
     }
-    
+
     /**
      * Perform a bare minimum of parsing as required prior to saving a topic to
      * the database. In general this method will simply parse signature tags are
@@ -93,9 +92,6 @@ public class BlikiProxyParser extends AbstractParser {
         String output = raw;
         ParserOutput parserOutput = new ParserOutput();
 
-        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
-        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
-
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
         output = wikiModel.parseTemplates(raw, true);
 
@@ -103,10 +99,10 @@ public class BlikiProxyParser extends AbstractParser {
             output = "";
         }
 
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseMinimal) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-        }
+
+        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+        logger.fine("Parse time (parseMinimal) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
         return output;
     }
 
@@ -126,13 +122,19 @@ public class BlikiProxyParser extends AbstractParser {
         // to the end of the content for good measure
         String output = raw + '\n';
 
-        if (!StringUtils.isBlank(parserOutput.getRedirect())) {
+        String redirectTo = BlikiProxyParserUtil.isRedirect(raw);
+
+        if (redirectTo != null) {
+
+            parserOutput.setRedirect(redirectTo);
             // redirects are parsed differently
             return this.parseRedirect(parserOutput, raw);
         }
 
-        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
-        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
+        try {
+            parserInput.setTopicName(MagicWordUtil.processMagicWord(parserInput, parserInput.getTopicName()));
+        } catch (Exception ex) {
+        }
 
         if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
             raw = BlikiProxyParserUtil.parseUnsupportedMediaWikiMarkup(parserInput, raw);
@@ -140,43 +142,42 @@ public class BlikiProxyParser extends AbstractParser {
 
         JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, "");
         output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
-            if (output == null) {
-                output = "";
-            } else {
 
-                if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
-                    output = BlikiProxyParserUtil.cleanupHtmlParserError(parserInput, output);
-                }
+        if (output == null) {
+            output = "";
+        } else {
+
+            if (Environment.getBooleanValue(Environment.PROP_PARSER_CLEAN_HTML)) {
+                output = BlikiProxyParserUtil.cleanupHtmlParserError(parserInput, output);
             }
-
+        }
+        /*
         for (String link : wikiModel.getLinks()) {
-            parserOutput.addLink(link);
-            logger.debug("PARSER-OUTPUT-LINK: " + link);
+        parserOutput.addLink(link);
+        logger.debug("PARSER-OUTPUT-LINK: " + link);
         }
 
-      
+
         for (String template : wikiModel.getTemplates()) {
-            parserOutput.addTemplate(template);
-            logger.debug("PARSER-OUTPUT-TEMPLATE: " + template);
+        parserOutput.addTemplate(template);
+        logger.debug("PARSER-OUTPUT-TEMPLATE: " + template);
         }
 
         Map<String, String> cats = wikiModel.getCategories();
 
         if ((cats != null) && (!cats.isEmpty())) {
-            for (String key : cats.keySet()) {
-                parserOutput.addCategory(key, cats.get(key));
-                logger.debug("PARSER-OUTPUT-CATEGORY: " + key);
-            }
+        for (String key : cats.keySet()) {
+        parserOutput.addCategory(key, cats.get(key));
+        logger.debug("PARSER-OUTPUT-CATEGORY: " + key);
         }
-        
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
         }
+         */
+
+        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+        logger.fine("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
         return output;
     }
-
-
 
     /**
      * Returns a HTML representation of the given wiki raw text for online
@@ -193,23 +194,29 @@ public class BlikiProxyParser extends AbstractParser {
     public String parseHTML(ParserOutput parserOutput, String raw) throws ParserException {
 
         long start = System.currentTimeMillis();
-        logger.debug("RAW: " + raw);
-        String output = null;
-        logger.debug("IS-REDIRECT: " + BlikiProxyParserUtil.isRedirect(raw));
 
-        if (!StringUtils.isBlank(BlikiProxyParserUtil.isRedirect(raw))) {
+        String output = null;
+
+        String redirectTo = BlikiProxyParserUtil.isRedirect(raw);
+
+        if (redirectTo != null) {
 
             // redirects are parsed differently
-            logger.debug("PARSE-REDIRECT");
+            logger.fine("PARSE-REDIRECT");
             output = this.parseRedirect(parserOutput, raw);
+
+            parserOutput.setRedirect(redirectTo);
         } else {
-            logger.debug("PARSE-NON-REDIRECT");
+            logger.fine("PARSE-NON-REDIRECT");
             String context = parserInput.getContext();
             if (context == null) {
                 context = "";
             }
-            parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
-            raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
+            parserInput.setContext(context);
+            try {
+                parserInput.setTopicName(MagicWordUtil.processMagicWord(parserInput, parserInput.getTopicName()));
+            } catch (Exception ex) {
+            }
 
             JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
 
@@ -218,6 +225,7 @@ public class BlikiProxyParser extends AbstractParser {
             }
 
             output = wikiModel.render(new JAMHTMLConverter(parserInput), raw);
+
             if (output == null) {
                 output = "";
             } else {
@@ -227,10 +235,10 @@ public class BlikiProxyParser extends AbstractParser {
                 }
             }
         }
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-        }
+
+        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+        logger.fine("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
         return output;
     }
 
@@ -243,44 +251,51 @@ public class BlikiProxyParser extends AbstractParser {
      */
     public void parseMetadata(ParserOutput parserOutput, String raw) throws ParserException {
         long start = System.currentTimeMillis();
-        // FIXME - set a bogus context value to avoid parser errors
-        if (this.parserInput.getContext() == null) {
-            this.parserInput.setContext("/en");
+
+        String context = parserInput.getContext();
+        if (context == null) {
+            context = "";
+        }
+        parserInput.setContext(context);
+        try {
+            parserInput.setTopicName(MagicWordUtil.processMagicWord(parserInput, parserInput.getTopicName()));
+        } catch (Exception ex) {
+        }
+
+        String redirectTo = BlikiProxyParserUtil.isRedirect(raw);
+        if (redirectTo != null) {
+            parserOutput.setRedirect(redirectTo);
         }
 
         if (Environment.getBooleanValue(Environment.PROP_PARSER_REMOVE_UNSUPPORTED)) {
             raw = BlikiProxyParserUtil.parseUnsupportedMediaWikiMarkup(parserInput, raw);
         }
 
-        parserInput.setTopicName(BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, parserInput.getTopicName()));
-        raw = BlikiProxyParserUtil.parseMediaWikiVariables(parserInput, raw);
-        
-        WikiModel wikiModel = new WikiModel("${image}", "${title}");
+        JAMWikiModel wikiModel = new JAMWikiModel(parserInput, parserOutput, context);
         wikiModel.render(raw);
 
-        for (String link : wikiModel.getLinks()) {
-            parserOutput.addLink(link);
-            logger.debug("PARSER-OUTPUT-LINK: " + link);
+        /*
+        logger.debug("============== LINKS =============");
+        for (String link : parserOutput.getLinks()) {
+        logger.debug("LINK: " + link);
         }
 
-        for (String template : wikiModel.getTemplates()) {
-            parserOutput.addTemplate(template);
-            logger.debug("PARSER-OUTPUT-TEMPLATE: " + template);
+        logger.debug("============== TEMPLATES =============");
+        for (String template : parserOutput.getTemplates()) {
+        logger.debug("TEMPLATE: " + template);
         }
 
-        Map<String, String> cats = wikiModel.getCategories();
-
-        if ((cats != null) && (!cats.isEmpty())) {
-            for (String key : cats.keySet()) {
-                parserOutput.addCategory(key, cats.get(key));
-                logger.debug("PARSER-OUTPUT-CATEGORY: " + cats.get(key));
-            }
+        LinkedHashMap<String, String> categories = parserOutput.getCategories();
+        logger.debug("============== CATEGORIES =============");
+        for (String key : categories.keySet()) {
+        logger.debug("CATEGORY: " + categories.get(key));
         }
+         */
 
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseMetadata) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-        }
+
+        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+        logger.fine("Parse time (parseMetadata) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
     }
 
     /**
@@ -304,10 +319,9 @@ public class BlikiProxyParser extends AbstractParser {
         lexer.setTargetSection(targetSection);
         String output = this.lex(lexer, raw, parserOutput, MODE_SLICE);
 
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseSlice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-        }
+        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+        logger.fine("Parse time (parseSlice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
         return output;
     }
 
@@ -333,10 +347,9 @@ public class BlikiProxyParser extends AbstractParser {
         lexer.setTargetSection(targetSection);
         String output = this.lex(lexer, raw, parserOutput, MODE_SPLICE);
 
-        if (logger.isInfoEnabled()) {
-            String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
-            logger.info("Parse time (parseSplice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-        }
+        String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
+        logger.fine("Parse time (parseSplice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+
         return output;
     }
 
@@ -420,7 +433,7 @@ public class BlikiProxyParser extends AbstractParser {
         boolean validated = true;
         if (lexer.getMode() == MODE_SPLICE || lexer.getMode() == MODE_SLICE) {
             if (lexer.getParserInput().getTopicName() == null) {
-                logger.warn("Failure while initializing parser: topic name is null.");
+                logger.warning("Failure while initializing parser: topic name is null.");
                 validated = false;
             }
         }

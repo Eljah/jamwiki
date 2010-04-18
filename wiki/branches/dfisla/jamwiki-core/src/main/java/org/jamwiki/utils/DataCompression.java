@@ -2,13 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jamwiki.db;
+package org.jamwiki.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  *
@@ -16,7 +15,7 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class DataCompression {
 
-    private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
+    private static final WikiLogger logger = WikiLogger.getLogger(DataCompression.class.getName());
     public static final int PROP_DB_COMPRESSION_NONE = 0;
     public static final int PROP_DB_COMPRESSION_DEFAULT = 1;
 
@@ -25,7 +24,7 @@ public class DataCompression {
      * @param buffer
      * @return
      */
-    protected static byte[] decompressByteArray(byte[] buffer) {
+    public static byte[] decompressByteArray(byte[] buffer) {
 
         byte[] output = null;
         ByteArrayOutputStream bos = null;
@@ -71,7 +70,7 @@ public class DataCompression {
      * @param buffer
      * @return
      */
-    protected static byte[] compressByteArray(byte[] buffer) {
+    public static byte[] compressByteArray(byte[] buffer) {
 
         byte[] output = null;
         Deflater compressor = null;

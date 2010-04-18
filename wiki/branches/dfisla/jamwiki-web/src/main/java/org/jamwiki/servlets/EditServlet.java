@@ -300,6 +300,8 @@ public class EditServlet extends JAMWikiServlet {
 		parserInput.setTopicName(topicName);
 		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
 		parserInput.setVirtualWiki(virtualWiki);
+        parserInput.setRevisionId(topic.getCurrentVersionId());
+        parserInput.setRevisionDate(topic.getEditDate());
 		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
 		// parse signatures and other values that need to be updated prior to saving
 		contents = ParserUtil.parseMinimal(parserInput, contents);

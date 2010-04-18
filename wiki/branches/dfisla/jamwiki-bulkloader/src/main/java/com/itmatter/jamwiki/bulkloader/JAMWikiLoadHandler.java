@@ -217,9 +217,7 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
                 if (passChecks) {
                     Topic topic = new Topic();
                     topic.setName(pageName);
-                    if (redirectTo != null) {
-                        topic.setRedirectTo(redirectTo);
-                    }
+                   
                     topic.setVirtualWiki(virtualWiki);
                     topic.setTopicContent(pageText);
                     int charactersChanged = StringUtils.length(pageText);
@@ -227,6 +225,11 @@ public class JAMWikiLoadHandler extends org.xml.sax.helpers.DefaultHandler {
                     TopicVersion topicVersion = new TopicVersion(user, authorIpAddress, pageComment, pageText, charactersChanged);
                     // manage mapping between MediaWiki and JAMWiki namespaces
                     topic.setTopicType(convertNamespaceFromMediaWikiToJAMWiki(namespace));
+                    // do this last just in case
+                    if (redirectTo != null) {
+                        topic.setRedirectTo(redirectTo);
+                        topic.setTopicType(Topic.TYPE_REDIRECT);
+                    }
 
                     dataHandler.writeTopic(topic, topicVersion, null, null, true, false);
                 }

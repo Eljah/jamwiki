@@ -16,8 +16,10 @@
  */
 package org.jamwiki.db;
 
+import org.jamwiki.utils.DataCompression;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -59,6 +61,7 @@ import org.jamwiki.utils.WikiLink;
 import org.jamwiki.Environment;
 import org.jamwiki.authentication.RoleImpl;
 import org.jamwiki.model.ParsedTopic;
+import org.jamwiki.model.WikiImageResource;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
 import org.jamwiki.utils.WikiLogger;
@@ -142,6 +145,21 @@ public class AnsiDataHandler implements DataHandler {
             throw new DataAccessException(e);
         }
         return topicId;
+    }
+
+    /**
+     *
+     */
+    private int addWikipediaImage(WikiImageResource imgResource, Connection conn) throws DataAccessException, WikiException {
+        //int virtualWikiId = this.lookupVirtualWikiId(topic.getVirtualWiki());
+        int imageId = -1;
+        try {
+            //this.validateTopic(topic);
+            imageId = this.queryHandler().insertWikipediaImage(imgResource, conn);
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+        return imageId;
     }
 
     /**
@@ -1280,6 +1298,7 @@ public class AnsiDataHandler implements DataHandler {
             topic.setTopicId(rs.getInt(DATA_TOPIC_ID));
             topic.setReadOnly(rs.getInt("topic_read_only") != 0);
             topic.setDeleteDate(rs.getTimestamp("delete_date"));
+            topic.setEditDate(rs.getTimestamp("edit_date"));
             topic.setTopicType(rs.getInt("topic_type"));
             topic.setRedirectTo(rs.getString("redirect_to"));
             return topic;
@@ -1655,7 +1674,10 @@ public class AnsiDataHandler implements DataHandler {
             conn = DatabaseConnection.getConnection();
 
             rs = this.queryHandler().lookupTopicCount(virtualWikiId, conn);
-            result = rs.getInt("topic_count");
+
+            if (rs.next()) {
+                result = rs.getInt("topic_count");
+            }
 
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
@@ -1730,7 +1752,9 @@ public class AnsiDataHandler implements DataHandler {
         return results;
     }
 
-    // Daniel
+    /**
+     *
+     */
     public Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException {
         Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPICS, topicId);
         if (cacheElement != null) {
@@ -1962,7 +1986,9 @@ public class AnsiDataHandler implements DataHandler {
             conn = DatabaseConnection.getConnection();
 
             rs = this.queryHandler().lookupWikiFileCount(virtualWikiId, conn);
-            result = rs.getInt("file_count");
+            if (rs.next()) {
+                result = rs.getInt("file_count");
+            }
 
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
@@ -2099,13 +2125,15 @@ public class AnsiDataHandler implements DataHandler {
      */
     public int lookupWikiUserCount() throws DataAccessException {
         Connection conn = null;
-        int rv;
+        int rv = 0;
         ResultSet rs = null;
 
         try {
             conn = DatabaseConnection.getConnection();
             rs = this.queryHandler().lookupWikiUserCount(conn);
-            rv = rs.getInt("user_count");
+            if (rs.next()) {
+                rv = rs.getInt("user_count");
+            }
 
         } catch (SQLException e) {
             throw new DataAccessException(e);
@@ -2329,7 +2357,9 @@ public class AnsiDataHandler implements DataHandler {
             status = DatabaseConnection.startTransaction();
             conn = DatabaseConnection.getConnection();
 
-            DatabaseConnection.executeQuery(WikiDatabase.getExistenceValidationQuery(), conn);
+            PreparedStatement stmt = conn.prepareStatement(WikiDatabase.getExistenceValidationQuery());
+            ResultSet rs = stmt.executeQuery();
+
             DatabaseConnection.commit(status);
         } catch (SQLException e) {
             DatabaseConnection.rollbackOnException(status, e);
@@ -2677,6 +2707,28 @@ public class AnsiDataHandler implements DataHandler {
             DatabaseConnection.closeConnection(conn);
         }
 
+    }
+
+    public void importWikipediaImage(WikiImageResource imgResource) throws DataAccessException, WikiException{
+
+        TransactionStatus status = null;
+        Connection conn = null;
+        try {
+            status = DatabaseConnection.startTransaction();
+            conn = DatabaseConnection.getConnection();
+
+            this.addWikipediaImage(imgResource, conn);
+
+            DatabaseConnection.commit(status);
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        } catch (WikiException e) {
+            throw e;
+        } finally {
+            DatabaseConnection.closeConnection(conn);
+        }
     }
 
     public void buildTopicCategories(TopicVersion topicVersion, LinkedHashMap<String, String> categories, String topicName, int topicId, String virtualWiki) throws DataAccessException, WikiException {
@@ -3525,5 +3577,47 @@ public class AnsiDataHandler implements DataHandler {
         } finally {
             DatabaseConnection.closeConnection(conn);
         }
+    }
+
+    /**
+     *
+     */
+    public List<WikiImageResource> lookupWikipediaImage(String imageName, String parentName) throws DataAccessException {
+        List<WikiImageResource> all = new ArrayList<WikiImageResource>();
+        //int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
+        ResultSet rs = null;
+        TransactionStatus status = null;
+        Connection conn = null;
+        try {
+            status = DatabaseConnection.startTransaction();
+            conn = DatabaseConnection.getConnection();
+
+            rs = this.queryHandler().lookupWikipediaImage(imageName, parentName, conn);
+            while (rs.next()) {
+                WikiImageResource wpImage = new WikiImageResource();
+                wpImage.setPath(rs.getString("path"));
+                wpImage.setName(rs.getString("image_name"));
+                wpImage.setParentName(rs.getString("parent_name"));
+                wpImage.setIsThumb(rs.getInt("thumb"));
+                wpImage.setSize(rs.getInt("size"));
+                all.add(wpImage);
+            }
+
+            DatabaseConnection.commit(status);
+        } catch (SQLException e) {
+            DatabaseConnection.rollbackOnException(status, e);
+            throw new DataAccessException(e);
+        } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warning("Could not close ResultSet!", ex);
+                }
+            }
+            DatabaseConnection.closeConnection(conn);
+        }
+
+        return all;
     }
 }

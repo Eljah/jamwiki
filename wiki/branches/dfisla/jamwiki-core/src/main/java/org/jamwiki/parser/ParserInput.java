@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser;
 
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import org.jamwiki.model.WikiUser;
@@ -37,11 +38,15 @@ public class ParserInput {
 	/** Hashtable of generic temporary objects used during parsing. */
 	private final Hashtable<String, Object> tempParams = new Hashtable<String, Object>();
 	private String topicName = null;
+    private String nameSpace = null;
 	/** Display value for the current user, typically the IP address. */
 	private String userDisplay = null;
 	private String virtualWiki = null;
 	/** Current WikiUser (if any). */
 	private WikiUser wikiUser = null;
+
+    private Integer revisionId;
+    private Date revisionDate;
 
 	/**
 	 *
@@ -331,4 +336,30 @@ public class ParserInput {
 	public void setWikiUser(WikiUser user) {
 		this.wikiUser = user;
 	}
+
+    public String getNameSpace() {
+        return nameSpace;
+    }
+
+    public void setNameSpace(String nameSpace) {
+        this.nameSpace = nameSpace;
+    }
+
+    public Date getRevisionDate() {
+        return revisionDate;
+    }
+
+    public void setRevisionDate(Date revisionDate) {
+        this.revisionDate = revisionDate;
+    }
+
+    public Integer getRevisionId() {
+        return revisionId;
+    }
+
+    public void setRevisionId(Integer revisionId) {
+        this.revisionId = revisionId;
+    }
+
+
 }

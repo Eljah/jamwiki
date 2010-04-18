@@ -200,7 +200,7 @@ public class MagicWordUtil {
 	 * special handling.  See http://meta.wikimedia.org/wiki/Help:Magic_words
 	 * for a list of Mediawiki magic words.
 	 */
-	protected static boolean isMagicWord(String name) {
+	public static boolean isMagicWord(String name) {
 		return MAGIC_WORDS.contains(name);
 	}
 
@@ -209,7 +209,7 @@ public class MagicWordUtil {
 	 * word value.  See http://meta.wikimedia.org/wiki/Help:Magic_words for a
 	 * list of Mediawiki magic words.
 	 */
-	protected static String processMagicWord(ParserInput parserInput, String name) throws DataAccessException {
+	public static String processMagicWord(ParserInput parserInput, String name) throws DataAccessException {
 		SimpleDateFormat formatter = new SimpleDateFormat();
 		TimeZone utc = TimeZone.getTimeZone("GMT+00");
 		Date current = new Date(System.currentTimeMillis());
@@ -483,12 +483,14 @@ public class MagicWordUtil {
 			formatter.applyPattern("yyyyMMddHHmmss");
 			return formatter.format(revision);
 		}
-		/*
+		
 		if (name.equals(MAGIC_REVISION_ID)) {
+                    return parserInput.getRevisionId().toString();
 		}
 		if (name.equals(MAGIC_SITE_NAME)) {
+                    return Environment.getValue(Environment.PROP_SITE_NAME);
 		}
-		*/
+		
 		if (name.equals(MAGIC_SERVER)) {
 			return Environment.getValue(Environment.PROP_SERVER_URL);
 		}

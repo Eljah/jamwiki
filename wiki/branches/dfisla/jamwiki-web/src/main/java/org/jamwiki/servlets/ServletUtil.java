@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -132,6 +133,8 @@ public class ServletUtil {
                 parserInput.setLocale(locale);
                 parserInput.setVirtualWiki(virtualWiki);
                 parserInput.setTopicName(topicName);
+                parserInput.setRevisionId(topic.getCurrentVersionId());
+                parserInput.setRevisionDate(topic.getEditDate());
                 content = ParserUtil.parse(parserInput, null, content);
 
                 topic.setTopicContent(content);
@@ -790,6 +793,8 @@ public class ServletUtil {
                 parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
                 parserInput.setVirtualWiki(virtualWiki);
                 parserInput.setAllowSectionEdit(sectionEdit);
+                parserInput.setRevisionId(topic.getCurrentVersionId());
+                parserInput.setRevisionDate(topic.getEditDate());
                 ParserOutput parserOutput = new ParserOutput();
 
                 boolean timeLimited = false;

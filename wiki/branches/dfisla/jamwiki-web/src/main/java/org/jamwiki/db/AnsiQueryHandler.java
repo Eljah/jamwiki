@@ -16,6 +16,7 @@
  */
 package org.jamwiki.db;
 
+import org.jamwiki.utils.DataCompression;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,6 +41,7 @@ import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.model.ParsedTopic;
+import org.jamwiki.model.WikiImageResource;
 import org.jamwiki.utils.WikiLogger;
 /**
  * Default implementation of the QueryHandler implementation for retrieving, inserting,
@@ -169,6 +171,10 @@ public class AnsiQueryHandler implements QueryHandler {
     protected static String STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME = null;
     protected static String STATEMENT_SELECT_TOPIC_VERSION_CACHE = null;
 
+    protected static String STATEMENT_SELECT_WP_IMAGE = null;
+    protected static String STATEMENT_SELECT_WP_IMAGE_BY_PARENT = null;
+    protected static String STATEMENT_INSERT_WP_IMAGE_AUTO_SEQ = null;
+
     private static Properties props = null;
 
     /**
@@ -203,6 +209,7 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public void createTables(Connection conn) throws SQLException {
+        /*
         DatabaseConnection.executeUpdate(STATEMENT_CREATE_VIRTUAL_WIKI_TABLE, conn);
         DatabaseConnection.executeUpdate(STATEMENT_CREATE_USERS_TABLE, conn);
         DatabaseConnection.executeUpdate(STATEMENT_CREATE_WIKI_USER_TABLE, conn);
@@ -220,6 +227,7 @@ public class AnsiQueryHandler implements QueryHandler {
         DatabaseConnection.executeUpdate(STATEMENT_CREATE_GROUP_AUTHORITIES_TABLE, conn);
         DatabaseConnection.executeUpdate(STATEMENT_CREATE_RECENT_CHANGE_TABLE, conn);
         DatabaseConnection.executeUpdate(STATEMENT_CREATE_WATCHLIST_TABLE, conn);
+        */
     }
 
     /**
@@ -283,6 +291,7 @@ public class AnsiQueryHandler implements QueryHandler {
         // catch errors that might result from a partial failure during install.  also
         // note that the coding style violation here is intentional since it makes the
         // actual work of the method more obvious.
+        /*
         try {
             DatabaseConnection.executeUpdate(STATEMENT_DROP_WATCHLIST_TABLE, conn);
         } catch (SQLException e) {
@@ -368,6 +377,7 @@ public class AnsiQueryHandler implements QueryHandler {
         } catch (SQLException e) {
             logger.severe(e.getMessage());
         }
+        */
     }
 
     /**
@@ -483,7 +493,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public ResultSet getRoleMapGroups(Connection conn) throws SQLException {
-        return DatabaseConnection.executeQuery(STATEMENT_SELECT_GROUPS_AUTHORITIES, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_GROUPS_AUTHORITIES);
+        return stmt.executeQuery();
     }
 
     /**
@@ -499,7 +510,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public ResultSet getRoles(Connection conn) throws SQLException {
-        return DatabaseConnection.executeQuery(STATEMENT_SELECT_ROLES, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_ROLES);
+        return stmt.executeQuery();
     }
 
     /**
@@ -543,7 +555,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public ResultSet getVirtualWikis(Connection conn) throws SQLException {
-        return DatabaseConnection.executeQuery(STATEMENT_SELECT_VIRTUAL_WIKIS, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_VIRTUAL_WIKIS);
+        return stmt.executeQuery();
     }
 
     /**
@@ -695,7 +708,11 @@ public class AnsiQueryHandler implements QueryHandler {
         STATEMENT_DELETE_TOPIC_VERSION_CACHE = props.getProperty("STATEMENT_DELETE_TOPIC_VERSION_CACHE");
         STATEMENT_INSERT_TOPIC_VERSION_CACHE = props.getProperty("STATEMENT_INSERT_TOPIC_VERSION_CACHE");
         STATEMENT_SELECT_TOPIC_VERSION_CACHE = props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_CACHE");
-        STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME= props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME");
+        STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME = props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_CACHE_BY_NAME");
+        
+        STATEMENT_SELECT_WP_IMAGE = props.getProperty("STATEMENT_SELECT_WP_IMAGE");
+        STATEMENT_SELECT_WP_IMAGE_BY_PARENT = props.getProperty("STATEMENT_SELECT_WP_IMAGE_BY_PARENT");
+        STATEMENT_INSERT_WP_IMAGE_AUTO_SEQ = props.getProperty("STATEMENT_INSERT_WP_IMAGE_AUTO_SEQ");
     }
 
     /**
@@ -1228,7 +1245,8 @@ public class AnsiQueryHandler implements QueryHandler {
      * @throws SQLException
      */
     public ResultSet lookupWikiUserCount(Connection conn) throws SQLException {
-        return DatabaseConnection.executeQuery(STATEMENT_SELECT_WIKI_USER_COUNT, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_USER_COUNT);
+        return stmt.executeQuery();
     }
 
     /**
@@ -1254,7 +1272,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public int nextGroupMemberId(Connection conn) throws SQLException {
-        ResultSet rs = DatabaseConnection.executeQuery(STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE);
+        ResultSet rs = stmt.executeQuery();
         int nextId = 0;
         if (rs.next()) {
             nextId = rs.getInt("id");
@@ -1268,7 +1287,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public int nextVirtualWikiId(Connection conn) throws SQLException {
-        ResultSet rs = DatabaseConnection.executeQuery(STATEMENT_SELECT_VIRTUAL_WIKI_SEQUENCE, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_VIRTUAL_WIKI_SEQUENCE);
+        ResultSet rs = stmt.executeQuery();
         int nextId = 0;
         if (rs.next()) {
             nextId = rs.getInt("virtual_wiki_id");
@@ -1282,7 +1302,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public int nextWikiFileId(Connection conn) throws SQLException {
-        ResultSet rs = DatabaseConnection.executeQuery(STATEMENT_SELECT_WIKI_FILE_SEQUENCE, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_FILE_SEQUENCE);
+        ResultSet rs = stmt.executeQuery();
         int nextId = 0;
         if (rs.next()) {
             nextId = rs.getInt("file_id");
@@ -1296,7 +1317,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public int nextWikiFileVersionId(Connection conn) throws SQLException {
-        ResultSet rs = DatabaseConnection.executeQuery(STATEMENT_SELECT_WIKI_FILE_VERSION_SEQUENCE, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_FILE_VERSION_SEQUENCE);
+        ResultSet rs = stmt.executeQuery();
         int nextId = 0;
         if (rs.next()) {
             nextId = rs.getInt("file_version_id");
@@ -1310,7 +1332,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public int nextWikiGroupId(Connection conn) throws SQLException {
-        ResultSet rs = DatabaseConnection.executeQuery(STATEMENT_SELECT_GROUP_SEQUENCE, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_SEQUENCE);
+        ResultSet rs = stmt.executeQuery();
         int nextId = 0;
         if (rs.next()) {
             nextId = rs.getInt(AnsiDataHandler.DATA_GROUP_ID);
@@ -1324,7 +1347,8 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public int nextWikiUserId(Connection conn) throws SQLException {
-        ResultSet rs = DatabaseConnection.executeQuery(STATEMENT_SELECT_WIKI_USER_SEQUENCE, conn);
+        PreparedStatement stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_USER_SEQUENCE);
+        ResultSet rs = stmt.executeQuery();
         int nextId = 0;
         if (rs.next()) {
             nextId = rs.getInt(AnsiDataHandler.DATA_WIKI_USER_ID);
@@ -1338,8 +1362,10 @@ public class AnsiQueryHandler implements QueryHandler {
      *
      */
     public void reloadRecentChanges(Connection conn) throws SQLException {
+        /*
         DatabaseConnection.executeUpdate(STATEMENT_DELETE_RECENT_CHANGES, conn);
         DatabaseConnection.executeUpdate(STATEMENT_INSERT_RECENT_CHANGES, conn);
+         */
     }
 
     /**
@@ -1577,6 +1603,51 @@ public class AnsiQueryHandler implements QueryHandler {
     }
 
     // EXPERIMENTAL
+    public int insertWikipediaImage(WikiImageResource imgResource, Connection conn) throws SQLException{
+        int rv = -1;
+        int imageId = -1;
+
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = conn.prepareStatement(STATEMENT_INSERT_WP_IMAGE_AUTO_SEQ , Statement.RETURN_GENERATED_KEYS);
+
+            //  thumb,path,parent_name,image_name,size
+            stmt.setInt(1, imgResource.getIsThumb());
+            stmt.setString(2, imgResource.getPath());
+            stmt.setString(3, imgResource.getParentName());
+            stmt.setString(4, imgResource.getName());
+            stmt.setInt(5, imgResource.getSize());
+
+            //stmt.logParams();
+            logger.fine("SQL-QUERY-STRING =>: " + stmt.toString());
+            rv = stmt.executeUpdate();
+
+            if (rv > 0) {
+                rs = stmt.getGeneratedKeys();
+                if (rs.next()) {
+                    imageId = rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.severe(e.getMessage(), e);
+            throw e;
+        } finally {
+            if(rs != null){
+                try{
+                    rs.close();
+                }catch(Exception ex){
+                    logger.warning("Could not close ResultSet!", ex);
+                }
+            }
+            DatabaseConnection.closeConnection(conn, stmt, rs);
+        }
+        return imageId;
+    }
+
+    // EXPERIMENTAL
     public ResultSet lookupParsedTopic(int virtualWikiId, int topicId, int topicVersionId, Connection conn) throws SQLException {
 
         PreparedStatement stmt = null;
@@ -1596,6 +1667,23 @@ public class AnsiQueryHandler implements QueryHandler {
 
         stmt.setInt(1, virtualWikiId);
         stmt.setString(2, topicName);
+        return stmt.executeQuery();
+    }
+
+    /**
+     *
+     */
+    public ResultSet lookupWikipediaImage(String imageName, String parentName, Connection conn) throws SQLException {
+        PreparedStatement stmt = null;
+
+        if((parentName != null) && (!parentName.isEmpty())){
+            stmt = conn.prepareStatement(STATEMENT_SELECT_WP_IMAGE_BY_PARENT);
+            stmt.setString(1, parentName);
+        }else{
+            stmt = conn.prepareStatement(STATEMENT_SELECT_WP_IMAGE);
+            stmt.setString(1, imageName);
+        }
+        
         return stmt.executeQuery();
     }
 }

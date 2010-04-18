@@ -54,6 +54,8 @@ public class Topic implements Serializable {
     protected String virtualWiki = null;
 	private static final WikiLogger logger = WikiLogger.getLogger(Topic.class.getName());
 
+    private Timestamp editDate = new Timestamp(System.currentTimeMillis());
+
     /**
      *
      */
@@ -74,6 +76,7 @@ public class Topic implements Serializable {
         this.topicId = topic.topicId;
         this.topicType = topic.topicType;
         this.virtualWiki = topic.virtualWiki;
+        this.editDate = topic.editDate;
     }
 
     /**
@@ -123,6 +126,20 @@ public class Topic implements Serializable {
      */
     public void setDeleteDate(Timestamp deleteDate) {
         this.deleteDate = deleteDate;
+    }
+
+    /**
+     *
+     */
+    public Timestamp getEditDate() {
+        return this.editDate;
+    }
+
+    /**
+     *
+     */
+    public void setEditDate(Timestamp editDate) {
+        this.editDate = editDate;
     }
 
     /**

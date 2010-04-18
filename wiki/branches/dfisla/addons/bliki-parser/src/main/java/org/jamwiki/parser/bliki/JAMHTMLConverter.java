@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.NamespaceHandler;
@@ -30,6 +30,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiImage;
+import org.jamwiki.model.WikiImageResource;
 import org.jamwiki.utils.ImageUtil;
 import org.jamwiki.utils.WikiLink;
 
@@ -61,7 +62,6 @@ public class JAMHTMLConverter extends HTMLConverter {
      *
      * @throws IOException
      */
-
     @Override
     public void nodesToText(List<? extends Object> nodes, Appendable resultBuffer, IWikiModel model) throws IOException {
         if (nodes != null && !nodes.isEmpty()) {
@@ -74,7 +74,7 @@ public class JAMHTMLConverter extends HTMLConverter {
                 }
 
                 if (System.currentTimeMillis() - START_TIME > Environment.getLongValue(Environment.PROP_PARSER_TIME_LIMIT)) {
-                    logger.error("Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms");
+                    logger.warning("Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms");
                     resultBuffer.append("<span class=\"error\">TIME - Processing time limit exceeded rendering time of " + Environment.getValue(Environment.PROP_PARSER_TIME_LIMIT) + "ms.</span>");
                     return;
                 }
@@ -116,7 +116,7 @@ public class JAMHTMLConverter extends HTMLConverter {
             }
         }
     }
-    
+
     /**
      *
      *
@@ -128,6 +128,10 @@ public class JAMHTMLConverter extends HTMLConverter {
         String imageName = imageFormat.getFilename();
         imageName = imageName.replaceAll("_", " ");
         Map<String, String> map = imageTagNode.getAttributes();
+
+        //map.get("src")
+        //map.get("href")
+
         String caption = imageFormat.getCaption();
         String alt = null;
         if (caption != null && caption.length() > 0) {
@@ -138,7 +142,7 @@ public class JAMHTMLConverter extends HTMLConverter {
             alt = "";
         }
         String location = imageFormat.getLocation();
-        logger.debug("IMAGE-LINK-LOCATION =>: " + location);
+        logger.fine("IMAGE-LINK-LOCATION =>: " + location);
         String type = imageFormat.getType();
         int pxWidth = imageFormat.getWidth();
         int pxHeight = imageFormat.getHeight();
@@ -151,10 +155,10 @@ public class JAMHTMLConverter extends HTMLConverter {
 
         try {
             String linkHtml = this.buildImageLinkHtml(fParserInput.getContext(), fParserInput.getVirtualWiki(), model.getImageNamespace() + NamespaceHandler.NAMESPACE_SEPARATOR + imageName, frame, thumb, imageFormat.getLocation(), imageFormat.getCaption(), pxWidth, false, null, false);
-            logger.debug("IMAGE-LINK-HTML =>: " + linkHtml);
+            logger.fine("IMAGE-LINK-HTML =>: " + linkHtml);
             resultBuffer.append(linkHtml);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.severe(e.getMessage() + " TRACE: " + e.getStackTrace());
         }
 
     }
@@ -197,7 +201,7 @@ public class JAMHTMLConverter extends HTMLConverter {
     public String buildImageLinkHtml(String context, String virtualWiki, String topicName, boolean frame, boolean thumb, String align, String caption, int maxDimension, boolean suppressLink, String style, boolean escapeHtml) throws DataAccessException, IOException {
         String url = LinkUtil.buildImageFileUrl(context, virtualWiki, topicName);
         if (url == null) {
-            logger.debug("IMAGE-LINK-NULL!");
+            
             StringBuilder sb = new StringBuilder();
             WikiLink uploadLink = LinkUtil.parseWikiLink("Special:Upload");
             String uploadLinkHtml = LinkUtil.buildInternalLinkHtml(context, virtualWiki, uploadLink, "Upload " + topicName, "edit", null, true);
@@ -208,13 +212,51 @@ public class JAMHTMLConverter extends HTMLConverter {
                 caption = "Wikipedia " + topicName;
             }
 
-            //String imgSrcHtml = String.format("<img src=\"http://%s.wikipedia.org/wiki/%s\" width=\"40\" height=\"30\" alt=\"\" />", virtualWiki, imageName);
-            String wikipediaLinkHtml = String.format("<a href=\"http://%s.wikipedia.org/wiki/%s\" class=\"%s\" title=\"%s\" target=\"_new\">%s</a>", virtualWiki, imageName, "image", topicName, caption);
+            String imageResourceName = imageName.replaceFirst("File:", "");
+            logger.fine("UPLOAD-LINK-IMAGE-LOOKUP: " + imageResourceName);
+            // want thumbs only
+            List<WikiImageResource> imgResources = dataHandler.lookupWikipediaImage(null, imageResourceName);
+            String wikipediaLinkHtml = null;
 
+
+            if ((imgResources != null) && (imgResources.size() > 0)) {
+                logger.fine("UPLOAD-LINK-IMAGE-RESOURCE-COUNT: " + imgResources.size());
+
+                WikiImageResource imgR = null;
+                
+                if(imgResources.size() == 1){
+                    imgR = imgResources.get(0);
+                }else{
+                    Collections.sort(imgResources);
+                    int nextSize = (imgResources.size() / 2) - 1;
+                    imgR = imgResources.get(nextSize);
+                }
+
+                logger.fine("UPLOAD-LINK-IMAGE-RESOURCE-PATH: " + imgR.getPath());
+                logger.fine("UPLOAD-LINK-IMAGE-RESOURCE-FILENAME: " + imgR.getName());
+
+                if((imgR != null) && (imgR.getPath().startsWith("http://"))){
+                     imgR.setURL(imgR.getPath());
+                }
+                else if ((imgR != null) && (imgR.getPath().startsWith("en/images/shared"))) {
+                    String imgPath = imgR.getPath();
+                    String imgUrl = imgPath.replace("en/images/shared", "http://upload.wikimedia.org/wikipedia/commons");
+                    imgR.setURL(imgUrl + "/" + imgR.getName());
+                } else if ((imgR != null) && (imgR.getPath().startsWith("en/images/local"))) {
+                    String imgPath = imgR.getPath();
+                    String imgUrl = imgPath.replace("en/images/local", "http://upload.wikimedia.org/wikipedia/en");
+                    imgR.setURL(imgUrl + "/" + imgR.getName());
+                }
+                
+                String imgHtml = String.format("<img src=\"%s\" alt=\"%s\" />", imgR.getURL(), caption);
+                wikipediaLinkHtml = String.format("<a href=\"http://%s.wikipedia.org/wiki/%s\" class=\"%s\" title=\"%s\" target=\"_new\" rel=\"nofollow\">%s</a>", virtualWiki, imageName, "image", topicName, imgHtml);
+            } else {
+                wikipediaLinkHtml = String.format("<a href=\"http://%s.wikipedia.org/wiki/%s\" class=\"%s\" title=\"%s\" target=\"_new\" rel=\"nofollow\">%s</a>", virtualWiki, imageName, "image", topicName, caption);
+            }
             sb.append(wikipediaLinkHtml);
             //sb.append("<br/>");
             //sb.append(uploadLinkHtml);
-            logger.debug("UPLOAD-LINK-HTML: " + uploadLinkHtml);
+            //logger.debug("UPLOAD-LINK-HTML: " + uploadLinkHtml);
             return sb.toString();
         }
 

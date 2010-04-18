@@ -383,7 +383,11 @@ public class WikiDatabase {
         }
         // test to see if JAMWiki tables already exist (if they do, we can't continue this migration process
         try {
-            DatabaseConnection.executeQuery(newQueryHandler.existenceValidationQuery(), conn);
+
+            PreparedStatement stmt = conn.prepareStatement(newQueryHandler.existenceValidationQuery());
+            stmt.executeQuery();
+
+            //DatabaseConnection.executeQuery(newQueryHandler.existenceValidationQuery(), conn);
             errors.add(new WikiMessage("setup.error.migrate"));
             if (conn != null) {
                 try {
@@ -488,7 +492,8 @@ public class WikiDatabase {
         Connection conn = DatabaseConnection.getConnection();
 
         String sql = "select max(" + primaryIdColumnName + ") as max_table_id from " + tableName;
-        ResultSet rs = DatabaseConnection.executeQuery(sql, conn);
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
         int rv = rs.getInt("max_table_id");
         rs.close();
         return rv;

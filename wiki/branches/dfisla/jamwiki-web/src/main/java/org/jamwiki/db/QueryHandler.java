@@ -30,6 +30,7 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
+import org.jamwiki.model.WikiImageResource;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Pagination;
 
@@ -466,6 +467,11 @@ public interface QueryHandler {
          */
         int insertParsedTopic(ParsedTopic parsedTopic, int virtualWikiId, Connection conn) throws SQLException;
 
+        /*
+         * EXPERIMENTAL
+         */
+        int insertWikipediaImage(WikiImageResource imgResource, Connection conn) throws SQLException;
+
         /**
 	 * Add a new topic version record to the database.  The topic version must
 	 * not already exist in the database or else an error will be thrown.
@@ -734,6 +740,9 @@ public interface QueryHandler {
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
 	ResultSet lookupWikiUsers(Pagination pagination, Connection conn) throws SQLException;
+
+    /// EXPERIMENTAL
+    ResultSet lookupWikipediaImage(String imageName, String parentName, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve the next available group member id from the group members table.

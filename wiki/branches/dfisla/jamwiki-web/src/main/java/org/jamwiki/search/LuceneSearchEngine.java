@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
@@ -58,8 +58,11 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.SearchResultEntry;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
+import org.jamwiki.utils.DataCompression;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -97,14 +100,13 @@ public class LuceneSearchEngine implements SearchEngine {
     private static String CUSTOM_DATA_PATH = null;
     private List<Integer> topicIds = null;
 
-
     /**
      * Default Constructor
      */
     public LuceneSearchEngine() {
     }
-    
-     /**
+
+    /**
      * Constructor
      *
      * @param searchIndexPath
@@ -165,24 +167,35 @@ public class LuceneSearchEngine implements SearchEngine {
      * is suitable to be parsed with the StandardAnalyzer.
      */
     private Document createStandardDocument(Topic topic, List<String> links) {
-        String topicContent = topic.getTopicContent();
+        String topicContent = topic.getTopicContentClean();
+
         if (topicContent == null) {
             topicContent = "";
         }
+
+        byte[] contentData = null;
         Document doc = new Document();
-        // store topic name and content for later retrieval
-        doc.add(new Field(ITYPE_TOPIC_PLAIN, topic.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(ITYPE_CONTENT_PLAIN, topicContent, Field.Store.YES, Field.Index.NO));
-        // index topic name and content for search purposes
-        doc.add(new Field(ITYPE_TOPIC, new StringReader(topic.getName())));
-        doc.add(new Field(ITYPE_CONTENT, new StringReader(topicContent)));
-        // index topic links for search purposes
-        if (links == null) {
-            links = new ArrayList<String>();
+
+        try {
+            contentData = DataCompression.compressByteArray(topicContent.getBytes("utf-8"));
+
+            // store topic name and content for later retrieval
+            doc.add(new Field(ITYPE_TOPIC_PLAIN, topic.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field(ITYPE_CONTENT_PLAIN, contentData, 0, contentData.length, Field.Store.YES));
+            // index topic name and content for search purposes
+            doc.add(new Field(ITYPE_TOPIC, new StringReader(topic.getName())));
+            doc.add(new Field(ITYPE_CONTENT, new StringReader(topicContent)));
+            // index topic links for search purposes
+            if (links == null) {
+                links = new ArrayList<String>();
+            }
+            for (String linkTopic : links) {
+                doc.add(new Field(ITYPE_TOPIC_LINK, linkTopic, Field.Store.NO, Field.Index.NOT_ANALYZED));
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage(), ex);
         }
-        for (String linkTopic : links) {
-            doc.add(new Field(ITYPE_TOPIC_LINK, linkTopic, Field.Store.NO, Field.Index.NOT_ANALYZED));
-        }
+
         return doc;
     }
 
@@ -299,11 +312,10 @@ public class LuceneSearchEngine implements SearchEngine {
     private File getSearchIndexPath(String virtualWiki) throws IOException {
 
         File parent = null;
-        
-        if( (SEARCH_DIR_OVERRIDE) && (CUSTOM_DATA_PATH != null)){
+
+        if ((SEARCH_DIR_OVERRIDE) && (CUSTOM_DATA_PATH != null)) {
             parent = new File(CUSTOM_DATA_PATH, SEARCH_DIR);
-        }
-        else{
+        } else {
             parent = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), SEARCH_DIR);
         }
 
@@ -351,7 +363,7 @@ public class LuceneSearchEngine implements SearchEngine {
         try {
             mergeDirectory = new SimpleFSDirectory(mergePath);
             //IndexWriter writer = new IndexWriter(INDEX_DIR, new StandardAnalyzer(), true, IndexWriter.MaxFieldLength.UNLIMITED);
-            IndexWriter writer = new IndexWriter(mergeDirectory, new StandardAnalyzer(Version.LUCENE_CURRENT), true, IndexWriter.MaxFieldLength.UNLIMITED );
+            IndexWriter writer = new IndexWriter(mergeDirectory, new StandardAnalyzer(Version.LUCENE_CURRENT), true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             writer.setMergeFactor(mergeFactor);
             writer.setRAMBufferSizeMB(bufferSizeMB);
@@ -408,6 +420,9 @@ public class LuceneSearchEngine implements SearchEngine {
                 //int wikiTopicCount = 0;
                 logger.info("Retrieved WIki Topic IDs =>: " + this.topicIds.size());
 
+                // FIX ME - should not be hardcoded like this
+                Locale locale = new Locale("en", "US");
+
                 for (Integer topicId : this.topicIds) {
 
                     //topic = WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), topicName, false, null);
@@ -418,7 +433,24 @@ public class LuceneSearchEngine implements SearchEngine {
                     }
                     String topicContent = topic.getTopicContent();
                     if (topicContent != null) {
-                        ParserOutput parserOutput = ParserUtil.parserOutput(topic.getTopicContent(), virtualWiki.getName(), topic.getName());
+                        //ParserOutput parserOutput = ParserUtil.parserOutput(topic.getTopicContent(), virtualWiki.getName(), topic.getName());
+
+                        ParserInput parserInput = new ParserInput();
+                        parserInput.setContext("");
+                        parserInput.setLocale(locale);
+                        parserInput.setTopicName(topic.getName());
+                        parserInput.setVirtualWiki(wikiName);
+                        parserInput.setAllowSectionEdit(false);
+                        parserInput.setRevisionId(topic.getCurrentVersionId());
+                        parserInput.setRevisionDate(topic.getEditDate());
+
+                        ParserOutput parserOutput = new ParserOutput();
+
+                        String htmlContent = ParserUtil.parse(parserInput, parserOutput, topicContent);
+                        String content = Utilities.stripMarkup(htmlContent);
+                        content = StringEscapeUtils.unescapeHtml(content);
+                        topic.setTopicContentClean(topicContent);
+                        
                         // note: no delete is necessary since a new index is being created
                         this.addToIndex(writer, topic, parserOutput.getLinks());
                         count++;
@@ -497,14 +529,24 @@ public class LuceneSearchEngine implements SearchEngine {
      *
      */
     private String retrieveResultSummary(Document document, Highlighter highlighter, StandardAnalyzer analyzer) throws InvalidTokenOffsetsException, IOException {
-        String content = document.get(ITYPE_CONTENT_PLAIN);
-        TokenStream tokenStream = analyzer.tokenStream(ITYPE_CONTENT_PLAIN, new StringReader(content));
-        String summary = highlighter.getBestFragments(tokenStream, content, 3, "...");
-        if (StringUtils.isBlank(summary) && !StringUtils.isBlank(content)) {
-            summary = StringEscapeUtils.escapeHtml(content.substring(0, Math.min(200, content.length())));
-            if (Math.min(200, content.length()) == 200) {
-                summary += "...";
+        byte[] contentData = null;
+
+        String summary = "";
+
+        try {
+            contentData = document.getBinaryValue(ITYPE_CONTENT_PLAIN);
+            String content = new String(DataCompression.decompressByteArray(contentData), "UTF-8");
+
+            TokenStream tokenStream = analyzer.tokenStream(ITYPE_CONTENT_PLAIN, new StringReader(content));
+            summary = highlighter.getBestFragments(tokenStream, content, 3, "...");
+            if (StringUtils.isBlank(summary) && !StringUtils.isBlank(content)) {
+                summary = StringEscapeUtils.escapeHtml(content.substring(0, Math.min(200, content.length())));
+                if (Math.min(200, content.length()) == 200) {
+                    summary += "...";
+                }
             }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage(), ex);
         }
         return summary;
     }
