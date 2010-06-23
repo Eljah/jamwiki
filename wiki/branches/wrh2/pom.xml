@@ -46,7 +46,7 @@
 	</licenses>
 	<properties>
 		<jamwiki.version>1.0.0-SNAPSHOT</jamwiki.version>
-		<dependency.spring.version>3.0.1.RELEASE</dependency.spring.version>
+		<dependency.spring.version>3.0.3.RELEASE</dependency.spring.version>
 		<dependency.spring.security.version>3.0.2.RELEASE</dependency.spring.security.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -170,27 +170,28 @@
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
 				<artifactId>ehcache-core</artifactId>
-				<version>1.7.0</version>
+				<version>2.1.0</version>
+			</dependency>
+			<!-- slf4j is an ehcache dependency -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-jdk14</artifactId>
+				<version>1.5.8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-highlighter</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>info.bliki.wiki</groupId>
 				<artifactId>bliki-core</artifactId>
 				<version>3.0.12-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-aop</artifactId>
-				<version>${dependency.spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>

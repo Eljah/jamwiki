@@ -16,11 +16,15 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 --%>
-<ul id="tab-menu">
-<c:forEach items="${pageInfo.tabMenu}" var="menuItem" varStatus="status">
-	<c:set var="menuText" value="${menuItem.value}" />
-	<%-- FIXME - the print target check is an ugly hack.  need to find a better way. --%>
-	<c:if test="${menuText.key == 'tab.common.print'}"><li><jamwiki:link value="${menuItem.key}" target="${pageInfo.printTarget}"><fmt:message key="${menuText.key}"><fmt:param value="${menuText.params[0]}" /></fmt:message></jamwiki:link></li></c:if>
-	<c:if test="${menuText.key != 'tab.common.print'}"><li<c:if test="${pageInfo.selectedTab == menuItem.key}"> class="active"</c:if>><jamwiki:link value="${menuItem.key}"><fmt:message key="${menuText.key}"><fmt:param value="${menuText.params[0]}" /></fmt:message></jamwiki:link></li></c:if>
-</c:forEach>
-</ul>
+
+<c:if test="${empty notopic}">
+	<%@ include file="category-include.jsp" %>
+	<c:if test="${!empty categories}">
+		<div id="category-index"><jamwiki:link value="Special:Categories"><fmt:message key="topic.categories" /></jamwiki:link>:
+		<c:forEach items="${categories}" var="category" varStatus="status">
+			<c:if test="${!status.first}">&#160;|&#160;</c:if><jamwiki:link value="${category.key}" text="${category.value}" />
+		</c:forEach>
+		</div>
+		<div class="clear"></div>
+	</c:if>
+</c:if>
