@@ -1,0 +1,18 @@
+<!-- test interwiki links -->
+[[wikipedia:Main Page]]
+
+[[wikipedia: Main_Page]]
+
+[[:wikipedia:Main_Page]]
+
+[[:wikipedia : Main Page ]]
+
+[[:wIkIpEdIa: Main Page]]
+
+[[ : wikipedia : Main Page ]]
+
+[[Wikipedia]]
+
+[[jamwiki:]]
+
+[[:jamwiki:]]
