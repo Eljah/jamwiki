@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.jamwiki.model.Namespace;
 import org.jamwiki.model.WikiReference;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
@@ -48,12 +49,11 @@ public class JFlexParserUtil {
 	 * as an image caption.  This method should be used sparingly since it is
 	 * not very efficient.
 	 */
-	public static String parseFragment(ParserInput parserInput, String raw, int mode) throws ParserException {
+	public static String parseFragment(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
 		if (StringUtils.isBlank(raw)) {
 			return raw;
 		}
 		JFlexParser parser = new JFlexParser(parserInput);
-		ParserOutput parserOutput = new ParserOutput();
 		return parser.parseFragment(parserOutput, raw, mode);
 	}
 
@@ -65,7 +65,7 @@ public class JFlexParserUtil {
 	 * @param raw The raw Wiki link text.
 	 * @return A WikiLink object that represents the link.
 	 */
-	protected static WikiLink parseWikiLink(ParserInput parserInput, String raw) throws ParserException {
+	protected static WikiLink parseWikiLink(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
 		if (StringUtils.isBlank(raw)) {
 			return new WikiLink();
 		}
@@ -75,7 +75,7 @@ public class JFlexParserUtil {
 		// private static final Pattern WIKI_LINK_PATTERN = Pattern.compile("\\[\\[\\s*(\\:\\s*)?\\s*(.+?)(\\s*\\|\\s*(.+))?\\s*\\]\\]([a-z]*)");
 		raw = raw.substring(raw.indexOf("[[") + 2, raw.lastIndexOf("]]")).trim();
 		// parse in case there is a template or magic word - [[{{PAGENAME}}]]
-		raw = JFlexParserUtil.parseFragment(parserInput, raw, JFlexParser.MODE_PREPROCESS);
+		raw = JFlexParserUtil.parseFragment(parserInput, parserOutput, raw, JFlexParser.MODE_TEMPLATE);
 		boolean colon = false;
 		if (raw.startsWith(":")) {
 			colon = true;
@@ -89,6 +89,16 @@ public class JFlexParserUtil {
 		}
 		String virtualWiki = parserInput.getVirtualWiki();
 		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, raw);
+		if (wikiLink.getVirtualWiki() != null && !StringUtils.equals(wikiLink.getVirtualWiki().getName(), virtualWiki) && StringUtils.isBlank(wikiLink.getDestination())) {
+			// use the root topic name as the destination
+			wikiLink.setDestination(wikiLink.getVirtualWiki().getRootTopicName());
+			if (StringUtils.isBlank(wikiLink.getText())) {
+				wikiLink.setText(wikiLink.getVirtualWiki().getName() + Namespace.SEPARATOR);
+			}
+		}
+		if (wikiLink.getInterwiki() != null && StringUtils.isBlank(wikiLink.getDestination()) && StringUtils.isBlank(wikiLink.getText())) {
+			wikiLink.setText(wikiLink.getInterwiki().getInterwikiPrefix() + Namespace.SEPARATOR);
+		}
 		wikiLink.setColon(colon);
 		if (text != null) {
 			wikiLink.setText(text);

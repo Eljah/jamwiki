@@ -31,7 +31,6 @@ import org.jamwiki.WikiVersion;
 import org.jamwiki.db.DatabaseUpgrades;
 import org.jamwiki.db.WikiDatabase;
 import org.jamwiki.model.VirtualWiki;
-import org.jamwiki.parser.ParserException;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
@@ -108,20 +107,17 @@ public class UpgradeServlet extends JAMWikiServlet {
 			// perform any additional upgrades required
 			if (oldVersion.before(1, 0, 0)) {
 				try {
-					int topicCount = WikiBase.getDataHandler().lookupTopicCount(Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT), null);
+					int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
 					if (topicCount < 1000) {
 						// populate the jam_topic_links table
-						WikiDatabase.rebuildTopicLinks();
+						WikiDatabase.rebuildTopicMetadata();
 						messages.add(new WikiMessage("upgrade.message.db.data.added", "jam_topic_links"));
 					} else {
 						// print a message telling the user to do this step manually
 						messages.add(new WikiMessage("upgrade.message.100.topic.links"));
 					}
 				} catch (DataAccessException e) {
-					logger.warning("Failure during upgrade while generating topic link records.  Please use the tools on the Special:Maintenance page to complete this step.", e);
-					messages.add(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
-				} catch (ParserException e) {
-					logger.warning("Failure during upgrade while generating topic link records.  Please use the tools on the Special:Maintenance page to complete this step.", e);
+					logger.warn("Failure during upgrade while generating topic link records.  Please use the tools on the Special:Maintenance page to complete this step.", e);
 					messages.add(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
 				}
 			}
@@ -132,13 +128,13 @@ public class UpgradeServlet extends JAMWikiServlet {
 			errors = ServletUtil.validateSystemSettings(Environment.getInstance());
 			try {
 				Environment.setValue(Environment.PROP_BASE_WIKI_VERSION, WikiVersion.CURRENT_WIKI_VERSION);
-				Environment.saveProperties();
+				Environment.saveConfiguration();
 				// reset data handler and other instances.  this probably hides a bug
 				// elsewhere since no reset should be needed, but it's anyone's guess
 				// where that might be...
 				WikiBase.reload();
 			} catch (Exception e) {
-				logger.severe("Failure during upgrade while saving properties and executing WikiBase.reload()", e);
+				logger.error("Failure during upgrade while saving properties and executing WikiBase.reload()", e);
 				throw new WikiException(new WikiMessage("upgrade.error.nonfatal", e.toString()));
 			}
 		} catch (WikiException e) {
@@ -160,17 +156,17 @@ public class UpgradeServlet extends JAMWikiServlet {
 	 */
 	private void handleUpgradeSuccess(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
 		WikiMessage wm = new WikiMessage("upgrade.caption.upgradecomplete");
+		VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
+		WikiLink wikiLink = new WikiLink();
+		wikiLink.setDestination(virtualWiki.getRootTopicName());
 		try {
-			VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT));
-			WikiLink wikiLink = new WikiLink();
-			wikiLink.setDestination(virtualWiki.getDefaultTopicName());
-			String htmlLink = LinkUtil.buildInternalLinkHtml(request.getContextPath(), virtualWiki.getName(), wikiLink, virtualWiki.getDefaultTopicName(), null, null, true);
+			String htmlLink = LinkUtil.buildInternalLinkHtml(request.getContextPath(), virtualWiki.getName(), wikiLink, virtualWiki.getRootTopicName(), null, null, true);
 			// do not escape the HTML link
 			wm.setParamsWithoutEscaping(new String[]{htmlLink});
 		} catch (DataAccessException e) {
 			// building a link to the start page shouldn't fail, but if it does display a message
 			wm = new WikiMessage("upgrade.error.nonfatal", e.toString());
-			logger.warning("Upgrade complete, but unable to build redirect link to the start page.", e);
+			logger.warn("Upgrade complete, but unable to build redirect link to the start page.", e);
 		}
 		next.addObject("successMessage", wm);
 		// force logout to ensure current user will be re-validated.  this is
@@ -211,12 +207,12 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			return true;
 		} catch (WikiException e) {
-			logger.warning("Failure while updating JAMWiki stylesheet", e);
+			logger.warn("Failure while updating JAMWiki stylesheet", e);
 			messages.add(e.getWikiMessage());
 			messages.add(new WikiMessage("upgrade.message.stylesheet.failure",  e.getMessage()));
 			return false;
 		} catch (DataAccessException e) {
-			logger.warning("Failure while updating JAMWiki stylesheet", e);
+			logger.warn("Failure while updating JAMWiki stylesheet", e);
 			messages.add(new WikiMessage("upgrade.message.stylesheet.failure",  e.getMessage()));
 			return false;
 		}
@@ -228,6 +224,9 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private boolean upgradeStyleSheetRequired() {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
 		if (oldVersion.before(0, 9, 0)) {
+			return true;
+		}
+		if (oldVersion.before(1, 0, 0)) {
 			return true;
 		}
 		return false;

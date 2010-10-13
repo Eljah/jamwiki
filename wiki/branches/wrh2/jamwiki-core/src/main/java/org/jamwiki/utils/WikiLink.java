@@ -16,6 +16,7 @@
  */
 package org.jamwiki.utils;
 
+import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
 
@@ -32,7 +33,7 @@ public class WikiLink {
 	/** Link destination, including namespace. */
 	private String destination = null;
 	/** Interwiki link prefix. */
-	private String interWiki = null;
+	private Interwiki interwiki = null;
 	/** Namespace prefix for the link. */
 	private Namespace namespace = Namespace.namespace(Namespace.MAIN_ID);
 	/** Link query paramters. */
@@ -56,27 +57,6 @@ public class WikiLink {
 	 */
 	public void setArticle(String article) {
 		this.article = article;
-	}
-
-	/**
-	 * Certain namespaces are case sensitive (such as the main namespace) while
-	 * others (such as the user namespace) are not.
-	 */
-	public boolean isCaseSensitive() {
-		// user/template/category namespaces are not case-insensitive
-		if (this.namespace.getId().equals(Namespace.SPECIAL_ID)) {
-			return false;
-		}
-		if (this.namespace.getId().equals(Namespace.TEMPLATE_ID) || this.namespace.getId().equals(Namespace.TEMPLATE_COMMENTS_ID)) {
-			return false;
-		}
-		if (this.namespace.getId().equals(Namespace.USER_ID) || this.namespace.getId().equals(Namespace.USER_COMMENTS_ID)) {
-			return false;
-		}
-		if (this.namespace.getId().equals(Namespace.CATEGORY_ID) || this.namespace.getId().equals(Namespace.CATEGORY_COMMENTS_ID)) {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -110,15 +90,15 @@ public class WikiLink {
 	/**
 	 *
 	 */
-	public String getInterWiki() {
-		return this.interWiki;
+	public Interwiki getInterwiki() {
+		return this.interwiki;
 	}
 
 	/**
 	 *
 	 */
-	public void setInterWiki(String interWiki) {
-		this.interWiki = interWiki;
+	public void setInterwiki(Interwiki interwiki) {
+		this.interwiki = interwiki;
 	}
 
 	/**

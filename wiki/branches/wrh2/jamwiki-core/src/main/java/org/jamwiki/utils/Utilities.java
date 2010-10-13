@@ -17,7 +17,9 @@
 package org.jamwiki.utils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
@@ -35,9 +37,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -52,19 +54,10 @@ public class Utilities {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(Utilities.class.getName());
 
-	private static Pattern VALID_IPV4_PATTERN = null;
-	private static Pattern VALID_IPV6_PATTERN = null;
 	private static final String ipv4Pattern = "(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
 	private static final String ipv6Pattern = "([0-9a-f]{1,4}:){7}([0-9a-f]){1,4}";
-
-	static {
-		try {
-			VALID_IPV4_PATTERN = Pattern.compile(ipv4Pattern, Pattern.CASE_INSENSITIVE);
-			VALID_IPV6_PATTERN = Pattern.compile(ipv6Pattern, Pattern.CASE_INSENSITIVE);
-		} catch (PatternSyntaxException e) {
-			logger.severe("Unable to compile pattern", e);
-		}
-	}
+	private static final Pattern VALID_IPV4_PATTERN = Pattern.compile(ipv4Pattern, Pattern.CASE_INSENSITIVE);
+	private static final Pattern VALID_IPV6_PATTERN = Pattern.compile(ipv6Pattern, Pattern.CASE_INSENSITIVE);
 
 	/**
 	 *
@@ -85,18 +78,18 @@ public class Utilities {
 			return text;
 		}
 		if (StringUtils.isBlank(fromEncoding)) {
-			logger.warning("No character encoding specified to convert from, using UTF-8");
+			logger.warn("No character encoding specified to convert from, using UTF-8");
 			fromEncoding = "UTF-8";
 		}
 		if (StringUtils.isBlank(toEncoding)) {
-			logger.warning("No character encoding specified to convert to, using UTF-8");
+			logger.warn("No character encoding specified to convert to, using UTF-8");
 			toEncoding = "UTF-8";
 		}
 		try {
 			text = new String(text.getBytes(fromEncoding), toEncoding);
 		} catch (UnsupportedEncodingException e) {
 			// bad encoding
-			logger.warning("Unable to convert value " + text + " from " + fromEncoding + " to " + toEncoding, e);
+			logger.warn("Unable to convert value " + text + " from " + fromEncoding + " to " + toEncoding, e);
 		}
 		return text;
 	}
@@ -343,7 +336,7 @@ public class Utilities {
 		try {
 			loader = Thread.currentThread().getContextClassLoader();
 		} catch (SecurityException e) {
-			logger.fine("Unable to retrieve thread class loader, trying default");
+			logger.debug("Unable to retrieve thread class loader, trying default");
 		}
 		if (loader == null) {
 			loader = Utilities.class.getClassLoader();
@@ -380,15 +373,22 @@ public class Utilities {
 		}
 		file = FileUtils.toFile(url);
 		if (file == null || !file.exists()) {
+			InputStream is = null;
+			FileOutputStream os = null;
 			try {
 				// url exists but file cannot be read, so perhaps it's not a "file:" url (an example
 				// would be a "jar:" url).  as a workaround, copy the file to a temp file and return
 				// the temp file.
-				String tempFilename = RandomStringUtils.random(20);
+				String tempFilename = RandomStringUtils.randomAlphanumeric(20);
 				file = File.createTempFile(tempFilename, null);
-				FileUtils.copyURLToFile(url, file);
+				is = loader.getResourceAsStream(filename);
+				os = new FileOutputStream(file);
+				IOUtils.copy(is, os);
 			} catch (IOException e) {
 				throw new FileNotFoundException("Unable to load file with URL " + url);
+			} finally {
+				IOUtils.closeQuietly(is);
+				IOUtils.closeQuietly(os);
 			}
 		}
 		return file;
@@ -400,11 +400,12 @@ public class Utilities {
 	 * and then returning its parent directory.
 	 *
 	 * @return Returns a file indicating the directory of the class loader.
-	 * @throws FileNotFoundException Thrown if the class loader can not be found.
+	 * @throws FileNotFoundException Thrown if the class loader can not be found,
+	 *  which may occur if this class is deployed without the jamwiki-war package.
 	 */
 	public static File getClassLoaderRoot() throws FileNotFoundException {
-		// The file hard-coded here MUST be in the class loader directory.
-		File file = Utilities.getClassLoaderFile("ApplicationResources.properties");
+		// The file hard-coded here MUST exist in the class loader directory.
+		File file = Utilities.getClassLoaderFile("sql.ansi.properties");
 		if (!file.exists()) {
 			throw new FileNotFoundException("Unable to find class loader root");
 		}
@@ -421,18 +422,6 @@ public class Utilities {
 	}
 
 	/**
-	 * Retrieve the webapp root.
-	 *
-	 * @return The default webapp root directory.
-	 */
-	// FIXME - there HAS to be a utility method available in Spring or some other
-	// common library that offers this functionality.
-	public static File getWebappRoot() throws FileNotFoundException {
-		// webapp root is two levels above /WEB-INF/classes/
-		return Utilities.getClassLoaderRoot().getParentFile().getParentFile();
-	}
-
-	/**
 	 * Given a String representation of a class name (for example, org.jamwiki.db.AnsiDataHandler)
 	 * return an instance of the class.  The constructor for the class being instantiated must
 	 * not take any arguments.
@@ -444,7 +433,7 @@ public class Utilities {
 		if (StringUtils.isBlank(className)) {
 			throw new IllegalArgumentException("Cannot call instantiateClass with an empty class name");
 		}
-		logger.fine("Instantiating class: " + className);
+		logger.debug("Instantiating class: " + className);
 		try {
 			Class clazz = ClassUtils.getClass(className);
 			Class[] parameterTypes = new Class[0];

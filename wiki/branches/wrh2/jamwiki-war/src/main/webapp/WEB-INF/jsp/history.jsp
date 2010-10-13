@@ -49,9 +49,9 @@
 	<c:set var="nextTopicVersionId" value="${change.topicVersionId}" />
 	<c:if test="${numChanges > 1}">
 	&#160;
-	<input type="radio" name="version2" id="ver2_<c:out value="${change.topicVersionId}" />" onclick="historyRadio(this, 'version1', true)" value="<c:out value="${change.topicVersionId}" />" <c:if test="${status.index == 1}">checked="checked"</c:if> <c:if test="${status.first}">style="visibility:hidden"</c:if> />
+	<input type="radio" name="version2" id="ver2_<c:out value="${change.topicVersionId}" />" onclick="JAMWiki.UI.historyRadio(this, 'version1', true)" value="<c:out value="${change.topicVersionId}" />" <c:if test="${status.index == 1}">checked="checked"</c:if> <c:if test="${status.first}">style="visibility:hidden"</c:if> />
 	&#160;
-	<input type="radio" name="version1" id="ver1_<c:out value="${change.topicVersionId}" />" onclick="historyRadio(this, 'version2', false)" value="<c:out value="${change.topicVersionId}" />" <c:if test="${status.first}">checked="checked"</c:if> <c:if test="${status.last}">style="visibility:hidden"</c:if> />
+	<input type="radio" name="version1" id="ver1_<c:out value="${change.topicVersionId}" />" onclick="JAMWiki.UI.historyRadio(this, 'version2', false)" value="<c:out value="${change.topicVersionId}" />" <c:if test="${status.first}">checked="checked"</c:if> <c:if test="${status.last}">style="visibility:hidden"</c:if> />
 	</c:if>
 	&#160;
 	<%-- FIXME: do not hardcode date pattern --%>
@@ -60,8 +60,7 @@
 	<%-- the "+" symbol could be added using a pattern attribute, but there does not seem to be a way to avoid having "+0" show up when that approach is used. --%>
 	(<c:if test="${change.charactersChanged > 0}">+</c:if><fmt:formatNumber value="${change.charactersChanged}" />)
 	&#160;.&#160;.&#160;
-	<jamwiki:link value="${pageInfo.namespaces['User']}:${change.authorName}" text="${change.authorName}" />
-	(<jamwiki:link value="${pageInfo.namespaces['User comments']}:${change.authorName}"><fmt:message key="recentchanges.caption.comments" /></jamwiki:link>&#160;|&#160;<jamwiki:link value="Special:Contributions"><jamwiki:linkParam key="contributor" value="${change.authorName}" /><fmt:message key="recentchanges.caption.contributions" /></jamwiki:link>)
+	<jamwiki_t:userLinks pageInfo="${pageInfo}" userDisplay="${change.authorName}" />
 	<c:if test="${!empty change.changeTypeNotification}">&#160;<b><c:out value="${change.changeTypeNotification}" /></b></c:if>
 	<c:if test="${!empty change.changeWikiMessage}">
 		&#160;
@@ -78,7 +77,7 @@
 
 <c:if test="${numChanges > 1}">
 <script type="text/javascript">
-historyRadio(document.getElementById('ver2_<c:out value="${changes[1].topicVersionId}" />'), 'version1', true)
+JAMWiki.UI.historyRadio(document.getElementById('ver2_<c:out value="${changes[1].topicVersionId}" />'), 'version1', true)
 </script>
 </c:if>
 

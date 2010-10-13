@@ -99,13 +99,13 @@ public class JAMWikiModel extends AbstractWikiModel {
 	public void appendSignature(Appendable writer, int numberOfTildes) throws IOException {
 		switch (numberOfTildes) {
 		case 3:
-			writer.append(JFlexParserUtil.parseFragment(fParserInput, "~~~", JFlexParser.MODE_MINIMAL));
+			writer.append(JFlexParserUtil.parseFragment(fParserInput, fParserOutput, "~~~", JFlexParser.MODE_MINIMAL));
 			break;
 		case 4:
-			writer.append(JFlexParserUtil.parseFragment(fParserInput, "~~~~", JFlexParser.MODE_MINIMAL));
+			writer.append(JFlexParserUtil.parseFragment(fParserInput, fParserOutput, "~~~~", JFlexParser.MODE_MINIMAL));
 			break;
 		case 5:
-			writer.append(JFlexParserUtil.parseFragment(fParserInput, "~~~~~", JFlexParser.MODE_MINIMAL));
+			writer.append(JFlexParserUtil.parseFragment(fParserInput, fParserOutput, "~~~~~", JFlexParser.MODE_MINIMAL));
 			break;
 		}
 	}
@@ -129,7 +129,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 				// do not check existence for section links
 			} else {
 				String articleName = topic.replace('_', ' ');
-				if (!LinkUtil.isExistingArticle(virtualWiki, articleName)) {
+				if (LinkUtil.isExistingArticle(virtualWiki, articleName) == null) {
 					style = "edit";
 					href = LinkUtil.buildEditLinkUrl(fContextPath, virtualWiki, topic, query, -1);
 				}
@@ -252,7 +252,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 				url = LinkUtil.buildEditLinkUrl(fParserInput.getContext(), fParserInput.getVirtualWiki(), fParserInput.getTopicName(),
 						null, section + 1);
 			} catch (Exception e) {
-				logger.severe("Failure while building link for topic " + fParserInput.getVirtualWiki() + " / "
+				logger.error("Failure while building link for topic " + fParserInput.getVirtualWiki() + " / "
 						+ fParserInput.getTopicName(), e);
 			}
 			TagNode aTagNode = new TagNode("a");

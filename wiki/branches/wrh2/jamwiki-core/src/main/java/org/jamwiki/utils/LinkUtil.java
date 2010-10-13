@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.ParserException;
@@ -93,6 +94,9 @@ public class LinkUtil {
 	 * @throws DataAccessException Thrown if any error occurs while builing the link URL.
 	 */
 	public static String buildEditLinkUrl(String context, String virtualWiki, String topic, String query, int section) throws DataAccessException {
+		if (Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_CAPITALIZATION)) {
+			topic = StringUtils.capitalize(topic);
+		}
 		query = LinkUtil.appendQueryParam(query, "topic", topic);
 		if (section > 0) {
 			query += "&amp;section=" + section;
@@ -174,9 +178,9 @@ public class LinkUtil {
 			text = topic;
 		}
 		if (!wikiLink.getNamespace().getId().equals(Namespace.MEDIA_ID) && !StringUtils.isBlank(topic) && StringUtils.isBlank(style)) {
-			if (InterWikiHandler.isInterWiki(virtualWiki)) {
+			if (WikiBase.getDataHandler().lookupInterwiki(virtualWiki) != null) {
 				style = "interwiki";
-			} else if (!LinkUtil.isExistingArticle(virtualWiki, topic)) {
+			} else if (LinkUtil.isExistingArticle(virtualWiki, topic) == null) {
 				style = "edit";
 			}
 		}
@@ -248,7 +252,7 @@ public class LinkUtil {
 		if (wikiLink.getNamespace().getId().equals(Namespace.MEDIA_ID)) {
 			// for the "Media:" namespace, link directly to the file
 			String filename = Namespace.namespace(Namespace.FILE_ID).getLabel(virtualWiki) + Namespace.SEPARATOR + wikiLink.getArticle();
-			url = ImageUtil.buildImageFileUrl(context, virtualWiki, filename);
+			url = ImageUtil.buildImageFileUrl(virtualWiki, filename);
 			if (url == null) {
 				url = LinkUtil.buildTopicUrlNoEdit(context, virtualWiki, "Special:Upload", null, "?topic=" + filename);
 			}
@@ -261,8 +265,12 @@ public class LinkUtil {
 				// do not check existence for section links
 				return url;
 			}
-			if (!LinkUtil.isExistingArticle(virtualWiki, topic)) {
+			String targetTopic = LinkUtil.isExistingArticle(virtualWiki, topic);
+			if (targetTopic == null) {
 				url = LinkUtil.buildEditLinkUrl(context, virtualWiki, topic, query, -1);
+			} else if (!StringUtils.equals(topic, targetTopic)) {
+				// add an additional check in case the link was case sensitive
+				url = LinkUtil.buildTopicUrlNoEdit(context, virtualWiki, targetTopic, section, query);
 			}
 		}
 		return url;
@@ -317,11 +325,18 @@ public class LinkUtil {
 	 *
 	 * @param wikiLink The WikiLink object containing all relevant information
 	 *  about the link being generated.
-	 * @return The HTML anchor tag for the interwiki link.
+	 * @return The HTML anchor tag for the interwiki link, or <code>null</code>
+	 *  if there is no interwiki link defined for the WikiLink.
 	 */
-	public static String interWiki(WikiLink wikiLink) {
-		String url = InterWikiHandler.formatInterWiki(wikiLink.getInterWiki(), wikiLink.getDestination());
-		String text = (!StringUtils.isBlank(wikiLink.getText())) ? wikiLink.getText() : wikiLink.getDestination();
+	public static String interwiki(WikiLink wikiLink) {
+		if (wikiLink.getInterwiki() == null) {
+			return null;
+		}
+		String url = wikiLink.getInterwiki().format(wikiLink.getDestination());
+		String text = wikiLink.getText();
+		if (StringUtils.isBlank(text)) {
+			text = wikiLink.getDestination();
+		}
 		return "<a class=\"interwiki\" title=\"" + text + "\" href=\"" + url + "\">" + text + "</a>";
 	}
 
@@ -329,31 +344,41 @@ public class LinkUtil {
 	 * Utility method for determining if an article name corresponds to a valid
 	 * wiki link.  In this case an "article name" could be an existing topic, a
 	 * "Special:" page, a user page, an interwiki link, etc.  This method will
-	 * return true if the given name corresponds to a valid special page, user
-	 * page, topic, or other existing article.
+	 * return the article name if the given name corresponds to a valid special
+	 * page, user page, topic, or other existing article, or <code>null</code>
+	 * if no valid article exists.
 	 *
 	 * @param virtualWiki The virtual wiki for the topic being checked.
 	 * @param articleName The name of the article that is being checked.
-	 * @return <code>true</code> if there is an article that exists for the given
-	 *  name and virtual wiki.
+	 * @return The article name if the given name and virtual wiki correspond
+	 *  to a valid special page, user page, topic, or other existing article,
+	 *  or <code>null</code> if no valid article exists.
 	 * @throws DataAccessException Thrown if an error occurs during lookup.
 	 */
-	public static boolean isExistingArticle(String virtualWiki, String articleName) throws DataAccessException {
+	public static String isExistingArticle(String virtualWiki, String articleName) throws DataAccessException {
 		if (StringUtils.isBlank(virtualWiki) || StringUtils.isBlank(articleName)) {
-			return false;
+			return null;
 		}
 		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, articleName);
 		if (PseudoTopicHandler.isPseudoTopic(wikiLink.getDestination())) {
-			return true;
+			return articleName;
 		}
-		if (wikiLink.getInterWiki() != null) {
-			return true;
+		if (wikiLink.getInterwiki() != null) {
+			return articleName;
 		}
 		if (StringUtils.isBlank(Environment.getValue(Environment.PROP_BASE_FILE_DIR)) || !Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
 			// not initialized yet
-			return false;
+			return null;
 		}
-		return (WikiBase.getDataHandler().lookupTopicId(virtualWiki, articleName) != null);
+		String topicName = WikiBase.getDataHandler().lookupTopicName(virtualWiki, articleName);
+		if (topicName == null && Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_CAPITALIZATION)) {
+			String alternativeArticleName = (StringUtils.equals(wikiLink.getArticle(), StringUtils.capitalize(wikiLink.getArticle()))) ? StringUtils.lowerCase(wikiLink.getArticle()) : StringUtils.capitalize(wikiLink.getArticle());
+			if (!wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID)) {
+				alternativeArticleName = wikiLink.getNamespace().getLabel(virtualWiki) + Namespace.SEPARATOR + alternativeArticleName;
+			}
+			topicName = WikiBase.getDataHandler().lookupTopicName(virtualWiki, alternativeArticleName);
+		}
+		return topicName;
 	}
 
 	/**
@@ -442,7 +467,7 @@ public class LinkUtil {
 		// if no namespace or virtual wiki, see if there's an interwiki link
 		if (wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID) && wikiLink.getVirtualWiki() == null) {
 			topic = LinkUtil.processInterWiki(processed, wikiLink);
-			if (wikiLink.getInterWiki() != null) {
+			if (wikiLink.getInterwiki() != null) {
 				// strip the interwiki
 				processed = topic;
 				wikiLink.setText(processed);
@@ -464,22 +489,30 @@ public class LinkUtil {
 	 *
 	 */
 	private static String processInterWiki(String processed, WikiLink wikiLink) {
-		int prefixPosition = LinkUtil.prefixPosition(processed);
+		// interwiki does not require a topic name, so do not use the prefixPosition method
+		int prefixPosition = processed.indexOf(Namespace.SEPARATOR, 1);
 		if (prefixPosition == -1) {
 			return processed;
 		}
 		String linkPrefix = processed.substring(0, prefixPosition).trim();
-		if (InterWikiHandler.isInterWiki(linkPrefix)) {
-			wikiLink.setInterWiki(linkPrefix);
+		try {
+			Interwiki interwiki = WikiBase.getDataHandler().lookupInterwiki(linkPrefix);
+			if (interwiki != null) {
+				wikiLink.setInterwiki(interwiki);
+			}
+		} catch (DataAccessException e) {
+			// this should not happen, if it does then swallow the error
+			logger.warn("Failure while trying to lookup interwiki: " + linkPrefix, e);
 		}
-		return (wikiLink.getInterWiki() != null) ? processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim(): processed;
+		return (wikiLink.getInterwiki() != null) ? processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim(): processed;
 	}
 
 	/**
 	 *
 	 */
 	private static String processVirtualWiki(String processed, WikiLink wikiLink) {
-		int prefixPosition = LinkUtil.prefixPosition(processed);
+		// virtual wiki does not require a topic name, so do not use the prefixPosition method
+		int prefixPosition = processed.indexOf(Namespace.SEPARATOR, 1);
 		if (prefixPosition == -1) {
 			return processed;
 		}
@@ -491,7 +524,7 @@ public class LinkUtil {
 			}
 		} catch (DataAccessException e) {
 			// this should not happen, if it does then swallow the error
-			logger.warning("Failure while trying to lookup virtual wiki: " + linkPrefix, e);
+			logger.warn("Failure while trying to lookup virtual wiki: " + linkPrefix, e);
 		}
 		return (wikiLink.getVirtualWiki() != null) ? processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim(): processed;
 	}
@@ -500,20 +533,58 @@ public class LinkUtil {
 	 *
 	 */
 	private static String processNamespace(String virtualWiki, String processed, WikiLink wikiLink) {
-		int prefixPosition = LinkUtil.prefixPosition(processed);
-		if (prefixPosition == -1) {
+		wikiLink.setNamespace(LinkUtil.retrieveTopicNamespace(virtualWiki, processed));
+		if (wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID)) {
 			return processed;
+		} else {
+			// remove the namespace
+			int prefixPosition = LinkUtil.prefixPosition(processed);
+			return processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim();
 		}
-		String linkPrefix = processed.substring(0, prefixPosition).trim();
+	}
+
+	/**
+	 * Utility method for determining a topic namespace given a topic name.  This method
+	 * accepts ONLY the topic name - if the topic name is prefixed with a virtual wiki,
+	 * interwiki, or other value then it will not return the proper namespace.
+	 */
+	public static Namespace retrieveTopicNamespace(String virtualWiki, String topicName) {
+		int prefixPosition = LinkUtil.prefixPosition(topicName);
+		if (prefixPosition == -1) {
+			return Namespace.namespace(Namespace.MAIN_ID);
+		}
+		String linkPrefix = topicName.substring(0, prefixPosition).trim();
 		try {
 			Namespace namespace = WikiBase.getDataHandler().lookupNamespace(virtualWiki, linkPrefix);
-			if (namespace != null) {
-				wikiLink.setNamespace(namespace);
-			}
+			return (namespace == null) ? Namespace.namespace(Namespace.MAIN_ID) : namespace;
 		} catch (DataAccessException e) {
 			// this should not happen, if it does then throw a runtime exception
 			throw new IllegalStateException("Failure while trying to lookup namespace: " + linkPrefix, e);
 		}
-		return (!wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID)) ? processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim(): processed;
+	}
+
+	/**
+	 * Utility method for determining a topic's page name given its namespace and full
+	 * topic name.
+	 *
+	 * @param namespace The namespace for the topic name.  Use LinkUtil.retrieveTopicNamespace
+	 *  to retrieve the namespace prior to calling this method if necessary.
+	 * @param virtualWiki The virtual wiki for the topic.
+	 * @param topicName The full topic name that is being split.
+	 * @return The pageName portion of the topic name.  If the topic is "Comments:Main Page"
+	 *  then the page name is "Main Page".
+	 */
+	public static String retrieveTopicPageName(Namespace namespace, String virtualWiki, String topicName) {
+		if (namespace.getId() == Namespace.MAIN_ID) {
+			return topicName;
+		}
+		if (topicName.startsWith(namespace.getLabel(virtualWiki))) {
+			// translated namespace
+			return topicName.substring(namespace.getLabel(virtualWiki).length() + Namespace.SEPARATOR.length());
+		} else if (topicName.startsWith(namespace.getDefaultLabel())) {
+			// translated namespace available, but using the default namespace label
+			return topicName.substring(namespace.getDefaultLabel().length() + Namespace.SEPARATOR.length());
+		}
+		throw new IllegalArgumentException("Invalid topic name & namespace combination: " + namespace.getId() + " / " + topicName);
 	}
 }

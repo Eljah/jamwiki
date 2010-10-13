@@ -33,6 +33,7 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.RecentChange;
@@ -47,9 +48,7 @@ import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserDetails;
-import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Pagination;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -66,9 +65,11 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_CREATE_AUTHORITIES_TABLE = null;
 	protected static String STATEMENT_CREATE_CATEGORY_TABLE = null;
 	protected static String STATEMENT_CREATE_CATEGORY_INDEX = null;
+	protected static String STATEMENT_CREATE_CONFIGURATION_TABLE = null;
 	protected static String STATEMENT_CREATE_GROUP_AUTHORITIES_TABLE = null;
 	protected static String STATEMENT_CREATE_GROUP_MEMBERS_TABLE = null;
 	protected static String STATEMENT_CREATE_GROUP_TABLE = null;
+	protected static String STATEMENT_CREATE_INTERWIKI_TABLE = null;
 	protected static String STATEMENT_CREATE_LOG_TABLE = null;
 	protected static String STATEMENT_CREATE_NAMESPACE_TABLE = null;
 	protected static String STATEMENT_CREATE_NAMESPACE_TRANSLATION_TABLE = null;
@@ -80,9 +81,14 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_CREATE_TOPIC_LINKS_INDEX = null;
 	protected static String STATEMENT_CREATE_TOPIC_PAGE_NAME_INDEX = null;
 	protected static String STATEMENT_CREATE_TOPIC_PAGE_NAME_LOWER_INDEX = null;
+	protected static String STATEMENT_CREATE_TOPIC_NAMESPACE_INDEX = null;
+	protected static String STATEMENT_CREATE_TOPIC_VIRTUAL_WIKI_INDEX = null;
 	protected static String STATEMENT_CREATE_TOPIC_CURRENT_VERSION_INDEX = null;
 	protected static String STATEMENT_CREATE_TOPIC_VERSION_TABLE = null;
 	protected static String STATEMENT_CREATE_TOPIC_VERSION_TOPIC_INDEX = null;
+	protected static String STATEMENT_CREATE_TOPIC_VERSION_PREVIOUS_INDEX = null;
+	protected static String STATEMENT_CREATE_TOPIC_VERSION_USER_DISPLAY_INDEX = null;
+	protected static String STATEMENT_CREATE_TOPIC_VERSION_USER_ID_INDEX = null;
 	protected static String STATEMENT_CREATE_USERS_TABLE = null;
 	protected static String STATEMENT_CREATE_VIRTUAL_WIKI_TABLE = null;
 	protected static String STATEMENT_CREATE_WATCHLIST_TABLE = null;
@@ -91,7 +97,9 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_CREATE_WIKI_USER_TABLE = null;
 	protected static String STATEMENT_CREATE_WIKI_USER_LOGIN_INDEX = null;
 	protected static String STATEMENT_DELETE_AUTHORITIES = null;
+	protected static String STATEMENT_DELETE_CONFIGURATION = null;
 	protected static String STATEMENT_DELETE_GROUP_AUTHORITIES = null;
+	protected static String STATEMENT_DELETE_INTERWIKI = null;
 	protected static String STATEMENT_DELETE_LOG_ITEMS = null;
 	protected static String STATEMENT_DELETE_NAMESPACE_TRANSLATIONS = null;
 	protected static String STATEMENT_DELETE_RECENT_CHANGES = null;
@@ -101,10 +109,11 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DELETE_WATCHLIST_ENTRY = null;
 	protected static String STATEMENT_DROP_AUTHORITIES_TABLE = null;
 	protected static String STATEMENT_DROP_CATEGORY_TABLE = null;
-	protected static String STATEMENT_DROP_CATEGORY_INDEX = null;
+	protected static String STATEMENT_DROP_CONFIGURATION_TABLE = null;
 	protected static String STATEMENT_DROP_GROUP_AUTHORITIES_TABLE = null;
 	protected static String STATEMENT_DROP_GROUP_MEMBERS_TABLE = null;
 	protected static String STATEMENT_DROP_GROUP_TABLE = null;
+	protected static String STATEMENT_DROP_INTERWIKI_TABLE = null;
 	protected static String STATEMENT_DROP_LOG_TABLE = null;
 	protected static String STATEMENT_DROP_NAMESPACE_TABLE = null;
 	protected static String STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE = null;
@@ -113,26 +122,22 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT = null;
 	protected static String STATEMENT_DROP_TOPIC_TABLE = null;
 	protected static String STATEMENT_DROP_TOPIC_LINKS_TABLE = null;
-	protected static String STATEMENT_DROP_TOPIC_LINKS_INDEX = null;
-	protected static String STATEMENT_DROP_TOPIC_PAGE_NAME_INDEX = null;
-	protected static String STATEMENT_DROP_TOPIC_PAGE_NAME_LOWER_INDEX = null;
-	protected static String STATEMENT_DROP_TOPIC_CURRENT_VERSION_INDEX = null;
 	protected static String STATEMENT_DROP_TOPIC_VERSION_TABLE = null;
-	protected static String STATEMENT_DROP_TOPIC_VERSION_TOPIC_INDEX = null;
 	protected static String STATEMENT_DROP_USERS_TABLE = null;
 	protected static String STATEMENT_DROP_VIRTUAL_WIKI_TABLE = null;
 	protected static String STATEMENT_DROP_WATCHLIST_TABLE = null;
 	protected static String STATEMENT_DROP_WIKI_FILE_TABLE = null;
 	protected static String STATEMENT_DROP_WIKI_FILE_VERSION_TABLE = null;
 	protected static String STATEMENT_DROP_WIKI_USER_TABLE = null;
-	protected static String STATEMENT_DROP_WIKI_USER_LOGIN_INDEX = null;
 	protected static String STATEMENT_INSERT_AUTHORITY = null;
 	protected static String STATEMENT_INSERT_CATEGORY = null;
+	protected static String STATEMENT_INSERT_CONFIGURATION = null;
 	protected static String STATEMENT_INSERT_GROUP = null;
 	protected static String STATEMENT_INSERT_GROUP_AUTO_INCREMENT = null;
 	protected static String STATEMENT_INSERT_GROUP_AUTHORITY = null;
 	protected static String STATEMENT_INSERT_GROUP_MEMBER = null;
 	protected static String STATEMENT_INSERT_GROUP_MEMBER_AUTO_INCREMENT = null;
+	protected static String STATEMENT_INSERT_INTERWIKI = null;
 	protected static String STATEMENT_INSERT_LOG_ITEM = null;
 	protected static String STATEMENT_INSERT_LOG_ITEMS_BY_TOPIC_VERSION_TYPE = null;
 	protected static String STATEMENT_INSERT_LOG_ITEMS_IMPORT = null;
@@ -165,11 +170,13 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_AUTHORITIES_USER = null;
 	protected static String STATEMENT_SELECT_CATEGORIES = null;
 	protected static String STATEMENT_SELECT_CATEGORY_TOPICS = null;
+	protected static String STATEMENT_SELECT_CONFIGURATION = null;
 	protected static String STATEMENT_SELECT_GROUP = null;
 	protected static String STATEMENT_SELECT_GROUP_AUTHORITIES = null;
 	protected static String STATEMENT_SELECT_GROUPS_AUTHORITIES = null;
 	protected static String STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_GROUP_SEQUENCE = null;
+	protected static String STATEMENT_SELECT_INTERWIKIS = null;
 	protected static String STATEMENT_SELECT_LOG_ITEMS = null;
 	protected static String STATEMENT_SELECT_LOG_ITEMS_BY_TYPE = null;
 	protected static String STATEMENT_SELECT_NAMESPACE_SEQUENCE = null;
@@ -181,15 +188,16 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_TOPIC_COUNT = null;
 	protected static String STATEMENT_SELECT_TOPIC = null;
 	protected static String STATEMENT_SELECT_TOPIC_HISTORY = null;
-	protected static String STATEMENT_SELECT_TOPIC_ID = null;
-	protected static String STATEMENT_SELECT_TOPIC_ID_LOWER = null;
 	protected static String STATEMENT_SELECT_TOPIC_LINK_ORPHANS = null;
 	protected static String STATEMENT_SELECT_TOPIC_LINKS = null;
 	protected static String STATEMENT_SELECT_TOPIC_LOWER = null;
+	protected static String STATEMENT_SELECT_TOPIC_NAME = null;
+	protected static String STATEMENT_SELECT_TOPIC_NAME_LOWER = null;
 	protected static String STATEMENT_SELECT_TOPIC_NAMES = null;
 	protected static String STATEMENT_SELECT_TOPICS_ADMIN = null;
 	protected static String STATEMENT_SELECT_TOPIC_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_TOPIC_VERSION = null;
+	protected static String STATEMENT_SELECT_TOPIC_VERSION_NEXT_ID = null;
 	protected static String STATEMENT_SELECT_TOPIC_VERSION_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_USERS_AUTHENTICATION = null;
 	protected static String STATEMENT_SELECT_VIRTUAL_WIKIS = null;
@@ -271,9 +279,14 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_PAGE_NAME_INDEX, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_PAGE_NAME_LOWER_INDEX, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_NAMESPACE_INDEX, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_VIRTUAL_WIKI_INDEX, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_CURRENT_VERSION_INDEX, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_VERSION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_VERSION_TOPIC_INDEX, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_VERSION_PREVIOUS_INDEX, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_VERSION_USER_DISPLAY_INDEX, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_VERSION_USER_ID_INDEX, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_LINKS_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_LINKS_INDEX, conn);
@@ -289,6 +302,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_LOG_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_RECENT_CHANGE_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_WATCHLIST_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_INTERWIKI_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_CONFIGURATION_TABLE, conn);
 	}
 
 	/**
@@ -299,6 +314,20 @@ public class AnsiQueryHandler implements QueryHandler {
 		try {
 			stmt = conn.prepareStatement(STATEMENT_DELETE_GROUP_AUTHORITIES);
 			stmt.setInt(1, groupId);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public void deleteInterwiki(Interwiki interwiki, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_DELETE_INTERWIKI);
+			stmt.setString(1, interwiki.getInterwikiPrefix());
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
@@ -386,86 +415,71 @@ public class AnsiQueryHandler implements QueryHandler {
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
 		try {
+			DatabaseConnection.executeUpdate(STATEMENT_DROP_CONFIGURATION_TABLE, conn);
+		} catch (SQLException e) { logger.error(e.getMessage()); }
+		try {
+			DatabaseConnection.executeUpdate(STATEMENT_DROP_INTERWIKI_TABLE, conn);
+		} catch (SQLException e) { logger.error(e.getMessage()); }
+		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_WATCHLIST_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_RECENT_CHANGE_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_LOG_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_AUTHORITIES_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_AUTHORITIES_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_ROLE_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_MEMBERS_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_CATEGORY_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_CATEGORY_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_VERSION_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_LINKS_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_LINKS_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_VERSION_TOPIC_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_VERSION_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_CURRENT_VERSION_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_PAGE_NAME_LOWER_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_PAGE_NAME_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_NAMESPACE_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_USER_LOGIN_INDEX, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_USER_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_USERS_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_VIRTUAL_WIKI_TABLE, conn);
-		} catch (SQLException e) { logger.severe(e.getMessage()); }
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 	}
 
 	/**
@@ -961,10 +975,12 @@ public class AnsiQueryHandler implements QueryHandler {
 			rs = stmt.executeQuery();
 			List<VirtualWiki> results = new ArrayList<VirtualWiki>();
 			while (rs.next()) {
-				VirtualWiki virtualWiki = new VirtualWiki();
+				VirtualWiki virtualWiki = new VirtualWiki(rs.getString("virtual_wiki_name"));
 				virtualWiki.setVirtualWikiId(rs.getInt("virtual_wiki_id"));
-				virtualWiki.setName(rs.getString("virtual_wiki_name"));
-				virtualWiki.setDefaultTopicName(rs.getString("default_topic_name"));
+				virtualWiki.setRootTopicName(rs.getString("default_topic_name"));
+				virtualWiki.setLogoImageUrl(rs.getString("logo_image_url"));
+				virtualWiki.setMetaDescription(rs.getString("meta_description"));
+				virtualWiki.setSiteName(rs.getString("site_name"));
 				results.add(virtualWiki);
 			}
 			return results;
@@ -1036,7 +1052,9 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected void init(Properties properties) {
 		this.props = properties;
 		STATEMENT_CONNECTION_VALIDATION_QUERY    = props.getProperty("STATEMENT_CONNECTION_VALIDATION_QUERY");
+		STATEMENT_CREATE_CONFIGURATION_TABLE     = props.getProperty("STATEMENT_CREATE_CONFIGURATION_TABLE");
 		STATEMENT_CREATE_GROUP_TABLE             = props.getProperty("STATEMENT_CREATE_GROUP_TABLE");
+		STATEMENT_CREATE_INTERWIKI_TABLE         = props.getProperty("STATEMENT_CREATE_INTERWIKI_TABLE");
 		STATEMENT_CREATE_NAMESPACE_TABLE         = props.getProperty("STATEMENT_CREATE_NAMESPACE_TABLE");
 		STATEMENT_CREATE_NAMESPACE_TRANSLATION_TABLE = props.getProperty("STATEMENT_CREATE_NAMESPACE_TRANSLATION_TABLE");
 		STATEMENT_CREATE_ROLE_TABLE              = props.getProperty("STATEMENT_CREATE_ROLE_TABLE");
@@ -1049,9 +1067,14 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_CREATE_TOPIC_LINKS_INDEX       = props.getProperty("STATEMENT_CREATE_TOPIC_LINKS_INDEX");
 		STATEMENT_CREATE_TOPIC_PAGE_NAME_INDEX   = props.getProperty("STATEMENT_CREATE_TOPIC_PAGE_NAME_INDEX");
 		STATEMENT_CREATE_TOPIC_PAGE_NAME_LOWER_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_PAGE_NAME_LOWER_INDEX");
+		STATEMENT_CREATE_TOPIC_NAMESPACE_INDEX   = props.getProperty("STATEMENT_CREATE_TOPIC_NAMESPACE_INDEX");
+		STATEMENT_CREATE_TOPIC_VIRTUAL_WIKI_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_VIRTUAL_WIKI_INDEX");
 		STATEMENT_CREATE_TOPIC_CURRENT_VERSION_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_CURRENT_VERSION_INDEX");
 		STATEMENT_CREATE_TOPIC_VERSION_TABLE     = props.getProperty("STATEMENT_CREATE_TOPIC_VERSION_TABLE");
 		STATEMENT_CREATE_TOPIC_VERSION_TOPIC_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_VERSION_TOPIC_INDEX");
+		STATEMENT_CREATE_TOPIC_VERSION_PREVIOUS_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_VERSION_PREVIOUS_INDEX");
+		STATEMENT_CREATE_TOPIC_VERSION_USER_DISPLAY_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_VERSION_USER_DISPLAY_INDEX");
+		STATEMENT_CREATE_TOPIC_VERSION_USER_ID_INDEX = props.getProperty("STATEMENT_CREATE_TOPIC_VERSION_USER_ID_INDEX");
 		STATEMENT_CREATE_USERS_TABLE             = props.getProperty("STATEMENT_CREATE_USERS_TABLE");
 		STATEMENT_CREATE_WIKI_FILE_TABLE         = props.getProperty("STATEMENT_CREATE_WIKI_FILE_TABLE");
 		STATEMENT_CREATE_WIKI_FILE_VERSION_TABLE = props.getProperty("STATEMENT_CREATE_WIKI_FILE_VERSION_TABLE");
@@ -1064,7 +1087,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_CREATE_RECENT_CHANGE_TABLE     = props.getProperty("STATEMENT_CREATE_RECENT_CHANGE_TABLE");
 		STATEMENT_CREATE_WATCHLIST_TABLE         = props.getProperty("STATEMENT_CREATE_WATCHLIST_TABLE");
 		STATEMENT_DELETE_AUTHORITIES             = props.getProperty("STATEMENT_DELETE_AUTHORITIES");
+		STATEMENT_DELETE_CONFIGURATION           = props.getProperty("STATEMENT_DELETE_CONFIGURATION");
 		STATEMENT_DELETE_GROUP_AUTHORITIES       = props.getProperty("STATEMENT_DELETE_GROUP_AUTHORITIES");
+		STATEMENT_DELETE_INTERWIKI               = props.getProperty("STATEMENT_DELETE_INTERWIKI");
 		STATEMENT_DELETE_LOG_ITEMS               = props.getProperty("STATEMENT_DELETE_LOG_ITEMS");
 		STATEMENT_DELETE_NAMESPACE_TRANSLATIONS  = props.getProperty("STATEMENT_DELETE_NAMESPACE_TRANSLATIONS");
 		STATEMENT_DELETE_RECENT_CHANGES          = props.getProperty("STATEMENT_DELETE_RECENT_CHANGES");
@@ -1074,10 +1099,11 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DELETE_WATCHLIST_ENTRY         = props.getProperty("STATEMENT_DELETE_WATCHLIST_ENTRY");
 		STATEMENT_DROP_AUTHORITIES_TABLE         = props.getProperty("STATEMENT_DROP_AUTHORITIES_TABLE");
 		STATEMENT_DROP_CATEGORY_TABLE            = props.getProperty("STATEMENT_DROP_CATEGORY_TABLE");
-		STATEMENT_DROP_CATEGORY_INDEX            = props.getProperty("STATEMENT_DROP_CATEGORY_INDEX");
+		STATEMENT_DROP_CONFIGURATION_TABLE       = props.getProperty("STATEMENT_DROP_CONFIGURATION_TABLE");
 		STATEMENT_DROP_GROUP_AUTHORITIES_TABLE   = props.getProperty("STATEMENT_DROP_GROUP_AUTHORITIES_TABLE");
 		STATEMENT_DROP_GROUP_MEMBERS_TABLE       = props.getProperty("STATEMENT_DROP_GROUP_MEMBERS_TABLE");
 		STATEMENT_DROP_GROUP_TABLE               = props.getProperty("STATEMENT_DROP_GROUP_TABLE");
+		STATEMENT_DROP_INTERWIKI_TABLE           = props.getProperty("STATEMENT_DROP_INTERWIKI_TABLE");
 		STATEMENT_DROP_LOG_TABLE                 = props.getProperty("STATEMENT_DROP_LOG_TABLE");
 		STATEMENT_DROP_NAMESPACE_TABLE           = props.getProperty("STATEMENT_DROP_NAMESPACE_TABLE");
 		STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE = props.getProperty("STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE");
@@ -1085,27 +1111,23 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DROP_ROLE_TABLE                = props.getProperty("STATEMENT_DROP_ROLE_TABLE");
 		STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT = props.getProperty("STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT");
 		STATEMENT_DROP_TOPIC_TABLE               = props.getProperty("STATEMENT_DROP_TOPIC_TABLE");
-		STATEMENT_DROP_TOPIC_LINKS_INDEX         = props.getProperty("STATEMENT_DROP_TOPIC_LINKS_INDEX");
 		STATEMENT_DROP_TOPIC_LINKS_TABLE         = props.getProperty("STATEMENT_DROP_TOPIC_LINKS_TABLE");
-		STATEMENT_DROP_TOPIC_PAGE_NAME_INDEX     = props.getProperty("STATEMENT_DROP_TOPIC_PAGE_NAME_INDEX");
-		STATEMENT_DROP_TOPIC_PAGE_NAME_LOWER_INDEX = props.getProperty("STATEMENT_DROP_TOPIC_PAGE_NAME_LOWER_INDEX");
-		STATEMENT_DROP_TOPIC_CURRENT_VERSION_INDEX = props.getProperty("STATEMENT_DROP_TOPIC_CURRENT_VERSION_INDEX");
 		STATEMENT_DROP_TOPIC_VERSION_TABLE       = props.getProperty("STATEMENT_DROP_TOPIC_VERSION_TABLE");
-		STATEMENT_DROP_TOPIC_VERSION_TOPIC_INDEX = props.getProperty("STATEMENT_DROP_TOPIC_VERSION_TOPIC_INDEX");
 		STATEMENT_DROP_USERS_TABLE               = props.getProperty("STATEMENT_DROP_USERS_TABLE");
 		STATEMENT_DROP_VIRTUAL_WIKI_TABLE        = props.getProperty("STATEMENT_DROP_VIRTUAL_WIKI_TABLE");
 		STATEMENT_DROP_WATCHLIST_TABLE           = props.getProperty("STATEMENT_DROP_WATCHLIST_TABLE");
-		STATEMENT_DROP_WIKI_USER_LOGIN_INDEX     = props.getProperty("STATEMENT_DROP_WIKI_USER_LOGIN_INDEX");
 		STATEMENT_DROP_WIKI_USER_TABLE           = props.getProperty("STATEMENT_DROP_WIKI_USER_TABLE");
 		STATEMENT_DROP_WIKI_FILE_TABLE           = props.getProperty("STATEMENT_DROP_WIKI_FILE_TABLE");
 		STATEMENT_DROP_WIKI_FILE_VERSION_TABLE   = props.getProperty("STATEMENT_DROP_WIKI_FILE_VERSION_TABLE");
 		STATEMENT_INSERT_AUTHORITY               = props.getProperty("STATEMENT_INSERT_AUTHORITY");
 		STATEMENT_INSERT_CATEGORY                = props.getProperty("STATEMENT_INSERT_CATEGORY");
+		STATEMENT_INSERT_CONFIGURATION           = props.getProperty("STATEMENT_INSERT_CONFIGURATION");
 		STATEMENT_INSERT_GROUP                   = props.getProperty("STATEMENT_INSERT_GROUP");
 		STATEMENT_INSERT_GROUP_AUTO_INCREMENT    = props.getProperty("STATEMENT_INSERT_GROUP_AUTO_INCREMENT");
 		STATEMENT_INSERT_GROUP_AUTHORITY         = props.getProperty("STATEMENT_INSERT_GROUP_AUTHORITY");
 		STATEMENT_INSERT_GROUP_MEMBER            = props.getProperty("STATEMENT_INSERT_GROUP_MEMBER");
 		STATEMENT_INSERT_GROUP_MEMBER_AUTO_INCREMENT = props.getProperty("STATEMENT_INSERT_GROUP_MEMBER_AUTO_INCREMENT");
+		STATEMENT_INSERT_INTERWIKI               = props.getProperty("STATEMENT_INSERT_INTERWIKI");
 		STATEMENT_INSERT_LOG_ITEM                = props.getProperty("STATEMENT_INSERT_LOG_ITEM");
 		STATEMENT_INSERT_LOG_ITEMS_BY_TOPIC_VERSION_TYPE = props.getProperty("STATEMENT_INSERT_LOG_ITEMS_BY_TOPIC_VERSION_TYPE");
 		STATEMENT_INSERT_LOG_ITEMS_IMPORT        = props.getProperty("STATEMENT_INSERT_LOG_ITEMS_IMPORT");
@@ -1138,11 +1160,13 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_AUTHORITIES_USER        = props.getProperty("STATEMENT_SELECT_AUTHORITIES_USER");
 		STATEMENT_SELECT_CATEGORIES              = props.getProperty("STATEMENT_SELECT_CATEGORIES");
 		STATEMENT_SELECT_CATEGORY_TOPICS         = props.getProperty("STATEMENT_SELECT_CATEGORY_TOPICS");
+		STATEMENT_SELECT_CONFIGURATION           = props.getProperty("STATEMENT_SELECT_CONFIGURATION");
 		STATEMENT_SELECT_GROUP                   = props.getProperty("STATEMENT_SELECT_GROUP");
 		STATEMENT_SELECT_GROUP_AUTHORITIES       = props.getProperty("STATEMENT_SELECT_GROUP_AUTHORITIES");
 		STATEMENT_SELECT_GROUPS_AUTHORITIES      = props.getProperty("STATEMENT_SELECT_GROUPS_AUTHORITIES");
 		STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE  = props.getProperty("STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE");
 		STATEMENT_SELECT_GROUP_SEQUENCE          = props.getProperty("STATEMENT_SELECT_GROUP_SEQUENCE");
+		STATEMENT_SELECT_INTERWIKIS              = props.getProperty("STATEMENT_SELECT_INTERWIKIS");
 		STATEMENT_SELECT_LOG_ITEMS               = props.getProperty("STATEMENT_SELECT_LOG_ITEMS");
 		STATEMENT_SELECT_LOG_ITEMS_BY_TYPE       = props.getProperty("STATEMENT_SELECT_LOG_ITEMS_BY_TYPE");
 		STATEMENT_SELECT_NAMESPACE_SEQUENCE      = props.getProperty("STATEMENT_SELECT_NAMESPACE_SEQUENCE");
@@ -1154,15 +1178,16 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_TOPIC_COUNT             = props.getProperty("STATEMENT_SELECT_TOPIC_COUNT");
 		STATEMENT_SELECT_TOPIC                   = props.getProperty("STATEMENT_SELECT_TOPIC");
 		STATEMENT_SELECT_TOPIC_HISTORY           = props.getProperty("STATEMENT_SELECT_TOPIC_HISTORY");
-		STATEMENT_SELECT_TOPIC_ID                = props.getProperty("STATEMENT_SELECT_TOPIC_ID");
-		STATEMENT_SELECT_TOPIC_ID_LOWER          = props.getProperty("STATEMENT_SELECT_TOPIC_ID_LOWER");
 		STATEMENT_SELECT_TOPIC_LINK_ORPHANS      = props.getProperty("STATEMENT_SELECT_TOPIC_LINK_ORPHANS");
 		STATEMENT_SELECT_TOPIC_LINKS             = props.getProperty("STATEMENT_SELECT_TOPIC_LINKS");
 		STATEMENT_SELECT_TOPIC_LOWER             = props.getProperty("STATEMENT_SELECT_TOPIC_LOWER");
+		STATEMENT_SELECT_TOPIC_NAME              = props.getProperty("STATEMENT_SELECT_TOPIC_NAME");
+		STATEMENT_SELECT_TOPIC_NAME_LOWER        = props.getProperty("STATEMENT_SELECT_TOPIC_NAME_LOWER");
 		STATEMENT_SELECT_TOPIC_NAMES             = props.getProperty("STATEMENT_SELECT_TOPIC_NAMES");
 		STATEMENT_SELECT_TOPICS_ADMIN            = props.getProperty("STATEMENT_SELECT_TOPICS_ADMIN");
 		STATEMENT_SELECT_TOPIC_SEQUENCE          = props.getProperty("STATEMENT_SELECT_TOPIC_SEQUENCE");
 		STATEMENT_SELECT_TOPIC_VERSION           = props.getProperty("STATEMENT_SELECT_TOPIC_VERSION");
+		STATEMENT_SELECT_TOPIC_VERSION_NEXT_ID   = props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_NEXT_ID");
 		STATEMENT_SELECT_TOPIC_VERSION_SEQUENCE  = props.getProperty("STATEMENT_SELECT_TOPIC_VERSION_SEQUENCE");
 		STATEMENT_SELECT_USERS_AUTHENTICATION    = props.getProperty("STATEMENT_SELECT_USERS_AUTHENTICATION");
 		STATEMENT_SELECT_VIRTUAL_WIKIS           = props.getProperty("STATEMENT_SELECT_VIRTUAL_WIKIS");
@@ -1209,8 +1234,10 @@ public class AnsiQueryHandler implements QueryHandler {
 
 	/**
 	 *
+	 * had to override the insertTopicVersion method for the Caché implementation
+	 * need this to be public so that CacheQueryHandler can use it
 	 */
-	private LogItem initLogItem(ResultSet rs, String virtualWikiName) throws SQLException {
+	public LogItem initLogItem(ResultSet rs, String virtualWikiName) throws SQLException {
 		LogItem logItem = new LogItem();
 		int userId = rs.getInt("wiki_user_id");
 		if (userId > 0) {
@@ -1235,8 +1262,10 @@ public class AnsiQueryHandler implements QueryHandler {
 
 	/**
 	 *
+	 * had to override the insertTopicVersion method for the Caché implementation
+	 * need this to be public so that CacheQueryHandler can use it
 	 */
-	private RecentChange initRecentChange(ResultSet rs) throws SQLException {
+	public RecentChange initRecentChange(ResultSet rs) throws SQLException {
 		RecentChange change = new RecentChange();
 		int topicVersionId = rs.getInt("topic_version_id");
 		if (topicVersionId > 0) {
@@ -1286,16 +1315,6 @@ public class AnsiQueryHandler implements QueryHandler {
 	 *
 	 */
 	private Topic initTopic(ResultSet rs, String virtualWikiName) throws SQLException {
-		// if a topic by this name has been deleted then there will be
-		// multiple results.  the first will be a non-deleted topic (if
-		// one exists), otherwise the last is the most recently deleted
-		// topic.
-		if (rs.getTimestamp("delete_date") != null) {
-			while (!rs.isLast()) {
-				// go to the last result - do not use rs.last() since result set may be FORWARD_ONLY
-				rs.next();
-			}
-		}
 		Topic topic = new Topic(virtualWikiName, rs.getString("topic_name"));
 		topic.setAdminOnly(rs.getInt("topic_admin_only") != 0);
 		int currentVersionId = rs.getInt("current_version_id");
@@ -1313,6 +1332,17 @@ public class AnsiQueryHandler implements QueryHandler {
 		topic.setDeleteDate(rs.getTimestamp("delete_date"));
 		topic.setTopicType(TopicType.findTopicType(rs.getInt("topic_type")));
 		topic.setRedirectTo(rs.getString("redirect_to"));
+		// if a topic by this name has been deleted then there will be multiple results and
+		// the one we want is the last one.  due to the fact that the result set may be
+		// FORWARD_ONLY re-run this method for the remaining available results in the result
+		// set - it's inefficient, but safe.
+		if (rs.getTimestamp("delete_date") != null) {
+			// this is an inefficient way to get the last result, but due to the fact that
+			// the result set may be forward only it's the safest.
+			if (rs.next()) {
+				topic = this.initTopic(rs, virtualWikiName);
+			}
+		}
 		return topic;
 	}
 
@@ -1467,6 +1497,23 @@ public class AnsiQueryHandler implements QueryHandler {
 			}
 			stmt.setString(index++, username);
 			stmt.setInt(index++, groupId);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public void insertInterwiki(Interwiki interwiki, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_INSERT_INTERWIKI);
+			stmt.setString(1, interwiki.getInterwikiPrefix());
+			stmt.setString(2, interwiki.getInterwikiPattern());
+			stmt.setString(3, interwiki.getInterwikiDisplay());
+			stmt.setInt(4, interwiki.getInterwikiType());
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
@@ -1742,7 +1789,10 @@ public class AnsiQueryHandler implements QueryHandler {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_VIRTUAL_WIKI_AUTO_INCREMENT, Statement.RETURN_GENERATED_KEYS);
 			}
 			stmt.setString(index++, virtualWiki.getName());
-			stmt.setString(index++, virtualWiki.getDefaultTopicName());
+			stmt.setString(index++, (virtualWiki.isDefaultRootTopicName() ? null : virtualWiki.getRootTopicName()));
+			stmt.setString(index++, (virtualWiki.isDefaultLogoImageUrl() ? null : virtualWiki.getLogoImageUrl()));
+			stmt.setString(index++, (virtualWiki.isDefaultMetaDescription() ? null : virtualWiki.getMetaDescription()));
+			stmt.setString(index++, (virtualWiki.isDefaultSiteName() ? null : virtualWiki.getSiteName()));
 			stmt.executeUpdate();
 			if (this.autoIncrementPrimaryKeys()) {
 				rs = stmt.getGeneratedKeys();
@@ -1958,6 +2008,54 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
+	public Map<String, String> lookupConfiguration() throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Map<String, String> configuration = new HashMap<String, String>();
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_CONFIGURATION);
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				configuration.put(rs.getString("key"), rs.getString("value"));
+			}
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+		return configuration;
+	}
+
+	/**
+	 *
+	 */
+	public List<Interwiki> lookupInterwikis(Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Map<String, Interwiki> interwikis = new TreeMap<String, Interwiki>();
+		try {
+			stmt = conn.prepareStatement(STATEMENT_SELECT_INTERWIKIS);
+			rs = stmt.executeQuery();
+			String interwikiPrefix, interwikiPattern, interwikiDisplay;
+			int interwikiType;
+			while (rs.next()) {
+				interwikiPrefix = rs.getString("interwiki_prefix");
+				interwikiPattern = rs.getString("interwiki_pattern");
+				interwikiDisplay = rs.getString("interwiki_display");
+				interwikiType = rs.getInt("interwiki_type");
+				Interwiki interwiki = new Interwiki(interwikiPrefix, interwikiPattern, interwikiDisplay);
+				interwiki.setInterwikiType(interwikiType);
+				interwikis.put(interwikiPrefix, interwiki);
+			}
+		} finally {
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+		return new ArrayList<Interwiki>(interwikis.values());
+	}
+
+	/**
+	 *
+	 */
 	public List<Namespace> lookupNamespaces(Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1990,7 +2088,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			for (int mainNamespaceId : talkNamespaces.keySet()) {
 				Namespace mainNamespace = namespaces.get(mainNamespaceId);
 				if (mainNamespace == null) {
-					logger.warning("Invalid namespace reference - bad database data.  Namespace references invalid main namespace with ID " + mainNamespaceId);
+					logger.warn("Invalid namespace reference - bad database data.  Namespace references invalid main namespace with ID " + mainNamespaceId);
 				}
 				Namespace talkNamespace = talkNamespaces.get(mainNamespaceId);
 				talkNamespace.setMainNamespace(mainNamespace);
@@ -2005,9 +2103,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public Topic lookupTopic(int virtualWikiId, String virtualWikiName, String topicName, Connection conn) throws SQLException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWikiName, topicName);
-		if (wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
+	public Topic lookupTopic(int virtualWikiId, String virtualWikiName, Namespace namespace, String pageName, Connection conn) throws SQLException {
+		if (namespace.getId().equals(Namespace.SPECIAL_ID)) {
 			// invalid namespace
 			return null;
 		}
@@ -2018,18 +2115,21 @@ public class AnsiQueryHandler implements QueryHandler {
 			if (conn == null) {
 				conn = DatabaseConnection.getConnection();
 			}
-			String pageName = wikiLink.getArticle();
-			if (wikiLink.isCaseSensitive()) {
-				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC);
-			} else {
-				pageName = pageName.toLowerCase();
-				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_LOWER);
-			}
+			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC);
 			stmt.setString(1, pageName);
 			stmt.setInt(2, virtualWikiId);
-			stmt.setInt(3, wikiLink.getNamespace().getId());
+			stmt.setInt(3, namespace.getId());
 			rs = stmt.executeQuery();
-			return (rs.next()) ? this.initTopic(rs, virtualWikiName) : null;
+			Topic topic = (rs.next() ? this.initTopic(rs, virtualWikiName) : null);
+			if (topic == null && !namespace.isCaseSensitive() && !pageName.toLowerCase().equals(pageName)) {
+				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_LOWER);
+				stmt.setString(1, pageName.toLowerCase());
+				stmt.setInt(2, virtualWikiId);
+				stmt.setInt(3, namespace.getId());
+				rs = stmt.executeQuery();
+				topic = (rs.next() ? this.initTopic(rs, virtualWikiName) : null);
+			}
+			return topic;
 		} finally {
 			if (closeConnection) {
 				DatabaseConnection.closeConnection(conn, stmt, rs);
@@ -2108,6 +2208,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt(1, virtualWikiId);
 			stmt.setInt(2, namespaceStart);
 			stmt.setInt(3, namespaceEnd);
+			stmt.setInt(4, TopicType.REDIRECT.id());
 			rs = stmt.executeQuery();
 			return (rs.next()) ? rs.getInt("topic_count") : 0;
 		} finally {
@@ -2118,9 +2219,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public Integer lookupTopicId(int virtualWikiId, String virtualWikiName, String topicName) throws SQLException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWikiName, topicName);
-		if (wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
+	public String lookupTopicName(int virtualWikiId, String virtualWikiName, Namespace namespace, String pageName) throws SQLException {
+		if (namespace.getId().equals(Namespace.SPECIAL_ID)) {
 			// invalid namespace
 			return null;
 		}
@@ -2129,18 +2229,21 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			String pageName = wikiLink.getArticle();
-			if (wikiLink.isCaseSensitive()) {
-				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_ID);
-			} else {
-				pageName = pageName.toLowerCase();
-				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_ID_LOWER);
-			}
+			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_NAME);
 			stmt.setString(1, pageName);
 			stmt.setInt(2, virtualWikiId);
-			stmt.setInt(3, wikiLink.getNamespace().getId());
+			stmt.setInt(3, namespace.getId());
 			rs = stmt.executeQuery();
-			return (rs.next()) ? Integer.valueOf(rs.getInt("topic_id")) : null;
+			String topicName = (rs.next() ? rs.getString("topic_name") : null);
+			if (topicName == null && !namespace.isCaseSensitive() && !pageName.toLowerCase().equals(pageName)) {
+				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_NAME_LOWER);
+				stmt.setString(1, pageName.toLowerCase());
+				stmt.setInt(2, virtualWikiId);
+				stmt.setInt(3, namespace.getId());
+				rs = stmt.executeQuery();
+				topicName = (rs.next() ? rs.getString("topic_name") : null);
+			}
+			return topicName;
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt, rs);
 		}
@@ -2172,7 +2275,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public List<String> lookupTopicLinkOrphans(int virtualWikiId) throws SQLException{
+	public List<String> lookupTopicLinkOrphans(int virtualWikiId, int namespaceId) throws SQLException{
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2180,8 +2283,8 @@ public class AnsiQueryHandler implements QueryHandler {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_LINK_ORPHANS);
 			stmt.setInt(1, virtualWikiId);
-			stmt.setInt(2, Namespace.MAIN_ID);
-			stmt.setInt(3, TopicType.ARTICLE.id());
+			stmt.setInt(2, namespaceId);
+			stmt.setInt(3, TopicType.REDIRECT.id());
 			rs = stmt.executeQuery();
 			List<String> results = new ArrayList<String>();
 			while (rs.next()) {
@@ -2229,6 +2332,24 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt(1, topicVersionId);
 			rs = stmt.executeQuery();
 			return (rs.next()) ? this.initTopicVersion(rs) : null;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public Integer lookupTopicVersionNextId(int topicVersionId) throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_VERSION_NEXT_ID);
+			stmt.setInt(1, topicVersionId);
+			rs = stmt.executeQuery();
+			return (rs.next()) ? rs.getInt("topic_version_id") : null;
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt, rs);
 		}
@@ -2429,8 +2550,11 @@ public class AnsiQueryHandler implements QueryHandler {
 	 *  from this method.
 	 * @return The next available topic version id from the topic version table.
 	 * @throws SQLException Thrown if any error occurs during method execution.
+	 * 
+	 * had to override the insertTopicVersion method for the Caché implementation
+	 * need this to be public so that CacheQueryHandler can use it
 	 */
-	private int nextTopicVersionId(Connection conn) throws SQLException {
+	public int nextTopicVersionId(Connection conn) throws SQLException {
 		int nextId = DatabaseConnection.executeSequenceQuery(STATEMENT_SELECT_TOPIC_VERSION_SEQUENCE, "topic_version_id", conn);
 		// note - this returns the last id in the system, so add one
 		return nextId + 1;
@@ -2609,6 +2733,28 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
+	public void updateConfiguration(Map<String, String> configuration, Connection conn) throws SQLException {
+		Statement stmt = null;
+		PreparedStatement pstmt = null;
+		try {
+			stmt = conn.createStatement();
+			stmt.executeUpdate(STATEMENT_DELETE_CONFIGURATION);
+			pstmt = conn.prepareStatement(STATEMENT_INSERT_CONFIGURATION);
+			for (String key : configuration.keySet()) {
+				pstmt.setString(1, key);
+				pstmt.setString(2, configuration.get(key));
+				pstmt.addBatch();
+			}
+			pstmt.executeBatch();
+		} finally {
+			DatabaseConnection.closeStatement(pstmt);
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/**
+	 *
+	 */
 	public void updateNamespace(Namespace mainNamespace, Namespace commentsNamespace, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
@@ -2760,8 +2906,11 @@ public class AnsiQueryHandler implements QueryHandler {
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_UPDATE_VIRTUAL_WIKI);
-			stmt.setString(1, virtualWiki.getDefaultTopicName());
-			stmt.setInt(2, virtualWiki.getVirtualWikiId());
+			stmt.setString(1, (virtualWiki.isDefaultRootTopicName() ? null : virtualWiki.getRootTopicName()));
+			stmt.setString(2, (virtualWiki.isDefaultLogoImageUrl() ? null : virtualWiki.getLogoImageUrl()));
+			stmt.setString(3, (virtualWiki.isDefaultMetaDescription() ? null : virtualWiki.getMetaDescription()));
+			stmt.setString(4, (virtualWiki.isDefaultSiteName() ? null : virtualWiki.getSiteName()));
+			stmt.setInt(5, virtualWiki.getVirtualWikiId());
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);

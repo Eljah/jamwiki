@@ -57,6 +57,8 @@ To upgrade using this automated process follow these steps:
       "History" tab for the StyleSheet topic (for example: 
       http://jamwiki.org/wiki/en/Special:History?topic=StyleSheet), selecting
       the pre-upgrade version, and then editing and saving that version.
+  11. If you have created any virtual wikis, be sure to restore the
+      configuration for each virtual wiki to the /WEB-INF/web-xml file.
 
 If the upgrade fails see below for instructions to manually upgrade. If the
 problem persists please report it on http://jamwiki.org/wiki/en/Bug_Reports and
@@ -81,24 +83,96 @@ followed by 0.6.3.
   JAMWiki 1.0.0
   =============
 
-  NOTE: The Lucene search engine has been updated in this release.  As a
-  result most users will want to rebuild their search index using the
-  tools on the Special:Maintenance page.
+  SPECIAL NOTES:
+
+  * The Lucene search engine has been updated in this release.  As a result
+    most users will want to rebuild their search index using the tools on
+    the Special:Maintenance page.
+  * This release updates the default StyleSheet topic.  See below for
+    instructions on manaully updating this topic with the new styles.
+  * By default interwiki links that are not preceded by colons
+    ("[[:inter:Topic]]") will not be parsed as inline links.  This behavior
+    can be changed from the "Parser" tab of the Special:Admin page.
+  * This release changes how the "Link To" records for a topic are calculated.
+    See below for steps to initialize the new data after upgrading.
+
+  UPGRADE STEPS:
 
   1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
      "wiki-version" property to "1.0.0".
-  2. Update the database schema by executing the following SQL statements:
-       a) Create the jam_topic_links table
+  2. CSS styles have changed during this release.  An up-to-date version of
+     the default StyleSheet topic can be found in the
+     /WEB-INF/classes/pages/StyleSheet file.  Note that the StyleSheet topic
+     should only be edited AFTER all other upgrade steps have been completed.
+  3. Update the database schema by executing the following SQL statements:
+       a) Create the jam_topic_links table.
               CREATE TABLE jam_topic_links ( 
                 topic_id INTEGER NOT NULL, 
                 link_topic_name VARCHAR(200) NOT NULL, 
                 CONSTRAINT jam_p_topic_links PRIMARY KEY (topic_id, link_topic_name), 
                 CONSTRAINT jam_f_tlink_topic_id FOREIGN KEY (topic_id) REFERENCES jam_topic(topic_id) 
               );
-       b) Add an index to the jam_topic_links table
+       b) Create the jam_interwiki table.
+              CREATE TABLE jam_interwiki ( 
+                interwiki_prefix VARCHAR(30) NOT NULL, 
+                interwiki_pattern VARCHAR(200) NOT NULL, 
+                interwiki_type INTEGER NOT NULL, 
+                CONSTRAINT jam_p_interw PRIMARY KEY (interwiki_prefix) 
+              );
+       c) Add new columns to the jam_virtul_wiki table.
+            Oracle & MS SQL:
+              alter table jam_virtual_wiki add logo_image_url VARCHAR(200);
+              alter table jam_virtual_wiki add site_name VARCHAR(200);
+              alter table jam_virtual_wiki add meta_description VARCHAR(500);
+            Other Databases:
+              alter table jam_virtual_wiki add column logo_image_url VARCHAR(200);
+              alter table jam_virtual_wiki add column site_name VARCHAR(200);
+              alter table jam_virtual_wiki add column meta_description VARCHAR(500);
+       d) Drop the NOT NULL constraint on jam_virtual_wiki.default_topic_name:
+            Oracle & MySQL:
+              alter table jam_virtual_wiki modify default_topic_name VARCHAR(200) NULL;
+            Postgres:
+              alter table jam_virtual_wiki alter column default_topic_name drop NOT NULL;
+            Other Databases:
+              alter table jam_virtual_wiki alter column default_topic_name VARCHAR(200) NULL;
+       e) Add indexes to tables.
               CREATE INDEX jam_i_topic_links_tnm on jam_topic_links (link_topic_name);
-  3. Once the database upgrades are complete the "Regenerate Link to records"
-     tool should be invoked from the Special:Maintenance page.
+              CREATE INDEX jam_i_category_cti on jam_category (child_topic_id);
+              CREATE INDEX jam_i_topic_cver on jam_topic (current_version_id);
+              CREATE INDEX jam_i_topic_nmsp on jam_topic (namespace_id);
+              CREATE INDEX jam_i_topic_vwiki on jam_topic (virtual_wiki_id);
+              CREATE INDEX jam_i_topicv_prv on jam_topic_version (previous_topic_version_id);
+              CREATE INDEX jam_i_topicv_udisp on jam_topic_version (wiki_user_display);
+              CREATE INDEX jam_i_topicv_uid on jam_topic_version (wiki_user_id);
+       f) Create the jam_configuration table.
+              CREATE TABLE jam_configuration ( 
+                key VARCHAR(50) NOT NULL, 
+                value VARCHAR(500) NOT NULL, 
+                CONSTRAINT jam_p_config PRIMARY KEY (key) 
+              );
+  4. Once the database upgrades are complete the "Regenerate Topic Metadata
+     Records" tool should be invoked from the Special:Maintenance page.
+
+
+  JAMWiki 0.9.3
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.9.3".
+
+
+  JAMWiki 0.9.2
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.9.2".
+
+
+  JAMWiki 0.9.1
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "0.9.1".
 
 
   JAMWiki 0.9.0
@@ -122,14 +196,14 @@ followed by 0.6.3.
      jamwiki-configuration.xml will need to be re-configured using the new
      interface.
   5. Update the database schema by executing the following SQL statements:
-       a) Create the jam_namespace table
+       a) Create the jam_namespace table.
               CREATE TABLE jam_namespace ( 
                 namespace_id INTEGER NOT NULL, 
                 namespace VARCHAR(200) NOT NULL, 
-                main_namespace_id INTEGER,
-                CONSTRAINT jam_p_namesp PRIMARY KEY (namespace_id), \
-                CONSTRAINT jam_u_namesp_namesp UNIQUE (namespace), \
-                CONSTRAINT jam_f_namesp_namesp FOREIGN KEY (main_namespace_id) REFERENCES jam_topic(namespace_id) \
+                main_namespace_id INTEGER, 
+                CONSTRAINT jam_p_namesp PRIMARY KEY (namespace_id), 
+                CONSTRAINT jam_u_namesp_namesp UNIQUE (namespace), 
+                CONSTRAINT jam_f_namesp_namesp FOREIGN KEY (main_namespace_id) REFERENCES jam_namespace(namespace_id) 
               );
        b) Create the jam_namespace_translation table.
               CREATE TABLE jam_namespace_translation ( 
@@ -141,7 +215,26 @@ followed by 0.6.3.
                 CONSTRAINT jam_f_namesptr_vwiki FOREIGN KEY (virtual_wiki_id) REFERENCES jam_virtual_wiki(virtual_wiki_id), 
                 CONSTRAINT jam_u_namesptr_namesp UNIQUE (virtual_wiki_id, namespace) 
               );
-       c) Update the jam_topic table with namespace-related values
+       c) Create the base namespaces.
+              INSERT INTO jam_namespace (namespace_id, namespace) values (-2, 'Media');
+              INSERT INTO jam_namespace (namespace_id, namespace) values (-1, 'Special');
+              INSERT INTO jam_namespace (namespace_id, namespace) values (0, '');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (1, 'Comments', 0);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (2, 'User');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (3, 'User comments', 2);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (4, 'Project');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (5, 'Project comments', 4);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (6, 'Image');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (7, 'Image comments', 6);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (8, 'JAMWiki');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (9, 'JAMWiki comments', 8);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (10, 'Template');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (11, 'Template comments', 10);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (12, 'Help');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (13, 'Help comments', 12);
+              INSERT INTO jam_namespace (namespace_id, namespace) values (14, 'Category');
+              INSERT INTO jam_namespace (namespace_id, namespace, main_namespace_id) values (15, 'Category comments', 14);
+       d) Update the jam_topic table with namespace-related values
             Oracle:
               alter table jam_topic add namespace_id INTEGER DEFAULT 0 NOT NULL;
               alter table jam_topic add constraint jam_f_topic_namesp FOREIGN KEY (namespace_id) REFERENCES jam_namespace(namespace_id);
@@ -157,6 +250,10 @@ followed by 0.6.3.
               alter table jam_topic add constraint jam_f_topic_namesp FOREIGN KEY (namespace_id) REFERENCES jam_namespace(namespace_id);
               alter table jam_topic add column page_name VARCHAR(200);
               alter table jam_topic add column page_name_lower VARCHAR(200);
+       e) Add indexes to tables.
+              CREATE INDEX jam_i_topic_pgnm on jam_topic (page_name);
+              CREATE INDEX jam_i_topic_pgnml on jam_topic (page_name_lower);
+              CREATE INDEX jam_i_topicv_topic on jam_topic_version (topic_id);
   6. Once the database upgrades are complete the "Fix Incorrect Topic Namespaces"
      tool should be invoked from the Special:Maintenance page.  Provided that tool
      runs successfully then "NOT NULL" constraints should be added to the page_name

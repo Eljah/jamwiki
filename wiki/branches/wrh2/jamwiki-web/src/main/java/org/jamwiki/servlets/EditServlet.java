@@ -143,7 +143,10 @@ public class EditServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void loadEdit(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, String contents, String virtualWiki, String topicName, boolean useSection) throws Exception {
-		pageInfo.setPageTitle(new WikiMessage("edit.title", topicName));
+		WikiUser user = ServletUtil.currentWikiUser();
+		ParserInput parserInput = this.parserInput(request, user, virtualWiki, topicName);
+		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
+		pageInfo.setPageTitle(new WikiMessage("edit.title", ((parserOutput.getPageTitle() != null) ? parserOutput.getPageTitle() : topicName)));
 		pageInfo.setTopicName(topicName);
 		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
 		if (wikiLink.getNamespace().getId().equals(Namespace.CATEGORY_ID)) {
@@ -161,7 +164,6 @@ public class EditServlet extends JAMWikiServlet {
 			next.addObject("watchTopic", true);
 		}
 		pageInfo.setContentJsp(JSP_EDIT);
-		WikiUser user = ServletUtil.currentWikiUser();
 		String editor = user.getEditor();
 		next.addObject("editor", editor);
 		next.addObject("contents", contents);
@@ -212,6 +214,18 @@ public class EditServlet extends JAMWikiServlet {
 		}
 		// it should be impossible to get here...
 		throw new WikiException(new WikiMessage("error.unknown", "Unable to determine topic editing permissions"));
+	}
+
+	/**
+	 *
+	 */
+	private ParserInput parserInput(HttpServletRequest request, WikiUser user, String virtualWiki, String topicName) {
+		ParserInput parserInput = new ParserInput(virtualWiki, topicName);
+		parserInput.setContext(request.getContextPath());
+		parserInput.setLocale(request.getLocale());
+		parserInput.setWikiUser(user);
+		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
+		return parserInput;
 	}
 
 	/**
@@ -274,7 +288,7 @@ public class EditServlet extends JAMWikiServlet {
 			sectionName = parserOutput.getSectionName();
 		}
 		if (contents == null) {
-			logger.warning("The topic " + topicName + " has no content");
+			logger.warn("The topic " + topicName + " has no content");
 			throw new WikiException(new WikiMessage("edit.exception.nocontent", topicName));
 		}
 		// strip line feeds
@@ -290,15 +304,8 @@ public class EditServlet extends JAMWikiServlet {
 			this.loadEdit(request, next, pageInfo, contents, virtualWiki, topicName, false);
 			return;
 		}
-		// parse for signatures and other syntax that should not be saved in raw form
 		WikiUser user = ServletUtil.currentWikiUser();
-		ParserInput parserInput = new ParserInput();
-		parserInput.setContext(request.getContextPath());
-		parserInput.setLocale(request.getLocale());
-		parserInput.setWikiUser(user);
-		parserInput.setTopicName(topicName);
-		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
-		parserInput.setVirtualWiki(virtualWiki);
+		ParserInput parserInput = this.parserInput(request, user, virtualWiki, topicName);
 		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
 		// parse signatures and other values that need to be updated prior to saving
 		contents = ParserUtil.parseMinimal(parserInput, contents);

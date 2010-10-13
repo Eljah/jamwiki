@@ -43,18 +43,20 @@ public abstract class JFlexLexer {
 	/** Stack of currently parsed tag content. */
 	private Stack<JFlexTagItem> tagStack = new Stack<JFlexTagItem>();
 
-	protected static final int TAG_TYPE_HTML_LINK = 1;
-	protected static final int TAG_TYPE_IMAGE_LINK = 2;
-	protected static final int TAG_TYPE_INCLUDE_ONLY = 3;
-	protected static final int TAG_TYPE_JAVASCRIPT = 4;
-	protected static final int TAG_TYPE_NO_INCLUDE = 5;
-	protected static final int TAG_TYPE_TEMPLATE = 6;
-	protected static final int TAG_TYPE_WIKI_BOLD_ITALIC = 7;
-	protected static final int TAG_TYPE_WIKI_HEADING = 8;
-	protected static final int TAG_TYPE_WIKI_LINK = 9;
-	protected static final int TAG_TYPE_WIKI_REFERENCE = 10;
-	protected static final int TAG_TYPE_WIKI_REFERENCES = 11;
-	protected static final int TAG_TYPE_WIKI_SIGNATURE = 12;
+	protected static final int TAG_TYPE_HTML_HEADING = 5;
+	protected static final int TAG_TYPE_HTML_LINK = 10;
+	protected static final int TAG_TYPE_IMAGE_LINK = 15;
+	protected static final int TAG_TYPE_INCLUDE_ONLY = 20;
+	protected static final int TAG_TYPE_JAVASCRIPT = 25;
+	protected static final int TAG_TYPE_NO_INCLUDE = 30;
+	protected static final int TAG_TYPE_TEMPLATE = 35;
+	protected static final int TAG_TYPE_WIKI_BOLD_ITALIC = 40;
+	protected static final int TAG_TYPE_WIKI_HEADING = 45;
+	protected static final int TAG_TYPE_WIKI_LINK = 50;
+	protected static final int TAG_TYPE_WIKI_REFERENCE = 55;
+	protected static final int TAG_TYPE_WIKI_REFERENCES = 60;
+	protected static final int TAG_TYPE_WIKI_SIGNATURE = 65;
+	private static final HtmlHeadingTag TAG_HTML_HEADING = new HtmlHeadingTag();
 	private static final HtmlLinkTag TAG_HTML_LINK = new HtmlLinkTag();
 	private static final ImageLinkTag TAG_IMAGE_LINK = new ImageLinkTag();
 	private static final IncludeOnlyTag TAG_INCLUDE_ONLY = new IncludeOnlyTag();
@@ -118,7 +120,7 @@ public abstract class JFlexLexer {
 	protected void endState() {
 		// revert to previous state
 		if (states.empty()) {
-			logger.warning("Attempt to call endState for an empty stack with text: " + yytext());
+			logger.warn("Attempt to call endState for an empty stack with text: " + yytext());
 			return;
 		}
 		int next = states.pop();
@@ -178,11 +180,32 @@ public abstract class JFlexLexer {
 	}
 
 	/**
+	 * Utility method to walk the current tag stack to determine if the top of the stack
+	 * contains list tags followed by a tag of a specific type.
+	 */
+	private boolean isNextAfterListTags(String tagType) {
+		JFlexTagItem nextTag;
+		for (int i = (this.tagStack.size() - 1); i > 0; i--) {
+			nextTag = this.tagStack.get(i);
+			if (nextTag.getTagType().equals(tagType)) {
+				return true;
+			}
+			if (!nextTag.isListTag()) {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 *
 	 */
 	protected String parse(int type, String raw, Object... args) {
 		JFlexParserTag jflexParserTag = null;
 		switch (type) {
+			case TAG_TYPE_HTML_HEADING:
+				jflexParserTag = TAG_HTML_HEADING;
+				break;
 			case TAG_TYPE_HTML_LINK:
 				jflexParserTag = TAG_HTML_LINK;
 				break;
@@ -243,7 +266,7 @@ public abstract class JFlexLexer {
 	 */
 	protected JFlexTagItem popTag(String tagType) {
 		if (this.tagStack.size() <= 1) {
-			logger.warning("popTag called on an empty tag stack or on the root stack element.  Please report this error on jamwiki.org, and provide the wiki syntax for the topic being parsed.");
+			logger.warn("popTag called on an empty tag stack or on the root stack element.  Please report this error on jamwiki.org, and provide the wiki syntax for the topic being parsed.");
 		}
 		// verify that the tag being closed is the tag that is currently open.  if not
 		// there are two options - first is that the user entered unbalanced HTML such
@@ -257,6 +280,12 @@ public abstract class JFlexLexer {
 			// the "</strong>" should actually be parsed as a "</u>".
 			if (StringUtils.equals(this.peekTag().getTagType(), this.peekTag().getCloseTagOverride())) {
 				return this.popTag(this.peekTag().getCloseTagOverride());
+			}
+			// check to see if the parent tag is a list and the current tag is in the tag
+			// stack.  if so close the list and pop the current tag.
+			if (!JFlexTagItem.isListTag(tagType) && this.peekTag().isListItemTag() && this.isNextAfterListTags(tagType)) {
+				this.popAllListTags();
+				return this.popTag(tagType);
 			}
 			// check to see if the parent tag matches the current close tag.  if so then
 			// this is unbalanced HTML of the form "<u><strong>text</u></strong>" and

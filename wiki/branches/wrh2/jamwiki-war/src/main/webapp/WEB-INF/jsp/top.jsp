@@ -30,6 +30,9 @@
 	<link rel="start" title="<c:out value="${defaultTopic}" />" href="<jamwiki:link value="${defaultTopic}" />" />
 	<link rel="home" title="<c:out value="${defaultTopic}" />" href="<jamwiki:link value="${defaultTopic}" />" />
 </c:if>
+<c:if test="${!empty pageInfo.canonicalUrl}">
+	<link rel="canonical" href="${pageInfo.canonicalUrl}" />
+</c:if>
 <jamwiki:enabled property="PROP_RSS_ALLOWED">
 	<%-- This RSS link is automatically recognized by (some) browsers --%>
 	<link rel="alternate" type="application/rss+xml" title="<c:out value="${pageInfo.RSSTitle}" /> (<c:out value="${virtualWiki}"/>): <fmt:message key="recentchanges.rss.feed1" />" href="<jamwiki:link value="Special:RecentChangesFeed"/>" />

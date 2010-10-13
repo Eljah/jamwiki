@@ -121,16 +121,14 @@ public class ServletUtil {
 			Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false, null);
 			content = topic.getTopicContent();
 			if (cook) {
-				ParserInput parserInput = new ParserInput();
+				ParserInput parserInput = new ParserInput(virtualWiki, topicName);
 				parserInput.setContext(context);
 				parserInput.setLocale(locale);
-				parserInput.setVirtualWiki(virtualWiki);
-				parserInput.setTopicName(topicName);
 				content = ParserUtil.parse(parserInput, null, content);
 			}
 			WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key, content);
 		} catch (Exception e) {
-			logger.warning("error getting cached page " + virtualWiki + " / " + topicName, e);
+			logger.warn("error getting cached page " + virtualWiki + " / " + topicName, e);
 			return null;
 		}
 		return content;
@@ -207,13 +205,13 @@ public class ServletUtil {
 				// FIXME - do not lookup the user every time this method is called, that will kill performance
 				user = WikiBase.getDataHandler().lookupWikiUser(username);
 			} catch (DataAccessException e) {
-				logger.severe("Failure while retrieving user from database with login: " + username, e);
+				logger.error("Failure while retrieving user from database with login: " + username, e);
 				return user;
 			}
 			if (user == null) {
 				// invalid user.  someone has either spoofed a cookie or the user account is no longer in
 				// the database.
-				logger.warning("No user exists for principal found in security context authentication: " + username);
+				logger.warn("No user exists for principal found in security context authentication: " + username);
 				SecurityContextHolder.clearContext();
 				throw new AuthenticationCredentialsNotFoundException("Invalid user credentials found - username " + username + " does not exist in this wiki installation");
 			}
@@ -562,7 +560,7 @@ public class ServletUtil {
 	public static VirtualWiki retrieveVirtualWiki(String virtualWikiName) {
 		VirtualWiki virtualWiki = null;
 		if (virtualWikiName == null) {
-			virtualWikiName = Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT);
+			virtualWikiName = VirtualWiki.defaultVirtualWiki().getName();
 		}
 		// FIXME - the check here for initialized properties is due to this
 		// change being made late in a release cycle.  Revisit in a future
@@ -573,10 +571,8 @@ public class ServletUtil {
 			} catch (DataAccessException e) {}
 		}
 		if (virtualWiki == null) {
-			logger.severe("No virtual wiki found for " + virtualWikiName);
-			virtualWiki = new VirtualWiki();
-			virtualWiki.setName(Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT));
-			virtualWiki.setDefaultTopicName(Environment.getValue(Environment.PROP_BASE_DEFAULT_TOPIC));
+			logger.error("No virtual wiki found for " + virtualWikiName);
+			virtualWiki = VirtualWiki.defaultVirtualWiki();
 		}
 		return virtualWiki;
 	}
@@ -618,10 +614,10 @@ public class ServletUtil {
 		try {
 			DatabaseConnection.testDatabase(driver, url, userName, password, false);
 		} catch (ClassNotFoundException e) {
-			logger.severe("Invalid database settings", e);
+			logger.error("Invalid database settings", e);
 			errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
 		} catch (SQLException e) {
-			logger.severe("Invalid database settings", e);
+			logger.error("Invalid database settings", e);
 			errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
 		}
 		// verify valid parser class
@@ -672,7 +668,7 @@ public class ServletUtil {
 				} catch (DataAccessException e) {
 					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 				}
-				topic = virtualWiki.getDefaultTopicName();
+				topic = virtualWiki.getRootTopicName();
 			}
 			target = "/" + virtualWikiName + "/" + topic;
 			if (!StringUtils.isBlank(request.getQueryString())) {
@@ -712,7 +708,8 @@ public class ServletUtil {
 	 * @param next The current Spring ModelAndView object.
 	 * @param pageInfo The current WikiPageInfo object, which contains
 	 *  information needed for rendering the final JSP page.
-	 * @param pageTitle The title of the page being rendered.
+	 * @param pageTitle A WikiMessage for the title of the page being rendered.  The
+	 *  first parameter of the message should be the topic name.
 	 * @param topic The Topic object for the topic being displayed.
 	 * @param sectionEdit Set to <code>true</code> if edit links should be displayed
 	 *  for each section of the topic.
@@ -745,8 +742,13 @@ public class ServletUtil {
 				redirectUrl += LinkUtil.appendQueryParam("", "redirect", "no");
 				String redirectName = topic.getName();
 				pageInfo.setRedirectInfo(redirectUrl, redirectName);
-				pageTitle = new WikiMessage("topic.title", child.getName());
+				pageTitle.replaceParameter(0, child.getName());
 				topic = child;
+				try {
+					pageInfo.setCanonicalUrl(LinkUtil.buildTopicUrl(request.getContextPath(), topic.getVirtualWiki(), topic.getName(), false));
+				} catch (DataAccessException e) {
+					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+				}
 				// update the page info's virtual wiki in case this redirect is to another virtual wiki
 				pageInfo.setVirtualWikiName(topic.getVirtualWiki());
 			}
@@ -758,13 +760,11 @@ public class ServletUtil {
 			sectionEdit = false;
 		}
 		WikiUser user = ServletUtil.currentWikiUser();
-		ParserInput parserInput = new ParserInput();
+		ParserInput parserInput = new ParserInput(virtualWiki, topicName);
 		parserInput.setContext(request.getContextPath());
 		parserInput.setLocale(request.getLocale());
 		parserInput.setWikiUser(user);
-		parserInput.setTopicName(topicName);
 		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
-		parserInput.setVirtualWiki(virtualWiki);
 		parserInput.setAllowSectionEdit(sectionEdit);
 		ParserOutput parserOutput = new ParserOutput();
 		String content = null;
@@ -785,10 +785,12 @@ public class ServletUtil {
 		if (topic.getTopicType() == TopicType.CATEGORY) {
 			loadCategoryContent(next, virtualWiki, topic.getName());
 		}
+		next.addObject("interwikiLinks", parserOutput.getInterwikiLinks());
+		next.addObject("virtualWikiLinks", parserOutput.getVirtualWikiLinks());
 		if (topic.getTopicType() == TopicType.IMAGE || topic.getTopicType() == TopicType.FILE) {
 			List<WikiFileVersion> fileVersions = null;
 			try {
-				fileVersions = WikiBase.getDataHandler().getAllWikiFileVersions(virtualWiki, topicName, true);
+				fileVersions = WikiBase.getDataHandler().getAllWikiFileVersions(topic.getVirtualWiki(), topicName, true);
 			} catch (DataAccessException e) {
 				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 			}
@@ -817,11 +819,23 @@ public class ServletUtil {
 			} else {
 				next.addObject("topicFile", true);
 			}
+			boolean sharedImage = !pageInfo.getVirtualWikiName().equals(virtualWiki);
+			next.addObject("sharedImage", sharedImage);
+			if (sharedImage) {
+				try {
+					pageInfo.setCanonicalUrl(LinkUtil.buildTopicUrl(request.getContextPath(), virtualWiki, topic.getName(), false));
+				} catch (DataAccessException e) {
+					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+				}
+			}
 		}
 		pageInfo.setSpecial(false);
 		pageInfo.setTopicName(topicName);
 		next.addObject(ServletUtil.PARAMETER_TOPIC_OBJECT, topic);
 		if (pageTitle != null) {
+			if (parserOutput.getPageTitle() != null) {
+				pageTitle.replaceParameter(0, parserOutput.getPageTitle());
+			}
 			pageInfo.setPageTitle(pageTitle);
 		}
 	}

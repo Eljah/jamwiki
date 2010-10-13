@@ -58,6 +58,120 @@ public class ParserTest extends JAMWikiUnitTest {
 	 *
 	 */
 	@Test
+	public void testCategory() throws Throwable {
+		ParserOutput parserOutput = this.executeCategoryTest("WikiCategory");
+		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
+		assertNotNull("Category:Test expected", parserOutput.getCategories().get("Category:Test"));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCategoryNested() throws Throwable {
+		ParserOutput parserOutput = this.executeCategoryTest("TemplateIncludeCategory");
+		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
+		assertNotNull("Category:Test expected", parserOutput.getCategories().get("Category:Test"));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCategoryTemplate1() throws Throwable {
+		ParserOutput parserOutput = this.executeCategoryTest("TemplateCategory1");
+		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
+		assertNotNull("Category:Test Example1 expected", parserOutput.getCategories().get("Category:Test Example1"));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCategoryTemplate2() throws Throwable {
+		ParserOutput parserOutput = this.executeCategoryTest("TemplateCategory2");
+		assertEquals("Expected two categories", 2, parserOutput.getCategories().size());
+		assertNotNull("Category:Test Example1 expected", parserOutput.getCategories().get("Category:Test Example1"));
+		assertNotNull("Category:Test Example2 expected", parserOutput.getCategories().get("Category:Test Example2"));
+	}
+
+	/**
+	 *
+	 */
+	private ParserOutput executeCategoryTest(String topicName) throws Throwable {
+		ParserOutput parserOutput = new ParserOutput();
+		String parserResult = this.parserResult(parserOutput, topicName);
+		return parserOutput;
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testInterwiki1() throws Throwable {
+		// this topic has two interwiki links, but they both go to the same wikipedia page
+		ParserOutput parserOutput = new ParserOutput();
+		String parserResult = this.parserResult(parserOutput, "Interwiki1");
+		assertEquals("Interwiki1", 2, parserOutput.getInterwikiLinks().size());
+		assertEquals("Interwiki1", "<a class=\"interwiki\" title=\"Wikipedia\" href=\"http://en.wikipedia.org/wiki/Main_Page\">Wikipedia</a>", parserOutput.getInterwikiLinks().get(0));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testVirtualWiki1() throws Throwable {
+		// this topic has one virtual wiki link
+		ParserOutput parserOutput = new ParserOutput();
+		String parserResult = this.parserResult(parserOutput, "WikiLink1");
+		assertEquals("Interwiki1", 1, parserOutput.getVirtualWikiLinks().size());
+		assertEquals("Interwiki1", "<a href=\"/wiki/test/WikiLink1\" title=\"WikiLink1\">test:WikiLink1</a>", parserOutput.getVirtualWikiLinks().get(0));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testVirtualWiki2() throws Throwable {
+		ParserOutput parserOutput = new ParserOutput();
+		String parserResult = this.parserResult(parserOutput, "VirtualWiki1");
+		assertEquals("Expected no categories", 0, parserOutput.getCategories().size());
+		assertEquals("Expected one virtual wiki", 1, parserOutput.getVirtualWikiLinks().size());
+		assertEquals("Interwiki1", "<a href=\"/wiki/test/Category:Category1\" title=\"Category:Category1\">test:Category:Category1</a>", parserOutput.getVirtualWikiLinks().get(0));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testMagicWordDisplayTitleValid() throws Throwable {
+		String topicName = "Magic Words Display Title";
+		String displayTitle = "Magic_Words Display_Title";
+		String topicContent = "{{DISPLAYTITLE:" + displayTitle + "}}";
+		ParserInput parserInput = this.parserInput(topicName);
+		ParserOutput parserOutput = new ParserOutput();
+		ParserUtil.parse(parserInput, parserOutput, topicContent);
+		assertEquals("DISPLAYTITLE", displayTitle, parserOutput.getPageTitle());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testMagicWordDisplayTitleInvalid() throws Throwable {
+		String topicName = "Magic Words Display Title";
+		String displayTitle = "Invalid Title";
+		String topicContent = "{{DISPLAYTITLE:" + displayTitle + "}}";
+		ParserInput parserInput = this.parserInput(topicName);
+		ParserOutput parserOutput = new ParserOutput();
+		ParserUtil.parse(parserInput, parserOutput, topicContent);
+		assertNull("DISPLAYTITLE", parserOutput.getPageTitle());
+	}
+
+	/**
+	 *
+	 */
+	@Test
 	public void testParserNoJavascript() throws IOException {
 		// test with JS disabled
 		Environment.setBooleanValue(Environment.PROP_PARSER_ALLOW_JAVASCRIPT, false);
@@ -75,27 +189,25 @@ public class ParserTest extends JAMWikiUnitTest {
 	}
 
 	/**
-	 *
+	 * Generate a generic ParserInput object that can be used for testing.
 	 */
-	private String parse(String topicName, String raw) throws ParserException {
+	private ParserInput parserInput(String topicName) {
 		// set dummy values for parser input
-		ParserInput parserInput = new ParserInput();
+		ParserInput parserInput = new ParserInput("en", topicName);
 		parserInput.setContext("/wiki");
 		parserInput.setLocale(LocaleUtils.toLocale("en_US"));
 		parserInput.setWikiUser(null);
-		parserInput.setTopicName(topicName);
 		parserInput.setUserDisplay("0.0.0.0");
-		parserInput.setVirtualWiki("en");
 		parserInput.setAllowSectionEdit(true);
-		ParserOutput parserOutput = new ParserOutput();
-		return ParserUtil.parse(parserInput, parserOutput, raw);
+		return parserInput;
 	}
 
 	/**
 	 *
 	 */
 	private void executeParserTest(String fileName, String resultDirName) throws IOException, ParserException {
-		String parserResult = this.parserResult(fileName);
+		ParserOutput parserOutput = new ParserOutput();
+		String parserResult = this.parserResult(parserOutput, fileName);
 		String expectedResult = this.expectedResult(fileName, resultDirName);
 		assertEquals("Testing file " + fileName, expectedResult, parserResult);
 	}
@@ -120,9 +232,8 @@ public class ParserTest extends JAMWikiUnitTest {
 		failures.add("HtmlXSS1");
 		failures.add("ImageLink2"); // bad paragraph parsing - no <p> around <div> tags
 		failures.add("Inclusion~test"); // template params not parsed in parser functions
-		failures.add("NestedTable1");
-		failures.add("NestedTable2");
-		failures.add("Paragraph13");
+		failures.add("NestedTable1"); // paragraphs in <td> tags
+		failures.add("Paragraph13"); // paragraphs in <td> tags
 		failures.add("Paragraph15"); // failure parsing of empty paragraphs with <nowiki>
 		failures.add("PreformattedInvalid1");
 		failures.add("Template_-_Paramtest");
@@ -149,10 +260,11 @@ public class ParserTest extends JAMWikiUnitTest {
 	/**
 	 *
 	 */
-	private String parserResult(String fileName) throws IOException, ParserException {
+	private String parserResult(ParserOutput parserOutput, String fileName) throws IOException, ParserException {
 		String raw = TestFileUtil.retrieveFileContent(TestFileUtil.TEST_TOPICS_DIR, fileName);
 		String topicName = TestFileUtil.decodeTopicName(fileName);
-		return this.parse(topicName, raw);
+		ParserInput parserInput = this.parserInput(topicName);
+		return ParserUtil.parse(parserInput, parserOutput, raw);
 	}
 
 	/**

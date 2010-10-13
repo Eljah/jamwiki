@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
@@ -70,16 +69,16 @@ public abstract class JAMWikiServlet extends AbstractController {
 	private void buildLayout(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws DataAccessException {
 		String virtualWikiName = pageInfo.getVirtualWikiName();
 		if (virtualWikiName == null) {
-			logger.severe("No virtual wiki available for page request " + request.getRequestURI());
-			virtualWikiName = Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT);
+			logger.error("No virtual wiki available for page request " + request.getRequestURI());
+			virtualWikiName = VirtualWiki.defaultVirtualWiki().getName();
 		}
 		VirtualWiki virtualWiki = ServletUtil.retrieveVirtualWiki(virtualWikiName);
 		// build the layout contents
 		String leftMenu = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWikiName, WikiBase.SPECIAL_PAGE_LEFT_MENU, true);
 		next.addObject("leftMenu", leftMenu);
-		next.addObject("defaultTopic", virtualWiki.getDefaultTopicName());
+		next.addObject("defaultTopic", virtualWiki.getRootTopicName());
 		next.addObject("virtualWiki", virtualWiki.getName());
-		next.addObject("logo", Environment.getValue(Environment.PROP_BASE_LOGO_IMAGE));
+		next.addObject("logo", virtualWiki.getLogoImageUrl());
 		String bottomArea = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_BOTTOM_AREA, true);
 		next.addObject("bottomArea", bottomArea);
 		next.addObject(WikiUtil.PARAMETER_VIRTUAL_WIKI, virtualWiki.getName());
@@ -156,7 +155,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 				String printLink = "Special:Print?topic=" + Utilities.encodeAndEscapeTopicName(pageName);
 				links.put(printLink, new WikiMessage("tab.common.print"));
 			} catch (WikiException e) {
-				logger.severe("Unable to build tabbed menu links", e);
+				logger.error("Unable to build tabbed menu links", e);
 			}
 		}
 		pageInfo.setTabMenu(links);
@@ -263,7 +262,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 				next.addObject(ServletUtil.PARAMETER_PAGE_INFO, pageInfo);
 			}
 		} catch (Throwable t) {
-			return this.viewError(request, t);
+			return this.viewError(request, response, t);
 		}
 		long execution = System.currentTimeMillis() - start;
 		if (execution > JAMWikiServlet.SLOW_PAGE_LIMIT) {
@@ -335,16 +334,18 @@ public abstract class JAMWikiServlet extends AbstractController {
 	}
 
 	/**
-	 * Method used when redirecting to an error page.
+	 * Method used when redirecting to an error page.  The HTTP response will be
+	 * set to 500 (Internal Server Error).
 	 *
 	 * @param request The servlet request object.
 	 * @param t The exception that is the source of the error.
 	 * @return Returns a ModelAndView object corresponding to the error page display.
 	 */
-	private ModelAndView viewError(HttpServletRequest request, Throwable t) {
+	private ModelAndView viewError(HttpServletRequest request, HttpServletResponse response, Throwable t) {
 		if (!(t instanceof WikiException)) {
-			logger.severe("Servlet error", t);
+			logger.error("Servlet error", t);
 		}
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		ModelAndView next = new ModelAndView("wiki");
 		WikiPageInfo pageInfo = new WikiPageInfo(request);
 		pageInfo.setPageTitle(new WikiMessage("error.title"));
@@ -362,12 +363,12 @@ public abstract class JAMWikiServlet extends AbstractController {
 			WikiMessage wm = new WikiMessage("error.unknown", errorMessage);
 			pageInfo.setException(wm);
 			next.addObject("messageObject", wm);
-			logger.severe("Failure while loading JSP: " + request.getServletPath(), t);
+			logger.error("Failure while loading JSP: " + request.getServletPath(), t);
 		}
 		try {
 			this.loadLayout(request, next, pageInfo);
 		} catch (Exception err) {
-			logger.severe("Unable to load default layout", err);
+			logger.error("Unable to load default layout", err);
 		}
 		next.addObject(ServletUtil.PARAMETER_PAGE_INFO, pageInfo);
 		return next;

@@ -14,37 +14,22 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.parser.jflex;
 
-import java.io.Serializable;
+import org.jamwiki.parser.ParserException;
 
 /**
- * Utility class for storing key-value pairs.
+ * Custom exception class used to indicate that the parser has nested too deeply
+ * and may be in an infinite loop.
  */
-public class ImageDimensions implements Serializable {
-
-	int width = 0;
-	int height = 0;
+public class ExcessiveNestingException extends ParserException {
 
 	/**
+	 * Constructor for an exception containing a message.
 	 *
+	 * @param message The message information for the exception.
 	 */
-	public ImageDimensions(int width, int height) {
-		this.width = width;
-		this.height = height;
-	}
-
-	/**
-	 *
-	 */
-	public int getHeight() {
-		return this.height;
-	}
-
-	/**
-	 *
-	 */
-	public int getWidth() {
-		return this.width;
+	public ExcessiveNestingException(String message) {
+		super(message);
 	}
 }

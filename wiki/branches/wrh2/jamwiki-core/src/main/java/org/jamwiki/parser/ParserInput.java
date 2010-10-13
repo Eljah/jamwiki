@@ -46,7 +46,9 @@ public class ParserInput {
 	/**
 	 *
 	 */
-	public ParserInput() {
+	public ParserInput(String virtualWiki, String topicName) {
+		this.virtualWiki = virtualWiki;
+		this.topicName = topicName;
 	}
 
 	/**
@@ -138,17 +140,6 @@ public class ParserInput {
 	}
 
 	/**
-	 * Since it is possible to call a new parser instance from within another
-	 * parser instance, depth provides a way to determine how many times the
-	 * parser has nested, thus providing a way of avoiding infinite loops.
-	 *
-	 * @param depth The current nesting level of the parser instance.
-	 */
-	public void setDepth(int depth) {
-		this.depth = depth;
-	}
-
-	/**
 	 * Get the locale associated with the current parser input instance.
 	 * Locale is used primarily when building links or displaying messages.
 	 *
@@ -232,15 +223,6 @@ public class ParserInput {
 	}
 
 	/**
-	 * Set the depth level when template code is being parsed.
-	 *
-	 * @param templateDepth The current number of template inclusions.
-	 */
-	public void setTemplateDepth(int templateDepth) {
-		this.templateDepth = templateDepth;
-	}
-
-	/**
 	 * Get the topic name for the topic being parsed by this parser input
 	 * instance.
 	 *
@@ -249,17 +231,6 @@ public class ParserInput {
 	 */
 	public String getTopicName() {
 		return this.topicName;
-	}
-
-	/**
-	 * Set the topic name for the topic being parsed by this parser input
-	 * instance.
-	 *
-	 * @param topicName The topic name for the topic being parsed by this
-	 *  parser input instance.
-	 */
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
 	}
 
 	/**
@@ -295,17 +266,6 @@ public class ParserInput {
 	 */
 	public String getVirtualWiki() {
 		return this.virtualWiki;
-	}
-
-	/**
-	 * Set the virtual wiki name associated with the current parser input
-	 * instance.  The virtual wiki name is used primarily when parsing links.
-	 *
-	 * @param virtualWiki The virtual wiki name associated with the current
-	 *  parser input instance.
-	 */
-	public void setVirtualWiki(String virtualWiki) {
-		this.virtualWiki = virtualWiki;
 	}
 
 	/**
