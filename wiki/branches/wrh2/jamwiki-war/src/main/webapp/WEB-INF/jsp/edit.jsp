@@ -54,14 +54,19 @@
 <input type="hidden" name="section" value="<c:out value="${section}" />" />
 <input type="hidden" name="topicVersionId" value="<c:out value="${topicVersionId}" />" />
 
+<div id="toolbar">
 <c:choose>
 	<c:when test="${editor == 'toolbar'}">
 		<%@ include file="editor-toolbar-include.jsp" %>
 	</c:when>
+	<c:when test="${editor == 'wysiwyg'}">
+		<%@ include file="editor-wysiwyg-include.jsp" %>
+	</c:when>
 </c:choose>
+</div>
 
 <p>
-<textarea id="topicContents" name="contents" rows="25" cols="80" accesskey=","><c:out value="${contents}" escapeXml="true" /></textarea>
+<textarea id="wpTextbox1" name="contents" rows="25" cols="80" accesskey=","><c:out value="${contents}" escapeXml="true" /></textarea>
 </p>
 <p><label for="editComment"><fmt:message key="edit.caption.comment" /></label>: <input type="text" name="editComment" value="<c:out value="${editComment}" />" size="60" id="editComment" /></p>
 <p>

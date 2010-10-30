@@ -19,7 +19,6 @@
 
 <script type="text/javascript">
 /*<![CDATA[*/
-document.writeln("<div id='toolbar'>");
 JAMWiki.Editor.addButton('../images/button_bold.png','<fmt:message key="edit.button.bold"/>','\'\'\'','\'\'\'','<fmt:message key="edit.button.bold.text"/>');
 JAMWiki.Editor.addButton('../images/button_italic.png','<fmt:message key="edit.button.italic"/>','\'\'','\'\'','<fmt:message key="edit.button.italic.text"/>');
 JAMWiki.Editor.addButton('../images/button_underline.png','<fmt:message key="edit.button.underline"/>','<u>','</u>','<fmt:message key="edit.button.underline.text"/>');
@@ -30,6 +29,5 @@ JAMWiki.Editor.addButton('../images/button_image.png','<fmt:message key="edit.bu
 JAMWiki.Editor.addButton('../images/button_nowiki.png','<fmt:message key="edit.button.nowiki"/>','<nowiki>','</nowiki>','<fmt:message key="edit.button.nowiki.text"/>');
 JAMWiki.Editor.addButton('../images/button_sig.png','<fmt:message key="edit.button.signature"/>','--~~~~','','');
 JAMWiki.Editor.addButton('../images/button_hr.png','<fmt:message key="edit.button.line"/>','\n----\n','','');
-document.writeln("</div>");
 /*]]>*/ 
 </script>

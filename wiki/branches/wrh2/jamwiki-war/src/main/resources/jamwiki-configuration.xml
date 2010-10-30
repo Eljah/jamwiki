@@ -117,6 +117,10 @@
 		<name>Toolbar</name>
 		<key>toolbar</key>
 	</editor>
+	<editor>
+		<name>WYSIWYG</name>
+		<key>wysiwyg</key>
+	</editor>
 </editors>
 
 <!--
