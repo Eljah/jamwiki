@@ -167,6 +167,9 @@
 		<name>Special:Admin</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Allpages</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:AllPages</name>
 	</pseudotopic>
 	<pseudotopic>
@@ -185,10 +188,16 @@
 		<name>Special:Export</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Filelist</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:FileList</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:History</name>
+	</pseudotopic>
+	<pseudotopic>
+		<name>Special:Imagelist</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:ImageList</name>
@@ -200,7 +209,13 @@
 		<name>Special:ImportTiddly</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Linkto</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:LinkTo</name>
+	</pseudotopic>
+	<pseudotopic>
+		<name>Special:Listusers</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:ListUsers</name>
@@ -227,10 +242,16 @@
 		<name>Special:Move</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Orphanedpages</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:OrphanedPages</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:Print</name>
+	</pseudotopic>
+	<pseudotopic>
+		<name>Special:Recentchanges</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:RecentChanges</name>
@@ -248,7 +269,13 @@
 		<name>Special:Setup</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Specialpages</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:SpecialPages</name>
+	</pseudotopic>
+	<pseudotopic>
+		<name>Special:Topicsadmin</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:TopicsAdmin</name>
@@ -263,10 +290,16 @@
 		<name>Special:Upload</name>
 	</pseudotopic>
 	<pseudotopic>
+		<name>Special:Virtualwiki</name>
+	</pseudotopic>
+	<pseudotopic>
 		<name>Special:VirtualWiki</name>
 	</pseudotopic>
 	<pseudotopic>
 		<name>Special:Watchlist</name>
+	</pseudotopic>
+	<pseudotopic>
+		<name>Special:WatchList</name>
 	</pseudotopic>
 </pseudotopics>
 
