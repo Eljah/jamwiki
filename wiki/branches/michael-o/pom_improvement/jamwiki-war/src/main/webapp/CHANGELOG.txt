@@ -44,8 +44,9 @@ New Features:
     addition to the jamwiki.properties file.  This table will be used in future
     releases.
   * Upgrade to Spring Framework 3.0.5.RELEASE.
-  * Upgrade to Spring Security 3.0.4.RELEASE.
+  * Upgrade to Spring Security 3.0.5.RELEASE.
   * Upgrade to Ehcache 2.1.0.
+  * Upgrade to Lucene Search 3.0.3.
   * Upgrade to commons-fileupload-1.2.2.
   * Upgrade to commons-io-2.0.
 
@@ -79,6 +80,19 @@ Translation Updates:
 
   * Updated German translations (axelclk).
   * Updated Russian translations (shar).
+
+
+0.9.4
+=====
+
+Bugfixes:
+
+  * The SERVERNAME was previously implemented incorrectly and has been fixed
+    to return only the server URL ("www.example.com") without an "http://"
+    prefix.  Reported by an anonymous user.
+  * Several pages including the Special:History page could generated errors on
+    Apache 7.0.x due to an invalid JSTL naming convention used with import
+    revisions.  Reported by anonymous users.
 
 
 0.9.3
