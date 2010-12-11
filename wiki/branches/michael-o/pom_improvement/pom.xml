@@ -381,6 +381,7 @@
 		<contributor><name>Michael (mindweb)</name><organization>VQWiki project</organization><roles><role>translator</role></roles></contributor>
 	</contributors>
 	<build>
+		<defaultGoal>package</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
