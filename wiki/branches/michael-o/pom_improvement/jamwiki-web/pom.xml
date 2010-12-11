@@ -123,7 +123,8 @@
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.4.1</version>
-				<executions>
+				<!-- disabled for development purposes -->
+				<!--<executions>
 					<execution>
 						<id>auto-clean</id>
 						<phase>initialize</phase>
@@ -131,7 +132,7 @@
 							<goal>clean</goal>
 						</goals>
 					</execution>
-				</executions>
+				</executions>-->
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
