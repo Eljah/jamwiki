@@ -34,6 +34,7 @@ New Features:
   * Add support for the Caché database (dprekker).
   * Add an option to treat capitalized and lowercase topic names as a single
     record.  For example, "Topic" and "topic" would refer to the same topic.
+  * Display pagination options when viewing topic categories.
   * Reduce the amount of parsing the must be done when importing topics in
     order to improve performance.
   * Remove ability to automatically upgrade from versions prior to 0.8.0.
@@ -80,6 +81,15 @@ Translation Updates:
 
   * Updated German translations (axelclk).
   * Updated Russian translations (shar).
+
+
+0.9.5
+=====
+
+Bugfixes:
+
+  * Headings of seven or more levels caused generation of invalid HTML.
+    Reported by an anonymous user.
 
 
 0.9.4
