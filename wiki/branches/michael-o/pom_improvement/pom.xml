@@ -8,7 +8,7 @@
 	<artifactId>jamwiki</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>Jamwiki Super POM</name>
+	<name>JAMWiki Super POM</name>
 	<description>
 		JAMWiki is a Java-based Wiki engine which offers many of the
 		features of MediaWiki.
