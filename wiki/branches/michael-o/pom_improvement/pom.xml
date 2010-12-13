@@ -44,11 +44,12 @@
 		</license>
 	</licenses>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jamwiki.version>1.0.0-SNAPSHOT</jamwiki.version>
 		<dependency.spring.version>3.0.5.RELEASE</dependency.spring.version>
 		<dependency.spring.security.version>3.0.5.RELEASE</dependency.spring.security.version>
 		<slf4j.version>1.5.11</slf4j.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -388,6 +389,8 @@
 	</contributors>
 	<build>
 		<defaultGoal>package</defaultGoal>
+		<!-- for future Maven 2.2 use -->
+		<!--<sourceEncoding>UTF-8</sourceEncoding>-->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -459,14 +462,14 @@
 	</build>
 	<!-- FIXME merge versions and configs with pluginManagement if possible -->
 	<reporting>
+		<!-- for future Maven 2.2 use -->
+		<!--<outputEncoding>UTF-8</outputEncoding>-->
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.7</version>
 				<configuration>
 					<aggregate>true</aggregate>
-					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -490,7 +493,6 @@
 						<ruleset>${basedir}/pmd.xml</ruleset>
 					</rulesets>
 					<targetJdk>1.5</targetJdk>
-					<sourceEncoding>UTF-8</sourceEncoding>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -518,7 +520,6 @@
 				<version>2.4</version>
 				<configuration>
 					<aggregate>true</aggregate>
-					<encoding>UTF-8</encoding>
 					<tags>
 						<tag>TODO</tag>
 						<tag>FIXME</tag>
