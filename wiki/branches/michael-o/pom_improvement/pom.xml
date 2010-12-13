@@ -46,30 +46,12 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jamwiki.version>1.0.0-SNAPSHOT</jamwiki.version>
 		<dependency.spring.version>3.0.5.RELEASE</dependency.spring.version>
 		<dependency.spring.security.version>3.0.5.RELEASE</dependency.spring.security.version>
 		<slf4j.version>1.5.11</slf4j.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>org.jamwiki</groupId>
-				<artifactId>jamwiki-core</artifactId>
-				<version>${jamwiki.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jamwiki</groupId>
-				<artifactId>jamwiki-core</artifactId>
-				<scope>test</scope>
-				<classifier>tests</classifier>
-				<version>${jamwiki.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jamwiki</groupId>
-				<artifactId>jamwiki-web</artifactId>
-				<version>${jamwiki.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-config</artifactId>
