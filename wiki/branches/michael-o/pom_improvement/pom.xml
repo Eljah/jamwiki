@@ -40,7 +40,7 @@
 		<license>
 			<name>LGPL</name>
 			<url>http://www.gnu.org/licenses/lgpl.html</url>
-			<distribution>repo</distribution>
+			<distribution>manual</distribution>
 		</license>
 	</licenses>
 	<properties>
