@@ -44,7 +44,7 @@ New Features:
   * Organize uploaded images by virtual wiki on the file system.
   * Add several indexes to the database to improve query performance.
   * Persist configuration information to a new jam_configuration table in
-    addition to the jamwiki.properties file.  This table will be used in future
+    addition to the jamwiki.properties file. This table will be used in future
     releases.
   * Upgrade to Spring Framework 3.0.5.RELEASE.
   * Upgrade to Spring Security 3.0.5.RELEASE.
@@ -52,6 +52,7 @@ New Features:
   * Upgrade to Lucene Search 3.0.3.
   * Upgrade to commons-fileupload-1.2.2.
   * Upgrade to commons-io-2.0.
+  * Upgrade to Bliki Core 3.0.15.
 
 Bugfixes:
 
