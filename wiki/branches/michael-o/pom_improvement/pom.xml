@@ -371,8 +371,6 @@
 	</contributors>
 	<build>
 		<defaultGoal>package</defaultGoal>
-		<!-- for future Maven 2.2 use -->
-		<!--<sourceEncoding>UTF-8</sourceEncoding>-->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -444,8 +442,6 @@
 	</build>
 	<!-- FIXME merge versions and configs with pluginManagement if possible -->
 	<reporting>
-		<!-- for future Maven 2.2 use -->
-		<!--<outputEncoding>UTF-8</outputEncoding>-->
 		<plugins>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
