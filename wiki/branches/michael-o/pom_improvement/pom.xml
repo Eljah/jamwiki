@@ -326,6 +326,16 @@
 				<role>developer</role>
 			</roles>
 		</developer>
+		<developer>
+			<id>michael-o</id>
+			<name>Michael Osipov</name>
+			<email>michael-o at users.sf.net</email>
+			<roles>
+				<role>developer</role>
+				<role>Maven responsible</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 	<contributors>
 		<contributor><name>Fernando Fernandes</name><email>leandes</email><roles><role>translator (Portugese - Brazilian)</role></roles></contributor>
