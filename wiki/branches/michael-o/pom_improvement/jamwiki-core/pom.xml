@@ -83,8 +83,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<!-- disabled for development purposes -->
-				<!--<executions>
+				<executions>
 					<execution>
 						<id>auto-clean</id>
 						<phase>initialize</phase>
@@ -92,7 +91,7 @@
 							<goal>clean</goal>
 						</goals>
 					</execution>
-				</executions>-->
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>de.jflex</groupId>

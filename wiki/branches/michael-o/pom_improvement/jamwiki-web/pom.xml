@@ -58,10 +58,10 @@
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
 		<!-- Necessary due to https://jira.springframework.org/browse/SEC-1433 -->
-		 <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
@@ -134,8 +134,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<!-- disabled for development purposes -->
-				<!--<executions>
+				<executions>
 					<execution>
 						<id>auto-clean</id>
 						<phase>initialize</phase>
@@ -143,7 +142,7 @@
 							<goal>clean</goal>
 						</goals>
 					</execution>
-				</executions>-->
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
