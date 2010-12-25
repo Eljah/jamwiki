@@ -396,7 +396,6 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.3.2</version>
 					<configuration>
-						<encoding>ISO-8859-1</encoding>
 						<showDeprecation>true</showDeprecation>
 						<compilerArgument>-Xlint:unchecked</compilerArgument>
 					</configuration>
