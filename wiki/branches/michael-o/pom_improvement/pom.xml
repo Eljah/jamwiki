@@ -418,8 +418,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<!-- version 2.7 is broken due to http://jira.codehaus.org/browse/SUREFIRE-674 -->
-					<version>2.6</version>
+					<version>2.7.1</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
