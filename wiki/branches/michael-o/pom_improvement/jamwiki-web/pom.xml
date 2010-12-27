@@ -96,12 +96,15 @@
 			<artifactId>jamwiki-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 'mvn test' fails without prior 'mvn install' but still leads to -->
+		<!-- due to http://jira.codehaus.org/browse/MNG-3043 -->
+		
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>jamwiki-core</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
