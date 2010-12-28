@@ -90,7 +90,8 @@
 			NOTE: *.txt files currently won't unpack - a bug report has been filed with
 			the Maven team (http://jira.codehaus.org/browse/MDEP-258).
 			-->
-			<!-- Error-prone with 'mvn test' due to http://jira.codehaus.org/browse/MDEP-98 -->
+			<!-- Error-prone with 'mvn test' due to -->
+			<!-- http://jira.codehaus.org/browse/MDEP-98 and http://jira.codehaus.org/browse/MDEP-194 -->
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
