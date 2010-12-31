@@ -61,6 +61,7 @@
 	</c:when>
 	<c:when test="${editor == 'wysiwyg'}">
 		<%@ include file="editor-wysiwyg-include.jsp" %>
+		<div id="wysiwyg_html" style="display:none">${topicObject.topicContent}</div>
 	</c:when>
 </c:choose>
 </div>

@@ -134,6 +134,14 @@ public class EditServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private boolean isWysiwyg(String editor) {
+		// FIXME - hard coding
+		return StringUtils.equals(editor, "wysiwyg");
+	}
+
+	/**
+	 *
+	 */
 	private void loadDiff(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, String contents1, String contents2) throws Exception {
 		List<WikiDiff> diffs = DiffUtil.diff(contents1, contents2);
 		next.addObject("diffs", diffs);
@@ -167,6 +175,11 @@ public class EditServlet extends JAMWikiServlet {
 		String editor = user.getEditor();
 		next.addObject("editor", editor);
 		next.addObject("contents", contents);
+		if (this.isWysiwyg(editor) && !this.isPreview(request)) {
+			// if this is a preview then HTML was already generated, otherwise
+			// generate it for the WYSIWYG editor
+			this.loadHtml(request, next, pageInfo, contents);
+		}
 	}
 
 	/**
@@ -180,6 +193,17 @@ public class EditServlet extends JAMWikiServlet {
 			throw new WikiException(new WikiMessage("error.readonly"));
 		}
 		return topic;
+	}
+
+	/**
+	 * Generate HTML for either a preview or the WYSIWYG editor
+	 */
+	private void loadHtml(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, String contents) throws Exception {
+		String topicName = WikiUtil.getTopicFromRequest(request);
+		String virtualWiki = pageInfo.getVirtualWikiName();
+		Topic topic = new Topic(virtualWiki, topicName);
+		topic.setTopicContent(contents);
+		ServletUtil.viewTopic(request, next, pageInfo, null, topic, false, false);
 	}
 
 	/**
@@ -232,13 +256,9 @@ public class EditServlet extends JAMWikiServlet {
 	 * Functionality to handle the "Preview" button being clicked.
 	 */
 	private void preview(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		String topicName = WikiUtil.getTopicFromRequest(request);
-		String virtualWiki = pageInfo.getVirtualWikiName();
 		String contents = (String)request.getParameter("contents");
-		Topic previewTopic = new Topic(virtualWiki, topicName);
-		previewTopic.setTopicContent(contents);
+		this.loadHtml(request, next, pageInfo, contents);
 		next.addObject("editPreview", "true");
-		ServletUtil.viewTopic(request, next, pageInfo, null, previewTopic, false, false);
 	}
 
 	/**

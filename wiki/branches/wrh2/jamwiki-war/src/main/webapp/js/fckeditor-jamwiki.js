@@ -144,7 +144,7 @@ function sajax_do_call(func_name, args, target) {
 var RTE_VISIBLE = 1;
 var RTE_TOGGLE_LINK = 2;
 var RTE_POPUP = 4;
-var showFCKEditor = RTE_VISIBLE | RTE_TOGGLE_LINK | RTE_POPUP;
+var showFCKEditor = RTE_VISIBLE;
 var popup = false;		//pointer to popup document
 var firstLoad = true;
 var editorMsgOn = "Rich Editor";
@@ -405,7 +405,7 @@ function ToggleFCKEditor(mode, objId)
 //			if ( firstLoad )	//still
 //			{
 //				SRCtextarea.value = result.responseText; //insert parsed text
-				SRCtextarea.value = "<b>test</b>"; //insert parsed text
+				SRCtextarea.value = document.getElementById("wysiwyg_html").innerHTML; //insert parsed text
 				onLoadFCKeditor();
 				if (oToggleLink) oToggleLink.innerHTML = editorMsgOff;
 				oFCKeditor.ready = true;
@@ -466,3 +466,16 @@ function FCKeditor_OpenPopup(jsID, textareaID)
 	window.open(popupUrl, null, 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=1,dependent=yes');
 	return 0;
 }
+
+function JAMWiki_loadEditor() {
+	if (typeof FCKeditorAPI == "undefined") {
+		// not loaded yet, try again in a bit
+		setTimeout(JAMWiki_loadEditor, 200);
+	} else {
+		console.log("Loading textarea");
+		var SRCtextarea = document.getElementById( 'wpTextbox1' ) ;
+		SRCtextarea.value = document.getElementById("wysiwyg_html").innerHTML; //insert parsed text
+		onLoadFCKeditor();
+	}
+}
+addOnloadHook( JAMWiki_loadEditor );
