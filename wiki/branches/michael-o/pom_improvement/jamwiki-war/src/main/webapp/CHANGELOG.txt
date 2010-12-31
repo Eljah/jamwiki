@@ -57,6 +57,9 @@ New Features:
   * Persist configuration information to a new jam_configuration table in
     addition to the jamwiki.properties file. This table will be used in future
     releases.
+  * Removed Java Diff from JAMWiki source and moved to Maven Central repository.
+  * Reworked internal POM structure and made build process easier than ever
+    before.
   * Upgrade to Spring Framework 3.0.5.RELEASE.
   * Upgrade to Spring Security 3.0.5.RELEASE.
   * Upgrade to Ehcache 2.1.0.
