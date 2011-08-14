@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -414,7 +414,7 @@ public class LuceneSearchEngine implements SearchEngine {
 		TokenStream tokenStream = analyzer.tokenStream(FIELD_TOPIC_CONTENT, new StringReader(content));
 		String summary = highlighter.getBestFragments(tokenStream, content, 3, "...");
 		if (StringUtils.isBlank(summary) && !StringUtils.isBlank(content)) {
-			summary = StringEscapeUtils.escapeHtml(content.substring(0, Math.min(200, content.length())));
+			summary = StringEscapeUtils.escapeHtml4(content.substring(0, Math.min(200, content.length())));
 			if (Math.min(200, content.length()) == 200) {
 				summary += "...";
 			}

@@ -19,7 +19,7 @@ package org.jamwiki;
 import java.util.List;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiMessageParam;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class is a utility class useful for storing messages key and object
@@ -57,7 +57,7 @@ public class WikiMessage {
 	public WikiMessage(String key, String param1) {
 		this.key = key;
 		this.params = new WikiMessageParam[1];
-		params[0] = new WikiMessageParam(this.escapeHtml(param1));
+		params[0] = new WikiMessageParam(this.escapeHtml4(param1));
 	}
 
 	/**
@@ -76,8 +76,8 @@ public class WikiMessage {
 	public WikiMessage(String key, String param1, String param2) {
 		this.key = key;
 		this.params = new WikiMessageParam[2];
-		params[0] = new WikiMessageParam(this.escapeHtml(param1));
-		params[1] = new WikiMessageParam(this.escapeHtml(param2));
+		params[0] = new WikiMessageParam(this.escapeHtml4(param1));
+		params[1] = new WikiMessageParam(this.escapeHtml4(param2));
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class WikiMessage {
 		if (params != null) {
 			this.params = new WikiMessageParam[params.length];
 			for (int i = 0; i < params.length; i++) {
-				this.params[i] = new WikiMessageParam(this.escapeHtml(params[i]));
+				this.params[i] = new WikiMessageParam(this.escapeHtml4(params[i]));
 			}
 		}
 	}
@@ -116,7 +116,7 @@ public class WikiMessage {
 			this.params = new WikiMessageParam[paramList.size()];
 			int i = 0;
 			for (String param : paramList) {
-				this.params[i++] = new WikiMessageParam(this.escapeHtml(param));
+				this.params[i++] = new WikiMessageParam(this.escapeHtml4(param));
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class WikiMessage {
 	 *  when this wiki message is rendered.
 	 */
 	public void addParam(String param) {
-		WikiMessageParam wikiMessageParam = new WikiMessageParam(this.escapeHtml(param));
+		WikiMessageParam wikiMessageParam = new WikiMessageParam(this.escapeHtml4(param));
 		this.addParam(wikiMessageParam);
 	}
 
@@ -220,7 +220,7 @@ public class WikiMessage {
 	 * but the current version escapes unicode characters as well as HTML entities
 	 * which breaks some wiki functionality.
 	 */
-	private String escapeHtml(String param) {
+	private String escapeHtml4(String param) {
 		// this could be optimized should performance become an issue
 		param = StringUtils.replace(param, "&", "&amp;");
 		param = StringUtils.replace(param, "<", "&lt;");
@@ -242,7 +242,7 @@ public class WikiMessage {
 		if (this.params == null || this.params.length <= index) {
 			throw new IllegalArgumentException("Attempt to replace index " + index + " for an array that has " + ((this.params == null) ? "0" : this.params.length) + " parameters");
 		}
-		this.params[index] = new WikiMessageParam(this.escapeHtml(parameter));
+		this.params[index] = new WikiMessageParam(this.escapeHtml4(parameter));
 	}
 
 	/**

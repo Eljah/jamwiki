@@ -39,11 +39,11 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class provides a variety of basic utility methods that are not
@@ -528,7 +528,7 @@ public class Utilities {
 			return false;
 		}
 		// see if it was successfully converted, in which case it is an entity
-		return (!text.equals(StringEscapeUtils.unescapeHtml(text)));
+		return (!text.equals(StringEscapeUtils.unescapeHtml4(text)));
 	}
 
 	/**

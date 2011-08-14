@@ -18,7 +18,7 @@ package org.jamwiki.model;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.utils.WikiLogger;
 
 /**

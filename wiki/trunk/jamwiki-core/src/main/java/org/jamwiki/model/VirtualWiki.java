@@ -17,7 +17,7 @@
 package org.jamwiki.model;
 
 import java.io.Serializable;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.WikiLogger;
 

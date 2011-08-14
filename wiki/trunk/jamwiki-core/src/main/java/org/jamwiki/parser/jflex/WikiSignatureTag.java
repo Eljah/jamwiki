@@ -18,7 +18,7 @@ package org.jamwiki.parser.jflex;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.WikiUser;

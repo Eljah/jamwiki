@@ -16,7 +16,7 @@ import org.jamwiki.utils.ImageHorizontalAlignmentEnum;
 import org.jamwiki.utils.ImageMetadata;
 import org.jamwiki.utils.ImageUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class JAMHTMLConverter extends HTMLConverter {
 	private static final int DEFAULT_THUMBNAIL_SIZE = 180;

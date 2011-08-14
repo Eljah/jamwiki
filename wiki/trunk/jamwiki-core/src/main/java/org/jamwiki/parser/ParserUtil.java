@@ -19,7 +19,7 @@ package org.jamwiki.parser;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
-import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;

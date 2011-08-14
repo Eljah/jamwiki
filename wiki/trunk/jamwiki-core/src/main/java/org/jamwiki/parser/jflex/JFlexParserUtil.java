@@ -19,7 +19,7 @@ package org.jamwiki.parser.jflex;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.WikiReference;
 import org.jamwiki.parser.ParserException;

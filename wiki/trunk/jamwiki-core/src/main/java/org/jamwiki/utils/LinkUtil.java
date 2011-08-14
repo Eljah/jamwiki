@@ -16,8 +16,8 @@
  */
 package org.jamwiki.utils;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
@@ -219,9 +219,9 @@ public class LinkUtil {
 		}
 		StringBuilder html = new StringBuilder();
 		html.append("<a href=\"").append(url).append('\"').append(style);
-		html.append(" title=\"").append(StringEscapeUtils.escapeHtml(topic)).append('\"').append(target).append('>');
+		html.append(" title=\"").append(StringEscapeUtils.escapeHtml4(topic)).append('\"').append(target).append('>');
 		if (escapeHtml) {
-			html.append(StringEscapeUtils.escapeHtml(text));
+			html.append(StringEscapeUtils.escapeHtml4(text));
 		} else {
 			html.append(text);
 		}

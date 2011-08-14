@@ -5,7 +5,7 @@
  */
 package org.jamwiki.parser.jflex;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jamwiki.parser.TableOfContents;
 import org.jamwiki.utils.Utilities;
 
@@ -147,7 +147,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {nowiki} {
         if (logger.isTraceEnabled()) logger.trace("nowiki: " + yytext() + " (" + yystate() + ")");
         String content = JFlexParserUtil.tagContent(yytext());
-        return "<nowiki>" + StringEscapeUtils.escapeHtml(content) + "</nowiki>";
+        return "<nowiki>" + StringEscapeUtils.escapeHtml4(content) + "</nowiki>";
     }
 }
 
@@ -157,7 +157,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmlprestart} {
         if (logger.isTraceEnabled()) logger.trace("htmlprestart: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         beginState(PRE);
         this.pushTag("pre", yytext());
@@ -458,7 +458,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmlbr} {
         if (logger.isTraceEnabled()) logger.trace("htmlbr: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         // <br> may have attributes, so check for them
         HtmlTagItem htmlTagItem = JFlexParserUtil.sanitizeHtmlTag(yytext());
@@ -468,7 +468,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmlparagraphopen} {
         if (logger.isTraceEnabled()) logger.trace("htmlparagraphopen: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         if (this.peekTag().getTagType().equals("p")) {
             // if a paragraph is already opened, close it before opening a new paragraph
@@ -483,7 +483,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmlparagraphclose} {
         if (logger.isTraceEnabled()) logger.trace("htmlparagraphclose: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         if (this.peekTag().getTagType().equals("p")) {
             // only perform processing if a paragraph is open.  otherwise just suppress this tag.
@@ -499,7 +499,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmltagnocontent} {
         if (logger.isTraceEnabled()) logger.trace("htmltagnocontent: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         HtmlTagItem tagItem = JFlexParserUtil.sanitizeHtmlTag(yytext());
         return (tagItem == null) ? "" : tagItem.toHtml();
@@ -507,7 +507,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmltagopen} {
         if (logger.isTraceEnabled()) logger.trace("htmltagopen: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         this.pushTag(null, yytext());
         return "";
@@ -515,7 +515,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {htmltagclose} {
         if (logger.isTraceEnabled()) logger.trace("htmltagclose: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
-            return StringEscapeUtils.escapeHtml(yytext());
+            return StringEscapeUtils.escapeHtml4(yytext());
         }
         this.popTag(null, yytext());
         return "";
@@ -548,10 +548,10 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     {entity} {
         if (logger.isTraceEnabled()) logger.trace("entity: " + yytext() + " (" + yystate() + ")");
         String raw = yytext();
-        return (Utilities.isHtmlEntity(raw)) ? raw : StringEscapeUtils.escapeHtml(raw);
+        return (Utilities.isHtmlEntity(raw)) ? raw : StringEscapeUtils.escapeHtml4(raw);
     }
     {whitespace} | . {
         // no need to log this
-        return StringEscapeUtils.escapeHtml(yytext());
+        return StringEscapeUtils.escapeHtml4(yytext());
     }
 }

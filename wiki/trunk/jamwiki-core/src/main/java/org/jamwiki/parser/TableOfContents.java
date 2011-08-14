@@ -18,7 +18,7 @@ package org.jamwiki.parser;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.LinkUtil;

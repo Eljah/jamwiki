@@ -16,8 +16,8 @@
  */
 package org.jamwiki.parser.jflex;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
@@ -68,7 +68,7 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 	 */
 	private String buildTagName(JFlexLexer lexer, String tocText) {
 		// re-convert any &uuml; or other (converted by the parser) entities back
-		String tagName = StringEscapeUtils.unescapeHtml(tocText);
+		String tagName = StringEscapeUtils.unescapeHtml4(tocText);
 		return lexer.getParserInput().getTableOfContents().buildUniqueName(tagName);
 	}
 
@@ -134,7 +134,7 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 		String tocText = this.buildTocText(lexer, tagText);
 		String tagName = this.buildTagName(lexer, tocText);
 		if (lexer.getMode() <= JFlexParser.MODE_SLICE) {
-			String sectionName = StringEscapeUtils.unescapeHtml(tocText);
+			String sectionName = StringEscapeUtils.unescapeHtml4(tocText);
 			lexer.getParserOutput().setSectionName(sectionName);
 			return raw;
 		}

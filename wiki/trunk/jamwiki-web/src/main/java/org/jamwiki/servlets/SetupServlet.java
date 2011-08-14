@@ -20,8 +20,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiConfiguration;
@@ -50,7 +51,7 @@ public class SetupServlet extends JAMWikiServlet {
 	private static final WikiLogger logger = WikiLogger.getLogger(SetupServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_SETUP = "setup.jsp";
-	private static final int MINIMUM_JDK_VERSION = 150;
+	private static final JavaVersion MINIMUM_JDK_VERSION = JavaVersion.JAVA_1_5;
 
 	/**
 	 * This method handles the request after its parent class receives control.
@@ -69,7 +70,7 @@ public class SetupServlet extends JAMWikiServlet {
 		}
 		try {
 			if (!SystemUtils.isJavaVersionAtLeast(MINIMUM_JDK_VERSION)) {
-				throw new WikiException(new WikiMessage("setup.error.jdk", Integer.valueOf(MINIMUM_JDK_VERSION).toString(), System.getProperty("java.version")));
+				throw new WikiException(new WikiMessage("setup.error.jdk", MINIMUM_JDK_VERSION.toString(), System.getProperty("java.version")));
 			}
 			if (!StringUtils.isBlank(function) && initialize(request, next, pageInfo)) {
 				VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();

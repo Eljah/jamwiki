@@ -17,7 +17,7 @@
 package org.jamwiki.parser.jflex;
 
 import java.util.Stack;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;

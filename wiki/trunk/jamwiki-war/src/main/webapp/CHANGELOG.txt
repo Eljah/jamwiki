@@ -3,7 +3,7 @@
 
 New Features:
 
-  * None.
+  * Upgrade to commons-lang 3.0.1.
 
 Bugfixes:
 
@@ -1042,7 +1042,7 @@ New Features:
     should be backwards-compatible.
   * Upgrade to JSTL 1.1.2 (from 1.0.6).
   * Make the valid login, topic name, and role name patterns configurable.
-  * Replace several custom methods with the org.apache.commons.lang equivalent.
+  * Replace several custom methods with the org.apache.commons.lang3 equivalent.
   * During setup, create a default directory to use for image and other file
     uploads to hopefully eliminate some confusion.
   * When using multiple references to the same source, use the first non-empty

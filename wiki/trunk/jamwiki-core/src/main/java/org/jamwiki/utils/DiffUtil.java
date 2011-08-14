@@ -19,7 +19,7 @@ package org.jamwiki.utils;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.ehcache.Element;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.incava.util.diff.Diff;
 import org.incava.util.diff.Difference;
 import org.jamwiki.DataAccessException;

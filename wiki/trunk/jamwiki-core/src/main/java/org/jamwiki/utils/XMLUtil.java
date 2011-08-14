@@ -28,7 +28,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -84,7 +84,7 @@ public class XMLUtil {
 		}
 		writer.append('<').append(tagName).append('>');
 		if (escape) {
-			StringEscapeUtils.escapeXml(writer, tagValue);
+			StringEscapeUtils.ESCAPE_XML.translate(tagValue, writer);
 		} else {
 			writer.append(tagValue);
 		}
@@ -131,9 +131,9 @@ public class XMLUtil {
 		for (String key : attributes.keySet()) {
 			writer.append(' ');
 			if (escape) {
-				StringEscapeUtils.escapeXml(writer, key);
+				StringEscapeUtils.ESCAPE_XML.translate(key, writer);
 				writer.append("=\"");
-				StringEscapeUtils.escapeXml(writer, attributes.get(key));
+				StringEscapeUtils.ESCAPE_XML.translate(attributes.get(key), writer);
 			} else {
 				writer.append(' ').append(key).append("=\"").append(attributes.get(key));
 			}
@@ -141,7 +141,7 @@ public class XMLUtil {
 		}
 		writer.append('>');
 		if (escape) {
-			StringEscapeUtils.escapeXml(writer, tagValue);
+			StringEscapeUtils.ESCAPE_XML.translate(tagValue, writer);
 		} else {
 			writer.append(tagValue);
 		}

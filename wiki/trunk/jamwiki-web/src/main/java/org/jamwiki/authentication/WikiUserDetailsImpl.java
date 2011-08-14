@@ -18,7 +18,7 @@ package org.jamwiki.authentication;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.model.Role;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

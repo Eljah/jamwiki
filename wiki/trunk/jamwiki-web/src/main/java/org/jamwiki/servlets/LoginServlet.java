@@ -21,7 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.authentication.JAMWikiAuthenticationConstants;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;

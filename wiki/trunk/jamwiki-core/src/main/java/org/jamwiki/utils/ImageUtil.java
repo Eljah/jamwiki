@@ -28,8 +28,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import net.sf.ehcache.Element;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
@@ -181,7 +181,7 @@ public class ImageUtil {
 		html.append(" width=\"").append(wikiImage.getWidth()).append('\"');
 		html.append(" height=\"").append(wikiImage.getHeight()).append('\"');
 		String alt = imageMetadata.getAlt();
-		html.append(" alt=\"").append(StringEscapeUtils.escapeHtml(alt)).append('\"');
+		html.append(" alt=\"").append(StringEscapeUtils.escapeHtml4(alt)).append('\"');
 		if (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) {
 			html.append(" style=\"vertical-align: ").append(imageMetadata.getVerticalAlignment().toString()).append('\"');
 		}
@@ -193,7 +193,7 @@ public class ImageUtil {
 			// captions are only displayed for thumbnails and framed images.  galleries are handled separately.
 			html.append("\n<div class=\"thumbcaption\">");
 			if (escapeHtml) {
-				html.append(StringEscapeUtils.escapeHtml(caption));
+				html.append(StringEscapeUtils.escapeHtml4(caption));
 			} else {
 				html.append(caption);
 			}
@@ -274,7 +274,7 @@ public class ImageUtil {
 		}
 		html.append("<a href=\"").append(url).append("\">");
 		if (escapeHtml) {
-			html.append(StringEscapeUtils.escapeHtml(caption));
+			html.append(StringEscapeUtils.escapeHtml4(caption));
 		} else {
 			html.append(caption);
 		}

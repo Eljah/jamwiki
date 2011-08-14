@@ -17,7 +17,7 @@
 package org.jamwiki.authentication;
 
 import org.jamwiki.utils.Encryption;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
 /**

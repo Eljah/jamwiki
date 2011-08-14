@@ -16,8 +16,8 @@
  */
 package org.jamwiki.parser.jflex;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
@@ -58,7 +58,7 @@ public class JavascriptTag implements JFlexParserTag {
 		// otherwise, if Javascript is disabled but a script tag is present during the
 		// postprocessor parsing then it's highly likely someone is attempting an XSS attack.
 		logger.warn("Potential XSS attack detected from user " + parserInput.getUserDisplay() + ": " + raw);
-		return StringEscapeUtils.escapeHtml(raw);
+		return StringEscapeUtils.escapeHtml4(raw);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class JavascriptTag implements JFlexParserTag {
 		String closeTag = raw.substring(pos);
 		raw = raw.substring(0, pos);
 		if (!Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_JAVASCRIPT)) {
-			return StringEscapeUtils.escapeHtml(openTag) + JFlexParserUtil.parseFragment(parserInput, parserOutput, raw, mode) + StringEscapeUtils.escapeHtml(closeTag);
+			return StringEscapeUtils.escapeHtml4(openTag) + JFlexParserUtil.parseFragment(parserInput, parserOutput, raw, mode) + StringEscapeUtils.escapeHtml4(closeTag);
 		}
 		JFlexTagItem tag = new JFlexTagItem("script", openTag);
 		tag.getTagContent().append(raw);
