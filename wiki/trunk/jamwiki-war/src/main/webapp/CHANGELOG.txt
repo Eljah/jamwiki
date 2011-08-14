@@ -1,5 +1,21 @@
-﻿1.1.0
-=====
+﻿1.2
+===
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+  * None.
+
+Translation Updates:
+
+  * None.
+
+
+1.1
+===
 
 New Features:
 
@@ -202,8 +218,8 @@ Translation Updates:
   * Updated German translations (axelclk).
 
 
-1.0.0
-=====
+1.0
+===
 
 New Features:
 
