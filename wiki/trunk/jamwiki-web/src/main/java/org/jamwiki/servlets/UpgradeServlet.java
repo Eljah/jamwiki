@@ -85,8 +85,8 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private void upgrade(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
 		try {
 			WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-			if (oldVersion.before(0, 9, 0)) {
-				throw new WikiException(new WikiMessage("upgrade.error.oldversion", WikiVersion.CURRENT_WIKI_VERSION, "0.9.0"));
+			if (oldVersion.before(1, 0, 0)) {
+				throw new WikiException(new WikiMessage("upgrade.error.oldversion", WikiVersion.CURRENT_WIKI_VERSION, "1.0.0"));
 			}
 			// first perform database upgrades
 			this.upgradeDatabase(true, pageInfo.getMessages());
@@ -169,12 +169,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 			// per HSQL guidelines, execute a shutdown compact to upgrade on-disk format
 			DatabaseUpgrades.upgradeHsql22(messages);
 		}
-		if (oldVersion.before(1, 0, 0)) {
-			upgradeRequired = true;
-			if (performUpgrade) {
-				DatabaseUpgrades.upgrade100(messages);
-			}
-		}
 		if (oldVersion.before(1, 1, 0)) {
 			upgradeRequired = true;
 			if (performUpgrade) {
@@ -252,8 +246,8 @@ public class UpgradeServlet extends JAMWikiServlet {
 	 */
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		if (oldVersion.before(0, 9, 0)) {
-			pageInfo.addError(new WikiMessage("upgrade.error.oldversion", WikiVersion.CURRENT_WIKI_VERSION, "0.9.0"));
+		if (oldVersion.before(1, 0, 0)) {
+			pageInfo.addError(new WikiMessage("upgrade.error.oldversion", WikiVersion.CURRENT_WIKI_VERSION, "1.0.0"));
 		}
 		List<WikiMessage> upgradeDetails = new ArrayList<WikiMessage>();
 		try {
@@ -268,9 +262,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 			searchWikiMessage.addParam(Integer.toString(MAX_TOPICS_FOR_AUTOMATIC_UPDATE));
 			searchWikiMessage.addWikiLinkParam("Special:Maintenance");
 			upgradeDetails.add(searchWikiMessage);
-		}
-		if (oldVersion.before(1, 0, 0)) {
-			upgradeDetails.add(new WikiMessage("upgrade.message.100.reparse"));
 		}
 		if (this.upgradeStyleSheetRequired()) {
 			upgradeDetails.add(new WikiMessage("upgrade.caption.stylesheet"));

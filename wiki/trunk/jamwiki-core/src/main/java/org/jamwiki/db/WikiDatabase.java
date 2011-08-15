@@ -683,8 +683,7 @@ public class WikiDatabase {
 	/**
 	 *
 	 */
-	// FIXME - make this private once the ability to upgrade to 0.9.0 is removed
-	protected static void setupDefaultNamespaces() throws DataAccessException, WikiException {
+	private static void setupDefaultNamespaces() throws DataAccessException, WikiException {
 		logger.info("Creating default wiki namespaces");
 		List<Namespace> defaultNamespaces = new ArrayList<Namespace>(Namespace.DEFAULT_NAMESPACES.values());
 		Namespace commentsNamespace, mainNamespace;

@@ -3,6 +3,7 @@
 
 New Features:
 
+  * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to commons-lang 3.0.1.
 
 Bugfixes:
