@@ -81,6 +81,10 @@ public class MigrationUtil {
 		TopicImporter importer = new MediaWikiXmlImporter();
 		long start = System.currentTimeMillis();
 		Map<Topic, List<Integer>> parsedTopics = null;
+		// for performance reasons disable writes to the search engine during
+		// import since the search engine will be updated with the same topic
+		// information again during the creation of the topic import record.
+		WikiBase.getSearchEngine().setDisabled(true);
 		try {
 			parsedTopics = importer.importFromFile(file, virtualWiki);
 		} catch (MigrationException e) {
@@ -88,6 +92,9 @@ public class MigrationUtil {
 				throw (WikiException)(e.getCause());
 			}
 			throw e;
+		} finally {
+			// re-enable the write updates to the search engine
+			WikiBase.getSearchEngine().setDisabled(false);
 		}
 		logger.debug("Parsed XML " + file.getAbsolutePath() + " in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
 		if (parsedTopics.isEmpty()) {

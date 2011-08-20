@@ -82,6 +82,8 @@ public class LuceneSearchEngine implements SearchEngine {
 	protected static final int MAXIMUM_RESULTS_PER_SEARCH = 200;
 	/** Flag indicating whether or not to commit search index changes immediately. */
 	private boolean autoCommit = true;
+	/** Flag indicating whether write operations are temporarily disabled. */
+	private boolean disabled = false;
 	/** Store Searchers (once opened) for re-use for performance reasons. */
 	private Map<String, IndexSearcher> searchers = new HashMap<String, IndexSearcher>();
 	/** Store Writers (once opened) for re-use for performance reasons. */
@@ -93,6 +95,9 @@ public class LuceneSearchEngine implements SearchEngine {
 	 * @param topic The Topic object that is to be added to the index.
 	 */
 	public void addToIndex(Topic topic) {
+		if (this.disabled) {
+			return;
+		}
 		try {
 			long start = System.currentTimeMillis();
 			IndexWriter writer = this.retrieveIndexWriter(topic.getVirtualWiki(), false);
@@ -212,6 +217,9 @@ public class LuceneSearchEngine implements SearchEngine {
 	 * @param topic The topic object that is to be removed from the index.
 	 */
 	public void deleteFromIndex(Topic topic) {
+		if (this.disabled) {
+			return;
+		}
 		try {
 			long start = System.currentTimeMillis();
 			// delete the current document
@@ -300,7 +308,9 @@ public class LuceneSearchEngine implements SearchEngine {
 	}
 
 	/**
-	 * Refresh the current search index by re-visiting all topic pages.
+	 * Refresh the current search index by re-visiting all topic pages.  Note
+	 * that this method will update the index even if the {@link setDisabled()}
+	 * method has been invoked to disable write operations.
 	 *
 	 * @throws Exception Thrown if any error occurs while re-indexing the Wiki.
 	 */
@@ -430,6 +440,13 @@ public class LuceneSearchEngine implements SearchEngine {
 	}
 
 	/**
+	 *
+	 */
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+	}
+
+	/**
 	 * 
 	 */
 	public void shutdown() throws IOException {
@@ -445,6 +462,9 @@ public class LuceneSearchEngine implements SearchEngine {
 	 *
 	 */
 	public void updateInIndex(Topic topic) {
+		if (this.disabled) {
+			return;
+		}
 		try {
 			long start = System.currentTimeMillis();
 			IndexWriter writer = this.retrieveIndexWriter(topic.getVirtualWiki(), false);

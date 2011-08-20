@@ -33,6 +33,7 @@ public interface SearchEngine {
 	public static final String SEARCH_ENGINE_LUCENE = "org.jamwiki.search.LuceneSearchEngine";
 	/** RankingAlgorithm search engine class */
 	public static final String SEARCH_ENGINE_RANKINGALGORITHM = "org.jamwiki.search.RankingAlgorithmSearchEngine";
+
 	/**
 	 * Add a topic to the search index.
 	 *
@@ -85,6 +86,19 @@ public interface SearchEngine {
 	 *  the search index should be immediately committed to the index.
 	 */
 	void setAutoCommit(boolean autoCommit);
+
+	/**
+	 * Temporarily disable the search engine from all write operations such as
+	 * adding and updating topics in its index, but not from read operations
+	 * such as performing searches.  This is useful in cases such as bulk
+	 * loading of topic versions where the search engine only needs to be
+	 * updated after the last topic version is inserted since all intermediate
+	 * updates would have been overridden.
+	 *
+	 * @param disabled <code>true</code> to disable updates to the search engine
+	 *  index.
+	 */
+	void setDisabled(boolean disabled);
 
 	/**
 	 * Trigger a shutdown of a search engine instance, allowing resources to

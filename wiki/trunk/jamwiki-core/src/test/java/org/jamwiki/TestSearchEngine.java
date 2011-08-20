@@ -66,6 +66,12 @@ public class TestSearchEngine implements SearchEngine {
 	/**
 	 *
 	 */
+	public void setDisabled(boolean disabled) {
+	}
+
+	/**
+	 *
+	 */
 	public void shutdown() {
 	}
 
