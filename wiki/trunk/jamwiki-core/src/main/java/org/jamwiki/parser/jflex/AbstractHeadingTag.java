@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser.jflex;
 
+import java.io.IOException;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -26,6 +27,7 @@ import org.jamwiki.parser.TableOfContents;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.utils.WikiUtil;
 
 /**
  * Abstract parent class used for parsing wiki & HTML heading tags.
@@ -33,11 +35,13 @@ import org.jamwiki.utils.WikiLogger;
 public abstract class AbstractHeadingTag implements JFlexParserTag {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(AbstractHeadingTag.class.getName());
+	/** Path to the template used to format a header edit link, relative to the classpath. */
+	private static final String TEMPLATE_HEADER_EDIT_LINK = "templates/header-edit-link.template";
 
 	/**
 	 *
 	 */
-	private String buildSectionEditLink(ParserInput parserInput, int section) {
+	private String buildSectionEditLink(ParserInput parserInput, int section) throws ParserException {
 		if (!parserInput.getAllowSectionEdit()) {
 			return "";
 		}
@@ -57,10 +61,15 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 		} catch (DataAccessException e) {
 			logger.error("Failure while building link for topic " + parserInput.getVirtualWiki() + " / " + parserInput.getTopicName(), e);
 		}
-		StringBuilder output = new StringBuilder("<span class=\"editsection\">[<a href=\"").append(url).append("\">");
-		output.append(Utilities.formatMessage("common.sectionedit", parserInput.getLocale()));
-		output.append("</a>]</span>");
-		return output.toString();
+		// arguments are edit link URL and edit label text
+		Object[] args = new Object[2];
+		args[0] = url;
+		args[1] = Utilities.formatMessage("common.sectionedit", parserInput.getLocale());
+		try {
+			return WikiUtil.formatFromTemplate(TEMPLATE_HEADER_EDIT_LINK, args);
+		} catch (IOException e) {
+			throw new ParserException(e);
+		}
 	}
 
 	/**
