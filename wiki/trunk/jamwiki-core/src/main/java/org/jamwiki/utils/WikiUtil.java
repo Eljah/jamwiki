@@ -20,11 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+import net.sf.ehcache.Element;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -51,6 +53,8 @@ public class WikiUtil {
 
 	/** webapp context path, initialized from JAMWikiFilter. */
 	public static String WEBAPP_CONTEXT_PATH = null;
+	private static final String CACHE_TEMPLATE_MESSAGE_FORMATTER = "org.jamwiki.util.WikiUtil.CACHE_TEMPLATE_MESSAGE_FORMATTER";
+	private static final Pattern HTML_COMMENT_PATTERN = Pattern.compile("<!--.*?-->", Pattern.DOTALL);
 	private static final Pattern INVALID_NAMESPACE_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_NAMESPACE_NAME));
 	private static final Pattern INVALID_ROLE_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_ROLE_NAME));
 	private static final Pattern INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_NAME));
@@ -263,6 +267,37 @@ public class WikiUtil {
 			}
 		}
 		return TopicType.ARTICLE;
+	}
+
+	/**
+	 * Load a template file, which is a <code>java.text.MessageFormat</code>
+	 * pattern, and parse it with the specified arguments.
+	 *
+	 * @param template A template file path that is either absolute or
+	 *  relative to the classpath.
+	 * @param args Zero or more arguments to use when parsing the template.
+	 */
+	public static String formatFromTemplate(String template, Object... args) throws IOException {
+		MessageFormat mf = null;
+		// cache the message formatter since this code is likely to be invoked often
+		Element cacheElement = null;
+		try {
+			cacheElement = WikiCache.retrieveFromCache(CACHE_TEMPLATE_MESSAGE_FORMATTER, template);
+		} catch (DataAccessException e) {
+			// FIXME - the root cause is lost, find a way to handle it
+			throw new IOException(e.toString());
+		}
+		if (cacheElement != null) {
+			mf = (MessageFormat)cacheElement.getObjectValue();
+		} else {
+			String templateString = Utilities.readFile(template);
+			// strip HTML comments
+			Matcher m = WikiUtil.HTML_COMMENT_PATTERN.matcher(templateString);
+			templateString = m.replaceAll("");
+			mf = new MessageFormat(templateString.trim());
+			WikiCache.addToCache(CACHE_TEMPLATE_MESSAGE_FORMATTER, template, mf);
+		}
+		return mf.format(args);
 	}
 
 	/**

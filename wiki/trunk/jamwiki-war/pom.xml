@@ -79,10 +79,11 @@
 				</configuration>
 			</plugin>
 			<!--
-			Currently the sql.*.properties files and default topic files are in the
-			jamwiki-core.jar file.  To make it easy for sites to customize SQL (for bug
-			fixing and such) and to create new translations, unpack these files
-			from the JAR and place them into the WEB-INF/classes folder.
+			Currently the sql.*.properties files, default topic files and HTML template
+			fragments are in the jamwiki-core.jar file.  To make it easy for sites to
+			customize SQL (for bug fixing and such) and to create new translations,
+			unpack these files from the JAR and place them into the WEB-INF/classes
+			folder.
 			
 			NOTE: *.txt files currently won't unpack - a bug report has been filed with
 			the Maven team (http://jira.codehaus.org/browse/MDEP-258).
@@ -99,7 +100,7 @@
 						</goals>
 						<configuration>
 							<includeArtifactIds>jamwiki-core</includeArtifactIds>
-							<includes>**/sql.*.properties,pages/**</includes>
+							<includes>sql/**,templates/**,pages/**</includes>
 							<outputDirectory>${project.build.outputDirectory}</outputDirectory>
 						</configuration>
 					</execution>

@@ -3,6 +3,8 @@
 
 New Features:
 
+  * Move hard-coded HTML to template files to allow simpler customization of
+    images, table of contents, and other elements.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to commons-lang 3.0.1.
 
