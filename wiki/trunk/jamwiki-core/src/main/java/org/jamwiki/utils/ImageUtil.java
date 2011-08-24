@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -58,6 +57,30 @@ public class ImageUtil {
 	private static final String CACHE_IMAGE_DIMENSIONS = "org.jamwiki.utils.ImageUtil.CACHE_IMAGE_DIMENSIONS";
 	/** Sub-folder of the "files" directory into which to place resized images. */
 	private static final String RESIZED_IMAGE_SUBFOLDER = "resized";
+	/** Path to the template used to format a center-aligned image. */
+	private static final String TEMPLATE_IMAGE_ALIGN_CENTER = "templates/image-align-center.template";
+	/** Path to the template used to format a left-aligned image. */
+	private static final String TEMPLATE_IMAGE_ALIGN_LEFT = "templates/image-align-left.template";
+	/** Path to the template used to format an image that is not aligned. */
+	private static final String TEMPLATE_IMAGE_ALIGN_NONE = "templates/image-align-none.template";
+	/** Path to the template used to format a right-aligned image. */
+	private static final String TEMPLATE_IMAGE_ALIGN_RIGHT = "templates/image-align-right.template";
+	/** Path to the template used to format gallery elements without captions. */
+	private static final String TEMPLATE_IMAGE_GALLERY_ELEMENT_NO_CAPTION = "templates/image-gallery-element-no-caption.template";
+	/** Path to the template used to format gallery elements with captions. */
+	private static final String TEMPLATE_IMAGE_GALLERY_ELEMENT_WITH_CAPTION = "templates/image-gallery-element-with-caption.template";
+	/** Path to the template used to format img tags that are not vertical aligned. */
+	private static final String TEMPLATE_IMAGE_IMG_STANDARD = "templates/image-img-standard.template";
+	/** Path to the template used to format img tags that are vertical aligned. */
+	private static final String TEMPLATE_IMAGE_IMG_VERTICAL = "templates/image-img-vertical.template";
+	/** Path to the template used to format a plain image. */
+	private static final String TEMPLATE_IMAGE_PLAIN = "templates/image-plain.template";
+	/** Path to the template used to format center-aligned image thumbnails. */
+	private static final String TEMPLATE_IMAGE_THUMBNAIL_CENTER = "templates/image-thumbnail-center.template";
+	/** Path to the template used to format left-aligned image thumbnails. */
+	private static final String TEMPLATE_IMAGE_THUMBNAIL_LEFT = "templates/image-thumbnail-left.template";
+	/** Path to the template used to format right-aligned image thumbnails. */
+	private static final String TEMPLATE_IMAGE_THUMBNAIL_RIGHT = "templates/image-thumbnail-right.template";
 
 	/**
 	 *
@@ -147,7 +170,6 @@ public class ImageUtil {
 		if (wikiImage == null) {
 			return ImageUtil.buildLinkToFile(url, topic, caption, escapeHtml);
 		}
-		String imageWrapperDiv = ImageUtil.buildImageWrapperDivs(imageMetadata, wikiImage.getWidth(), wikiImage.getHeight());
 		if (!StringUtils.isWhitespace(imageMetadata.getLink())) {
 			if (imageMetadata.getLink() == null) {
 				// no link set, link to the image topic page.  At this point we have validated
@@ -175,17 +197,20 @@ public class ImageUtil {
 		if (imageMetadata.getBordered()) {
 			style += " thumbborder";
 		}
-		html.append("<img class=\"").append(style).append("\" src=\"");
-		html.append(buildRelativeImageUrl(wikiImage.getUrl()));
-		html.append('\"');
-		html.append(" width=\"").append(wikiImage.getWidth()).append('\"');
-		html.append(" height=\"").append(wikiImage.getHeight()).append('\"');
-		String alt = imageMetadata.getAlt();
-		html.append(" alt=\"").append(StringEscapeUtils.escapeHtml4(alt)).append('\"');
+		Object[] args = (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) ? new Object[6] : new Object[5];
+		args[0] = style;
+		args[1] = buildRelativeImageUrl(wikiImage.getUrl());
+		args[2] = wikiImage.getWidth();
+		args[3] = wikiImage.getHeight();
+		args[4] = StringEscapeUtils.escapeHtml4(imageMetadata.getAlt());
+		// TODO: combine the standard & vertical templates by adding a CSS class for
+		// vertical alignment
+		String template = TEMPLATE_IMAGE_IMG_STANDARD;
 		if (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) {
-			html.append(" style=\"vertical-align: ").append(imageMetadata.getVerticalAlignment().toString()).append('\"');
+			template = TEMPLATE_IMAGE_IMG_VERTICAL;
+			args[5] = imageMetadata.getVerticalAlignment().toString();
 		}
-		html.append(" />");
+		html.append(WikiUtil.formatFromTemplate(template, args));
 		if (!StringUtils.isWhitespace(imageMetadata.getLink())) {
 			html.append("</a>");
 		}
@@ -199,7 +224,7 @@ public class ImageUtil {
 			}
 			html.append("</div>\n");
 		}
-		return MessageFormat.format(imageWrapperDiv, html.toString());
+		return ImageUtil.buildWrappedImageDiv(imageMetadata, wikiImage.getWidth(), wikiImage.getHeight(), html.toString());
 	}
 
 	/**
@@ -224,42 +249,43 @@ public class ImageUtil {
 	/**
 	 * Determine the CSS styles to apply to the image wrapper div.
 	 */
-	private static String buildImageWrapperDivs(ImageMetadata imageMetadata, int width, int height) {
+	private static String buildWrappedImageDiv(ImageMetadata imageMetadata, int width, int height, String imageHtml) throws IOException {
 		// CSS and wrappers are processed differently for thumb/frame vs. non-thumb/non-frame
 		if (imageMetadata.getBorder() == ImageBorderEnum._GALLERY) {
-			// vertical padding centers the image in the box.  the extra 4 pixels are padding.
+			// gallery images.
 			int verticalPadding = ((imageMetadata.getGalleryHeight() - height) > 0) ? (int)Math.floor((imageMetadata.getGalleryHeight() - height) / 2) : 0;
-			StringBuilder html = new StringBuilder();
-			html.append("<div style=\"width:").append(width + 35).append("px;\" class=\"gallerybox\">\n");
-			html.append("<div class=\"thumb\" style=\"padding:").append(verticalPadding).append("px 0;\">\n");
-			html.append("<div class=\"thumbinner\" style=\"width:").append(width + 2).append("px; margin:0 auto;\">{0}</div>\n");
-			html.append("</div>\n");
+			Object[] args = (StringUtils.isBlank(imageMetadata.getCaption())) ? new Object[4] : new Object[5];
+			args[0] = width + 35;
+			args[1] = verticalPadding;
+			args[2] = width + 2;
+			args[3] = imageHtml;
+			String template = TEMPLATE_IMAGE_GALLERY_ELEMENT_NO_CAPTION;
 			if (!StringUtils.isBlank(imageMetadata.getCaption())) {
-				html.append("<div class=\"gallerytext\">\n<p>").append(imageMetadata.getCaption()).append("</p>\n</div>\n");
+				args[4] = imageMetadata.getCaption();
+				template = TEMPLATE_IMAGE_GALLERY_ELEMENT_WITH_CAPTION;
 			}
-			html.append("</div>");
-			return html.toString();
+			return WikiUtil.formatFromTemplate(template, args);
 		} else if (imageMetadata.getBorder() != ImageBorderEnum.THUMB && imageMetadata.getBorder() != ImageBorderEnum.FRAME) {
+			// non-thumbnail images
 			if (imageMetadata.getHorizontalAlignment() == ImageHorizontalAlignmentEnum.LEFT) {
-				return "<div class=\"floatleft\">{0}</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_ALIGN_LEFT, imageHtml);
 			} else if (imageMetadata.getHorizontalAlignment() == ImageHorizontalAlignmentEnum.RIGHT) {
-				return "<div class=\"floatright\">{0}</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_ALIGN_RIGHT, imageHtml);
 			} else if (imageMetadata.getHorizontalAlignment() == ImageHorizontalAlignmentEnum.CENTER) {
-				return "<div class=\"center\">\n<div class=\"floatnone\">{0}</div>\n</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_ALIGN_CENTER, imageHtml);
 			} else if (imageMetadata.getHorizontalAlignment() == ImageHorizontalAlignmentEnum.NONE) {
-				return "<div class=\"floatnone\">{0}</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_ALIGN_NONE, imageHtml);
 			} else {
-				return "{0}";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_PLAIN, imageHtml);
 			}
 		} else {
-			// the inner div must specify a width
-			String styleWidth = " style=\"width:" + (width + 2) + "px\"";
+			// thumbnail images
 			if (imageMetadata.getHorizontalAlignment() == ImageHorizontalAlignmentEnum.CENTER) {
-				return "<div class=\"center\">\n<div class=\"thumb tnone\">\n<div class=\"thumbinner\"" + styleWidth + ">{0}</div>\n</div>\n</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_THUMBNAIL_CENTER, width + 2, imageHtml);
 			} else if (imageMetadata.getHorizontalAlignment() == ImageHorizontalAlignmentEnum.LEFT) {
-				return "<div class=\"thumb tleft\">\n<div class=\"thumbinner\"" + styleWidth + ">{0}</div>\n</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_THUMBNAIL_LEFT, width + 2, imageHtml);
 			} else {
-				return "<div class=\"thumb tright\">\n<div class=\"thumbinner\"" + styleWidth + ">{0}</div>\n</div>";
+				return WikiUtil.formatFromTemplate(TEMPLATE_IMAGE_THUMBNAIL_RIGHT, width + 2, imageHtml);
 			}
 		}
 	}
