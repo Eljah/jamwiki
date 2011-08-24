@@ -1,0 +1,11 @@
+<!--
+HTML wrapper for the table of contents element.  The arguments are:
+  0 = The HTML list of TOC entries to insert into this wrapper element.
+-->
+<table id="toc">
+<tr>
+<td>
+{0}
+</td>
+</tr>
+</table>

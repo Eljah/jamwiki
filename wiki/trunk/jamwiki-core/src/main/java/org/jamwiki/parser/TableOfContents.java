@@ -16,12 +16,14 @@
  */
 package org.jamwiki.parser;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.utils.WikiUtil;
 
 /**
  * This class is used to generate a table of contents based on values passed in
@@ -42,6 +44,10 @@ public class TableOfContents {
 	public static final int STATUS_TOC_INITIALIZED = 1;
 	/** Status indicating that the document being parsed does not allow a table of contents. */
 	public static final int STATUS_NO_TOC = 2;
+	/** Path to the template used to format the TOC container, relative to the classpath. */
+	private static final String TEMPLATE_TOC_CONTAINER = "templates/toc-wrapper.template";
+	/** Path to the template used to format a TOC entry, relative to the classpath. */
+	private static final String TEMPLATE_TOC_ENTRY = "templates/toc-entry.template";
 	/** Force a TOC to appear */
 	private boolean forceTOC = false;
 	/** It is possible for a user to include more than one "TOC" tag in a document, so keep count. */
@@ -95,7 +101,7 @@ public class TableOfContents {
 	 *  or an empty string if the table of contents can not be inserted due
 	 *  to an inadequate number of entries or some other reason.
 	 */
-	public String attemptTOCInsertion() {
+	public String attemptTOCInsertion() throws IOException {
 		this.insertionAttempt++;
 		if (this.size() == 0 || (this.size() < MINIMUM_HEADINGS && !this.forceTOC)) {
 			// too few headings
@@ -242,11 +248,11 @@ public class TableOfContents {
 	 *
 	 * @return An HTML representation of this table of contents object.
 	 */
-	public String toHTML() {
+	private String toHTML() throws IOException {
 		StringBuilder text = new StringBuilder();
-		text.append("<table id=\"toc\">\n<tr>\n<td>\n");
 		int adjustedLevel = 0;
 		int previousLevel = 0;
+		Object[] args = new Object[3];
 		for (TableOfContentsEntry entry : this.entries.values()) {
 			// adjusted level determines how far to indent the list
 			adjustedLevel = ((entry.level - minLevel) + 1);
@@ -258,15 +264,16 @@ public class TableOfContents {
 				// only display if not nested deeper than max
 				closeList(adjustedLevel, text, previousLevel);
 				openList(adjustedLevel, text, previousLevel);
-				text.append("<a href=\"#").append(entry.name).append("\">");
-				text.append("<span class=\"tocnumber\">").append(this.nextTocPrefix(adjustedLevel - 1)).append("</span> ");
-				text.append("<span class=\"toctext\">").append(entry.text).append("</span></a>");
+				// arguments are anchor name, TOC level display, and TOC entry text
+				args[0] = entry.name;
+				args[1] = this.nextTocPrefix(adjustedLevel - 1);
+				args[2] = entry.text;
+				text.append(WikiUtil.formatFromTemplate(TEMPLATE_TOC_ENTRY, args));
 				previousLevel = adjustedLevel;
 			}
 		}
 		closeList(0, text, previousLevel);
-		text.append("\n</td>\n</tr>\n</table>\n");
-		return text.toString();
+		return WikiUtil.formatFromTemplate(TEMPLATE_TOC_CONTAINER, text.toString()) + '\n';
 	}
 
 	/**
