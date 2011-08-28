@@ -53,7 +53,7 @@ public class JAMWikiFilter implements Filter {
 	 * discussion.
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		request.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding(this.encoding);
 		if (WikiUtil.WEBAPP_CONTEXT_PATH == null && request instanceof HttpServletRequest) {
 			WikiUtil.WEBAPP_CONTEXT_PATH = ((HttpServletRequest)request).getContextPath();
 		}
@@ -64,7 +64,8 @@ public class JAMWikiFilter implements Filter {
 	}
 
 	/**
-	 * Standard servlet filter init() method implementation.
+	 * Standard servlet filter init() method implementation to configure
+	 * parameters specified via web.xml init-param configuration.
 	 */
 	public void init(FilterConfig config) throws ServletException {
 		this.encoding = config.getInitParameter("encoding");
