@@ -46,6 +46,8 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLEncoder;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.util.Version;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.jamwiki.Environment;
@@ -302,16 +304,43 @@ public class LuceneSearchEngine implements SearchEngine {
 		if (!child.exists()) {
 			// create the search instance
 			child.mkdirs();
-			IndexWriter writer = new IndexWriter(FSDirectory.open(child), this.retrieveIndexWriterConfig(true));
+			IndexWriter writer = this.openIndexWriter(child, true);
 			writer.close();
 		}
 		return child;
 	}
 
 	/**
-	 * Refresh the current search index by re-visiting all topic pages.  Note
-	 * that this method will update the index even if the {@link setDisabled()}
-	 * method has been invoked to disable write operations.
+	 * Open an IndexWriter, executing error handling as needed.
+	 */
+	private IndexWriter openIndexWriter(File searchIndexPath, boolean create) throws IOException {
+		// NFS doesn't work with Lucene default locking as of Lucene 3.3, so use
+		// SimpleFSLockFactory instead.
+		LockFactory lockFactory = new SimpleFSLockFactory();
+		FSDirectory fsDirectory = FSDirectory.open(searchIndexPath, lockFactory);
+		IndexWriter indexWriter = null;
+		try {
+			indexWriter = new IndexWriter(fsDirectory, this.retrieveIndexWriterConfig(create));
+		} catch (LockObtainFailedException e) {
+			logger.warn("Unable to obtain lock for " + searchIndexPath.getAbsolutePath() + ".  Attempting to forcibly unlock the index.");
+			if (IndexWriter.isLocked(fsDirectory)) {
+				try {
+					IndexWriter.unlock(fsDirectory);
+					logger.info("Successfully unlocked search directory " + searchIndexPath.getAbsolutePath());
+				} catch (IOException ex) {
+					logger.warn("Unable to unlock search directory " + searchIndexPath.getAbsolutePath() + " " + ex.toString());
+				}
+			}
+		}
+		if (indexWriter == null) {
+			// try again, there could have been a stale lock
+			indexWriter = new IndexWriter(fsDirectory, this.retrieveIndexWriterConfig(create));
+		}
+		return indexWriter;
+	}
+
+	/**
+	 * Refresh the current search index by re-visiting all topic pages.
 	 *
 	 * @throws Exception Thrown if any error occurs while re-indexing the Wiki.
 	 */
@@ -400,14 +429,7 @@ public class LuceneSearchEngine implements SearchEngine {
 		}
 		if (indexWriter == null) {
 			File searchIndexPath = this.getSearchIndexPath(virtualWiki);
-			FSDirectory fsDirectory = FSDirectory.open(searchIndexPath);
-			try {
-				indexWriter = new IndexWriter(fsDirectory, this.retrieveIndexWriterConfig(create));
-			} catch (LockObtainFailedException e) {
-				logger.warn("Search index " + searchIndexPath.getAbsolutePath() + " found locked.  This can potentially occur after a JVM OOM error or if the search index is being accessed by multiple threads.  Attempting to forcibly unlock the index.");
-				fsDirectory.clearLock(IndexWriter.WRITE_LOCK_NAME);
-				indexWriter = new IndexWriter(fsDirectory, this.retrieveIndexWriterConfig(create));
-			}
+			indexWriter = this.openIndexWriter(searchIndexPath, create);
 			if (!create) {
 				indexWriters.put(virtualWiki, indexWriter);
 			}
