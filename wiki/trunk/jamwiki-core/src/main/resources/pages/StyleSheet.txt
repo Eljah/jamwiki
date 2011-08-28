@@ -320,6 +320,10 @@ table#diff col.diff-content {
 	padding: 0.5em 0.8em 0.5em 0.8em;
 	background-color: #fff;
 }
+.toctoggle {
+	font-size: 90%;
+	font-weight: normal;
+}
 #toc ul {
 	list-style-type: none;
 	list-style-image: none;

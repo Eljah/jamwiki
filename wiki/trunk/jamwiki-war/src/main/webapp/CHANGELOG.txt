@@ -3,6 +3,7 @@
 
 New Features:
 
+  * Allow the table of contents to be hidden via a "show/hide" link.
   * Move hard-coded HTML to template files to allow simpler customization of
     images, table of contents, and other elements.
   * Remove ability to automatically upgrade from versions prior to 1.0.

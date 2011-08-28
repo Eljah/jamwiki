@@ -85,7 +85,8 @@ followed by 0.6.3.
 
   SPECIAL NOTES:
 
-  * None.
+  * This release updates the default StyleSheet topic.  See below for
+    instructions on manaully updating this topic with the new styles.
 
   UPGRADE STEPS:
 

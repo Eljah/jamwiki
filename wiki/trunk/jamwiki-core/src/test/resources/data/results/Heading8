@@ -1,6 +1,9 @@
 <table id="toc">
 <tr>
-<td>
+<th>Contents <span class="toctoggle hidden" id="toggle-link-wrapper">[<a id="toggle-link" href="#">hide</a>]</span></th>
+</tr>
+<tr>
+<td id="toc-content">
 <ul>
 <li><a href="#first"><span class="tocnumber">1</span> <span class="toctext">first</span></a></li>
 <li><a href="#second"><span class="tocnumber">2</span> <span class="toctext">second</span></a></li>
@@ -13,6 +16,10 @@
 </td>
 </tr>
 </table>
+<script type="text/javascript">
+JAMWiki.UI.removeClass(document.getElementById("toggle-link-wrapper"), "hidden");
+JAMWiki.UI.initializeTocToggle("hide", "show");
+</script>
 <h2><span class="editsection">[<a href="/wiki/en/Special:Edit?topic=Heading8&amp;section=1">Edit</a>]</span><span id="first">first</span></h2>
 <p>first</p>
 <h2><span class="editsection">[<a href="/wiki/en/Special:Edit?topic=Heading8&amp;section=2">Edit</a>]</span><span id="second">second</span></h2>

@@ -113,6 +113,16 @@ JAMWiki.Editor = function() {
 	};
 }();
 JAMWiki.UI = function() {
+	function toggleToc(toggleLink, toggleTarget, hideLabel, showLabel) {
+		if (toggleLink.innerHTML == hideLabel) {
+			toggleLink.innerHTML = showLabel;
+			JAMWiki.UI.addClass(toggleTarget, "hidden");
+		} else {
+			toggleLink.innerHTML = hideLabel;
+			JAMWiki.UI.removeClass(toggleTarget, "hidden");
+		}
+		return false;
+	}
 	return {
 		// assign a CSS class to an element if it is not already assigned
 		addClass: function(element, cssClassName) {
@@ -183,6 +193,12 @@ JAMWiki.UI = function() {
 			// close by default
 			JAMWiki.UI.removeClass(containerElement, expandedClass);
 			toggleElement.onclick = JAMWiki.UI.toggleClass.bind(JAMWiki.UI, containerElement, expandedClass);
+		},
+		// toggle the show/hide link in the TOC header
+		initializeTocToggle: function(hideLabel, showLabel) {
+			var toggleLink = document.getElementById("toggle-link");
+			var toggleTarget = document.getElementById("toc-content")
+			toggleLink.onclick = toggleToc.bind(this, toggleLink, toggleTarget, hideLabel, showLabel);
 		}
 	};
 }();

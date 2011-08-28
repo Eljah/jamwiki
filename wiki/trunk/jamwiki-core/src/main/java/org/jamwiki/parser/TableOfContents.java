@@ -18,10 +18,12 @@ package org.jamwiki.parser;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
@@ -97,11 +99,13 @@ public class TableOfContents {
 	 * This method checks to see if a TOC is allowed to be inserted, and if so
 	 * returns an HTML representation of the TOC.
 	 *
+	 * @param locale The locale of the user viewing the TOC, used for formatting
+	 *  the header message key.
 	 * @return An HTML representation of the current table of contents object,
 	 *  or an empty string if the table of contents can not be inserted due
 	 *  to an inadequate number of entries or some other reason.
 	 */
-	public String attemptTOCInsertion() throws IOException {
+	public String attemptTOCInsertion(Locale locale) throws IOException {
 		this.insertionAttempt++;
 		if (this.size() == 0 || (this.size() < MINIMUM_HEADINGS && !this.forceTOC)) {
 			// too few headings
@@ -119,7 +123,7 @@ public class TableOfContents {
 			// user specified a TOC location, only insert there
 			return "";
 		}
-		return this.toHTML();
+		return this.toHTML(locale);
 	}
 
 	/**
@@ -246,9 +250,11 @@ public class TableOfContents {
 	/**
 	 * Return an HTML representation of this table of contents object.
 	 *
+	 * @param locale The locale of the user viewing the TOC, used for formatting
+	 *  the header message key.
 	 * @return An HTML representation of this table of contents object.
 	 */
-	private String toHTML() throws IOException {
+	private String toHTML(Locale locale) throws IOException {
 		StringBuilder text = new StringBuilder();
 		int adjustedLevel = 0;
 		int previousLevel = 0;
@@ -273,7 +279,13 @@ public class TableOfContents {
 			}
 		}
 		closeList(0, text, previousLevel);
-		return WikiUtil.formatFromTemplate(TEMPLATE_TOC_CONTAINER, text.toString()) + '\n';
+		args = new Object[4];
+		// arguments are TOC header text and TOC entries
+		args[0] = Utilities.formatMessage("topic.toc.header", locale);
+		args[1] = Utilities.formatMessage("topic.toc.label.hide", locale);
+		args[2] = Utilities.formatMessage("topic.toc.label.show", locale);
+		args[3] = text.toString();
+		return WikiUtil.formatFromTemplate(TEMPLATE_TOC_CONTAINER, args) + '\n';
 	}
 
 	/**
