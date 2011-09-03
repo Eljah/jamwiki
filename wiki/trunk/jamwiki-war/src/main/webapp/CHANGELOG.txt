@@ -18,6 +18,25 @@ Translation Updates:
   * None.
 
 
+1.1.1
+=====
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+  * Spring security 3.0 change how logout redirection is handled.  Update
+    JAMWiki to redirect logout properly.  Note that this change modifies
+    the applicationContext-security.xml file.  Reported by Leonardo Silva Kury
+    Aragão Mendes.
+
+Translation Updates:
+
+  * None.
+
+
 1.1
 ===
 
