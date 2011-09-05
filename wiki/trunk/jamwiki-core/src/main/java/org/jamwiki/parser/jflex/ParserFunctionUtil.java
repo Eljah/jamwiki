@@ -56,6 +56,8 @@ public class ParserFunctionUtil {
 	private static final String PARSER_FUNCTION_LOWER_CASE_FIRST = "lcfirst:";
 	private static final String PARSER_FUNCTION_NAMESPACE = "ns:";
 	private static final String PARSER_FUNCTION_NAMESPACE_ESCAPED = "nse:";
+	private static final String PARSER_FUNCTION_PAD_LEFT = "padleft:";
+	private static final String PARSER_FUNCTION_PAD_RIGHT = "padright:";
 	private static final String PARSER_FUNCTION_SWITCH = "#switch:";
 	private static final String PARSER_FUNCTION_UPPER_CASE = "uc:";
 	private static final String PARSER_FUNCTION_UPPER_CASE_FIRST = "ucfirst:";
@@ -78,6 +80,8 @@ public class ParserFunctionUtil {
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_LOWER_CASE_FIRST);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_NAMESPACE);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_NAMESPACE_ESCAPED);
+		PARSER_FUNCTIONS.add(PARSER_FUNCTION_PAD_LEFT);
+		PARSER_FUNCTIONS.add(PARSER_FUNCTION_PAD_RIGHT);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_SWITCH);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_UPPER_CASE);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_UPPER_CASE_FIRST);
@@ -149,6 +153,12 @@ public class ParserFunctionUtil {
 		}
 		if (parserFunction.equals(PARSER_FUNCTION_NAMESPACE_ESCAPED)) {
 			return ParserFunctionUtil.parseNamespace(parserInput, parserFunctionArgumentArray, true);
+		}
+		if (parserFunction.equals(PARSER_FUNCTION_PAD_LEFT)) {
+			return ParserFunctionUtil.parsePad(parserInput, parserFunctionArgumentArray, true);
+		}
+		if (parserFunction.equals(PARSER_FUNCTION_PAD_RIGHT)) {
+			return ParserFunctionUtil.parsePad(parserInput, parserFunctionArgumentArray, false);
 		}
 		if (parserFunction.equals(PARSER_FUNCTION_SWITCH)) {
 			return ParserFunctionUtil.parseSwitch(parserInput, parserFunctionArgumentArray);
@@ -401,6 +411,27 @@ public class ParserFunctionUtil {
 			return "";
 		}
 		return (escape) ? Utilities.encodeAndEscapeTopicName(result) : result;
+	}
+
+	/**
+	 * Parse the {{padleft:}} and {{padright:}} parser functions.
+	 */
+	private static String parsePad(ParserInput parserInput, String[] parserFunctionArgumentArray, boolean isLeft) {
+		if (parserFunctionArgumentArray.length < 1) {
+			return "";
+		}
+		String value = parserFunctionArgumentArray[0];
+		if (parserFunctionArgumentArray.length < 2) {
+			// no length parameter
+			return value;
+		}
+		int length = NumberUtils.toInt(parserFunctionArgumentArray[1], 0);
+		if (value.length() >= length) {
+			// no padding needed
+			return value;
+		}
+		String padString = (parserFunctionArgumentArray.length > 2) ? parserFunctionArgumentArray[2] : "0";
+		return (isLeft) ? StringUtils.leftPad(value, length, padString) : StringUtils.rightPad(value, length, padString);
 	}
 
 	/**

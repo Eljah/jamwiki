@@ -19,3 +19,27 @@
 {{ucfirst:aBcDe Fg}}
 
 {{ucfirst:aBcDe fg}}
+
+{{padleft:xyz|5}}
+
+{{padleft:xyz|5|_}}
+
+{{padleft:xyz|5|abc}}
+
+{{padleft:xyz|2}}
+
+{{padleft:|1|xyz}}
+
+{{padright:xyz|5}}
+
+{{padright:xyz|5|_}}
+
+{{padright:xyz|5|abc}}
+
+{{padright:xyz|2}}
+
+{{padright:|1|xyz}}
+
+{{padleft:xyz|z|abc}}
+
+{{padleft:|2|x}}
