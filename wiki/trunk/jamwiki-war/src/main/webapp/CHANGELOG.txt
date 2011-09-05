@@ -8,6 +8,8 @@ New Features:
     images, table of contents, and other elements.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to commons-lang 3.0.1.
+  * {{REVISIONMONTH}} is no longer padded ("4" instead of "04") while
+    {{REVISIONMONTH1}} has been added in order to match Mediawiki behavior.
 
 Bugfixes:
 

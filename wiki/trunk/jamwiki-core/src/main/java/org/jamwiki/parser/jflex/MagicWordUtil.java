@@ -112,6 +112,7 @@ public class MagicWordUtil {
 	private static final String MAGIC_REVISION_DAY = "REVISIONDAY";
 	private static final String MAGIC_REVISION_DAY2 = "REVISIONDAY2";
 	private static final String MAGIC_REVISION_MONTH = "REVISIONMONTH";
+	private static final String MAGIC_REVISION_MONTH1 = "REVISIONMONTH1";
 	private static final String MAGIC_REVISION_YEAR = "REVISIONYEAR";
 	private static final String MAGIC_REVISION_TIMESTAMP = "REVISIONTIMESTAMP";
 	private static final String MAGIC_REVISION_USER = "REVISIONUSER";
@@ -190,6 +191,7 @@ public class MagicWordUtil {
 		MAGIC_WORDS.add(MAGIC_REVISION_DAY);
 		MAGIC_WORDS.add(MAGIC_REVISION_DAY2);
 		MAGIC_WORDS.add(MAGIC_REVISION_MONTH);
+		MAGIC_WORDS.add(MAGIC_REVISION_MONTH1);
 		MAGIC_WORDS.add(MAGIC_REVISION_YEAR);
 		MAGIC_WORDS.add(MAGIC_REVISION_TIMESTAMP);
 		MAGIC_WORDS.add(MAGIC_REVISION_USER);
@@ -469,6 +471,13 @@ public class MagicWordUtil {
 			return formatter.format(revision);
 		}
 		if (name.equals(MAGIC_REVISION_MONTH)) {
+			if (revision == null) {
+				return "";
+			}
+			formatter.applyPattern("M");
+			return formatter.format(revision);
+		}
+		if (name.equals(MAGIC_REVISION_MONTH1)) {
 			if (revision == null) {
 				return "";
 			}
