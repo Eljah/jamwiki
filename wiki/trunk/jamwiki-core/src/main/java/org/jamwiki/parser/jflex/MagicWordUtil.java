@@ -80,11 +80,6 @@ public class MagicWordUtil {
 	private static final String MAGIC_NUMBER_FILES_R = "NUMBEROFFILES:R";
 	private static final String MAGIC_NUMBER_USERS = "NUMBEROFUSERS";
 	private static final String MAGIC_NUMBER_USERS_R = "NUMBEROFUSERS:R";
-	private static final String MAGIC_NUMBER_ADMINS = "NUMBEROFADMINS";
-	private static final String MAGIC_NUMBER_ADMINS_R = "NUMBEROFADMINS:R";
-	private static final String MAGIC_PAGES_IN_NAMESPACE = "PAGESINNAMESPACE";
-	private static final String MAGIC_PAGES_IN_NAMESPACE_NS = "PAGESINNS:ns";
-	private static final String MAGIC_PAGES_IN_NAMESPACE_NS_R = "PAGESINNS:ns:R";
 	// page values
 	private static final String MAGIC_PAGE_NAME = "PAGENAME";
 	private static final String MAGIC_PAGE_NAME_E = "PAGENAMEE";
@@ -118,87 +113,86 @@ public class MagicWordUtil {
 	private static final String MAGIC_REVISION_USER = "REVISIONUSER";
 	private static final String MAGIC_SITE_NAME = "SITENAME";
 	private static final String MAGIC_SERVER = "SERVER";
-	private static final String MAGIC_SCRIPT_PATH = "SCRIPTPATH";
 	private static final String MAGIC_SERVER_NAME = "SERVERNAME";
-	private static List<String> MAGIC_WORDS = new ArrayList<String>();
+	private static List<String> MAGIC_WORDS_DATETIME = new ArrayList<String>();
+	private static List<String> MAGIC_WORDS_METADATA = new ArrayList<String>();
+	private static List<String> MAGIC_WORDS_NAMESPACES = new ArrayList<String>();
+	private static List<String> MAGIC_WORDS_PAGE_NAMES = new ArrayList<String>();
+	private static List<String> MAGIC_WORDS_STATISTICS = new ArrayList<String>();
 
 	static {
 		// current date values
-		MAGIC_WORDS.add(MAGIC_CURRENT_DAY);
-		MAGIC_WORDS.add(MAGIC_CURRENT_DAY2);
-		MAGIC_WORDS.add(MAGIC_CURRENT_DAY_NAME);
-		MAGIC_WORDS.add(MAGIC_CURRENT_DAY_OF_WEEK);
-		MAGIC_WORDS.add(MAGIC_CURRENT_MONTH);
-		MAGIC_WORDS.add(MAGIC_CURRENT_MONTH_ABBR);
-		MAGIC_WORDS.add(MAGIC_CURRENT_MONTH_NAME);
-		MAGIC_WORDS.add(MAGIC_CURRENT_TIME);
-		MAGIC_WORDS.add(MAGIC_CURRENT_HOUR);
-		MAGIC_WORDS.add(MAGIC_CURRENT_WEEK);
-		MAGIC_WORDS.add(MAGIC_CURRENT_YEAR);
-		MAGIC_WORDS.add(MAGIC_CURRENT_TIMESTAMP);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_DAY);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_DAY2);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_DAY_NAME);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_DAY_OF_WEEK);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_MONTH);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_MONTH_ABBR);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_MONTH_NAME);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_TIME);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_HOUR);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_WEEK);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_YEAR);
+		MAGIC_WORDS_DATETIME.add(MAGIC_CURRENT_TIMESTAMP);
 		// local date values
-		MAGIC_WORDS.add(MAGIC_LOCAL_DAY);
-		MAGIC_WORDS.add(MAGIC_LOCAL_DAY2);
-		MAGIC_WORDS.add(MAGIC_LOCAL_DAY_NAME);
-		MAGIC_WORDS.add(MAGIC_LOCAL_DAY_OF_WEEK);
-		MAGIC_WORDS.add(MAGIC_LOCAL_MONTH);
-		MAGIC_WORDS.add(MAGIC_LOCAL_MONTH_ABBR);
-		MAGIC_WORDS.add(MAGIC_LOCAL_MONTH_NAME);
-		MAGIC_WORDS.add(MAGIC_LOCAL_TIME);
-		MAGIC_WORDS.add(MAGIC_LOCAL_HOUR);
-		MAGIC_WORDS.add(MAGIC_LOCAL_WEEK);
-		MAGIC_WORDS.add(MAGIC_LOCAL_YEAR);
-		MAGIC_WORDS.add(MAGIC_LOCAL_TIMESTAMP);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_DAY);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_DAY2);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_DAY_NAME);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_DAY_OF_WEEK);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_MONTH);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_MONTH_ABBR);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_MONTH_NAME);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_TIME);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_HOUR);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_WEEK);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_YEAR);
+		MAGIC_WORDS_DATETIME.add(MAGIC_LOCAL_TIMESTAMP);
 		// statistics
-		MAGIC_WORDS.add(MAGIC_CURRENT_VERSION);
-		MAGIC_WORDS.add(MAGIC_NUMBER_ARTICLES);
-		MAGIC_WORDS.add(MAGIC_NUMBER_ARTICLES_R);
-		MAGIC_WORDS.add(MAGIC_NUMBER_PAGES);
-		MAGIC_WORDS.add(MAGIC_NUMBER_PAGES_R);
-		MAGIC_WORDS.add(MAGIC_NUMBER_FILES);
-		MAGIC_WORDS.add(MAGIC_NUMBER_FILES_R);
-		MAGIC_WORDS.add(MAGIC_NUMBER_USERS);
-		MAGIC_WORDS.add(MAGIC_NUMBER_USERS_R);
-		MAGIC_WORDS.add(MAGIC_NUMBER_ADMINS);
-		MAGIC_WORDS.add(MAGIC_NUMBER_ADMINS_R);
-		MAGIC_WORDS.add(MAGIC_PAGES_IN_NAMESPACE);
-		MAGIC_WORDS.add(MAGIC_PAGES_IN_NAMESPACE_NS);
-		MAGIC_WORDS.add(MAGIC_PAGES_IN_NAMESPACE_NS_R);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_CURRENT_VERSION);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_ARTICLES);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_ARTICLES_R);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_PAGES);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_PAGES_R);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_FILES);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_FILES_R);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_USERS);
+		MAGIC_WORDS_STATISTICS.add(MAGIC_NUMBER_USERS_R);
 		// page values
-		MAGIC_WORDS.add(MAGIC_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_SUB_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_SUB_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_BASE_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_BASE_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_NAMESPACE);
-		MAGIC_WORDS.add(MAGIC_NAMESPACE_E);
-		MAGIC_WORDS.add(MAGIC_FULL_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_FULL_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_TALK_SPACE);
-		MAGIC_WORDS.add(MAGIC_TALK_SPACE_E);
-		MAGIC_WORDS.add(MAGIC_SUBJECT_SPACE);
-		MAGIC_WORDS.add(MAGIC_SUBJECT_SPACE_E);
-		MAGIC_WORDS.add(MAGIC_ARTICLE_SPACE);
-		MAGIC_WORDS.add(MAGIC_ARTICLE_SPACE_E);
-		MAGIC_WORDS.add(MAGIC_TALK_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_TALK_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_SUBJECT_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_SUBJECT_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_ARTICLE_PAGE_NAME);
-		MAGIC_WORDS.add(MAGIC_ARTICLE_PAGE_NAME_E);
-		MAGIC_WORDS.add(MAGIC_REVISION_ID);
-		MAGIC_WORDS.add(MAGIC_REVISION_DAY);
-		MAGIC_WORDS.add(MAGIC_REVISION_DAY2);
-		MAGIC_WORDS.add(MAGIC_REVISION_MONTH);
-		MAGIC_WORDS.add(MAGIC_REVISION_MONTH1);
-		MAGIC_WORDS.add(MAGIC_REVISION_YEAR);
-		MAGIC_WORDS.add(MAGIC_REVISION_TIMESTAMP);
-		MAGIC_WORDS.add(MAGIC_REVISION_USER);
-		MAGIC_WORDS.add(MAGIC_SITE_NAME);
-		MAGIC_WORDS.add(MAGIC_SERVER);
-		MAGIC_WORDS.add(MAGIC_SCRIPT_PATH);
-		MAGIC_WORDS.add(MAGIC_SERVER_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_PAGE_NAME_E);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_SUB_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_SUB_PAGE_NAME_E);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_BASE_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_BASE_PAGE_NAME_E);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_FULL_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_FULL_PAGE_NAME_E);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_TALK_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_TALK_PAGE_NAME_E);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_SUBJECT_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_SUBJECT_PAGE_NAME_E);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_ARTICLE_PAGE_NAME);
+		MAGIC_WORDS_PAGE_NAMES.add(MAGIC_ARTICLE_PAGE_NAME_E);
+		// namespaces
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_NAMESPACE);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_NAMESPACE_E);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_TALK_SPACE);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_TALK_SPACE_E);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_SUBJECT_SPACE);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_SUBJECT_SPACE_E);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_ARTICLE_SPACE);
+		MAGIC_WORDS_NAMESPACES.add(MAGIC_ARTICLE_SPACE_E);
+		// revisions
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_ID);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_DAY);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_DAY2);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_MONTH);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_MONTH1);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_YEAR);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_TIMESTAMP);
+		MAGIC_WORDS_METADATA.add(MAGIC_REVISION_USER);
+		MAGIC_WORDS_METADATA.add(MAGIC_SITE_NAME);
+		MAGIC_WORDS_METADATA.add(MAGIC_SERVER);
+		MAGIC_WORDS_METADATA.add(MAGIC_SERVER_NAME);
 	}
 
 	/**
@@ -207,7 +201,18 @@ public class MagicWordUtil {
 	 * for a list of Mediawiki magic words.
 	 */
 	protected static boolean isMagicWord(String name) {
-		return MAGIC_WORDS.contains(name);
+		if (MAGIC_WORDS_DATETIME.contains(name)) {
+			return true;
+		} else if (MAGIC_WORDS_STATISTICS.contains(name)) {
+			return true;
+		} else if (MAGIC_WORDS_PAGE_NAMES.contains(name)) {
+			return true;
+		} else if (MAGIC_WORDS_NAMESPACES.contains(name)) {
+			return true;
+		} else if (MAGIC_WORDS_METADATA.contains(name)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -216,8 +221,25 @@ public class MagicWordUtil {
 	 * list of Mediawiki magic words.
 	 */
 	protected static String processMagicWord(ParserInput parserInput, String name) throws DataAccessException {
+		if (MAGIC_WORDS_DATETIME.contains(name)) {
+			return processMagicWordDateTime(parserInput, name);
+		} else if (MAGIC_WORDS_STATISTICS.contains(name)) {
+			return processMagicWordStatistics(parserInput, name);
+		} else if (MAGIC_WORDS_PAGE_NAMES.contains(name)) {
+			return processMagicWordPageNames(parserInput, name);
+		} else if (MAGIC_WORDS_NAMESPACES.contains(name)) {
+			return processMagicWordNamespaces(parserInput, name);
+		} else if (MAGIC_WORDS_METADATA.contains(name)) {
+			return processMagicWordMetadata(parserInput, name);
+		}
+		return name;
+	}
+
+	/**
+	 * Process date & time magic words.
+	 */
+	private static String processMagicWordDateTime(ParserInput parserInput, String name) throws DataAccessException {
 		SimpleDateFormat formatter = new SimpleDateFormat();
-		TimeZone utc = TimeZone.getTimeZone("GMT+00");
 		Date current = new Date(System.currentTimeMillis());
 		// local date values
 		if (name.equals(MAGIC_LOCAL_DAY)) {
@@ -269,6 +291,7 @@ public class MagicWordUtil {
 			return formatter.format(current);
 		}
 		// current date values
+		TimeZone utc = TimeZone.getTimeZone("GMT+00");
 		formatter.setTimeZone(utc);
 		if (name.equals(MAGIC_CURRENT_DAY)) {
 			formatter.applyPattern("d");
@@ -318,7 +341,13 @@ public class MagicWordUtil {
 			formatter.applyPattern("yyyyMMddHHmmss");
 			return formatter.format(current);
 		}
-		// statistics
+		return name;
+	}
+
+	/**
+	 * Process statistic magic words.
+	 */
+	private static String processMagicWordStatistics(ParserInput parserInput, String name) throws DataAccessException {
 		NumberFormat numFormatter = NumberFormat.getInstance();
 		if (name.equals(MAGIC_CURRENT_VERSION)) {
 			return WikiVersion.CURRENT_WIKI_VERSION;
@@ -355,19 +384,13 @@ public class MagicWordUtil {
 			int results = WikiBase.getDataHandler().lookupWikiUserCount();
 			return Integer.toString(results);
 		}
-		/*
-		if (name.equals(MAGIC_NUMBER_ADMINS)) {
-		}
-		if (name.equals(MAGIC_NUMBER_ADMINS_R)) {
-		}
-		if (name.equals(MAGIC_PAGES_IN_NAMESPACE)) {
-		}
-		if (name.equals(MAGIC_PAGES_IN_NAMESPACE_NS)) {
-		}
-		if (name.equals(MAGIC_PAGES_IN_NAMESPACE_NS_R)) {
-		}
-		*/
-		// page values
+		return name;
+	}
+
+	/**
+	 * Process page value magic words.
+	 */
+	private static String processMagicWordPageNames(ParserInput parserInput, String name) throws DataAccessException {
 		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
 		if (name.equals(MAGIC_FULL_PAGE_NAME)) {
 			return parserInput.getTopicName();
@@ -413,6 +436,26 @@ public class MagicWordUtil {
 			}
 			return Utilities.encodeAndEscapeTopicName(topic);
 		}
+		if (name.equals(MAGIC_TALK_PAGE_NAME)) {
+			return WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
+		}
+		if (name.equals(MAGIC_TALK_PAGE_NAME_E)) {
+			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), parserInput.getTopicName()));
+		}
+		if (name.equals(MAGIC_SUBJECT_PAGE_NAME) || name.equals(MAGIC_ARTICLE_PAGE_NAME)) {
+			return WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
+		}
+		if (name.equals(MAGIC_SUBJECT_PAGE_NAME_E) || name.equals(MAGIC_ARTICLE_PAGE_NAME_E)) {
+			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), parserInput.getTopicName()));
+		}
+		return name;
+	}
+
+	/**
+	 * Process namespace magic words.
+	 */
+	private static String processMagicWordNamespaces(ParserInput parserInput, String name) throws DataAccessException {
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
 		if (name.equals(MAGIC_NAMESPACE)) {
 			return wikiLink.getNamespace().getLabel(parserInput.getVirtualWiki());
 		}
@@ -435,18 +478,15 @@ public class MagicWordUtil {
 			Namespace result = Namespace.findMainNamespace(wikiLink.getNamespace());
 			return (result != null) ? Utilities.encodeAndEscapeTopicName(result.getLabel(parserInput.getVirtualWiki())) : Utilities.encodeAndEscapeTopicName(name);
 		}
-		if (name.equals(MAGIC_TALK_PAGE_NAME)) {
-			return WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
-		}
-		if (name.equals(MAGIC_TALK_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), parserInput.getTopicName()));
-		}
-		if (name.equals(MAGIC_SUBJECT_PAGE_NAME) || name.equals(MAGIC_ARTICLE_PAGE_NAME)) {
-			return WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
-		}
-		if (name.equals(MAGIC_SUBJECT_PAGE_NAME_E) || name.equals(MAGIC_ARTICLE_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), parserInput.getTopicName()));
-		}
+		return name;
+	}
+
+	/**
+	 * Process metadata magic words.
+	 */
+	private static String processMagicWordMetadata(ParserInput parserInput, String name) throws DataAccessException {
+		SimpleDateFormat formatter = new SimpleDateFormat();
+		TimeZone utc = TimeZone.getTimeZone("GMT+00");
 		Topic topic = WikiBase.getDataHandler().lookupTopic(parserInput.getVirtualWiki(), parserInput.getTopicName(), false);
 		TopicVersion topicVersion = null;
 		Date revision = null;
@@ -515,10 +555,6 @@ public class MagicWordUtil {
 		if (name.equals(MAGIC_SERVER)) {
 			return Environment.getValue(Environment.PROP_SERVER_URL);
 		}
-		/*
-		if (name.equals(MAGIC_SCRIPT_PATH)) {
-		}
-		*/
 		if (name.equals(MAGIC_SERVER_NAME)) {
 			// strip the opening "http://" if there is one
 			String result = Environment.getValue(Environment.PROP_SERVER_URL);
