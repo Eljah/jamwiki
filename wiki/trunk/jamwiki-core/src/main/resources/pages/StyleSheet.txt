@@ -464,6 +464,9 @@ span.section-link {
 span.section-link a {
 	color: #333;
 }
+#summaryPreview {
+	padding: 0 0 3px;
+}
 
 /* topic pages */
 
