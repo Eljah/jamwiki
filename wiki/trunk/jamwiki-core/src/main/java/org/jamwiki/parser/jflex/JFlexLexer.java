@@ -39,6 +39,7 @@ public abstract class JFlexLexer {
 	/** Parser mode, which provides input to the parser about what steps to take. */
 	protected int mode = JFlexParser.MODE_POSTPROCESS;
 
+	protected static final int TAG_TYPE_EDIT_SECTION = 3;
 	protected static final int TAG_TYPE_HTML_HEADING = 5;
 	protected static final int TAG_TYPE_HTML_LINK = 10;
 	protected static final int TAG_TYPE_IMAGE_LINK = 15;
@@ -54,6 +55,7 @@ public abstract class JFlexLexer {
 	protected static final int TAG_TYPE_WIKI_REFERENCE = 55;
 	protected static final int TAG_TYPE_WIKI_REFERENCES = 60;
 	protected static final int TAG_TYPE_WIKI_SIGNATURE = 65;
+	private static final EditSectionTag TAG_EDIT_SECTION = new EditSectionTag();
 	private static final HtmlHeadingTag TAG_HTML_HEADING = new HtmlHeadingTag();
 	private static final HtmlLinkTag TAG_HTML_LINK = new HtmlLinkTag();
 	private static final ImageLinkTag TAG_IMAGE_LINK = new ImageLinkTag();
@@ -178,6 +180,9 @@ public abstract class JFlexLexer {
 		}
 		JFlexParserTag jflexParserTag = null;
 		switch (type) {
+			case TAG_TYPE_EDIT_SECTION:
+				jflexParserTag = TAG_EDIT_SECTION;
+				break;
 			case TAG_TYPE_HTML_HEADING:
 				jflexParserTag = TAG_HTML_HEADING;
 				break;

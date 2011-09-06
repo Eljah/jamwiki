@@ -3,6 +3,8 @@
 
 New Features:
 
+  * Add support for limited wiki text in edit summaries (wiki links, interwiki
+    links) to match Mediawiki behavior.
   * Allow the table of contents to be hidden via a "show/hide" link.
   * Move hard-coded HTML to template files to allow simpler customization of
     images, table of contents, and other elements.

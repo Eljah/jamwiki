@@ -40,16 +40,35 @@ public class WikiLinkTag implements JFlexParserTag {
 	protected static final String LINK_CAPTION = "link-caption";
 
 	/**
+	 * Determine if the link is valid or not.  An invalid link is one
+	 * that contains an invalid character or has other issues.
+	 */
+	private boolean isValidLink(ParserInput parserInput, WikiLink wikiLink) {
+		if (!StringUtils.isBlank(wikiLink.getDestination())) {
+			String virtualWiki = (wikiLink.getVirtualWiki() == null) ? parserInput.getVirtualWiki() : wikiLink.getVirtualWiki().getName();
+			try {
+				WikiUtil.validateTopicName(virtualWiki, wikiLink.getDestination(), true);
+			} catch (WikiException e) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Parse a Mediawiki link of the form "[[topic|text]]" and return the
 	 * resulting HTML output.
 	 */
 	public String parse(JFlexLexer lexer, String raw, Object... args) throws ParserException {
-		boolean containsNestedLinks = (args.length > 0 && StringUtils.equals(args[0].toString(), "nested"));
 		WikiLink wikiLink = JFlexParserUtil.parseWikiLink(lexer.getParserInput(), lexer.getParserOutput(), raw);
 		if (wikiLink.getInterwiki() == null && StringUtils.isBlank(wikiLink.getDestination()) && StringUtils.isBlank(wikiLink.getSection())) {
 			// no destination or section
 			return raw;
 		}
+		if (lexer.getMode() == JFlexParser.MODE_EDIT_COMMENT) {
+			return this.parseEditComment(lexer.getParserInput(), lexer.getParserOutput(), wikiLink, raw);
+		}
+		boolean containsNestedLinks = (args.length > 0 && StringUtils.equals(args[0].toString(), "nested"));
 		if (containsNestedLinks) {
 			// if there is a nested link it must be an image, otherwise the syntax is invalid.
 			if (wikiLink.getColon() || !wikiLink.getNamespace().getId().equals(Namespace.FILE_ID)) {
@@ -59,14 +78,9 @@ public class WikiLinkTag implements JFlexParserTag {
 				return "[[" + JFlexParserUtil.parseFragment(lexer.getParserInput(), lexer.getParserOutput(), content, lexer.getMode()) + "]]";
 			}
 		}
-		if (!StringUtils.isBlank(wikiLink.getDestination())) {
-			String virtualWiki = (wikiLink.getVirtualWiki() == null) ? lexer.getParserInput().getVirtualWiki() : wikiLink.getVirtualWiki().getName();
-			try {
-				// do not process the link if it's an invalid topic name
-				WikiUtil.validateTopicName(virtualWiki, wikiLink.getDestination(), true);
-			} catch (WikiException e) {
-				return raw;
-			}
+		if (!this.isValidLink(lexer.getParserInput(), wikiLink)) {
+			// do not process the link if it's an invalid topic name
+			return raw;
 		}
 		raw = this.processLinkMetadata(lexer.getParserInput(), lexer.getParserOutput(), lexer.getMode(), raw, wikiLink);
 		if (lexer.getMode() <= JFlexParser.MODE_PREPROCESS) {
@@ -77,26 +91,33 @@ public class WikiLinkTag implements JFlexParserTag {
 			// parse as an image
 			return lexer.parse(JFlexLexer.TAG_TYPE_IMAGE_LINK, raw);
 		}
+		return this.parseWikiLink(lexer.getParserInput(), lexer.getParserOutput(), wikiLink, raw, lexer.getMode());
+	}
+
+	/**
+	 *
+	 */
+	private String parseWikiLink(ParserInput parserInput, ParserOutput parserOutput, WikiLink wikiLink, String raw, int mode) throws ParserException {
 		try {
 			if (wikiLink.getInterwiki() != null) {
 				// inter-wiki link
-				if (!wikiLink.getColon() && !Environment.getBooleanValue(Environment.PROP_PARSER_DISPLAY_INTERWIKI_LINKS_INLINE)) {
+				if (mode != JFlexParser.MODE_EDIT_COMMENT && !wikiLink.getColon() && !Environment.getBooleanValue(Environment.PROP_PARSER_DISPLAY_INTERWIKI_LINKS_INLINE)) {
 					wikiLink.setText(wikiLink.getInterwiki().getInterwikiDisplay());
 					String url = LinkUtil.interwiki(wikiLink);
-					lexer.getParserOutput().addInterwikiLink(url);
+					parserOutput.addInterwikiLink(url);
 					return "";
 				} else {
 					return LinkUtil.interwiki(wikiLink);
 				}
 			}
-			String virtualWiki = lexer.getParserInput().getVirtualWiki();
+			String virtualWiki = parserInput.getVirtualWiki();
 			if (wikiLink.getVirtualWiki() != null && !StringUtils.equals(wikiLink.getVirtualWiki().getName(), virtualWiki)) {
 				// link to another virtual wiki
 				virtualWiki = wikiLink.getVirtualWiki().getName();
-				if (!wikiLink.getColon() && !Environment.getBooleanValue(Environment.PROP_PARSER_DISPLAY_VIRTUALWIKI_LINKS_INLINE)) {
+				if (mode != JFlexParser.MODE_EDIT_COMMENT && !wikiLink.getColon() && !Environment.getBooleanValue(Environment.PROP_PARSER_DISPLAY_VIRTUALWIKI_LINKS_INLINE)) {
 					wikiLink.setText(wikiLink.getVirtualWiki().getName() + Namespace.SEPARATOR + wikiLink.getDestination());
-					String url = LinkUtil.buildInternalLinkHtml(lexer.getParserInput().getContext(), virtualWiki, wikiLink, wikiLink.getText(), null, null, false);
-					lexer.getParserOutput().addVirtualWikiLink(url);
+					String url = LinkUtil.buildInternalLinkHtml(parserInput.getContext(), virtualWiki, wikiLink, wikiLink.getText(), null, null, false);
+					parserOutput.addVirtualWikiLink(url);
 					return "";
 				}
 			}
@@ -107,18 +128,18 @@ public class WikiLinkTag implements JFlexParserTag {
 				}
 			} else if (StringUtils.isBlank(wikiLink.getText()) && !StringUtils.isBlank(wikiLink.getSection())) {
 				wikiLink.setText(Utilities.decodeAndEscapeTopicName("#" + wikiLink.getSection(), true));
-			} else {
+			} else if (mode != JFlexParser.MODE_EDIT_COMMENT) {
 				// pass a parameter via the parserInput to prevent nested links from being generated
-				lexer.getParserInput().getTempParams().put(LINK_CAPTION, true);
-				wikiLink.setText(JFlexParserUtil.parseFragment(lexer.getParserInput(), lexer.getParserOutput(), wikiLink.getText(), lexer.getMode()));
-				lexer.getParserInput().getTempParams().remove(LINK_CAPTION);
+				parserInput.getTempParams().put(LINK_CAPTION, true);
+				wikiLink.setText(JFlexParserUtil.parseFragment(parserInput, parserOutput, wikiLink.getText(), mode));
+				parserInput.getTempParams().remove(LINK_CAPTION);
 			}
-			if (StringUtils.equals(wikiLink.getDestination(), lexer.getParserInput().getTopicName()) && StringUtils.equals(virtualWiki, lexer.getParserInput().getVirtualWiki()) && StringUtils.isBlank(wikiLink.getSection())) {
+			if (StringUtils.equals(wikiLink.getDestination(), parserInput.getTopicName()) && StringUtils.equals(virtualWiki, parserInput.getVirtualWiki()) && StringUtils.isBlank(wikiLink.getSection())) {
 				// same page, bold the text and return
 				return "<b>" + (StringUtils.isBlank(wikiLink.getText()) ? wikiLink.getDestination() : wikiLink.getText()) + "</b>";
 			}
 			// do not escape text html - already done by parser
-			return LinkUtil.buildInternalLinkHtml(lexer.getParserInput().getContext(), virtualWiki, wikiLink, wikiLink.getText(), null, null, false);
+			return LinkUtil.buildInternalLinkHtml(parserInput.getContext(), virtualWiki, wikiLink, wikiLink.getText(), null, null, false);
 		} catch (DataAccessException e) {
 			logger.error("Failure while parsing link " + raw, e);
 			return "";
@@ -126,6 +147,18 @@ public class WikiLinkTag implements JFlexParserTag {
 			logger.error("Failure while parsing link " + raw, e);
 			return "";
 		}
+	}
+
+	/**
+	 * Parse a wiki link for use as an edit comment, which means the available
+	 * outputs are limited.
+	 */
+	public String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, WikiLink wikiLink, String raw) throws ParserException {
+		if (!this.isValidLink(parserInput, wikiLink)) {
+			// do not process the link if it's an invalid topic name
+			return raw;
+		}
+		return this.parseWikiLink(parserInput, parserOutput, wikiLink, raw, JFlexParser.MODE_EDIT_COMMENT);
 	}
 
 	/**

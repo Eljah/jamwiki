@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.JAMWikiUnitTest;
@@ -207,6 +208,31 @@ public class ParserTest extends JAMWikiUnitTest {
 		ParserOutput parserOutput = new ParserOutput();
 		ParserUtil.parse(parserInput, parserOutput, topicContent);
 		assertNull("DISPLAYTITLE", parserOutput.getPageTitle());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testParseEditComment() throws Throwable {
+		// read in inputs
+		File inputFile = TestFileUtil.retrieveFile(TestFileUtil.TEST_FILES_DIR, "edit-comment-inputs.txt");
+		List<String> inputs = FileUtils.readLines(inputFile);
+		// read in outputs
+		File outputFile = TestFileUtil.retrieveFile(TestFileUtil.TEST_FILES_DIR, "edit-comment-outputs.txt");
+		List<String> outputs = FileUtils.readLines(outputFile);
+		// verify parsed inputs equal outputs
+		ParserInput parserInput = this.parserInput("Example1");
+		String parsedOutput;
+		int i = 0;
+		for (String input : inputs) {
+			if (i != 0) {
+				// the first line is a comment
+				parsedOutput = ParserUtil.parseEditComment(parserInput, input);
+				assertEquals("Invalid edit comment result " + i, outputs.get(i), parsedOutput);
+			}
+			i++;
+		}
 	}
 
 	/**

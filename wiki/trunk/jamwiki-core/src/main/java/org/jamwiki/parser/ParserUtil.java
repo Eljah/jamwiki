@@ -57,6 +57,24 @@ public class ParserUtil {
 	}
 
 	/**
+	 * Using the system parser, parse an edit comment.
+	 *
+	 * @param parserInput A ParserInput object that contains parser
+	 *  configuration information.
+	 * @param content The raw topic content that is to be parsed.
+	 * @return The parsed content.
+	 * @throws ParserException Thrown if there are any parsing errors.
+	 */
+	public static String parseEditComment(ParserInput parserInput, String content) throws ParserException {
+		if (content == null) {
+			return null;
+		}
+		ParserOutput parserOutput = new ParserOutput();
+		AbstractParser parser = parserInstance(parserInput);
+		return parser.parseEditComment(parserOutput, content);
+	}
+
+	/**
 	 * Retrieve a default ParserOutput object for a given topic name.  Note that
 	 * the content has almost no parsing performed on it other than to generate
 	 * parser output metadata.

@@ -31,6 +31,7 @@ public class TestFileUtil {
 	public static final String TEST_RESULTS_DIR = "data/results/";
 	public static final String TEST_JS_RESULTS_DIR = "data/javascript/";
 	public static final String TEST_TOPICS_DIR = "data/topics/";
+	public static final String TEST_FILES_DIR = "data/files/";
 
 	/**
 	 *

@@ -17,16 +17,13 @@
 package org.jamwiki.taglib;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.DataAccessException;
-import org.jamwiki.utils.LinkUtil;
-import org.jamwiki.utils.WikiLink;
+import org.jamwiki.parser.ParserException;
+import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
@@ -37,8 +34,6 @@ import org.jamwiki.utils.WikiUtil;
 public class EditCommentTag extends TagSupport {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(EditCommentTag.class.getName());
-	private static final Pattern SECTION_NAME_PATTERN = Pattern.compile("(/\\*(.+?)\\*/)(.*)");
-	private static final String CSS_SECTION_COMMENT = "section-link";
 	private String comment = null;
 	private String topic = null;
 
@@ -46,9 +41,8 @@ public class EditCommentTag extends TagSupport {
 	 * Generate the tag HTML output.
 	 */
 	public int doEndTag() throws JspException {
-		String result = this.parseComment();
 		try {
-			this.pageContext.getOut().print(result);
+			this.pageContext.getOut().print(this.parseComment());
 		} catch (IOException e) {
 			logger.error("Failure while building edit comment for comment " + this.comment, e);
 			throw new JspException(e);
@@ -87,36 +81,15 @@ public class EditCommentTag extends TagSupport {
 	/**
 	 * Process the edit comment and return a parsed output string.
 	 */
-	private String parseComment() throws JspException {
+	private String parseComment() throws ParserException {
 		if (StringUtils.isBlank(this.getComment())) {
-			return this.getComment();
+			return "";
 		}
-		Matcher matcher = SECTION_NAME_PATTERN.matcher(this.getComment().trim());
-		if (!matcher.matches()) {
-			return StringEscapeUtils.escapeXml(this.getComment());
-		}
-		String sectionName = matcher.group(2);
-		if (StringUtils.isBlank(sectionName)) {
-			return StringEscapeUtils.escapeXml(this.getComment());
-		}
-		sectionName = sectionName.trim();
-		String additionalComment = matcher.group(3);
 		HttpServletRequest request = (HttpServletRequest)this.pageContext.getRequest();
 		String virtualWiki = WikiUtil.getVirtualWikiFromRequest(request);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, this.topic + "#" + sectionName);
-		StringBuilder result = new StringBuilder();
-		result.append("<span class=\"").append(CSS_SECTION_COMMENT).append("\">");
-		try {
-			result.append(LinkUtil.buildInternalLinkHtml(request.getContextPath(), virtualWiki, wikiLink, "&rarr;", null, null, false));
-		} catch (DataAccessException e) {
-			logger.error("Failure while building edit comment for comment " + this.comment, e);
-			throw new JspException(e);
-		}
-		result.append(StringEscapeUtils.escapeXml(sectionName) + (!StringUtils.isBlank(additionalComment) ? " -" : ""));
-		result.append("</span>");
-		if (!StringUtils.isBlank(additionalComment)) {
-			result.append(' ').append(StringEscapeUtils.escapeXml(additionalComment));
-		}
-		return result.toString();
+		ParserInput parserInput = new ParserInput(virtualWiki, this.getTopic());
+		parserInput.setContext(request.getContextPath());
+		parserInput.setLocale(request.getLocale());
+		return ParserUtil.parseEditComment(parserInput, this.getComment());
 	}
 }

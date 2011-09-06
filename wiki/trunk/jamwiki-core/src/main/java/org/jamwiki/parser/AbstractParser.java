@@ -52,6 +52,17 @@ public abstract class AbstractParser {
 	public abstract String buildRedirectContent(String topicName);
 
 	/**
+	 * Parse an edit comment and return HTML for online representation.
+	 *
+	 * @param parserOutput A ParserOutput object containing parser
+	 *  metadata output.
+	 * @param raw The raw Wiki syntax to be converted into HTML.
+	 * @return The parsed content.
+	 * @throws ParserException Thrown if any error occurs during parsing.
+	 */
+	public abstract String parseEditComment(ParserOutput parserOutput, String raw) throws ParserException;
+
+	/**
 	 * This method parses content, performing all transformations except for
 	 * layout changes such as adding paragraph tags.  It is suitable to be used
 	 * when parsing the contents of a link or performing similar internal

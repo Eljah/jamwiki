@@ -38,6 +38,8 @@ public class JFlexParser extends AbstractParser {
 
 	/** Any parsing that takes longer than the specified time (in ms) will trigger a log message. */
 	private static final int TIME_LIMIT_PARSE = 15;
+	/** Mode used when parsing edit comments. */
+	public static final int MODE_EDIT_COMMENT = 0;
 	/** Splice mode is used when inserting an edited topic section back into the full topic content. */
 	public static final int MODE_SPLICE = 1;
 	/** Slice mode is used when retrieving a section of a topic for editing. */
@@ -115,6 +117,21 @@ public class JFlexParser extends AbstractParser {
 		JFlexLexer lexer = new JAMWikiCustomTagLexer(reader);
 		int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
 		return this.lex(lexer, raw, parserOutput, preMode);
+	}
+
+	/**
+	 * Parse an edit comment and return HTML for online representation.
+	 *
+	 * @param parserOutput A ParserOutput object containing parser
+	 *  metadata output.
+	 * @param raw The raw Wiki syntax to be converted into HTML.
+	 * @return The parsed content.
+	 * @throws ParserException Thrown if any error occurs during parsing.
+	 */
+	public String parseEditComment(ParserOutput parserOutput, String raw) throws ParserException {
+		StringReader reader = toStringReader(raw);
+		JFlexLexer lexer = new JAMWikiEditCommentLexer(reader);
+		return this.lex(lexer, raw, parserOutput, MODE_EDIT_COMMENT).trim();
 	}
 
 	/**
