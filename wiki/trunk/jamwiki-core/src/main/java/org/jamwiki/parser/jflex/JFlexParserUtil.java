@@ -131,6 +131,25 @@ public class JFlexParserUtil {
 	}
 
 	/**
+	 * Parse arguments of the form "arg1|arg2", trimming excess whitespace, handling
+	 * arguments of the form "arg1|{{{arg2|arg3}}}|arg4", and returning an array of
+	 * results.
+	 */
+	protected static String[] retrieveTokenizedArgumentArray(ParserInput parserInput, ParserOutput parserOutput, int mode, String argumentTokenString) throws ParserException {
+		if (StringUtils.isBlank(argumentTokenString)) {
+			return new String[0];
+		}
+		List<String> parserFunctionArgumentList = JFlexParserUtil.tokenizeParamString(argumentTokenString);
+		String[] parserFunctionArgumentArray = new String[parserFunctionArgumentList.size()];
+		// trim results and store in array
+		int i = 0;
+		for (String argument : parserFunctionArgumentList) {
+			parserFunctionArgumentArray[i++] = JFlexParserUtil.parseFragment(parserInput, parserOutput, argument.trim(), mode);
+		}
+		return parserFunctionArgumentArray;
+	}
+
+	/**
 	 * Given a tag of the form "<tag>content</tag>", return all content between
 	 * the tags.  Consider the following examples:
 	 *

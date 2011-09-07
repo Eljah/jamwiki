@@ -125,13 +125,14 @@ public class TemplateTag implements JFlexParserTag {
 			throw new ExcessiveNestingException("Potentially infinite parsing loop - over " + parserInput.getTemplateDepth() + " template inclusions while parsing topic " + parserInput.getTopicName());
 		}
 		// check for magic word or parser function
-		String[] parserFunctionInfo = ParserFunctionUtil.parseParserFunctionInfo(parserInput, mode, templateContent);
+		String[] magicWordInfo = MagicWordUtil.parseMagicWordInfo(templateContent);
+		String[] parserFunctionInfo = ParserFunctionUtil.parseParserFunctionInfo(templateContent);
 		String result = null;
-		if (MagicWordUtil.isMagicWord(templateContent) || parserFunctionInfo != null) {
+		if (magicWordInfo != null || parserFunctionInfo != null) {
 			if (mode <= JFlexParser.MODE_MINIMAL) {
 				result = raw;
-			} else if (MagicWordUtil.isMagicWord(templateContent)) {
-				result = MagicWordUtil.processMagicWord(parserInput, templateContent);
+			} else if (magicWordInfo != null) {
+				result = MagicWordUtil.processMagicWord(parserInput, parserOutput, mode, magicWordInfo[0], magicWordInfo[1]);
 			} else {
 				result = ParserFunctionUtil.processParserFunction(parserInput, parserOutput, mode, parserFunctionInfo[0], parserFunctionInfo[1]);
 			}

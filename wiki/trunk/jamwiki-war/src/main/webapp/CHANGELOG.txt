@@ -12,6 +12,9 @@ New Features:
     functions.  Usage: "{{padleft:string|amt|padString}}".
   * {{REVISIONMONTH}} is no longer padded ("4" instead of "04") while
     {{REVISIONMONTH1}} has been added in order to match Mediawiki behavior.
+  * Allow page name and namespace magic words to specify the page to be
+    operated on, instead of just the current page, to match Mediawiki behavior.
+    Example: "{{PAGENAME:Template:Main Page}}".
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to commons-lang 3.0.1.
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
@@ -31,7 +32,9 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
@@ -198,6 +201,25 @@ public class MagicWordUtil {
 	/**
 	 * Determine if a template name corresponds to a magic word requiring
 	 * special handling.  See http://meta.wikimedia.org/wiki/Help:Magic_words
+	 * for a list of Mediawiki magic words.  If the template name is a magic
+	 * word then return the magic word name and any arguments.
+	 */
+	protected static String[] parseMagicWordInfo(String name) {
+		int pos = name.indexOf(':');
+		String magicWord = (pos != -1) ? name.substring(0, pos).trim() : name.trim();
+		if (!MagicWordUtil.isMagicWord(magicWord)) {
+			return null;
+		}
+		String magicWordArguments = null;
+		if (pos != -1 && (pos + 2) <= name.length()) {
+			magicWordArguments = name.substring(pos + 1).trim();
+		}
+		return new String[]{magicWord, magicWordArguments};
+	}
+
+	/**
+	 * Determine if a template name corresponds to a magic word requiring
+	 * special handling.  See http://meta.wikimedia.org/wiki/Help:Magic_words
 	 * for a list of Mediawiki magic words.
 	 */
 	protected static boolean isMagicWord(String name) {
@@ -220,19 +242,20 @@ public class MagicWordUtil {
 	 * word value.  See http://meta.wikimedia.org/wiki/Help:Magic_words for a
 	 * list of Mediawiki magic words.
 	 */
-	protected static String processMagicWord(ParserInput parserInput, String name) throws DataAccessException {
-		if (MAGIC_WORDS_DATETIME.contains(name)) {
-			return processMagicWordDateTime(parserInput, name);
-		} else if (MAGIC_WORDS_STATISTICS.contains(name)) {
-			return processMagicWordStatistics(parserInput, name);
-		} else if (MAGIC_WORDS_PAGE_NAMES.contains(name)) {
-			return processMagicWordPageNames(parserInput, name);
-		} else if (MAGIC_WORDS_NAMESPACES.contains(name)) {
-			return processMagicWordNamespaces(parserInput, name);
-		} else if (MAGIC_WORDS_METADATA.contains(name)) {
-			return processMagicWordMetadata(parserInput, name);
+	protected static String processMagicWord(ParserInput parserInput, ParserOutput parserOutput, int mode, String magicWord, String magicWordArguments) throws DataAccessException, ParserException {
+		String[] magicWordArgumentArray = JFlexParserUtil.retrieveTokenizedArgumentArray(parserInput, parserOutput, mode, magicWordArguments);
+		if (MAGIC_WORDS_DATETIME.contains(magicWord)) {
+			return processMagicWordDateTime(parserInput, magicWord);
+		} else if (MAGIC_WORDS_STATISTICS.contains(magicWord)) {
+			return processMagicWordStatistics(parserInput, magicWord);
+		} else if (MAGIC_WORDS_PAGE_NAMES.contains(magicWord)) {
+			return processMagicWordPageNames(parserInput, magicWord, magicWordArgumentArray);
+		} else if (MAGIC_WORDS_NAMESPACES.contains(magicWord)) {
+			return processMagicWordNamespaces(parserInput, magicWord, magicWordArgumentArray);
+		} else if (MAGIC_WORDS_METADATA.contains(magicWord)) {
+			return processMagicWordMetadata(parserInput, magicWord);
 		}
-		return name;
+		return magicWord;
 	}
 
 	/**
@@ -390,13 +413,19 @@ public class MagicWordUtil {
 	/**
 	 * Process page value magic words.
 	 */
-	private static String processMagicWordPageNames(ParserInput parserInput, String name) throws DataAccessException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
+	private static String processMagicWordPageNames(ParserInput parserInput, String name, String[] magicWordArgumentArray) throws DataAccessException {
+		// if there is an argument then use it as the topic name, otherwise
+		// default to the current topic.
+		String topic = parserInput.getTopicName();
+		if (magicWordArgumentArray.length > 0 && !StringUtils.isBlank(magicWordArgumentArray[0])) {
+			topic = magicWordArgumentArray[0];
+		}
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), topic);
 		if (name.equals(MAGIC_FULL_PAGE_NAME)) {
-			return parserInput.getTopicName();
+			return topic;
 		}
 		if (name.equals(MAGIC_FULL_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(parserInput.getTopicName());
+			return Utilities.encodeAndEscapeTopicName(topic);
 		}
 		if (name.equals(MAGIC_PAGE_NAME)) {
 			return wikiLink.getArticle();
@@ -404,49 +433,33 @@ public class MagicWordUtil {
 		if (name.equals(MAGIC_PAGE_NAME_E)) {
 			return Utilities.encodeAndEscapeTopicName(wikiLink.getArticle());
 		}
-		if (name.equals(MAGIC_SUB_PAGE_NAME)) {
-			String topic = wikiLink.getArticle();
-			int pos = topic.lastIndexOf('/');
-			if (pos != -1 && pos < topic.length()) {
-				topic = topic.substring(pos + 1);
+		if (name.equals(MAGIC_SUB_PAGE_NAME) || name.equals(MAGIC_SUB_PAGE_NAME_E)) {
+			String pageName = wikiLink.getArticle();
+			int pos = pageName.lastIndexOf('/');
+			if (pos != -1 && pos < pageName.length()) {
+				pageName = pageName.substring(pos + 1);
 			}
-			return topic;
+			return name.equals(MAGIC_SUB_PAGE_NAME) ? pageName : Utilities.encodeAndEscapeTopicName(pageName);
 		}
-		if (name.equals(MAGIC_SUB_PAGE_NAME_E)) {
-			String topic = wikiLink.getArticle();
-			int pos = topic.lastIndexOf('/');
-			if (pos != -1 && pos < topic.length()) {
-				topic = topic.substring(pos + 1);
+		if (name.equals(MAGIC_BASE_PAGE_NAME) || name.equals(MAGIC_BASE_PAGE_NAME_E)) {
+			String pageName = wikiLink.getArticle();
+			int pos = pageName.lastIndexOf('/');
+			if (pos != -1 && pos < pageName.length()) {
+				pageName = pageName.substring(0, pos);
 			}
-			return Utilities.encodeAndEscapeTopicName(topic);
-		}
-		if (name.equals(MAGIC_BASE_PAGE_NAME)) {
-			String topic = wikiLink.getArticle();
-			int pos = topic.lastIndexOf('/');
-			if (pos != -1 && pos < topic.length()) {
-				topic = topic.substring(0, pos);
-			}
-			return topic;
-		}
-		if (name.equals(MAGIC_BASE_PAGE_NAME_E)) {
-			String topic = wikiLink.getArticle();
-			int pos = topic.lastIndexOf('/');
-			if (pos != -1 && pos < topic.length()) {
-				topic = topic.substring(0, pos);
-			}
-			return Utilities.encodeAndEscapeTopicName(topic);
+			return name.equals(MAGIC_BASE_PAGE_NAME) ? pageName : Utilities.encodeAndEscapeTopicName(pageName);
 		}
 		if (name.equals(MAGIC_TALK_PAGE_NAME)) {
-			return WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
+			return WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), topic);
 		}
 		if (name.equals(MAGIC_TALK_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), parserInput.getTopicName()));
+			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), topic));
 		}
 		if (name.equals(MAGIC_SUBJECT_PAGE_NAME) || name.equals(MAGIC_ARTICLE_PAGE_NAME)) {
-			return WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
+			return WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), topic);
 		}
 		if (name.equals(MAGIC_SUBJECT_PAGE_NAME_E) || name.equals(MAGIC_ARTICLE_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), parserInput.getTopicName()));
+			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), topic));
 		}
 		return name;
 	}
@@ -454,8 +467,14 @@ public class MagicWordUtil {
 	/**
 	 * Process namespace magic words.
 	 */
-	private static String processMagicWordNamespaces(ParserInput parserInput, String name) throws DataAccessException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserInput.getTopicName());
+	private static String processMagicWordNamespaces(ParserInput parserInput, String name, String[] magicWordArgumentArray) throws DataAccessException {
+		// if there is an argument then use it as the topic name, otherwise
+		// default to the current topic.
+		String topic = parserInput.getTopicName();
+		if (magicWordArgumentArray.length > 0 && !StringUtils.isBlank(magicWordArgumentArray[0])) {
+			topic = magicWordArgumentArray[0];
+		}
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), topic);
 		if (name.equals(MAGIC_NAMESPACE)) {
 			return wikiLink.getNamespace().getLabel(parserInput.getVirtualWiki());
 		}

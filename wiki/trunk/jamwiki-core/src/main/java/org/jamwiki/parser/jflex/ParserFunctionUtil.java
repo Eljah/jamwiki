@@ -95,9 +95,10 @@ public class ParserFunctionUtil {
 	 * for a list of Mediawiki parser functions.  If the template name is a parser
 	 * function then return the parser function name and argument.
 	 */
-	protected static String[] parseParserFunctionInfo(ParserInput parserInput, int mode, String name) throws ParserException {
+	protected static String[] parseParserFunctionInfo(String name) {
 		int pos = name.indexOf(':');
 		if (pos == -1 || (pos + 2) > name.length()) {
+			// no colon or the colon is the last character
 			return null;
 		}
 		String parserFunction = name.substring(0, pos + 1).trim();
@@ -114,7 +115,7 @@ public class ParserFunctionUtil {
 	 * list of Mediawiki parser functions.
 	 */
 	protected static String processParserFunction(ParserInput parserInput, ParserOutput parserOutput, int mode, String parserFunction, String parserFunctionArguments) throws DataAccessException, ParserException {
-		String[] parserFunctionArgumentArray = ParserFunctionUtil.parseParserFunctionArgumentArray(parserInput, parserOutput, mode, parserFunctionArguments);
+		String[] parserFunctionArgumentArray = JFlexParserUtil.retrieveTokenizedArgumentArray(parserInput, parserOutput, mode, parserFunctionArguments);
 		if (parserFunction.equals(PARSER_FUNCTION_ANCHOR_ENCODE)) {
 			return Utilities.encodeAndEscapeTopicName(parserFunctionArgumentArray[0]);
 		}
@@ -502,23 +503,5 @@ public class ParserFunctionUtil {
 			}
 		}
 		return "";
-	}
-
-	/**
-	 * Parse parser function arguments of the form "arg1|arg2", trimming excess whitespace
-	 * and returning an array of results.
-	 */
-	private static String[] parseParserFunctionArgumentArray(ParserInput parserInput, ParserOutput parserOutput, int mode, String parserFunctionArguments) throws ParserException {
-		if (StringUtils.isBlank(parserFunctionArguments)) {
-			return new String[0];
-		}
-		List<String> parserFunctionArgumentList = JFlexParserUtil.tokenizeParamString(parserFunctionArguments);
-		String[] parserFunctionArgumentArray = new String[parserFunctionArgumentList.size()];
-		// trim results and store in array
-		int i = 0;
-		for (String argument : parserFunctionArgumentList) {
-			parserFunctionArgumentArray[i++] = JFlexParserUtil.parseFragment(parserInput, parserOutput, argument.trim(), mode);
-		}
-		return parserFunctionArgumentArray;
 	}
 }
