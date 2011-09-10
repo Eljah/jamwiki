@@ -7,4 +7,4 @@ HTML <img> tag.  The arguments are:
   4 = Image alt tag.
   5 = Vertical alignment CSS.
 -->
-<img class="{0}" src="{1}" width="{2}" height="{3}" alt="{4}" style="vertical-align: {5}" />
+<img class="{0}" src="{1}" width="{2,number,#}" height="{3,number,#}" alt="{4}" style="vertical-align: {5}" />

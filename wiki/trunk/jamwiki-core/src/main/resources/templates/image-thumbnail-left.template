@@ -5,5 +5,5 @@ HTML wrapper for a left-aligned thumbnail image.  The arguments are:
 -->
 <!-- the inner div must specify a width -->
 <div class="thumb tleft">
-<div class="thumbinner" style="width:{0}px">{1}</div>
+<div class="thumbinner" style="width:{0,number,#}px">{1}</div>
 </div>

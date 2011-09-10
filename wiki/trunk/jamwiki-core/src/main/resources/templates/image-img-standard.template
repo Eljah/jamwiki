@@ -6,4 +6,4 @@ HTML <img> tag for images without vertical alignment.  The arguments are:
   3 = Image height in pixels.
   4 = Image alt tag.
 -->
-<img class="{0}" src="{1}" width="{2}" height="{3}" alt="{4}" />
+<img class="{0}" src="{1}" width="{2,number,#}" height="{3,number,#}" alt="{4}" />
