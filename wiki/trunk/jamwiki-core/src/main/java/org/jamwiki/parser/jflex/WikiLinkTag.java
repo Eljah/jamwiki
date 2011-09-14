@@ -75,7 +75,7 @@ public class WikiLinkTag implements JFlexParserTag {
 				int start = raw.indexOf("[[");
 				int end = raw.lastIndexOf("]]");
 				String content = raw.substring(start + "[[".length(), end);
-				return "[[" + JFlexParserUtil.parseFragment(lexer.getParserInput(), lexer.getParserOutput(), content, lexer.getMode()) + "]]";
+				return "[[" + JFlexParserUtil.parseFragmentNonLineStart(lexer.getParserInput(), lexer.getParserOutput(), content, lexer.getMode()) + "]]";
 			}
 		}
 		if (!this.isValidLink(lexer.getParserInput(), wikiLink)) {
@@ -131,7 +131,7 @@ public class WikiLinkTag implements JFlexParserTag {
 			} else if (mode != JFlexParser.MODE_EDIT_COMMENT) {
 				// pass a parameter via the parserInput to prevent nested links from being generated
 				parserInput.getTempParams().put(LINK_CAPTION, true);
-				wikiLink.setText(JFlexParserUtil.parseFragment(parserInput, parserOutput, wikiLink.getText(), mode));
+				wikiLink.setText(JFlexParserUtil.parseFragmentNonLineStart(parserInput, parserOutput, wikiLink.getText(), mode));
 				parserInput.getTempParams().remove(LINK_CAPTION);
 			}
 			if (StringUtils.equals(wikiLink.getDestination(), parserInput.getTopicName()) && StringUtils.equals(virtualWiki, parserInput.getVirtualWiki()) && StringUtils.isBlank(wikiLink.getSection())) {
