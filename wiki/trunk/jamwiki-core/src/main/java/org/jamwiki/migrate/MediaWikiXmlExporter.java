@@ -18,8 +18,9 @@ package org.jamwiki.migrate;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -55,11 +56,11 @@ public class MediaWikiXmlExporter implements TopicExporter {
 	 *
 	 */
 	public void exportToFile(File file, String virtualWiki, List<String> topicNames, boolean excludeHistory) throws MigrationException {
-		FileWriter fileWriter = null;
+		OutputStreamWriter fileWriter = null;
 		BufferedWriter bufferedWriter = null;
 		boolean success = false;
 		try {
-			fileWriter = new FileWriter(file);
+			fileWriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
 			bufferedWriter = new BufferedWriter(fileWriter);
 			bufferedWriter.append("<mediawiki xmlns=\"http://www.mediawiki.org/xml/export-0.3/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd\" version=\"0.3\" xml:lang=\"en\">");
 			this.writeSiteInfo(bufferedWriter, virtualWiki);

@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import org.apache.commons.io.FileUtils;
 import org.jamwiki.JAMWikiUnitTest;
 import org.jamwiki.TestFileUtil;
 import org.jamwiki.WikiBase;
@@ -59,6 +60,7 @@ public class MigrationUtilTest extends JAMWikiUnitTest {
 	public void setup() throws Exception {
 		super.setup();
 		if (!INITIALIZED) {
+			this.setupTopic(null, "CharacterUtf8");
 			this.setupTopic(null, "Example1");
 			this.setupTopic(null, "Example2");
 			INITIALIZED = true;
@@ -91,7 +93,7 @@ public class MigrationUtilTest extends JAMWikiUnitTest {
 	 *
 	 */
 	@Test
-	public void testTwoTopics() throws Throwable {
+	public void testExportTwoTopics() throws Throwable {
 		String virtualWiki = VIRTUAL_WIKI_EN;
 		List<String> topicNames = new ArrayList<String>();
 		topicNames.add("Example1");
@@ -103,6 +105,26 @@ public class MigrationUtilTest extends JAMWikiUnitTest {
 		} catch (MigrationException e) {
 			fail("Failure during export" + e);
 		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testExportUtf8() throws Throwable {
+		String virtualWiki = VIRTUAL_WIKI_EN;
+		List<String> topicNames = new ArrayList<String>();
+		topicNames.add("CharacterUtf8");
+		boolean excludeHistory = false;
+		File file = TEMP_FOLDER.newFile("export.xml");
+		try {
+			MigrationUtil.exportToFile(file, virtualWiki, topicNames, excludeHistory);
+		} catch (MigrationException e) {
+			fail("Failure during export" + e);
+		}
+		Topic topic = WikiBase.getDataHandler().lookupTopic(VIRTUAL_WIKI_EN, "CharacterUtf8", true);
+		String fileContent = FileUtils.readFileToString(file, "UTF-8");
+		assertTrue("UTF-8 exported incorrectly", fileContent.contains(topic.getTopicContent()));
 	}
 
 	/**
