@@ -99,14 +99,17 @@ public class TableOfContents {
 	 * This method checks to see if a TOC is allowed to be inserted, and if so
 	 * returns an HTML representation of the TOC.
 	 *
-	 * @param locale The locale of the user viewing the TOC, used for formatting
-	 *  the header message key.
+	 * @param parserInput The current parser input configuration object.
 	 * @return An HTML representation of the current table of contents object,
 	 *  or an empty string if the table of contents can not be inserted due
 	 *  to an inadequate number of entries or some other reason.
 	 */
-	public String attemptTOCInsertion(Locale locale) throws IOException {
+	public String attemptTOCInsertion(ParserInput parserInput) throws IOException {
 		this.insertionAttempt++;
+		if (!parserInput.getAllowTableOfContents()) {
+			// TOC forbidden due to configuration
+			return "";
+		}
 		if (this.size() == 0 || (this.size() < MINIMUM_HEADINGS && !this.forceTOC)) {
 			// too few headings
 			return "";
@@ -123,7 +126,7 @@ public class TableOfContents {
 			// user specified a TOC location, only insert there
 			return "";
 		}
-		return this.toHTML(locale);
+		return this.toHTML(parserInput.getLocale());
 	}
 
 	/**
