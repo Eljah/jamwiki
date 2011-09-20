@@ -26,12 +26,11 @@ import org.jamwiki.utils.WikiLogger;
 public class HSqlDataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(HSqlDataHandler.class.getName());
-	private final QueryHandler queryHandler = new HSqlQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public HSqlDataHandler() {
+		this.queryHandler = new HSqlQueryHandler();
 	}
 }

@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class SybaseASADataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(SybaseASADataHandler.class.getName());
-	private final QueryHandler queryHandler = new SybaseASAQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public SybaseASADataHandler() {
+		this.queryHandler = new SybaseASAQueryHandler();
 	}
 }

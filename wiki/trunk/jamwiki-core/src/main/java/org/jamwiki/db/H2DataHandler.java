@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class H2DataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(H2DataHandler.class.getName());
-	private final QueryHandler queryHandler = new H2QueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public H2DataHandler() {
+		this.queryHandler = new H2QueryHandler();
 	}
 }

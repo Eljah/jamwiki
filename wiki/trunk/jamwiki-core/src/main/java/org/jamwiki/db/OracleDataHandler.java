@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class OracleDataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(OracleDataHandler.class.getName());
-	private final QueryHandler queryHandler = new OracleQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public OracleDataHandler() {
+		this.queryHandler = new OracleQueryHandler();
 	}
 }

@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class MySqlDataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(MySqlDataHandler.class.getName());
-	private final QueryHandler queryHandler = new MySqlQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public MySqlDataHandler() {
+		this.queryHandler = new MySqlQueryHandler();
 	}
 }

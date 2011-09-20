@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class PostgresDataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(PostgresDataHandler.class.getName());
-	private final QueryHandler queryHandler = new PostgresQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public PostgresDataHandler() {
+		this.queryHandler = new PostgresQueryHandler();
 	}
 }

@@ -85,7 +85,14 @@ public class AnsiDataHandler implements DataHandler {
 	private static final String CACHE_VIRTUAL_WIKI_LIST = "org.jamwiki.db.AnsiDataHandler.CACHE_VIRTUAL_WIKI_LIST";
 	private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
 
-	private final QueryHandler queryHandler = new AnsiQueryHandler();
+	protected QueryHandler queryHandler;
+
+	/**
+	 *
+	 */
+	public AnsiDataHandler() {
+		this.queryHandler = new AnsiQueryHandler();
+	}
 
 	/**
 	 *
@@ -1428,7 +1435,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
+	protected final QueryHandler queryHandler() {
 		return this.queryHandler;
 	}
 

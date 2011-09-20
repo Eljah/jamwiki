@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class MSSqlDataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(MSSqlDataHandler.class.getName());
-	private final QueryHandler queryHandler = new MSSqlQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public MSSqlDataHandler() {
+		this.queryHandler = new MSSqlQueryHandler();
 	}
 }

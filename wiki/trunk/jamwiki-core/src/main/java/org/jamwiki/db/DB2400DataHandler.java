@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class DB2400DataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(DB2400DataHandler.class.getName());
-	private final QueryHandler queryHandler = new DB2400QueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public DB2400DataHandler() {
+		this.queryHandler = new DB2400QueryHandler();
 	}
 }

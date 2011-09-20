@@ -25,12 +25,11 @@ import org.jamwiki.utils.WikiLogger;
 public class CacheDataHandler extends AnsiDataHandler {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(CacheDataHandler.class.getName());
-	private final QueryHandler queryHandler = new CacheQueryHandler();
 
 	/**
 	 *
 	 */
-	protected QueryHandler queryHandler() {
-		return this.queryHandler;
+	public CacheDataHandler() {
+		this.queryHandler = new CacheQueryHandler();
 	}
 }
