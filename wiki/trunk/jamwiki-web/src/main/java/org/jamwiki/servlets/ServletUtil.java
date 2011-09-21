@@ -17,7 +17,7 @@
 package org.jamwiki.servlets;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -721,7 +721,7 @@ public class ServletUtil {
 			if (classesDirError != null) {
 				errors.add(classesDirError);
 			}
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			errors.add(new WikiMessage("error.directorywrite", classesDir, e.getMessage()));
 		}
 		// test database
