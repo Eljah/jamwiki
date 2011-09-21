@@ -883,7 +883,7 @@ used with JMX monitors.
             memoryStoreEvictionPolicy="LRU"
             />
 
-     <cache name="org.jamwiki.utils.ImageUtil.CACHE_IMAGE_DIMENSIONS"
+     <cache name="org.jamwiki.parser.image.ImageUtil.CACHE_IMAGE_DIMENSIONS"
             maxElementsInMemory="1000"
             eternal="true"
             timeToIdleSeconds="120"

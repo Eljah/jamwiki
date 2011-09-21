@@ -26,7 +26,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
-import org.jamwiki.utils.ImageBorderEnum;
+import org.jamwiki.parser.image.ImageBorderEnum;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;

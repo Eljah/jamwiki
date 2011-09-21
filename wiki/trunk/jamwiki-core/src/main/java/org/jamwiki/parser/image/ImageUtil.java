@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.parser.image;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -42,9 +42,15 @@ import org.jamwiki.model.WikiImage;
 import org.jamwiki.model.WikiFile;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
+import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.WikiCache;
+import org.jamwiki.utils.WikiLink;
+import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.utils.WikiUtil;
 
 /**
  * Utility methods for performing wiki-specific image tasks, such as generating
@@ -54,7 +60,7 @@ public class ImageUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageUtil.class.getName());
 	/** Cache name for the cache of image dimensions. */
-	private static final String CACHE_IMAGE_DIMENSIONS = "org.jamwiki.utils.ImageUtil.CACHE_IMAGE_DIMENSIONS";
+	private static final String CACHE_IMAGE_DIMENSIONS = "org.jamwiki.parser.image.ImageUtil.CACHE_IMAGE_DIMENSIONS";
 	/** Sub-folder of the "files" directory into which to place resized images. */
 	private static final String RESIZED_IMAGE_SUBFOLDER = "resized";
 	/** Path to the template used to format a center-aligned image. */

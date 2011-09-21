@@ -42,6 +42,7 @@ import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicType;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.parser.LinkUtil;
 
 /**
  * This class provides a variety of general utility methods for handling

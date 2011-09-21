@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.parser;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +24,11 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
-import org.jamwiki.parser.ParserException;
+import org.jamwiki.parser.image.ImageUtil;
+import org.jamwiki.utils.PseudoTopicHandler;
+import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.WikiLink;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * General utility methods for handling both wiki topic links and HTML links.

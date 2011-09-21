@@ -28,7 +28,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.SearchResultEntry;
-import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;

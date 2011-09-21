@@ -14,35 +14,11 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.parser.image;
 
 /**
  *
  */
-public enum ImageVerticalAlignmentEnum {
-	BASELINE("baseline"),
-	SUB("sub"),
-	SUPER("super"),
-	TOP("top"),
-	TEXT_TOP("text-top"),
-	MIDDLE("middle"),
-	BOTTOM("bottom"),
-	TEXT_BOTTOM("text-bottom"),
-	NOT_SPECIFIED("not-specified");
-
-	private String label;
-
-	/**
-	 *
-	 */
-	ImageVerticalAlignmentEnum(String label) {
-		this.label = label;
-	}
-
-	/**
-	 * Override the default toString() method so that valid CSS is returned.
-	 */
-	public String toString() {
-		return this.label;
-	}
+public enum ImageBorderEnum {
+	_GALLERY, BORDER, FRAME, THUMB, FRAMELESS, NOT_SPECIFIED
 }

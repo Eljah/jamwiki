@@ -18,10 +18,10 @@ package org.jamwiki.parser.jflex;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserUtil;
-import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;

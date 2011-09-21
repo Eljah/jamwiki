@@ -22,8 +22,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.utils.ImageMetadata;
-import org.jamwiki.utils.ImageUtil;
+import org.jamwiki.parser.image.ImageMetadata;
+import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 

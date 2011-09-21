@@ -19,7 +19,7 @@ package org.jamwiki.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 

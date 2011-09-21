@@ -29,11 +29,11 @@ import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Namespace;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
-import org.jamwiki.utils.ImageUtil;
-import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 

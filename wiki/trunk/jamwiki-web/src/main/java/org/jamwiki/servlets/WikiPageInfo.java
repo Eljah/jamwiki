@@ -32,7 +32,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
-import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;

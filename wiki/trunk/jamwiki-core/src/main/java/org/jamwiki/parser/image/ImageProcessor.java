@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.parser.image;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -32,6 +32,8 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.utils.WikiUtil;
 
 /**
  * Utility methods that wrap native Java image processing functionality to allow

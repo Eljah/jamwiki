@@ -29,7 +29,7 @@ import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiUser;
-import org.jamwiki.utils.ImageUtil;
+import org.jamwiki.parser.image.ImageUtil;
 import org.junit.Before;
 
 /**

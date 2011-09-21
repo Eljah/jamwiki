@@ -31,7 +31,7 @@ import org.jamwiki.WikiVersion;
 import org.jamwiki.db.DatabaseUpgrades;
 import org.jamwiki.db.WikiDatabase;
 import org.jamwiki.model.VirtualWiki;
-import org.jamwiki.utils.LinkUtil;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;

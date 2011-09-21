@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
