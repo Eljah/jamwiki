@@ -39,7 +39,6 @@ import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
-import org.jamwiki.utils.WikiUtil;
 
 /**
  * Process magic words.  See http://www.mediawiki.org/wiki/Help:Magic_words
@@ -450,16 +449,16 @@ public class MagicWordUtil {
 			return name.equals(MAGIC_BASE_PAGE_NAME) ? pageName : Utilities.encodeAndEscapeTopicName(pageName);
 		}
 		if (name.equals(MAGIC_TALK_PAGE_NAME)) {
-			return WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), topic);
+			return LinkUtil.extractCommentsLink(parserInput.getVirtualWiki(), topic);
 		}
 		if (name.equals(MAGIC_TALK_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractCommentsLink(parserInput.getVirtualWiki(), topic));
+			return Utilities.encodeAndEscapeTopicName(LinkUtil.extractCommentsLink(parserInput.getVirtualWiki(), topic));
 		}
 		if (name.equals(MAGIC_SUBJECT_PAGE_NAME) || name.equals(MAGIC_ARTICLE_PAGE_NAME)) {
-			return WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), topic);
+			return LinkUtil.extractTopicLink(parserInput.getVirtualWiki(), topic);
 		}
 		if (name.equals(MAGIC_SUBJECT_PAGE_NAME_E) || name.equals(MAGIC_ARTICLE_PAGE_NAME_E)) {
-			return Utilities.encodeAndEscapeTopicName(WikiUtil.extractTopicLink(parserInput.getVirtualWiki(), topic));
+			return Utilities.encodeAndEscapeTopicName(LinkUtil.extractTopicLink(parserInput.getVirtualWiki(), topic));
 		}
 		return name;
 	}

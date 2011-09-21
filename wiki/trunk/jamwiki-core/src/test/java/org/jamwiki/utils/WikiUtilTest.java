@@ -21,8 +21,7 @@ package org.jamwiki.utils;
 import org.jamwiki.JAMWikiUnitTest;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.model.Topic;
-import org.jamwiki.model.TopicType;
+import org.jamwiki.parser.LinkUtil;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -58,46 +57,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 *
 	 */
 	@Test
-	public void testExtractTopicLink() throws Throwable {
-		//TODO
-		String result = WikiUtil.extractTopicLink("en", "testWikiUtilName");
-		assertSame("result", "testWikiUtilName", result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindRedirectedTopic1() throws Throwable {
-		Topic parent = new Topic("en", "Test");
-		parent.setTopicType(TopicType.REDIRECT);
-		Topic result = WikiUtil.findRedirectedTopic(parent, 100);
-		assertSame("result", parent, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
 	public void testValidateDirectory1() throws Throwable {
 		WikiMessage result = WikiUtil.validateDirectory("testUtilitiesName");
 		assertEquals("result.getKey()", "error.directoryinvalid", result.getKey());
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=IllegalArgumentException.class)
-	public void testExtractCommentsLinkThrowsException() throws Throwable {
-		WikiUtil.extractCommentsLink("en", "");
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=IllegalArgumentException.class)
-	public void testExtractTopicLinkThrowsException() throws Throwable {
-		WikiUtil.extractTopicLink("en", "");
 	}
 
 	/**
@@ -228,7 +190,7 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test(expected=WikiException.class)
 	public void testValidateTopicNameThrowsNullPointerException() throws Throwable {
-		WikiUtil.validateTopicName(null, null, false);
+		WikiUtil.validateTopicName(null, null, null, false);
 	}
 
 	/**
@@ -236,8 +198,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testValidateTopicNameThrowsWikiException1() throws Throwable {
+		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "");
 		try {
-			WikiUtil.validateTopicName("en", "", false);
+			WikiUtil.validateTopicName("en", "", wikiLink, false);
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("ex.getWikiMessage().getKey()", "common.exception.notopic", ex.getWikiMessage().getKey());
@@ -249,8 +212,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testValidateTopicNameThrowsWikiException2() throws Throwable {
+		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "/Test");
 		try {
-			WikiUtil.validateTopicName("en", "/Test", false);
+			WikiUtil.validateTopicName("en", "/Test", wikiLink, false);
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
@@ -262,8 +226,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testValidateTopicNameThrowsWikiException3() throws Throwable {
+		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Comments:/Test");
 		try {
-			WikiUtil.validateTopicName("en", "Comments:/Test", false);
+			WikiUtil.validateTopicName("en", "Comments:/Test", wikiLink, false);
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
@@ -275,8 +240,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testValidateTopicNameThrowsWikiException4() throws Throwable {
+		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Comments: /Test");
 		try {
-			WikiUtil.validateTopicName("en", "Comments: /Test", false);
+			WikiUtil.validateTopicName("en", "Comments: /Test", wikiLink, false);
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
@@ -288,8 +254,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testValidateTopicNameThrowsWikiException5() throws Throwable {
+		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Comments: /Test");
 		try {
-			WikiUtil.validateTopicName("en", "Comments: /Test", false);
+			WikiUtil.validateTopicName("en", "Comments: /Test", wikiLink, false);
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
@@ -301,8 +268,9 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testValidateTopicNameThrowsWikiException6() throws Throwable {
+		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Test?");
 		try {
-			WikiUtil.validateTopicName("en", "Test?", false);
+			WikiUtil.validateTopicName("en", "Test?", wikiLink, false);
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());

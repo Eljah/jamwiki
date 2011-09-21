@@ -47,7 +47,8 @@ public class WikiLinkTag implements JFlexParserTag {
 		if (!StringUtils.isBlank(wikiLink.getDestination())) {
 			String virtualWiki = (wikiLink.getVirtualWiki() == null) ? parserInput.getVirtualWiki() : wikiLink.getVirtualWiki().getName();
 			try {
-				WikiUtil.validateTopicName(virtualWiki, wikiLink.getDestination(), true);
+				WikiLink tempWikiLink = LinkUtil.parseWikiLink(virtualWiki, wikiLink.getDestination());
+				WikiUtil.validateTopicName(virtualWiki, wikiLink.getDestination(), tempWikiLink, true);
 			} catch (WikiException e) {
 				return false;
 			}

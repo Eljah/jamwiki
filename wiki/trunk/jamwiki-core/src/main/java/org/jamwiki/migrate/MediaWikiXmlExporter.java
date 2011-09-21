@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiVersion;
 import org.jamwiki.model.Namespace;
@@ -38,6 +39,7 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -82,6 +84,18 @@ public class MediaWikiXmlExporter implements TopicExporter {
 	}
 
 	/**
+	 * Return the URL of the index page for the wiki.
+	 *
+	 * @throws DataAccessException Thrown if any error occurs while retrieving data.
+	 */
+	private String retrieveBaseUrl() throws DataAccessException {
+		VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
+		String url = Environment.getValue(Environment.PROP_SERVER_URL);
+		url += LinkUtil.buildTopicUrl(WikiUtil.WEBAPP_CONTEXT_PATH, virtualWiki.getName(), virtualWiki.getRootTopicName(), true);
+		return url;
+	}
+
+	/**
 	 *
 	 */
 	private void writeSiteInfo(Writer writer, String virtualWikiName) throws DataAccessException, IOException {
@@ -90,7 +104,7 @@ public class MediaWikiXmlExporter implements TopicExporter {
 		String sitename = virtualWiki.getSiteName();
 		writer.append('\n');
 		XMLUtil.buildTag(writer, "sitename", sitename, true);
-		String base = WikiUtil.getBaseUrl();
+		String base = this.retrieveBaseUrl();
 		writer.append('\n');
 		XMLUtil.buildTag(writer, "base", base, true);
 		String generator = "JAMWiki " + WikiVersion.CURRENT_WIKI_VERSION;

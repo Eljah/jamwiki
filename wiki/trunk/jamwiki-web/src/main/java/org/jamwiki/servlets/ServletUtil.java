@@ -334,7 +334,8 @@ public class ServletUtil {
 	 *  initializing the topic object.
 	 */
 	protected static Topic initializeTopic(String virtualWiki, String topicName) throws WikiException {
-		WikiUtil.validateTopicName(virtualWiki, topicName, false);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
+		WikiUtil.validateTopicName(virtualWiki, topicName, wikiLink, false);
 		Topic topic = null;
 		try {
 			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
@@ -345,7 +346,6 @@ public class ServletUtil {
 			return topic;
 		}
 		topic = new Topic(virtualWiki, topicName);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
 		topic.setTopicType(WikiUtil.findTopicTypeForNamespace(wikiLink.getNamespace()));
 		return topic;
 	}
@@ -854,11 +854,12 @@ public class ServletUtil {
 		if (topic == null) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
-		WikiUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), topic.getName());
+		WikiUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), wikiLink, false);
 		if (allowRedirect && topic.getTopicType() == TopicType.REDIRECT && (request.getParameter("redirect") == null || !request.getParameter("redirect").equalsIgnoreCase("no"))) {
 			Topic child = null;
 			try {
-				child = WikiUtil.findRedirectedTopic(topic, 0);
+				child = LinkUtil.findRedirectedTopic(topic, 0);
 			} catch (DataAccessException e) {
 				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 			}

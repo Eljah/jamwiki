@@ -60,6 +60,7 @@ import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiCache;
+import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
@@ -1880,7 +1881,8 @@ public class AnsiDataHandler implements DataHandler {
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			WikiUtil.validateTopicName(wikiFile.getVirtualWiki(), wikiFile.getFileName(), false);
+			WikiLink wikiLink = LinkUtil.parseWikiLink(wikiFile.getVirtualWiki(), wikiFile.getFileName());
+			WikiUtil.validateTopicName(wikiFile.getVirtualWiki(), wikiFile.getFileName(), wikiLink, false);
 			if (wikiFile.getFileId() <= 0) {
 				addWikiFile(wikiFile, conn);
 			} else {
@@ -2051,7 +2053,8 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
 		long start = System.currentTimeMillis();
-		WikiUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), topic.getName());
+		WikiUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), wikiLink, false);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -2214,8 +2217,8 @@ public class AnsiDataHandler implements DataHandler {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
 			int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
-			String article = WikiUtil.extractTopicLink(virtualWiki, topicName);
-			String comments = WikiUtil.extractCommentsLink(virtualWiki, topicName);
+			String article = LinkUtil.extractTopicLink(virtualWiki, topicName);
+			String comments = LinkUtil.extractCommentsLink(virtualWiki, topicName);
 			if (watchlist.containsTopic(topicName)) {
 				// remove from watchlist
 				this.deleteWatchlistEntry(virtualWikiId, article, userId, conn);

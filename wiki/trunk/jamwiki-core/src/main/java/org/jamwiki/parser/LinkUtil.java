@@ -23,6 +23,8 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
+import org.jamwiki.model.Topic;
+import org.jamwiki.model.TopicType;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.PseudoTopicHandler;
@@ -345,6 +347,98 @@ public class LinkUtil {
 	}
 
 	/**
+	 * Given an article name, return the appropriate comments topic article name.
+	 * For example, if the article name is "Topic" then the return value is
+	 * "Comments:Topic".
+	 *
+	 * @param virtualWiki The current virtual wiki.
+	 * @param name The article name from which a comments article name is to
+	 *  be constructed.
+	 * @return The comments article name for the article name.
+	 */
+	public static String extractCommentsLink(String virtualWiki, String name) {
+		if (StringUtils.isBlank(name)) {
+			throw new IllegalArgumentException("Topic name must not be empty in extractCommentsLink");
+		}
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, name);
+		Namespace commentsNamespace = null;
+		try {
+			commentsNamespace = Namespace.findCommentsNamespace(wikiLink.getNamespace());
+		} catch (DataAccessException e) {
+			throw new IllegalStateException("Database error while retrieving comments namespace", e);
+		}
+		if (commentsNamespace == null) {
+			throw new IllegalArgumentException("Topic " + name + " does not have a comments namespace");
+		}
+		return (!StringUtils.isBlank(commentsNamespace.getLabel(virtualWiki))) ? commentsNamespace.getLabel(virtualWiki) + Namespace.SEPARATOR + wikiLink.getArticle() : wikiLink.getArticle();
+	}
+
+	/**
+	 * Given an article name, extract an appropriate topic article name.  For
+	 * example, if the article name is "Comments:Topic" then the return value
+	 * is "Topic".
+	 *
+	 * @param virtualWiki The current virtual wiki.
+	 * @param name The article name from which a topic article name is to be
+	 *  constructed.
+	 * @return The topic article name for the article name.
+	 */
+	public static String extractTopicLink(String virtualWiki, String name) {
+		if (StringUtils.isBlank(name)) {
+			throw new IllegalArgumentException("Topic name must not be empty in extractTopicLink");
+		}
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, name);
+		Namespace mainNamespace = Namespace.findMainNamespace(wikiLink.getNamespace());
+		if (mainNamespace == null) {
+			throw new IllegalArgumentException("Topic " + name + " does not have a main namespace");
+		}
+		return (!StringUtils.isBlank(mainNamespace.getLabel(virtualWiki))) ? mainNamespace.getLabel(virtualWiki) + Namespace.SEPARATOR + wikiLink.getArticle() : wikiLink.getArticle();
+	}
+
+	/**
+	 * Given a topic, if that topic is a redirect find the target topic of the redirection.
+	 *
+	 * @param parent The topic being queried.  If this topic is a redirect then the redirect
+	 *  target will be returned, otherwise the topic itself is returned.
+	 * @param attempts The maximum number of child topics to follow.  This parameter prevents
+	 *  infinite loops if topics redirect back to one another.
+	 * @return If the parent topic is a redirect then this method returns the target topic that
+	 *  is being redirected to, otherwise the parent topic is returned.
+	 * @throws DataAccessException Thrown if any error occurs while retrieving data.
+	 */
+	public static Topic findRedirectedTopic(Topic parent, int attempts) throws DataAccessException {
+		int count = attempts;
+		String target = parent.getRedirectTo();
+		if (parent.getTopicType() != TopicType.REDIRECT || StringUtils.isBlank(target)) {
+			logger.error("getRedirectTarget() called for non-redirect topic " + parent.getName());
+			return parent;
+		}
+		// avoid infinite redirection
+		count++;
+		if (count > 10) {
+			//TODO throw new WikiException(new WikiMessage("topic.redirect.infinite"));
+			return parent;
+		}
+		String virtualWiki = parent.getVirtualWiki();
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, target);
+		if (wikiLink.getVirtualWiki() != null) {
+			virtualWiki = wikiLink.getVirtualWiki().getName();
+		}
+		// get the topic that is being redirected to
+		Topic child = WikiBase.getDataHandler().lookupTopic(virtualWiki, wikiLink.getDestination(), false);
+		if (child == null) {
+			// child being redirected to doesn't exist, return parent
+			return parent;
+		}
+		if (StringUtils.isBlank(child.getRedirectTo())) {
+			// found a topic that is not a redirect, return
+			return child;
+		}
+		// child is a redirect, keep looking
+		return findRedirectedTopic(child, count);
+	}
+
+	/**
 	 * Generate the HTML for an interwiki anchor link.
 	 *
 	 * @param wikiLink The WikiLink object containing all relevant information
@@ -365,6 +459,28 @@ public class LinkUtil {
 			text = wikiLink.getDestination();
 		}
 		return "<a class=\"interwiki\" title=\"" + text + "\" href=\"" + url + "\">" + text + "</a>";
+	}
+
+	/**
+	 * Given a topic name, determine if that name corresponds to a comments
+	 * page.
+	 *
+	 * @param virtualWiki The current virtual wiki.
+	 * @param topicName The topic name (non-null) to examine to determine if it
+	 *  is a comments page or not.
+	 * @return <code>true</code> if the page is a comments page, <code>false</code>
+	 *  otherwise.
+	 */
+	public static boolean isCommentsPage(String virtualWiki, String topicName) {
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
+		if (wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
+			return false;
+		}
+		try {
+			return (Namespace.findCommentsNamespace(wikiLink.getNamespace()) != null);
+		} catch (DataAccessException e) {
+			throw new IllegalStateException("Database error while retrieving comments namespace", e);
+		}
 	}
 
 	/**

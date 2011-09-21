@@ -28,6 +28,7 @@ import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -69,7 +70,7 @@ public class WatchlistServlet extends JAMWikiServlet {
 		Watchlist watchlist = ServletUtil.currentWatchlist(request, virtualWiki);
 		WikiUser user = ServletUtil.currentWikiUser();
 		WikiBase.getDataHandler().writeWatchlistEntry(watchlist, virtualWiki, topicName, user.getUserId());
-		String article = WikiUtil.extractTopicLink(virtualWiki, topicName);
+		String article = LinkUtil.extractTopicLink(virtualWiki, topicName);
 		if (watchlist.containsTopic(topicName)) {
 			// added to watchlist
 			pageInfo.addMessage(new WikiMessage("watchlist.caption.added", article));

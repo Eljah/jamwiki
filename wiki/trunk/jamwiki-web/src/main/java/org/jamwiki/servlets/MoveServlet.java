@@ -82,8 +82,8 @@ public class MoveServlet extends JAMWikiServlet {
 		String moveCommentsPage = Utilities.decodeAndEscapeTopicName(request.getParameter("moveCommentsPage"), true);
 		if (!StringUtils.isBlank(moveCommentsPage)) {
 			String virtualWiki = pageInfo.getVirtualWikiName();
-			String commentsDestination = WikiUtil.extractCommentsLink(virtualWiki, moveDestination);
-			if (WikiUtil.isCommentsPage(virtualWiki, moveCommentsPage) && !moveCommentsPage.equals(topicName) && !commentsDestination.equals(moveDestination)) {
+			String commentsDestination = LinkUtil.extractCommentsLink(virtualWiki, moveDestination);
+			if (LinkUtil.isCommentsPage(virtualWiki, moveCommentsPage) && !moveCommentsPage.equals(topicName) && !commentsDestination.equals(moveDestination)) {
 				if (!movePage(request, next, pageInfo, moveCommentsPage, commentsDestination)) {
 					return;
 				}
@@ -157,7 +157,7 @@ public class MoveServlet extends JAMWikiServlet {
 		if (topic == null) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
-		String commentsPage = WikiUtil.extractCommentsLink(virtualWiki, topicName);
+		String commentsPage = LinkUtil.extractCommentsLink(virtualWiki, topicName);
 		Topic commentsTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, commentsPage, false);
 		if (commentsTopic != null) {
 			// add option to also move comments page

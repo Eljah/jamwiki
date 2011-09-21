@@ -30,6 +30,7 @@ import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -79,7 +80,7 @@ public class ManageServlet extends JAMWikiServlet {
 		String manageCommentsPage = WikiUtil.getParameterFromRequest(request, "manageCommentsPage", true);
 		if (!StringUtils.isBlank(manageCommentsPage)) {
 			String virtualWiki = pageInfo.getVirtualWikiName();
-			if (WikiUtil.isCommentsPage(virtualWiki, manageCommentsPage) && !manageCommentsPage.equals(topicName)) {
+			if (LinkUtil.isCommentsPage(virtualWiki, manageCommentsPage) && !manageCommentsPage.equals(topicName)) {
 				deletePage(request, next, pageInfo, manageCommentsPage);
 			}
 		}
@@ -167,7 +168,7 @@ public class ManageServlet extends JAMWikiServlet {
 		String manageCommentsPage = WikiUtil.getParameterFromRequest(request, "manageCommentsPage", true);
 		if (!StringUtils.isBlank(manageCommentsPage)) {
 			String virtualWiki = pageInfo.getVirtualWikiName();
-			if (WikiUtil.isCommentsPage(virtualWiki, manageCommentsPage) && !manageCommentsPage.equals(topicName)) {
+			if (LinkUtil.isCommentsPage(virtualWiki, manageCommentsPage) && !manageCommentsPage.equals(topicName)) {
 				undeletePage(request, next, pageInfo, manageCommentsPage);
 			}
 		}
@@ -209,7 +210,7 @@ public class ManageServlet extends JAMWikiServlet {
 		if (topic == null) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
-		String commentsPage = WikiUtil.extractCommentsLink(virtualWiki, topicName);
+		String commentsPage = LinkUtil.extractCommentsLink(virtualWiki, topicName);
 		if (!topicName.equals(commentsPage)) {
 			Topic commentsTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, commentsPage, true);
 			if (commentsTopic != null && commentsTopic.getDeleted() == topic.getDeleted()) {

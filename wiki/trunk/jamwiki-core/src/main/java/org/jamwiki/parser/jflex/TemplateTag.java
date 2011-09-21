@@ -158,7 +158,8 @@ public class TemplateTag implements JFlexParserTag {
 		String templateName = name;
 		try {
 			// do not process the template if it's an invalid topic name
-			WikiUtil.validateTopicName(parserInput.getVirtualWiki(), templateName, false);
+			WikiLink tempWikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), templateName);
+			WikiUtil.validateTopicName(parserInput.getVirtualWiki(), templateName, tempWikiLink, false);
 		} catch (WikiException e) {
 			return raw;
 		}
@@ -183,7 +184,7 @@ public class TemplateTag implements JFlexParserTag {
 		} else {
 			// make sure template was not redirected
 			if (templateTopic != null && templateTopic.getTopicType() == TopicType.REDIRECT) {
-				templateTopic = WikiUtil.findRedirectedTopic(templateTopic, 0);
+				templateTopic = LinkUtil.findRedirectedTopic(templateTopic, 0);
 				name = templateTopic.getName();
 			}
 			if (templateTopic != null && templateTopic.getTopicType() == TopicType.REDIRECT) {

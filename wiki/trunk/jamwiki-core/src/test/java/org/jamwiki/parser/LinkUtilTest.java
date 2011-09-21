@@ -20,6 +20,8 @@ package org.jamwiki.parser;
 
 import org.jamwiki.JAMWikiUnitTest;
 import org.jamwiki.model.Namespace;
+import org.jamwiki.model.Topic;
+import org.jamwiki.model.TopicType;
 import org.jamwiki.utils.WikiLink;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -122,6 +124,43 @@ public class LinkUtilTest extends JAMWikiUnitTest {
 	public void testbuildTopicUrl() throws Throwable {
 		String result = LinkUtil.buildTopicUrl("testLinkUtilContext", "testLinkUtilVirtualWiki", "", true);
 		assertNull("result", result);
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testExtractTopicLink() throws Throwable {
+		//TODO
+		String result = LinkUtil.extractTopicLink("en", "testWikiUtilName");
+		assertSame("result", "testWikiUtilName", result);
+	}
+
+	/**
+	 *
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void testExtractCommentsLinkThrowsException() throws Throwable {
+		LinkUtil.extractCommentsLink("en", "");
+	}
+
+	/**
+	 *
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void testExtractTopicLinkThrowsException() throws Throwable {
+		LinkUtil.extractTopicLink("en", "");
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testFindRedirectedTopic1() throws Throwable {
+		Topic parent = new Topic("en", "Test");
+		parent.setTopicType(TopicType.REDIRECT);
+		Topic result = LinkUtil.findRedirectedTopic(parent, 100);
+		assertSame("result", parent, result);
 	}
 
 	/**
