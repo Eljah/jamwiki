@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import org.jamwiki.WikiConfiguration;
 import org.jamwiki.parser.ParserException;
-import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -69,7 +69,7 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 		for (String parserCustomTag : parserCustomTags) {
 			Object object = null;
 			try {
-				object = Utilities.instantiateClass(parserCustomTag);
+				object = ResourceUtil.instantiateClass(parserCustomTag);
 			} catch (IllegalStateException e) {
 				logger.warn("Could not instantiate configured custom parser tag: " + parserCustomTag);
 				continue;

@@ -18,7 +18,6 @@
  */
 package org.jamwiki.utils;
 
-import java.io.FileNotFoundException;
 import org.jamwiki.JAMWikiUnitTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -279,38 +278,6 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	public void testFormatMessageThrowsNullPointerException1() throws Throwable {
 		Object[] objects = new Object[2];
 		Utilities.formatMessage("testUtilitiesKey", null, objects);
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=Exception.class)
-	public void testGetClassLoaderFileThrowsException() throws Throwable {
-		Utilities.getClassLoaderFile("testUtilitiesFilename");
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=FileNotFoundException.class)
-	public void testReadFileThrowsFileNotFoundException() throws Throwable {
-		Utilities.readFile("fakeFileName");
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=FileNotFoundException.class)
-	public void testReadFileThrowsFileNotFoundException1() throws Throwable {
-		Utilities.readFile("testUtilitiesFilename");
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=NullPointerException.class)
-	public void testReadFileThrowsNullPointerException() throws Throwable {
-		Utilities.readFile(null);
 	}
 
 	/**

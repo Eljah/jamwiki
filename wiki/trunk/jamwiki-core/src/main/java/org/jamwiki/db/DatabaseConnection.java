@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -300,7 +300,7 @@ public class DatabaseConnection {
 			if (!StringUtils.isBlank(driver)) {
 				try {
 					// ensure that the Driver class has been loaded
-					Utilities.forName(driver);
+					ResourceUtil.forName(driver);
 				} catch (ClassNotFoundException e) {
 					throw new SQLException("Unable to instantiate class with name: " + driver);
 				}

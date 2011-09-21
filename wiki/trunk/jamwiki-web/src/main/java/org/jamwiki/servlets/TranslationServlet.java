@@ -33,6 +33,7 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicType;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -101,7 +102,7 @@ public class TranslationServlet extends JAMWikiServlet {
 	 */
 	private TreeSet<String> retrieveTranslationCodes() throws Exception {
 		TreeSet<String> codes = new TreeSet<String>();
-		File propertyRoot = Utilities.getClassLoaderRoot();
+		File propertyRoot = ResourceUtil.getClassLoaderRoot();
 		File[] files = propertyRoot.listFiles();
 		File file;
 		String filename;
@@ -190,7 +191,7 @@ public class TranslationServlet extends JAMWikiServlet {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		String language = request.getParameter("language");
 		String topicName = Namespace.namespace(Namespace.JAMWIKI_ID).getLabel(virtualWiki) + Namespace.SEPARATOR + Utilities.decodeTopicName(filename(language), true);
-		String contents = "<pre><nowiki>\n" + Utilities.readFile(filename(language)) + "\n</nowiki></pre>";
+		String contents = "<pre><nowiki>\n" + ResourceUtil.readFile(filename(language)) + "\n</nowiki></pre>";
 		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
 		if (topic == null) {
 			topic = new Topic(virtualWiki, topicName);

@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.ResourceUtil;
 
 /**
  *
@@ -59,11 +59,11 @@ public class TestFileUtil {
 	 */
 	public static File getClassLoaderFile(String fileName) throws FileNotFoundException {
 		try {
-			return Utilities.getClassLoaderFile(fileName);
+			return ResourceUtil.getClassLoaderFile(fileName);
 		} catch (FileNotFoundException e) {
 			// ignore
 		}
-		return new File(Utilities.getClassLoaderRoot(), fileName);
+		return new File(ResourceUtil.getClassLoaderRoot(), fileName);
 	}
 
 	/**
@@ -73,10 +73,10 @@ public class TestFileUtil {
 		fileName = encodeTopicName(fileName);
 		String fullName = directory + fileName;
 		try {
-			return Utilities.getClassLoaderFile(fullName);
+			return ResourceUtil.getClassLoaderFile(fullName);
 		} catch (FileNotFoundException e) { }
 		try {
-			return new File(Utilities.getClassLoaderRoot(), fullName);
+			return new File(ResourceUtil.getClassLoaderRoot(), fullName);
 		} catch (FileNotFoundException e) { }
 		return null;
 	}

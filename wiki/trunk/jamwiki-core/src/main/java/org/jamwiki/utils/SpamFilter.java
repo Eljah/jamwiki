@@ -82,7 +82,7 @@ public class SpamFilter {
 	private static void initialize() throws DataAccessException {
 		File file = null;
 		try {
-			file = Utilities.getClassLoaderFile(SPAM_BLACKLIST_FILE);
+			file = ResourceUtil.getClassLoaderFile(SPAM_BLACKLIST_FILE);
 		} catch (IOException e) {
 			throw new DataAccessException("I/O exception while initlaizing spam blacklist", e);
 		}

@@ -107,7 +107,7 @@ public class WikiUtil {
 		}
 		String dataHandlerClass = Environment.getValue(Environment.PROP_DB_TYPE);
 		try {
-			return (DataHandler)Utilities.instantiateClass(dataHandlerClass);
+			return (DataHandler)ResourceUtil.instantiateClass(dataHandlerClass);
 		} catch (ClassCastException e) {
 			throw new IllegalStateException("Data handler specified in jamwiki.properties does not implement org.jamwiki.DataHandler: " + dataHandlerClass);
 		}
@@ -290,7 +290,7 @@ public class WikiUtil {
 		if (cacheElement != null) {
 			mf = (MessageFormat)cacheElement.getObjectValue();
 		} else {
-			String templateString = Utilities.readFile(template);
+			String templateString = ResourceUtil.readFile(template);
 			// strip HTML comments
 			Matcher m = WikiUtil.HTML_COMMENT_PATTERN.matcher(templateString);
 			templateString = m.replaceAll("");
@@ -608,7 +608,7 @@ public class WikiUtil {
 	public static SearchEngine searchEngineInstance() {
 		String searchEngineClass = Environment.getValue(Environment.PROP_BASE_SEARCH_ENGINE);
 		try {
-			return (SearchEngine)Utilities.instantiateClass(searchEngineClass);
+			return (SearchEngine)ResourceUtil.instantiateClass(searchEngineClass);
 		} catch (ClassCastException e) {
 			throw new IllegalStateException("Search engine specified in jamwiki.properties does not implement org.jamwiki.SearchEngine: " + searchEngineClass);
 		}

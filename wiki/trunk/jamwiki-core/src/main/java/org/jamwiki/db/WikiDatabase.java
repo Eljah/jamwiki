@@ -49,7 +49,7 @@ import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.Encryption;
-import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
@@ -110,7 +110,7 @@ public class WikiDatabase {
 			return WikiBase.getDataHandler();
 		}
 		logger.debug("Using NEW data handler: " + handlerClassName);
-		return (DataHandler)Utilities.instantiateClass(handlerClassName);
+		return (DataHandler)ResourceUtil.instantiateClass(handlerClassName);
 	}
 
 	/**
@@ -464,7 +464,7 @@ public class WikiDatabase {
 			try {
 				subdirectory = WikiDatabase.SPECIAL_PAGE_DIR + File.separator + language + "_" + country;
 				filename = subdirectory + File.separator + WikiUtil.encodeForFilename(pageName) + ".txt";
-				contents = Utilities.readFile(filename);
+				contents = ResourceUtil.readFile(filename);
 			} catch (IOException e) {
 				logger.info("No locale-specific file is available for " + filename + ", checking for a language-specific version.");
 			}
@@ -473,7 +473,7 @@ public class WikiDatabase {
 			try {
 				subdirectory = WikiDatabase.SPECIAL_PAGE_DIR + File.separator + language;
 				filename = subdirectory + File.separator + WikiUtil.encodeForFilename(pageName) + ".txt";
-				contents = Utilities.readFile(filename);
+				contents = ResourceUtil.readFile(filename);
 			} catch (IOException e) {
 				logger.info("No language-specific file is available for " + filename + " so the default will be used.");
 			}
@@ -482,7 +482,7 @@ public class WikiDatabase {
 			try {
 				subdirectory = WikiDatabase.SPECIAL_PAGE_DIR;
 				filename = subdirectory + File.separator + WikiUtil.encodeForFilename(pageName) + ".txt";
-				contents = Utilities.readFile(filename);
+				contents = ResourceUtil.readFile(filename);
 			} catch (IOException e) {
 				logger.warn("Default topic initialization file " + filename + " could not be read", e);
 				throw e;

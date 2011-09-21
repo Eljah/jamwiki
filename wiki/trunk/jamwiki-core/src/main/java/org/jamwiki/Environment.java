@@ -30,10 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
-import org.jamwiki.utils.Utilities;
 
 /**
  * The <code>Environment</code> class is instantiated as a singleton to
@@ -459,7 +459,7 @@ public class Environment {
 		String defaultUploadDirectory = "";
 		String defaultRelativeUploadDirectory = "";
 		try {
-			File webAppRoot = Utilities.getClassLoaderRoot();
+			File webAppRoot = ResourceUtil.getClassLoaderRoot();
 			// the class loader root should be /WEB-INF/classes, but if deployed as anything
 			// other than a WAR then it might just be the temp directory.
 			if (webAppRoot.getParentFile() != null && webAppRoot.getName().equalsIgnoreCase("classes")) {
@@ -489,12 +489,12 @@ public class Environment {
 	 */
 	private static File retrievePropertyFile(String filename) {
 		try {
-			return Utilities.getClassLoaderFile(filename);
+			return ResourceUtil.getClassLoaderFile(filename);
 		} catch (FileNotFoundException e) {
 			// NOPMD file might not exist
 		}
 		try {
-			return new File(Utilities.getClassLoaderRoot(), filename);
+			return new File(ResourceUtil.getClassLoaderRoot(), filename);
 		} catch (FileNotFoundException e) {
 			logger.error("Error while searching for resource " + filename, e);
 		}

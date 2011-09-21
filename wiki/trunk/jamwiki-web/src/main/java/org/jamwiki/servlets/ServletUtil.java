@@ -63,6 +63,7 @@ import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.LinkUtil;
 import org.jamwiki.utils.Pagination;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SpamFilter;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiCache;
@@ -715,7 +716,7 @@ public class ServletUtil {
 		}
 		String classesDir = null;
 		try {
-			classesDir = Utilities.getClassLoaderRoot().getPath();
+			classesDir = ResourceUtil.getClassLoaderRoot().getPath();
 			WikiMessage classesDirError = WikiUtil.validateDirectory(classesDir);
 			if (classesDirError != null) {
 				errors.add(classesDirError);

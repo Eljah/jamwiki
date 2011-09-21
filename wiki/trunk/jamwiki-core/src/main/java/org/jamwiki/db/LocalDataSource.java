@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.Encryption;
-import org.jamwiki.utils.Utilities;
+import org.jamwiki.utils.ResourceUtil;
 
 /**
  * Extension of the Commons DBCP BasicDataSource class that
@@ -41,7 +41,7 @@ public class LocalDataSource extends BasicDataSource {
 	public LocalDataSource() throws SQLException, ClassNotFoundException {
 		super();
 		if (!StringUtils.isBlank(Environment.getValue(Environment.PROP_DB_DRIVER))) {
-			Utilities.forName(Environment.getValue(Environment.PROP_DB_DRIVER));
+			ResourceUtil.forName(Environment.getValue(Environment.PROP_DB_DRIVER));
 		}
 		setUrl(Environment.getValue(Environment.PROP_DB_URL));
 		setUsername(Environment.getValue(Environment.PROP_DB_USERNAME));

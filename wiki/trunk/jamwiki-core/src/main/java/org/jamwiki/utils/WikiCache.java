@@ -47,7 +47,7 @@ public class WikiCache {
 	static {
 		boolean xmlConfig = false;
 		try {
-			Utilities.getClassLoaderFile(EHCACHE_XML_CONFIG_FILENAME);
+			ResourceUtil.getClassLoaderFile(EHCACHE_XML_CONFIG_FILENAME);
 			logger.info("Initializing cache configuration from " + EHCACHE_XML_CONFIG_FILENAME + " file");
 			xmlConfig = true;
 		} catch (FileNotFoundException e) {

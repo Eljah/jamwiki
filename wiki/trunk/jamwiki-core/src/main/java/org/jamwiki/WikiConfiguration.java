@@ -24,9 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.Environment;
-import org.jamwiki.utils.Utilities;
 import org.jamwiki.model.WikiConfigurationObject;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.XMLUtil;
 import org.w3c.dom.Document;
@@ -145,7 +144,7 @@ public class WikiConfiguration {
 		File file = null;
 		Document document = null;
 		try {
-			file = Utilities.getClassLoaderFile(JAMWIKI_CONFIGURATION_FILE);
+			file = ResourceUtil.getClassLoaderFile(JAMWIKI_CONFIGURATION_FILE);
 			document = XMLUtil.parseXML(file, false);
 		} catch (ParseException e) {
 			// this should never happen unless someone mangles the config file
