@@ -61,13 +61,13 @@ import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SpamFilter;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiCache;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.security.core.Authentication;
@@ -334,8 +334,7 @@ public class ServletUtil {
 	 *  initializing the topic object.
 	 */
 	protected static Topic initializeTopic(String virtualWiki, String topicName) throws WikiException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
-		WikiUtil.validateTopicName(virtualWiki, topicName, wikiLink, false);
+		LinkUtil.validateTopicName(virtualWiki, topicName, false);
 		Topic topic = null;
 		try {
 			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
@@ -346,6 +345,7 @@ public class ServletUtil {
 			return topic;
 		}
 		topic = new Topic(virtualWiki, topicName);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
 		topic.setTopicType(WikiUtil.findTopicTypeForNamespace(wikiLink.getNamespace()));
 		return topic;
 	}
@@ -854,8 +854,7 @@ public class ServletUtil {
 		if (topic == null) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), topic.getName());
-		WikiUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), wikiLink, false);
+		LinkUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
 		if (allowRedirect && topic.getTopicType() == TopicType.REDIRECT && (request.getParameter("redirect") == null || !request.getParameter("redirect").equalsIgnoreCase("no"))) {
 			Topic child = null;
 			try {

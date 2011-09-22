@@ -45,7 +45,7 @@ import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.parser.LinkUtil;
-import org.jamwiki.utils.WikiLink;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.xml.sax.Attributes;

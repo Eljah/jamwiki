@@ -26,12 +26,12 @@ import org.jamwiki.model.Namespace;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.parser.image.ImageBorderEnum;
 import org.jamwiki.parser.image.ImageHorizontalAlignmentEnum;
 import org.jamwiki.parser.image.ImageVerticalAlignmentEnum;
 import org.jamwiki.parser.image.ImageMetadata;
 import org.jamwiki.parser.image.ImageUtil;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
 /**

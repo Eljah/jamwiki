@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.LinkUtil;
-import org.jamwiki.utils.WikiLink;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 

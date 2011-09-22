@@ -56,7 +56,6 @@ public class WikiUtil {
 	private static final Pattern HTML_COMMENT_PATTERN = Pattern.compile("<!--.*?-->", Pattern.DOTALL);
 	private static final Pattern INVALID_NAMESPACE_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_NAMESPACE_NAME));
 	private static final Pattern INVALID_ROLE_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_ROLE_NAME));
-	private static final Pattern INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_NAME));
 	private static final Pattern VALID_USER_LOGIN_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_VALID_USER_LOGIN));
 	private static final Pattern VALID_VIRTUAL_WIKI_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_VALID_VIRTUAL_WIKI));
 	private static final Pattern XSS_PATTERN = Pattern.compile("[\\\"><]");
@@ -579,40 +578,6 @@ public class WikiUtil {
 			throw new WikiException(new WikiMessage("roles.error.description"));
 		}
 		// FIXME - throw a user-friendly error if the role name is already in use
-	}
-
-	/**
-	 * Utility method for determining if a topic name is valid for use on the Wiki,
-	 * meaning that it is not empty and does not contain any invalid characters.
-	 *
-	 * @param virtualWiki The current virtual wiki.
-	 * @param name The topic name to validate.
-	 * @param allowSpecial Set to <code>true</code> if topics in the Special: namespace
-	 *  should be considered valid.  These topics cannot be created, so (for example)
-	 *  this method should not allow them when editing topics.
-	 * @throws WikiException Thrown if the topic name is invalid.
-	 */
-	public static void validateTopicName(String virtualWiki, String name, WikiLink wikiLink, boolean allowSpecial) throws WikiException {
-		if (StringUtils.isBlank(virtualWiki)) {
-			throw new WikiException(new WikiMessage("common.exception.novirtualwiki"));
-		}
-		if (StringUtils.isBlank(name)) {
-			throw new WikiException(new WikiMessage("common.exception.notopic"));
-		}
-		if (!allowSpecial && PseudoTopicHandler.isPseudoTopic(name)) {
-			throw new WikiException(new WikiMessage("common.exception.pseudotopic", name));
-		}
-		String article = StringUtils.trimToNull(wikiLink.getArticle());
-		if (StringUtils.startsWith(article, "/")) {
-			throw new WikiException(new WikiMessage("common.exception.name", name));
-		}
-		if (!allowSpecial && wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
-			throw new WikiException(new WikiMessage("common.exception.name", name));
-		}
-		Matcher m = WikiUtil.INVALID_TOPIC_NAME_PATTERN.matcher(name);
-		if (m.find()) {
-			throw new WikiException(new WikiMessage("common.exception.name", name));
-		}
 	}
 
 	/**

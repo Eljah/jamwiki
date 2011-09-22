@@ -21,7 +21,6 @@ package org.jamwiki.utils;
 import org.jamwiki.JAMWikiUnitTest;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.parser.LinkUtil;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -182,98 +181,6 @@ public class WikiUtilTest extends JAMWikiUnitTest {
 			fail("Expected WikiException to be thrown");
 		} catch (WikiException ex) {
 			assertEquals("Expected error message key", "admin.vwiki.error.namespace.unique", ex.getWikiMessage().getKey());
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test(expected=WikiException.class)
-	public void testValidateTopicNameThrowsNullPointerException() throws Throwable {
-		WikiUtil.validateTopicName(null, null, null, false);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testValidateTopicNameThrowsWikiException1() throws Throwable {
-		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "");
-		try {
-			WikiUtil.validateTopicName("en", "", wikiLink, false);
-			fail("Expected WikiException to be thrown");
-		} catch (WikiException ex) {
-			assertEquals("ex.getWikiMessage().getKey()", "common.exception.notopic", ex.getWikiMessage().getKey());
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testValidateTopicNameThrowsWikiException2() throws Throwable {
-		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "/Test");
-		try {
-			WikiUtil.validateTopicName("en", "/Test", wikiLink, false);
-			fail("Expected WikiException to be thrown");
-		} catch (WikiException ex) {
-			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testValidateTopicNameThrowsWikiException3() throws Throwable {
-		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Comments:/Test");
-		try {
-			WikiUtil.validateTopicName("en", "Comments:/Test", wikiLink, false);
-			fail("Expected WikiException to be thrown");
-		} catch (WikiException ex) {
-			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testValidateTopicNameThrowsWikiException4() throws Throwable {
-		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Comments: /Test");
-		try {
-			WikiUtil.validateTopicName("en", "Comments: /Test", wikiLink, false);
-			fail("Expected WikiException to be thrown");
-		} catch (WikiException ex) {
-			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testValidateTopicNameThrowsWikiException5() throws Throwable {
-		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Comments: /Test");
-		try {
-			WikiUtil.validateTopicName("en", "Comments: /Test", wikiLink, false);
-			fail("Expected WikiException to be thrown");
-		} catch (WikiException ex) {
-			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testValidateTopicNameThrowsWikiException6() throws Throwable {
-		WikiLink wikiLink = LinkUtil.parseWikiLink("en", "Test?");
-		try {
-			WikiUtil.validateTopicName("en", "Test?", wikiLink, false);
-			fail("Expected WikiException to be thrown");
-		} catch (WikiException ex) {
-			assertEquals("ex.getWikiMessage().getKey()", "common.exception.name", ex.getWikiMessage().getKey());
 		}
 	}
 

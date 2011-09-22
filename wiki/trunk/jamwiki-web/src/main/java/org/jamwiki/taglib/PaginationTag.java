@@ -22,10 +22,10 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.parser.LinkUtil;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiUtil;
 
 /**

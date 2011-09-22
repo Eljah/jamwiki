@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.parser.LinkUtil;
-import org.jamwiki.utils.WikiLink;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
 /**

@@ -34,10 +34,9 @@ import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
-import org.jamwiki.utils.WikiUtil;
 
 /**
  * <code>TemplateTag</code> parses Mediawiki template syntax, which allows
@@ -158,8 +157,7 @@ public class TemplateTag implements JFlexParserTag {
 		String templateName = name;
 		try {
 			// do not process the template if it's an invalid topic name
-			WikiLink tempWikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), templateName);
-			WikiUtil.validateTopicName(parserInput.getVirtualWiki(), templateName, tempWikiLink, false);
+			LinkUtil.validateTopicName(parserInput.getVirtualWiki(), templateName, false);
 		} catch (WikiException e) {
 			return raw;
 		}

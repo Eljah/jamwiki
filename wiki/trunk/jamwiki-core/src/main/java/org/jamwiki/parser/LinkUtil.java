@@ -16,11 +16,15 @@
  */
 package org.jamwiki.parser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.WikiException;
+import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Topic;
@@ -29,7 +33,6 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.PseudoTopicHandler;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -40,6 +43,8 @@ import org.jamwiki.utils.WikiLogger;
 public class LinkUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(LinkUtil.class.getName());
+
+	private static final Pattern INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_NAME));
 
 	/**
 	 *
@@ -728,5 +733,40 @@ public class LinkUtil {
 			return topicName.substring(namespace.getDefaultLabel().length() + Namespace.SEPARATOR.length());
 		}
 		throw new IllegalArgumentException("Invalid topic name & namespace combination: " + namespace.getId() + " / " + topicName);
+	}
+
+	/**
+	 * Utility method for determining if a topic name is valid for use on the Wiki,
+	 * meaning that it is not empty and does not contain any invalid characters.
+	 *
+	 * @param virtualWiki The current virtual wiki.
+	 * @param name The topic name to validate.
+	 * @param allowSpecial Set to <code>true</code> if topics in the Special: namespace
+	 *  should be considered valid.  These topics cannot be created, so (for example)
+	 *  this method should not allow them when editing topics.
+	 * @throws WikiException Thrown if the topic name is invalid.
+	 */
+	public static void validateTopicName(String virtualWiki, String name, boolean allowSpecial) throws WikiException {
+		if (StringUtils.isBlank(virtualWiki)) {
+			throw new WikiException(new WikiMessage("common.exception.novirtualwiki"));
+		}
+		if (StringUtils.isBlank(name)) {
+			throw new WikiException(new WikiMessage("common.exception.notopic"));
+		}
+		if (!allowSpecial && PseudoTopicHandler.isPseudoTopic(name)) {
+			throw new WikiException(new WikiMessage("common.exception.pseudotopic", name));
+		}
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, name);
+		String article = StringUtils.trimToNull(wikiLink.getArticle());
+		if (StringUtils.startsWith(article, "/")) {
+			throw new WikiException(new WikiMessage("common.exception.name", name));
+		}
+		if (!allowSpecial && wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
+			throw new WikiException(new WikiMessage("common.exception.name", name));
+		}
+		Matcher m = LinkUtil.INVALID_TOPIC_NAME_PATTERN.matcher(name);
+		if (m.find()) {
+			throw new WikiException(new WikiMessage("common.exception.name", name));
+		}
 	}
 }

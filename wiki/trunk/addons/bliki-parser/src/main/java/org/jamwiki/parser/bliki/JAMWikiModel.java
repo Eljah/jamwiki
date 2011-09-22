@@ -23,10 +23,10 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.parser.jflex.JFlexParser;
 import org.jamwiki.parser.jflex.JFlexParserUtil;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
 /**

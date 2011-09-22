@@ -60,7 +60,6 @@ import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiCache;
-import org.jamwiki.utils.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
@@ -1881,8 +1880,7 @@ public class AnsiDataHandler implements DataHandler {
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			WikiLink wikiLink = LinkUtil.parseWikiLink(wikiFile.getVirtualWiki(), wikiFile.getFileName());
-			WikiUtil.validateTopicName(wikiFile.getVirtualWiki(), wikiFile.getFileName(), wikiLink, false);
+			LinkUtil.validateTopicName(wikiFile.getVirtualWiki(), wikiFile.getFileName(), false);
 			if (wikiFile.getFileId() <= 0) {
 				addWikiFile(wikiFile, conn);
 			} else {
@@ -2053,8 +2051,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
 		long start = System.currentTimeMillis();
-		WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), topic.getName());
-		WikiUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), wikiLink, false);
+		LinkUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
