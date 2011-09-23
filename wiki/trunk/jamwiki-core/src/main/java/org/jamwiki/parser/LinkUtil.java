@@ -426,8 +426,8 @@ public class LinkUtil {
 		}
 		String virtualWiki = parent.getVirtualWiki();
 		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, target);
-		if (wikiLink.getVirtualWiki() != null) {
-			virtualWiki = wikiLink.getVirtualWiki().getName();
+		if (wikiLink.getAltVirtualWiki() != null) {
+			virtualWiki = wikiLink.getAltVirtualWiki().getName();
 		}
 		// get the topic that is being redirected to
 		Topic child = WikiBase.getDataHandler().lookupTopic(virtualWiki, wikiLink.getDestination(), false);
@@ -599,10 +599,10 @@ public class LinkUtil {
 		}
 		// search for a namespace or virtual wiki
 		String topic = LinkUtil.processVirtualWiki(processed, wikiLink);
-		if (wikiLink.getVirtualWiki() != null) {
+		if (wikiLink.getAltVirtualWiki() != null) {
 			// strip the virtual wiki
 			processed = topic;
-			virtualWiki = wikiLink.getVirtualWiki().getName();
+			virtualWiki = wikiLink.getAltVirtualWiki().getName();
 		}
 		wikiLink.setText(processed);
 		topic = LinkUtil.processNamespace(virtualWiki, topic, wikiLink);
@@ -613,7 +613,7 @@ public class LinkUtil {
 			processed = wikiLink.getNamespace().getLabel(virtualWiki) + Namespace.SEPARATOR + topic;
 		}
 		// if no namespace or virtual wiki, see if there's an interwiki link
-		if (wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID) && wikiLink.getVirtualWiki() == null) {
+		if (wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID) && wikiLink.getAltVirtualWiki() == null) {
 			topic = LinkUtil.processInterWiki(processed, wikiLink);
 			if (wikiLink.getInterwiki() != null) {
 				// strip the interwiki
@@ -667,13 +667,13 @@ public class LinkUtil {
 		try {
 			VirtualWiki virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(linkPrefix);
 			if (virtualWiki != null) {
-				wikiLink.setVirtualWiki(virtualWiki);
+				wikiLink.setAltVirtualWiki(virtualWiki);
 			}
 		} catch (DataAccessException e) {
 			// this should not happen, if it does then swallow the error
 			logger.warn("Failure while trying to lookup virtual wiki: " + linkPrefix, e);
 		}
-		return (wikiLink.getVirtualWiki() != null) ? processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim(): processed;
+		return (wikiLink.getAltVirtualWiki() != null) ? processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim(): processed;
 	}
 
 	/**

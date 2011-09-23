@@ -191,7 +191,7 @@ public class ImageUtil {
 				} catch (ParserException e) {
 					// not an external link, but an internal link
 					WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), imageMetadata.getLink());
-					String internalLinkVirtualWiki = ((wikiLink.getVirtualWiki() != null) ? wikiLink.getVirtualWiki().getName() : linkVirtualWiki);
+					String internalLinkVirtualWiki = ((wikiLink.getAltVirtualWiki() != null) ? wikiLink.getAltVirtualWiki().getName() : linkVirtualWiki);
 					String link = LinkUtil.buildTopicUrl(context, internalLinkVirtualWiki, wikiLink);
 					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
 				}

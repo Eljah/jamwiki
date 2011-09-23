@@ -331,8 +331,8 @@ public class JFlexParser extends AbstractParser {
 		try {
 			String virtualWiki = this.parserInput.getVirtualWiki();
 			// see if the redirect link starts with a virtual wiki
-			if (wikiLink.getVirtualWiki() != null) {
-				virtualWiki = wikiLink.getVirtualWiki().getName();
+			if (wikiLink.getAltVirtualWiki() != null) {
+				virtualWiki = wikiLink.getAltVirtualWiki().getName();
 			}
 			if (LinkUtil.isExistingArticle(virtualWiki, wikiLink.getDestination()) == null && !wikiLink.isSpecial()) {
 				style = "edit redirect";

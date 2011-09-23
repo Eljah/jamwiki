@@ -27,6 +27,8 @@ import org.jamwiki.utils.WikiLogger;
 public class WikiLink {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiLink.class.getName());
+	/** Virtual wiki link prefix. */
+	private VirtualWiki altVirtualWiki = null;
 	/** Indicator that the link requires special handling, such as links starting with a colon. */
 	private boolean colon = false;
 	/** Article name, not including namespace. */
@@ -43,8 +45,26 @@ public class WikiLink {
 	private String section = null;
 	/** Link text. */
 	private String text = null;
-	/** Virtual wiki link prefix. */
-	private VirtualWiki virtualWiki = null;
+
+	/**
+	 * Return the internal virtual wiki that this wiki link is linking to.  Note
+	 * that this parameter is used when linking to a different virtual wiki and
+	 * thus may be <code>null</code> when the link is to a topic in the same
+	 * virtual wiki.
+	 */
+	public VirtualWiki getAltVirtualWiki() {
+		return this.altVirtualWiki;
+	}
+
+	/**
+	 * Set the internal virtual wiki that this wiki link is linking to.  Note
+	 * that this parameter is used when linking to a different virtual wiki and
+	 * thus may be <code>null</code> when the link is to a topic in the same
+	 * virtual wiki.
+	 */
+	public void setAltVirtualWiki(VirtualWiki altVirtualWiki) {
+		this.altVirtualWiki = altVirtualWiki;
+	}
 
 	/**
 	 *
@@ -167,19 +187,5 @@ public class WikiLink {
 	 */
 	public void setText(String text) {
 		this.text = text;
-	}
-
-	/**
-	 *
-	 */
-	public VirtualWiki getVirtualWiki() {
-		return this.virtualWiki;
-	}
-
-	/**
-	 *
-	 */
-	public void setVirtualWiki(VirtualWiki virtualWiki) {
-		this.virtualWiki = virtualWiki;
 	}
 }

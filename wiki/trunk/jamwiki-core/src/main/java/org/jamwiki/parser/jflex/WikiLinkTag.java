@@ -44,7 +44,7 @@ public class WikiLinkTag implements JFlexParserTag {
 	 */
 	private boolean isValidLink(ParserInput parserInput, WikiLink wikiLink) {
 		if (!StringUtils.isBlank(wikiLink.getDestination())) {
-			String virtualWiki = (wikiLink.getVirtualWiki() == null) ? parserInput.getVirtualWiki() : wikiLink.getVirtualWiki().getName();
+			String virtualWiki = (wikiLink.getAltVirtualWiki() == null) ? parserInput.getVirtualWiki() : wikiLink.getAltVirtualWiki().getName();
 			try {
 				LinkUtil.validateTopicName(virtualWiki, wikiLink.getDestination(), true);
 			} catch (WikiException e) {
@@ -110,11 +110,11 @@ public class WikiLinkTag implements JFlexParserTag {
 				}
 			}
 			String virtualWiki = parserInput.getVirtualWiki();
-			if (wikiLink.getVirtualWiki() != null && !StringUtils.equals(wikiLink.getVirtualWiki().getName(), virtualWiki)) {
+			if (wikiLink.getAltVirtualWiki() != null && !StringUtils.equals(wikiLink.getAltVirtualWiki().getName(), virtualWiki)) {
 				// link to another virtual wiki
-				virtualWiki = wikiLink.getVirtualWiki().getName();
+				virtualWiki = wikiLink.getAltVirtualWiki().getName();
 				if (mode != JFlexParser.MODE_EDIT_COMMENT && !wikiLink.getColon() && !Environment.getBooleanValue(Environment.PROP_PARSER_DISPLAY_VIRTUALWIKI_LINKS_INLINE)) {
-					wikiLink.setText(wikiLink.getVirtualWiki().getName() + Namespace.SEPARATOR + wikiLink.getDestination());
+					wikiLink.setText(wikiLink.getAltVirtualWiki().getName() + Namespace.SEPARATOR + wikiLink.getDestination());
 					String url = LinkUtil.buildInternalLinkHtml(parserInput.getContext(), virtualWiki, wikiLink, wikiLink.getText(), null, null, false);
 					parserOutput.addVirtualWikiLink(url);
 					return "";
@@ -164,7 +164,7 @@ public class WikiLinkTag implements JFlexParserTag {
 	 *
 	 */
 	private String processLinkMetadata(ParserInput parserInput, ParserOutput parserOutput, int mode, String raw, WikiLink wikiLink) throws ParserException {
-		if (wikiLink.getInterwiki() != null || (wikiLink.getVirtualWiki() != null && !StringUtils.equals(wikiLink.getVirtualWiki().getName(), parserInput.getVirtualWiki()))) {
+		if (wikiLink.getInterwiki() != null || (wikiLink.getAltVirtualWiki() != null && !StringUtils.equals(wikiLink.getAltVirtualWiki().getName(), parserInput.getVirtualWiki()))) {
 			// no link metadata for interwiki or virtual wiki links
 			return raw;
 		}
@@ -180,7 +180,7 @@ public class WikiLinkTag implements JFlexParserTag {
 				result = "";
 			}
 		}
-		if (wikiLink.getInterwiki() == null && (wikiLink.getVirtualWiki() == null || StringUtils.equals(wikiLink.getVirtualWiki().getName(), parserInput.getVirtualWiki())) && !StringUtils.isBlank(wikiLink.getDestination())) {
+		if (wikiLink.getInterwiki() == null && (wikiLink.getAltVirtualWiki() == null || StringUtils.equals(wikiLink.getAltVirtualWiki().getName(), parserInput.getVirtualWiki())) && !StringUtils.isBlank(wikiLink.getDestination())) {
 			parserOutput.addLink(wikiLink.getDestination());
 		}
 		return result;

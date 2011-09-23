@@ -110,11 +110,11 @@ public class JFlexParserUtil {
 			// do not set default text for categories
 			wikiLink.setText(null);
 		}
-		if (wikiLink.getVirtualWiki() != null && !StringUtils.equals(wikiLink.getVirtualWiki().getName(), virtualWiki) && StringUtils.isBlank(wikiLink.getDestination())) {
+		if (wikiLink.getAltVirtualWiki() != null && !StringUtils.equals(wikiLink.getAltVirtualWiki().getName(), virtualWiki) && StringUtils.isBlank(wikiLink.getDestination())) {
 			// use the root topic name as the destination
-			wikiLink.setDestination(wikiLink.getVirtualWiki().getRootTopicName());
+			wikiLink.setDestination(wikiLink.getAltVirtualWiki().getRootTopicName());
 			if (StringUtils.isBlank(wikiLink.getText())) {
-				wikiLink.setText(wikiLink.getVirtualWiki().getName() + Namespace.SEPARATOR);
+				wikiLink.setText(wikiLink.getAltVirtualWiki().getName() + Namespace.SEPARATOR);
 			}
 		}
 		if (wikiLink.getInterwiki() != null && StringUtils.isBlank(wikiLink.getDestination()) && StringUtils.isBlank(wikiLink.getText())) {
