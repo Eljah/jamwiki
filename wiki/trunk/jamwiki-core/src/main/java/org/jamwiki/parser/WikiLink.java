@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -46,6 +47,34 @@ public class WikiLink {
 	private String section = null;
 	/** Link text. */
 	private String text = null;
+
+	/**
+	 * Standard constructor which initializes the destination field of
+	 * the wiki link.
+	 *
+	 * @param destination The topic that this link points to, including
+	 *  the namespace.  May  be <code>null</code> if (for example) this
+	 *  link is to a section within the current article of the form
+	 *  "#Section".
+	 */
+	public WikiLink(String destination) {
+		this.destination = destination;
+	}
+
+	/**
+	 * Copy constructor.
+	 */
+	public WikiLink(WikiLink wikiLink) {
+		this.altVirtualWiki = wikiLink.altVirtualWiki;
+		this.colon = wikiLink.colon;
+		this.article = wikiLink.article;
+		this.destination = wikiLink.destination;
+		this.interwiki = wikiLink.interwiki;
+		this.namespace = wikiLink.namespace;
+		this.query = wikiLink.query;
+		this.section = wikiLink.section;
+		this.text = wikiLink.text;
+	}
 
 	/**
 	 * Return the internal virtual wiki that this wiki link is linking to.  Note
@@ -217,5 +246,41 @@ public class WikiLink {
 	 */
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	/**
+	 * Utility method for converting a WikiLink to a relative URL.  This method
+	 * does NOT verify if the topic exists or if it is a "Special:" page, but
+	 * simply returns a relative URL for the topic and virtual wiki.
+	 *
+	 * @param context The servlet context path.
+	 * @param virtualWiki The default virtual wiki to use for the URL if this
+	 *  wiki link object does not specify an alternate virtual wiki.
+	 * @return A relative URL for the wiki link.  Sample return values might be
+	 *  of the form "/context/virtualwiki/Topic?param=value#Section", "#Section",
+	 *  "/context/virtualwiki/Namespace:Topic", etc.
+	 */
+	public String toRelativeUrl(String context, String virtualWiki) {
+		if (StringUtils.isBlank(this.getDestination()) && !StringUtils.isBlank(this.getSection())) {
+			return "#" + LinkUtil.buildAnchorText(this.getSection());
+		}
+		StringBuilder url = new StringBuilder();
+		if (context != null) {
+			url.append(context);
+		}
+		// context never ends with a "/" per servlet specification
+		url.append('/');
+		url.append(Utilities.encodeAndEscapeTopicName(virtualWiki));
+		url.append('/');
+		url.append(Utilities.encodeAndEscapeTopicName(this.getDestination()));
+		if (!StringUtils.isBlank(this.getQuery())) {
+			url.append('?');
+			url.append(this.getQuery());
+		}
+		if (!StringUtils.isBlank(this.getSection())) {
+			url.append('#');
+			url.append(LinkUtil.buildAnchorText(this.getSection()));
+		}
+		return url.toString();
 	}
 }

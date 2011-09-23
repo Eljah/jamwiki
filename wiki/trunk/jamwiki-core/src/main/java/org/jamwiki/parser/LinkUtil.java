@@ -132,9 +132,8 @@ public class LinkUtil {
 		if (section > 0) {
 			query += "&amp;section=" + section;
 		}
-		WikiLink wikiLink = new WikiLink();
 		// FIXME - hard coding
-		wikiLink.setDestination("Special:Edit");
+		WikiLink wikiLink = new WikiLink("Special:Edit");
 		wikiLink.setQuery(query);
 		return LinkUtil.buildTopicUrl(context, virtualWiki, wikiLink);
 	}
@@ -262,7 +261,7 @@ public class LinkUtil {
 		if (validateTopic) {
 			return LinkUtil.buildTopicUrl(context, virtualWiki, wikiLink);
 		} else {
-			return LinkUtil.buildTopicUrlNoEdit(context, virtualWiki, wikiLink.getDestination(), wikiLink.getSection(), wikiLink.getQuery());
+			return wikiLink.toRelativeUrl(context, virtualWiki);
 		}
 	}
 
@@ -280,75 +279,33 @@ public class LinkUtil {
 	 */
 	public static String buildTopicUrl(String context, String virtualWiki, WikiLink wikiLink) throws DataAccessException {
 		String url = null;
+		String topic = wikiLink.getDestination();
 		if (wikiLink.getNamespace().getId().equals(Namespace.MEDIA_ID)) {
 			// for the "Media:" namespace, link directly to the file
 			String filename = Namespace.namespace(Namespace.FILE_ID).getLabel(virtualWiki) + Namespace.SEPARATOR + wikiLink.getArticle();
 			url = ImageUtil.buildImageFileUrl(virtualWiki, filename);
 			if (url == null) {
-				url = LinkUtil.buildTopicUrlNoEdit(context, virtualWiki, "Special:Upload", null, "?topic=" + Utilities.encodeAndEscapeTopicName(filename));
+				wikiLink = new WikiLink("Special:Upload");
+				wikiLink.setQuery("topic=" + Utilities.encodeAndEscapeTopicName(filename));
+				url = wikiLink.toRelativeUrl(context, virtualWiki);
 			}
+		} else if (StringUtils.isBlank(topic) && !StringUtils.isBlank(wikiLink.getSection())) {
+			// do not check existence for section links
+			url = wikiLink.toRelativeUrl(context, virtualWiki);
 		} else {
-			String topic = wikiLink.getDestination();
-			String section = wikiLink.getSection();
-			String query = wikiLink.getQuery();
-			url = LinkUtil.buildTopicUrlNoEdit(context, virtualWiki, topic, section, query);
-			if (StringUtils.isBlank(topic) && !StringUtils.isBlank(section)) {
-				// do not check existence for section links
-				return url;
-			}
 			String targetTopic = LinkUtil.isExistingArticle(virtualWiki, topic);
 			if (targetTopic == null && !wikiLink.isSpecial()) {
-				url = LinkUtil.buildEditLinkUrl(context, virtualWiki, topic, query, -1);
+				url = LinkUtil.buildEditLinkUrl(context, virtualWiki, topic, wikiLink.getQuery(), -1);
 			} else if (!StringUtils.equals(topic, targetTopic) && !wikiLink.isSpecial()) {
-				// add an additional check in case the link was case sensitive
-				url = LinkUtil.buildTopicUrlNoEdit(context, virtualWiki, targetTopic, section, query);
+				// topics might have differed by case or some other minor reason
+				WikiLink altWikiLink = new WikiLink(wikiLink);
+				altWikiLink.setDestination(targetTopic);
+				url = altWikiLink.toRelativeUrl(context, virtualWiki);
+			} else {
+				url = wikiLink.toRelativeUrl(context, virtualWiki);
 			}
 		}
 		return url;
-	}
-
-	/**
-	 * Build a URL to the topic page for a given topic.  This method does NOT verify
-	 * if the topic exists or if it is a "Special:" page, simply returning the URL
-	 * for the topic and virtual wiki.
-	 *
-	 * @param context The servlet context path.  If this value is
-	 *  <code>null</code> then the resulting URL will NOT include context path,
-	 *  which breaks HTML links but is useful for servlet redirection URLs.
-	 * @param virtualWiki The virtual wiki for the link that is being created.
-	 * @param topicName The name of the topic for which a link is being built.
-	 * @param section The section of the page (#section) for which a link is
-	 *  being built.
-	 * @param queryString Query string parameters to append to the link.
-	 * @throws Exception Thrown if any error occurs while builing the link URL.
-	 */
-	private static String buildTopicUrlNoEdit(String context, String virtualWiki, String topicName, String section, String queryString) {
-		if (StringUtils.isBlank(topicName) && !StringUtils.isBlank(section)) {
-			return "#" + LinkUtil.buildAnchorText(section);
-		}
-		StringBuilder url = new StringBuilder();
-		if (context != null) {
-			url.append(context);
-		}
-		// context never ends with a "/" per servlet specification
-		url.append('/');
-		// get the virtual wiki, which should have been set by the parent servlet
-		url.append(Utilities.encodeAndEscapeTopicName(virtualWiki));
-		url.append('/');
-		url.append(Utilities.encodeAndEscapeTopicName(topicName));
-		if (!StringUtils.isBlank(queryString)) {
-			if (queryString.charAt(0) != '?') {
-				url.append('?');
-			}
-			url.append(queryString);
-		}
-		if (!StringUtils.isBlank(section)) {
-			if (section.charAt(0) != '#') {
-				url.append('#');
-			}
-			url.append(LinkUtil.buildAnchorText(section));
-		}
-		return url.toString();
 	}
 
 	/**
@@ -572,12 +529,12 @@ public class LinkUtil {
 		// expression, but the expression caused CPU usage to spike to 100%
 		// with topics such as "Urnordisch oder Nordwestgermanisch?"
 		String processed = raw.trim();
-		WikiLink wikiLink = new WikiLink();
+		WikiLink wikiLink = new WikiLink((String)null);
 		if (wikiLink.getNamespace() == null) {
 			throw new IllegalStateException("Unable to determine namespace for topic.  This error generally indicates a configuration or database issue.  Check the logs for additional information.");
 		}
 		if (StringUtils.isBlank(processed)) {
-			return new WikiLink();
+			return new WikiLink((String)null);
 		}
 		// first look for a section param - "#..."
 		int sectionPos = processed.indexOf('#');

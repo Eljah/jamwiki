@@ -145,8 +145,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private void handleUpgradeSuccess(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
 		WikiMessage wm = new WikiMessage("upgrade.caption.upgradecomplete");
 		VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
-		WikiLink wikiLink = new WikiLink();
-		wikiLink.setDestination(virtualWiki.getRootTopicName());
+		WikiLink wikiLink = new WikiLink(virtualWiki.getRootTopicName());
 		try {
 			String htmlLink = LinkUtil.buildInternalLinkHtml(request.getContextPath(), virtualWiki.getName(), wikiLink, virtualWiki.getRootTopicName(), null, null, true);
 			// do not escape the HTML link
