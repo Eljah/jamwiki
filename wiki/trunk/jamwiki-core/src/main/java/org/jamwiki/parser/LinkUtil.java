@@ -40,17 +40,14 @@ import org.jamwiki.utils.WikiLogger;
  * Wiki topic links are generally of the form "Topic?query=param#Section".
  * HTML links are of the form http://example.com/.
  */
-public class LinkUtil {
+public abstract class LinkUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(LinkUtil.class.getName());
 
 	private static final Pattern INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_NAME));
-
-	/**
-	 *
-	 */
-	private LinkUtil() {
-	}
+	// pattern for links of the form "http://example.com" or "mailto:email.com".  "(?:X)" means non-capturing group.
+	private static final String LINK_PROTOCOL_REGEX = "(http(?:s)?|file|ftp|mailto|news):(?://)?(.*)";
+	private static final Pattern LINK_PROTOCOL_PATTERN = Pattern.compile(LINK_PROTOCOL_REGEX, Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Build a query parameter.  If root is empty, this method returns
@@ -67,14 +64,12 @@ public class LinkUtil {
 	 * @return The full query string generated using the input parameters.
 	 */
 	public static String appendQueryParam(String query, String param, String value) {
-		String url = "";
+		String url = "?";
 		if (!StringUtils.isBlank(query)) {
 			if (query.charAt(0) != '?') {
 				query = "?" + query;
 			}
 			url = query + "&amp;";
-		} else {
-			url = "?";
 		}
 		if (StringUtils.isBlank(param)) {
 			return query;
@@ -143,30 +138,12 @@ public class LinkUtil {
 	 * form <a href="http://example.com">.
 	 */
 	public static String buildHtmlLinkOpenTag(String link, String cssClass) throws ParserException {
-		String linkLower = link.toLowerCase();
-		if (linkLower.startsWith("mailto://")) {
-			// fix bad mailto syntax
-			link = "mailto:" + link.substring("mailto://".length());
+		Matcher matcher = LINK_PROTOCOL_PATTERN.matcher(link);
+		if (!matcher.matches()) {
+			throw new ParserException("Invalid link " + link);
 		}
-		String protocol = "";
-		if (linkLower.startsWith("http://")) {
-			protocol = "http://";
-		} else if  (linkLower.startsWith("https://")) {
-			protocol = "https://";
-		} else if (linkLower.startsWith("ftp://")) {
-			protocol = "ftp://";
-		} else if (linkLower.startsWith("mailto:")) {
-			protocol = "mailto:";
-		} else if (linkLower.startsWith("news://")) {
-			protocol = "news://";
-		} else if (linkLower.startsWith("telnet://")) {
-			protocol = "telnet://";
-		} else if (linkLower.startsWith("file://")) {
-			protocol = "file://";
-		} else {
-			throw new ParserException("Invalid protocol in link " + link);
-		}
-		link = link.substring(protocol.length());
+		String protocol = matcher.group(1).toLowerCase();
+		link = matcher.group(2);
 		// make sure link values are properly escaped.
 		link = StringUtils.replace(link, "<", "%3C");
 		link = StringUtils.replace(link, ">", "%3E");
@@ -177,7 +154,8 @@ public class LinkUtil {
 			cssClass = "externallink";
 		}
 		String html = "<a class=\"" + cssClass + "\" rel=\"nofollow\"";
-		html += " href=\"" + protocol + link + "\"" + target + ">";
+		String dotSlashSlash = (protocol.equals("mailto")) ? ":" : "://";
+		html += " href=\"" + protocol + dotSlashSlash + link + "\"" + target + ">";
 		return html;
 	}
 
