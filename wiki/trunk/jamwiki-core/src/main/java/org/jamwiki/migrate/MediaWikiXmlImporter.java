@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -61,6 +60,8 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 
 	/** This map holds the current tag's attribute names and values.  It is cleared after an end-element is called and thus fails for nested elements. */
 	private Map<String, String> currentAttributeMap = new HashMap<String, String>();
+	/** Map used when converting namespaces.  Created for performance reasons to avoid recompiling patterns. */
+	private Map<String, Pattern> convertNamespaceMap = new HashMap<String, Pattern>();
 	/** This buffer holds the content of the current element during parsing.  It will be flushed after an end-element tag is reached. */
 	private StringBuilder currentElementBuffer = new StringBuilder();
 	private Topic currentTopic = null;
@@ -133,35 +134,27 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	/**
 	 * Convert all namespaces names from MediaWiki to JAMWiki local representation.
 	 */
-	private void convertToJAMWikiNamespaces(StringBuilder builder) {
+	private String convertToJAMWikiNamespaces(String topicContent) {
 		// convert all namespaces names from MediaWiki to JAMWiki local representation
 		String jamwikiNamespace;
+		Pattern pattern;
 		for (String mediawikiNamespace : mediawikiNamespaceMap.keySet()) {
 			jamwikiNamespace = mediawikiNamespaceMap.get(mediawikiNamespace);
 			if (jamwikiNamespace == null || StringUtils.equalsIgnoreCase(jamwikiNamespace, mediawikiNamespace)) {
 				continue;
 			}
-			// convert from Mediawiki to JAMWiki namespaces.  handle "[[", "[[:", "{{", "{{:".
-			String wikiLinkPatternString = "(\\[\\[[ ]*(:)?)" + mediawikiNamespace + Namespace.SEPARATOR;
-			this.replaceNamespace(builder, jamwikiNamespace, wikiLinkPatternString);
-			String templatePatternString = "(\\{\\{[ ]*(:)?)" + mediawikiNamespace + Namespace.SEPARATOR;
-			this.replaceNamespace(builder, jamwikiNamespace, templatePatternString);
+			pattern = this.convertNamespaceMap.get(mediawikiNamespace);
+			if (pattern == null) {
+				// convert from Mediawiki to JAMWiki namespaces.  handle "[[", "[[:", "{{", "{{:".
+				// note that "?:" is a regex non-capturing group.
+				String patternString = "((?:(?:\\[\\[)|(?:\\{\\{))[ ]*(?::)?)" + mediawikiNamespace + Namespace.SEPARATOR;
+				Pattern mediawikiPattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+				pattern = mediawikiPattern;
+				this.convertNamespaceMap.put(mediawikiNamespace, mediawikiPattern);
+			}
+			topicContent = pattern.matcher(topicContent).replaceAll("$1" + jamwikiNamespace + Namespace.SEPARATOR);
 		}
-	}
-
-	/**
-	 * Utility method for replacing the original namespaces from the XML with
-	 * namespaces configured for the current JAMWiki instance.
-	 */
-	private void replaceNamespace(StringBuilder builder, String jamwikiNamespace, String patternString) {
-		Pattern mediawikiPattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-		Matcher matcher = mediawikiPattern.matcher(builder);
-		String replacement;
-		while (matcher.find()) {
-			replacement = matcher.group(1) + jamwikiNamespace + Namespace.SEPARATOR;
-			builder.replace(0, builder.length(), matcher.replaceFirst(replacement));
-			matcher.reset(builder);
-		}
+		return topicContent;
 	}
 
 	/**
@@ -313,8 +306,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 			String topicName = currentElementBuffer.toString().trim();
 			this.initCurrentTopic(topicName);
 		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_CONTENT.equals(qName)) {
-			this.convertToJAMWikiNamespaces(currentElementBuffer);
-			String topicContent = currentElementBuffer.toString().trim();
+			String topicContent = this.convertToJAMWikiNamespaces(currentElementBuffer.toString().trim());
 			currentTopicVersion.setVersionContent(topicContent);
 			currentTopicVersion.setCharactersChanged(StringUtils.length(topicContent) - previousTopicContentLength);
 			previousTopicContentLength = StringUtils.length(topicContent);
