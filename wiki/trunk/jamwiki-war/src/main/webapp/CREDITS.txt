@@ -92,3 +92,6 @@ are released under free licenses:
     by Erasoft24, Olliminatore, and Rocket000 (GFDL 1.2+ / CC-SA 3.0)
   * /images/bullet.gif from http://commons.wikimedia.org/wiki/File:Bullet.gif
     by AB-me and Brian0918 (GFDL 1.2+ / CC-SA 3.0)
+  * The de.congrace.expd4j math expression parser library is releated under the
+    Apaache license by Frank Asseg (http://http://objecthunter.congrace.de/).
+

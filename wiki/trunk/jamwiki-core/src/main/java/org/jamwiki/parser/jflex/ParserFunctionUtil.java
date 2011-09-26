@@ -34,6 +34,7 @@ import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.image.ImageUtil;
+import org.jamwiki.utils.MathUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
@@ -87,6 +88,18 @@ public class ParserFunctionUtil {
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_UPPER_CASE_FIRST);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_URL_ENCODE);
 		PARSER_FUNCTIONS.add(MAGIC_DISPLAY_TITLE);
+	}
+
+	/**
+	 *
+	 */
+	private static String evaluateExpression(String expr) throws IllegalArgumentException {
+		double result = MathUtil.evaluateExpression(expr);
+		BigDecimal bigDecimal = new BigDecimal(result);
+		// trim to eight decimal places maximum
+		bigDecimal = bigDecimal.setScale(8, BigDecimal.ROUND_HALF_UP);
+		bigDecimal = bigDecimal.stripTrailingZeros();
+		return bigDecimal.toString();
 	}
 
 	/**
@@ -218,85 +231,16 @@ public class ParserFunctionUtil {
 	 */
 	private static String parseExpr(ParserInput parserInput, String[] parserFunctionArgumentArray) throws DataAccessException,  ParserException {
 		String expr = parserFunctionArgumentArray[0];
-		return ParserFunctionUtil.evaluateExpression(expr);
-	}
-
-	/**
-	 *
-	 */
-	private static String evaluateExpression(String expr) {
 		if (StringUtils.isBlank(expr)) {
 			return "";
 		}
-		StringBuilder expression = new StringBuilder(expr);
-		List<BigDecimal> stack = new ArrayList<BigDecimal>();
-		String next = "";
-		char part;
-		int i = 0;
-		while (i < expression.length()) {
-			part = expression.charAt(i);
-			if (Character.isDigit(part) || part == '.') {
-				next += part;
-			} else if (part == ')') {
-				// unmatched closing parentheses
-				return ((i > 0) ? expression.substring(0, i) : "") + "<strong class=\"error\">" + part + "</strong>" + ((i < expression.length() - 1) ? expression.substring(i + 1) : "");
-			} else if (part == '(') {
-				int end = Utilities.findMatchingEndTag(expression, i, "(", ")");
-				if (end == -1) {
-					// unmatched opening parentheses
-					return ((i > 0) ? expression.substring(0, i) : "") + "<strong class=\"error\">" + part + "</strong>" + ((i < expression.length() - 1) ? expression.substring(i + 1) : "");
-				}
-				String result = ParserFunctionUtil.evaluateExpression(expression.substring(i + 1, end - 1));
-				expression = expression.replace(i, end, "");
-				try {
-					stack.add(new BigDecimal(result));
-				} catch (NumberFormatException e) {
-					return result;
-				}
-			} else if (!StringUtils.isBlank(next)) {
-				stack.add(new BigDecimal(next));
-				next = "";
-			}
-			i++;
+		try {
+			return ParserFunctionUtil.evaluateExpression(expr);
+		} catch (IllegalArgumentException e) {
+			Object[] params = new Object[1];
+			params[0] = e.getMessage();
+			return "<strong class=\"error\">" + Utilities.formatMessage("common.exception.expression", parserInput.getLocale(), params) + "</strong>";
 		}
-		if (!StringUtils.isBlank(next)) {
-			stack.add(new BigDecimal(next));
-		}
-		BigDecimal a, b;
-		for (i = 0; i < expression.length(); i++) {
-			part = expression.charAt(i);
-			try {
-				switch (part) {
-					case '+':
-						a = stack.remove(0);
-						b = stack.remove(0);
-						stack.add(0, a.add(b));
-						break;
-					case '-':
-						a = stack.remove(0);
-						b = stack.remove(0);
-						stack.add(0, a.subtract(b));
-						break;
-					case '*':
-						a = stack.remove(0);
-						b = stack.remove(0);
-						stack.add(0, a.multiply(b));
-						break;
-					case '/':
-						a = stack.remove(0);
-						b = stack.remove(0);
-						stack.add(0, a.divide(b));
-						break;
-				}
-			} catch (ArithmeticException e) {
-				return "<strong class=\"error\">" + expr + "</strong>";
-			} catch (IndexOutOfBoundsException e) {
-				return "<strong class=\"error\">" + expr + "</strong>";
-			}
-		}
-		double result = stack.get(0).doubleValue();
-		// strip any trailing zeroes
-		return ((Math.round(result) == result) ? Long.toString(Math.round(result)) : Double.toString(result));
 	}
 
 	/**
