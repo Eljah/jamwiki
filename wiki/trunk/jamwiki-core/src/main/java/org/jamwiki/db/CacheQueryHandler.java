@@ -412,23 +412,13 @@ public class CacheQueryHandler extends AnsiQueryHandler {
 	/**
 	 * 
 	 */
-	public void insertTopicVersion(TopicVersion topicVersion, Connection conn) throws SQLException {
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+	protected void prepareTopicVersionStatement(TopicVersion topicVersion, PreparedStatement stmt) throws SQLException {
 		StringReader sr = null;
 		try {
 			int index = 1;
-			if (!this.autoIncrementPrimaryKeys()) {
-				stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_VERSION);
-				int topicVersionId = this.nextTopicVersionId(conn);
-				topicVersion.setTopicVersionId(topicVersionId);
-				stmt.setInt(index++, topicVersion.getTopicVersionId());
-			} else {
-				stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_VERSION_AUTO_INCREMENT, Statement.RETURN_GENERATED_KEYS);
-			}
+			stmt.setInt(index++, topicVersion.getTopicVersionId());
 			if (topicVersion.getEditDate() == null) {
-				Timestamp editDate = new Timestamp(System.currentTimeMillis());
-				topicVersion.setEditDate(editDate);
+				topicVersion.setEditDate(new Timestamp(System.currentTimeMillis()));
 			}
 			stmt.setInt(index++, topicVersion.getTopicId());
 			stmt.setString(index++, topicVersion.getEditComment());
@@ -450,19 +440,10 @@ public class CacheQueryHandler extends AnsiQueryHandler {
 			}
 			stmt.setInt(index++, topicVersion.getCharactersChanged());
 			stmt.setString(index++, topicVersion.getVersionParamString());
-			stmt.executeUpdate();
-			if (this.autoIncrementPrimaryKeys()) {
-				rs = stmt.getGeneratedKeys();
-				if (!rs.next()) {
-					throw new SQLException("Unable to determine auto-generated ID for database record");
-				}
-				topicVersion.setTopicVersionId(rs.getInt(1));
-			}
 		} finally {
-			// close only the statement and result set - leave the connection open for further use
-			//try {
-			DatabaseConnection.closeConnection(null, stmt, rs);
-			sr.close();
+			if (sr != null) {
+				sr.close();
+			}
 		}
 	}
 }

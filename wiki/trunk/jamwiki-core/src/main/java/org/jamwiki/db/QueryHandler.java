@@ -583,12 +583,13 @@ public interface QueryHandler {
 	 * Add a new topic version record to the database.  The topic version must
 	 * not already exist in the database or else an error will be thrown.
 	 *
-	 * @param topicVersion The TopicVersion record that is to be added to the database.
+	 * @param topicVersions A list of TopicVersion objects, each containing the
+	 *  author, date, and other information about the version being added.
 	 * @param conn A database connection to use when connecting to the database
 	 *  from this method.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	void insertTopicVersion(TopicVersion topicVersion, Connection conn) throws SQLException;
+	void insertTopicVersions(List<TopicVersion> topicVersions, Connection conn) throws SQLException;
 
 	/**
 	 * Add a new authority for a specified user.  The user must not already have

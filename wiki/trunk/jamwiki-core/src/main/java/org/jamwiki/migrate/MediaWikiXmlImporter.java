@@ -57,6 +57,8 @@ import org.xml.sax.helpers.DefaultHandler;
 public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporter {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(MediaWikiXmlImporter.class.getName());
+	/** Maximum number of topic versions that can be stored before being flushed to the database. */
+	private static final int MAX_TOPIC_VERSION_BUFFER = 50;
 
 	/** This map holds the current tag's attribute names and values.  It is cleared after an end-element is called and thus fails for nested elements. */
 	private Map<String, String> currentAttributeMap = new HashMap<String, String>();
@@ -70,6 +72,8 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	private final Map<String, String> mediawikiNamespaceMap = new HashMap<String, String>();
 	private Map<Topic, List<Integer>> parsedTopics = new HashMap<Topic, List<Integer>>();
 	private int previousTopicContentLength = 0;
+	/** For performance reasons add topic versions to the dabase in batches. */
+	private List<TopicVersion> topicVersionBuffer = new ArrayList<TopicVersion>();
 	private String virtualWiki;
 
 	/**
@@ -208,22 +212,8 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 		this.currentTopicVersion.setLoggable(false);
 		// no recent change record needed - can be added by reloading all recent changes if desired
 		this.currentTopicVersion.setRecentChangeAllowed(false);
-		try {
-			// for performance reasons write the topic once to create an initial record, then write
-			// only the version record.
-			if (this.currentTopic.getTopicId() <= 0) {
-				// metadata is needed only for the final import version, so for performance reasons
-				// do not include category or link data for older versions
-				WikiBase.getDataHandler().writeTopic(this.currentTopic, this.currentTopicVersion, null, null);
-			} else {
-				WikiBase.getDataHandler().writeTopicVersion(this.currentTopic, this.currentTopicVersion);
-			}
-		} catch (DataAccessException e) {
-			throw new SAXException("Failure while writing topic: " + this.currentTopic.getName(), e);
-		} catch (WikiException e) {
-			throw new SAXException("Failure while writing topic: " + this.currentTopic.getName(), e);
-		}
-		this.currentTopicVersions.put(this.currentTopicVersion.getEditDate(), this.currentTopicVersion.getTopicVersionId());
+		this.topicVersionBuffer.add(this.currentTopicVersion);
+		this.writeTopicVersion(false);
 	}
 
 	/**
@@ -326,6 +316,8 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_VERSION.equals(qName)) {
 			this.commitTopicVersion();
 		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC.equals(qName)) {
+			// flush any pending topic version data
+			this.writeTopicVersion(true);
 			this.orderTopicVersions();
 		}
 	}
@@ -336,5 +328,32 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	 */
 	public void characters(char buf[], int offset, int len) throws SAXException {
 		currentElementBuffer.append(buf, offset, len);
+	}
+
+	/**
+	 *
+	 */
+	private void writeTopicVersion(boolean forceWrite) throws SAXException {
+		try {
+			// for performance reasons write the topic once to create an initial record, then write
+			// only the version record.
+			if (this.currentTopic.getTopicId() <= 0) {
+				// metadata is needed only for the final import version, so for performance reasons
+				// do not include category or link data for older versions
+				WikiBase.getDataHandler().writeTopic(this.currentTopic, this.currentTopicVersion, null, null);
+			} else {
+				if (forceWrite || this.topicVersionBuffer.size() >= MAX_TOPIC_VERSION_BUFFER) {
+					WikiBase.getDataHandler().writeTopicVersions(this.currentTopic, this.topicVersionBuffer);
+					for (TopicVersion topicVersion : this.topicVersionBuffer) {
+						this.currentTopicVersions.put(topicVersion.getEditDate(), topicVersion.getTopicVersionId());
+					}
+					this.topicVersionBuffer = new ArrayList<TopicVersion>();
+				}
+			}
+		} catch (DataAccessException e) {
+			throw new SAXException("Failure while writing topic: " + this.currentTopic.getName(), e);
+		} catch (WikiException e) {
+			throw new SAXException("Failure while writing topic: " + this.currentTopic.getName(), e);
+		}
 	}
 }

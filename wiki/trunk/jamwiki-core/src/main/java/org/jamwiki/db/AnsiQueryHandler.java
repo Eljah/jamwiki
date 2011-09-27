@@ -1374,8 +1374,6 @@ public class AnsiQueryHandler implements QueryHandler {
 
 	/**
 	 *
-	 * had to override the insertTopicVersion method for the Caché implementation
-	 * need this to be public so that CacheQueryHandler can use it
 	 */
 	public LogItem initLogItem(ResultSet rs, String virtualWikiName) throws SQLException {
 		LogItem logItem = new LogItem();
@@ -1866,48 +1864,49 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public void insertTopicVersion(TopicVersion topicVersion, Connection conn) throws SQLException {
+	public void insertTopicVersions(List<TopicVersion> topicVersions, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		boolean useBatch = (topicVersions.size() > 1);
 		try {
-			int index = 1;
 			if (!this.autoIncrementPrimaryKeys()) {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_VERSION);
-				int topicVersionId = this.nextTopicVersionId(conn);
-				topicVersion.setTopicVersionId(topicVersionId);
-				stmt.setInt(index++, topicVersion.getTopicVersionId());
+			} else if (useBatch) {
+				// generated keys don't work in batch mode
+				stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_VERSION_AUTO_INCREMENT);
 			} else {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_TOPIC_VERSION_AUTO_INCREMENT, Statement.RETURN_GENERATED_KEYS);
 			}
-			if (topicVersion.getEditDate() == null) {
-				Timestamp editDate = new Timestamp(System.currentTimeMillis());
-				topicVersion.setEditDate(editDate);
+			int topicVersionId = -1;
+			if (!this.autoIncrementPrimaryKeys() || useBatch) {
+				// manually retrieve next topic version id when using batch
+				// mode or when the database doesn't support generated keys.
+				topicVersionId = this.nextTopicVersionId(conn);
 			}
-			stmt.setInt(index++, topicVersion.getTopicId());
-			stmt.setString(index++, topicVersion.getEditComment());
-			stmt.setString(index++, topicVersion.getVersionContent());
-			if (topicVersion.getAuthorId() == null) {
-				stmt.setNull(index++, Types.INTEGER);
-			} else {
-				stmt.setInt(index++, topicVersion.getAuthorId());
-			}
-			stmt.setInt(index++, topicVersion.getEditType());
-			stmt.setString(index++, topicVersion.getAuthorDisplay());
-			stmt.setTimestamp(index++, topicVersion.getEditDate());
-			if (topicVersion.getPreviousTopicVersionId() == null) {
-				stmt.setNull(index++, Types.INTEGER);
-			} else {
-				stmt.setInt(index++, topicVersion.getPreviousTopicVersionId());
-			}
-			stmt.setInt(index++, topicVersion.getCharactersChanged());
-			stmt.setString(index++, topicVersion.getVersionParamString());
-			stmt.executeUpdate();
-			if (this.autoIncrementPrimaryKeys()) {
-				rs = stmt.getGeneratedKeys();
-				if (!rs.next()) {
-					throw new SQLException("Unable to determine auto-generated ID for database record");
+			for (TopicVersion topicVersion : topicVersions) {
+				if (!this.autoIncrementPrimaryKeys() || useBatch) {
+					// FIXME - if two threads update the database simultaneously then
+					// it is possible that this code could set the topic version ID
+					// to a value that is different from what the database ends up
+					// using.
+					topicVersion.setTopicVersionId(topicVersionId++);
 				}
-				topicVersion.setTopicVersionId(rs.getInt(1));
+				this.prepareTopicVersionStatement(topicVersion, stmt);
+				if (useBatch) {
+					stmt.addBatch();
+				} else {
+					stmt.executeUpdate();
+				}
+				if (this.autoIncrementPrimaryKeys() && !useBatch) {
+					rs = stmt.getGeneratedKeys();
+					if (!rs.next()) {
+						throw new SQLException("Unable to determine auto-generated ID for database record");
+					}
+					topicVersion.setTopicVersionId(rs.getInt(1));
+				}
+			}
+			if (useBatch) {
+				stmt.executeBatch();
 			}
 		} finally {
 			// close only the statement and result set - leave the connection open for further use
@@ -2796,9 +2795,6 @@ public class AnsiQueryHandler implements QueryHandler {
 	 *  from this method.
 	 * @return The next available topic version id from the topic version table.
 	 * @throws SQLException Thrown if any error occurs during method execution.
-	 * 
-	 * had to override the insertTopicVersion method for the Caché implementation
-	 * need this to be public so that CacheQueryHandler can use it
 	 */
 	public int nextTopicVersionId(Connection conn) throws SQLException {
 		int nextId = DatabaseConnection.executeSequenceQuery(STATEMENT_SELECT_TOPIC_VERSION_SEQUENCE, "topic_version_id", conn);
@@ -3029,6 +3025,37 @@ public class AnsiQueryHandler implements QueryHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt);
 		}
+	}
+
+	/**
+	 *
+	 */
+	protected void prepareTopicVersionStatement(TopicVersion topicVersion, PreparedStatement stmt) throws SQLException {
+		int index = 1;
+		if (!this.autoIncrementPrimaryKeys()) {
+			stmt.setInt(index++, topicVersion.getTopicVersionId());
+		}
+		if (topicVersion.getEditDate() == null) {
+			topicVersion.setEditDate(new Timestamp(System.currentTimeMillis()));
+		}
+		stmt.setInt(index++, topicVersion.getTopicId());
+		stmt.setString(index++, topicVersion.getEditComment());
+		stmt.setString(index++, topicVersion.getVersionContent());
+		if (topicVersion.getAuthorId() == null) {
+			stmt.setNull(index++, Types.INTEGER);
+		} else {
+			stmt.setInt(index++, topicVersion.getAuthorId());
+		}
+		stmt.setInt(index++, topicVersion.getEditType());
+		stmt.setString(index++, topicVersion.getAuthorDisplay());
+		stmt.setTimestamp(index++, topicVersion.getEditDate());
+		if (topicVersion.getPreviousTopicVersionId() == null) {
+			stmt.setNull(index++, Types.INTEGER);
+		} else {
+			stmt.setInt(index++, topicVersion.getPreviousTopicVersionId());
+		}
+		stmt.setInt(index++, topicVersion.getCharactersChanged());
+		stmt.setString(index++, topicVersion.getVersionParamString());
 	}
 
 	/**

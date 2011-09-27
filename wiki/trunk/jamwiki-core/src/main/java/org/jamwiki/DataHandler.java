@@ -944,20 +944,19 @@ public interface DataHandler {
 	void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException;
 
 	/**
-	 * This method exists for performance reasons for scenarios such as topic imports where many versions
-	 * may be added without the need to update the topic record.  In general {@link #writeTopic}
-	 * should be used instead.
+	 * This method exists for performance reasons for scenarios such as topic
+	 * imports where many versions may be added without the need to update the
+	 * topic record.  In general {@link #writeTopic} should be used instead.
 	 *
-	 * @param topic The Topic to add or update.  If the Topic does not have
-	 *  a topic ID then a new record is created, otherwise an update is
-	 *  performed.
-	 * @param topicVersion A TopicVersion containing the author, date, and
-	 *  other information about the version being added.  If this value is <code>null</code>
-	 *  then no version is saved and no recent change record is created.
+	 * @param topic The Topic for the versions being added.  The topic must already
+	 *  exist.
+	 * @param topicVersions A list of TopicVersion objects, each containing the
+	 *  author, date, and other information about the version being added.  If
+	 *  this value is <code>null</code> or empty then no versions are saved.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 * @throws WikiException Thrown if the topic version information is invalid.
 	 */
-	public void writeTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException;
+	public void writeTopicVersions(Topic topic, List<TopicVersion> topicVersions) throws DataAccessException, WikiException;
 
 	/**
 	 * Add or update a user block.  This method will add a new record if the

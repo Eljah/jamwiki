@@ -188,19 +188,17 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	private void addTopicVersion(Topic topic, TopicVersion topicVersion, Connection conn) throws DataAccessException, WikiException {
-		if (topicVersion.getPreviousTopicVersionId() == null && topic.getCurrentVersionId() != null) {
-			topicVersion.setPreviousTopicVersionId(topic.getCurrentVersionId());
-		}
-		topicVersion.setTopicId(topic.getTopicId());
-		topicVersion.initializeVersionParams(topic);
-		try {
+	private void addTopicVersions(Topic topic, List<TopicVersion> topicVersions, Connection conn) throws DataAccessException, WikiException {
+		for (TopicVersion topicVersion : topicVersions) {
+			topicVersion.setTopicId(topic.getTopicId());
+			topicVersion.initializeVersionParams(topic);
 			this.validateTopicVersion(topicVersion);
-			this.queryHandler().insertTopicVersion(topicVersion, conn);
+		}
+		try {
+			this.queryHandler().insertTopicVersions(topicVersions, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		topic.setCurrentVersionId(topicVersion.getTopicVersionId());
 	}
 
 	/**
@@ -2066,8 +2064,14 @@ public class AnsiDataHandler implements DataHandler {
 			}
 			if (topicVersion != null) {
 				// write version
-				addTopicVersion(topic, topicVersion, conn);
+				if (topicVersion.getPreviousTopicVersionId() == null && topic.getCurrentVersionId() != null) {
+					topicVersion.setPreviousTopicVersionId(topic.getCurrentVersionId());
+				}
+				List topicVersions = new ArrayList<TopicVersion>();
+				topicVersions.add(topicVersion);
+				addTopicVersions(topic, topicVersions, conn);
 				// update the topic AFTER creating the version so that the current_topic_version_id parameter is set properly
+				topic.setCurrentVersionId(topicVersion.getTopicVersionId());
 				this.updateTopic(topic, conn);
 				String authorName = this.authorName(topicVersion.getAuthorId(), topicVersion.getAuthorDisplay());
 				LogItem logItem = LogItem.initLogItem(topic, topicVersion, authorName);
@@ -2128,11 +2132,15 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public void writeTopicVersion(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
+	public void writeTopicVersions(Topic topic, List<TopicVersion> topicVersions) throws DataAccessException, WikiException {
+		if (topic == null || topicVersions == null) {
+			logger.warn("Attempt to call writeTopicVersions() with null topic or topic version list");
+			return;
+		}
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			this.addTopicVersion(topic, topicVersion, conn);
+			this.addTopicVersions(topic, topicVersions, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		} finally {
