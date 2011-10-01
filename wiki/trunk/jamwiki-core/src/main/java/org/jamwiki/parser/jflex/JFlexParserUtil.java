@@ -85,7 +85,7 @@ public class JFlexParserUtil {
 	protected static WikiLink parseWikiLink(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
 		String virtualWiki = parserInput.getVirtualWiki();
 		if (StringUtils.isBlank(raw)) {
-			return new WikiLink(virtualWiki, null);
+			return new WikiLink(parserInput.getContext(), virtualWiki, null);
 		}
 		raw = raw.trim();
 		String suffix = ((!raw.endsWith("]]")) ? raw.substring(raw.lastIndexOf("]]") + 2) : null);
@@ -105,7 +105,7 @@ public class JFlexParserUtil {
 			text = raw.substring(pos + 1).trim();
 			raw = raw.substring(0, pos).trim();
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, raw);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), virtualWiki, raw);
 		if (!colon && wikiLink.getNamespace().getId().equals(Namespace.CATEGORY_ID)) {
 			// do not set default text for categories
 			wikiLink.setText(null);

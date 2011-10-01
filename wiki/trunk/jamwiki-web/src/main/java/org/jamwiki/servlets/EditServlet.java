@@ -159,7 +159,7 @@ public class EditServlet extends JAMWikiServlet {
 		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
 		pageInfo.setPageTitle(new WikiMessage("edit.title", ((parserOutput.getPageTitle() != null) ? parserOutput.getPageTitle() : topicName)));
 		pageInfo.setTopicName(topicName);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topicName);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, topicName);
 		if (wikiLink.getNamespace().getId().equals(Namespace.CATEGORY_ID)) {
 			ServletUtil.loadCategoryContent(request, next, virtualWiki, topicName);
 		}

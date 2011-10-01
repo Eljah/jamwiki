@@ -196,8 +196,8 @@ public abstract class ImageUtil {
 				// no link set, link to the image topic page.  At this point we have validated
 				// that the link is an image, so do not perform further validation and link to the
 				// CURRENT virtual wiki, even if it is a shared image
-				WikiLink wikiLink = LinkUtil.parseWikiLink(linkVirtualWiki, topicName);
-				String link = wikiLink.toRelativeUrl(context);
+				WikiLink wikiLink = LinkUtil.parseWikiLink(context, linkVirtualWiki, topicName);
+				String link = wikiLink.toRelativeUrl();
 				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
 				html.append(imageHtml);
 				html.append("</a>");
@@ -207,8 +207,8 @@ public abstract class ImageUtil {
 					html.append(LinkUtil.buildExternalLinkHtml(imageMetadata.getLink(), "wikiimg", imageHtml));
 				} catch (ParserException e) {
 					// not an external link, but an internal link
-					WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), imageMetadata.getLink());
-					String link = LinkUtil.buildTopicUrl(context, wikiLink);
+					WikiLink wikiLink = LinkUtil.parseWikiLink(context, topic.getVirtualWiki(), imageMetadata.getLink());
+					String link = LinkUtil.buildTopicUrl(wikiLink);
 					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
 					html.append(imageHtml);
 					html.append("</a>");
@@ -315,8 +315,8 @@ public abstract class ImageUtil {
 	 *
 	 */
 	private static String buildUploadLink(String context, String virtualWiki, String topicName) throws DataAccessException {
-		WikiLink uploadLink = LinkUtil.parseWikiLink(virtualWiki, "Special:Upload?topic=" + Utilities.encodeAndEscapeTopicName(topicName));
-		return LinkUtil.buildInternalLinkHtml(context, uploadLink, topicName, "edit", null, true);
+		WikiLink uploadLink = LinkUtil.parseWikiLink(context, virtualWiki, "Special:Upload?topic=" + Utilities.encodeAndEscapeTopicName(topicName));
+		return LinkUtil.buildInternalLinkHtml(uploadLink, topicName, "edit", null, true);
 	}
 
 	/**

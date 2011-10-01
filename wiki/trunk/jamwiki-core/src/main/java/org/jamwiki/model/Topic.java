@@ -144,7 +144,7 @@ public class Topic implements Serializable {
 	 * Set the full topic name, including namespace.  Example: "Help:Help Page".
 	 */
 	public void setName(String name) {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(this.virtualWiki, name);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(null, this.virtualWiki, name);
 		this.namespace = wikiLink.getNamespace();
 		this.pageName = wikiLink.getArticle();
 	}

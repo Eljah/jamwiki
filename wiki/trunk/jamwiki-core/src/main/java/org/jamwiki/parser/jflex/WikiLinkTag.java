@@ -115,7 +115,7 @@ public class WikiLinkTag implements JFlexParserTag {
 				virtualWiki = wikiLink.getAltVirtualWiki().getName();
 				if (mode != JFlexParser.MODE_EDIT_COMMENT && !wikiLink.getColon() && !Environment.getBooleanValue(Environment.PROP_PARSER_DISPLAY_VIRTUALWIKI_LINKS_INLINE)) {
 					wikiLink.setText(wikiLink.getAltVirtualWiki().getName() + Namespace.SEPARATOR + wikiLink.getDestination());
-					String url = LinkUtil.buildInternalLinkHtml(parserInput.getContext(), wikiLink, wikiLink.getText(), null, null, false);
+					String url = LinkUtil.buildInternalLinkHtml(wikiLink, wikiLink.getText(), null, null, false);
 					parserOutput.addVirtualWikiLink(url);
 					return "";
 				}
@@ -138,7 +138,7 @@ public class WikiLinkTag implements JFlexParserTag {
 				return "<b>" + (StringUtils.isBlank(wikiLink.getText()) ? wikiLink.getDestination() : wikiLink.getText()) + "</b>";
 			}
 			// do not escape text html - already done by parser
-			return LinkUtil.buildInternalLinkHtml(parserInput.getContext(), wikiLink, wikiLink.getText(), null, null, false);
+			return LinkUtil.buildInternalLinkHtml(wikiLink, wikiLink.getText(), null, null, false);
 		} catch (DataAccessException e) {
 			logger.error("Failure while parsing link " + raw, e);
 			return "";

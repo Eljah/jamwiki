@@ -63,12 +63,12 @@ public class PaginationTag extends BodyTagSupport {
 		}
 		output.append("<a href=\"");
 		String virtualWiki = WikiUtil.getVirtualWikiFromRequest(request);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, baseUrl);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, baseUrl);
 		String query = LinkUtil.appendQueryParam(wikiLink.getQuery(), "num", Integer.toString(num));
 		query += "&amp;offset=0";
 		wikiLink.setQuery(query);
 		try {
-			output.append(LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink));
+			output.append(LinkUtil.buildTopicUrl(wikiLink));
 		} catch (DataAccessException e) {
 			logger.warn("Failure while building pagination element", e);
 			return new StringBuilder();
@@ -111,7 +111,7 @@ public class PaginationTag extends BodyTagSupport {
 		}
 		output.append("<a href=\"");
 		String virtualWiki = WikiUtil.getVirtualWikiFromRequest(request);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, baseUrl);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, baseUrl);
 		int offset = pagination.getOffset() + pagination.getNumResults();
 		if (previous) {
 			offset = pagination.getOffset() - pagination.getNumResults();
@@ -123,7 +123,7 @@ public class PaginationTag extends BodyTagSupport {
 		query += "&amp;offset=" + offset;
 		wikiLink.setQuery(query);
 		try {
-			output.append(LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink));
+			output.append(LinkUtil.buildTopicUrl(wikiLink));
 		} catch (DataAccessException e) {
 			logger.warn("Failure while building pagination element", e);
 			return new StringBuilder();

@@ -36,6 +36,8 @@ public class WikiLink {
 	private VirtualWiki altVirtualWiki = null;
 	/** Indicator that the link requires special handling, such as links starting with a colon. */
 	private boolean colon = false;
+	/** The servlet context path. */
+	private String contextPath = null;
 	/** Article name, not including namespace. */
 	private String article = null;
 	/** Link destination, including namespace. */
@@ -57,17 +59,22 @@ public class WikiLink {
 	 * Standard constructor which initializes the destination field of
 	 * the wiki link.
 	 *
+	 * @param contextPath The servlet context path.  If this value is
+	 *  <code>null</code> then calling {@link #toRelativeUrl} will generate a
+	 *  a URL without a context path, which breaks HTML links but is useful
+	 *  for servlet redirection URLs.
+	 * @param virtualWiki The current link virtual wiki.  This is the virtual
+	 *  wiki that will be used when converting this WikiLink object to a
+	 *  relative URL UNLESS there is an altVirtualWiki specified.
 	 * @param destination The topic that this link points to, including
 	 *  the namespace.  May  be <code>null</code> if (for example) this
 	 *  link is to a section within the current article of the form
 	 *  "#Section".
-	 * @param virtualWiki The current link virtual wiki.  This is the virtual
-	 *  wiki that will be used when converting this WikiLink object to a
-	 *  relative URL UNLESS there is an altVirtualWiki specified.
 	 */
-	public WikiLink(String virtualWiki, String destination) {
-		this.destination = destination;
+	public WikiLink(String contextPath, String virtualWiki, String destination) {
+		this.contextPath = contextPath;
 		this.virtualWiki = virtualWiki;
+		this.destination = destination;
 	}
 
 	/**
@@ -76,6 +83,7 @@ public class WikiLink {
 	public WikiLink(WikiLink wikiLink) {
 		this.altVirtualWiki = wikiLink.altVirtualWiki;
 		this.colon = wikiLink.colon;
+		this.contextPath = wikiLink.contextPath;
 		this.article = wikiLink.article;
 		this.destination = wikiLink.destination;
 		this.interwiki = wikiLink.interwiki;
@@ -136,6 +144,15 @@ public class WikiLink {
 	 */
 	public void setColon(boolean colon) {
 		this.colon = colon;
+	}
+
+	/**
+	 * Return the servlet context path for this wiki link.  In some cases this
+	 * value may be initialized to <code>null</code>, if for example a redirection
+	 * URL is being generated relative to the context root.
+	 */
+	public String getContextPath() {
+		return this.contextPath;
 	}
 
 	/**
@@ -272,19 +289,18 @@ public class WikiLink {
 	 * does NOT verify if the topic exists or if it is a "Special:" page, but
 	 * simply returns a relative URL for the topic and virtual wiki.
 	 *
-	 * @param context The servlet context path.
 	 * @return A relative URL for the wiki link.  Sample return values might be
 	 *  of the form "/context/virtualwiki/Topic?param=value#Section", "#Section",
 	 *  "/context/virtualwiki/Namespace:Topic", etc.
 	 */
-	public String toRelativeUrl(String context) {
+	public String toRelativeUrl() {
 		if (StringUtils.isBlank(this.getDestination()) && !StringUtils.isBlank(this.getSection())) {
 			return "#" + LinkUtil.buildAnchorText(this.getSection());
 		}
 		String linkVirtualWiki = ((this.getAltVirtualWiki() != null) ? this.getAltVirtualWiki().getName() : this.getVirtualWiki());
 		StringBuilder url = new StringBuilder();
-		if (context != null) {
-			url.append(context);
+		if (this.getContextPath() != null) {
+			url.append(this.getContextPath());
 		}
 		// context never ends with a "/" per servlet specification
 		url.append('/');

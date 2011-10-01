@@ -219,8 +219,8 @@ public abstract class ParserFunctionUtil {
 	 * Parse the {{fileurl:}} parser function.
 	 */
 	private static String parseFileUrl(ParserInput parserInput, String[] parserFunctionArgumentArray) throws DataAccessException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserFunctionArgumentArray[0]);
-		String result = wikiLink.toRelativeUrl(parserInput.getContext());
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), parserFunctionArgumentArray[0]);
+		String result = wikiLink.toRelativeUrl();
 		result = LinkUtil.normalize(Environment.getValue(Environment.PROP_SERVER_URL) + result);
 		if (parserFunctionArgumentArray.length > 1 && !StringUtils.isBlank(parserFunctionArgumentArray[1])) {
 			result += "?" + parserFunctionArgumentArray[1];
@@ -325,8 +325,8 @@ public abstract class ParserFunctionUtil {
 	 * Parse the {{localurl:}} parser function.
 	 */
 	private static String parseLocalUrl(ParserInput parserInput, String[] parserFunctionArgumentArray) throws DataAccessException {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserFunctionArgumentArray[0]);
-		String result = wikiLink.toRelativeUrl(parserInput.getContext());
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), parserFunctionArgumentArray[0]);
+		String result = wikiLink.toRelativeUrl();
 		if (parserFunctionArgumentArray.length > 1 && !StringUtils.isBlank(parserFunctionArgumentArray[1])) {
 			result += "?" + parserFunctionArgumentArray[1];
 		}

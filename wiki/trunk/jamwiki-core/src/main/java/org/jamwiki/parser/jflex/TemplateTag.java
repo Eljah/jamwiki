@@ -335,7 +335,7 @@ public class TemplateTag implements JFlexParserTag {
 			inclusion = true;
 			name = name.substring(1).trim();
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), name);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), name);
 		wikiLink.setColon(inclusion);
 		return wikiLink;
 	}

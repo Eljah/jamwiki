@@ -179,7 +179,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	 */
 	private void initCurrentTopic(String topicName) throws SAXException {
 		topicName = convertArticleNameFromWikipediaToJAMWiki(topicName);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(this.virtualWiki, topicName);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(null, this.virtualWiki, topicName);
 		Topic existingTopic = null;
 		try {
 			existingTopic = WikiBase.getDataHandler().lookupTopic(this.virtualWiki, topicName, false);

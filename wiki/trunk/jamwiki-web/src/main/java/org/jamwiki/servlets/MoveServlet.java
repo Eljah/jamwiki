@@ -107,8 +107,8 @@ public class MoveServlet extends JAMWikiServlet {
 			this.view(request, next, pageInfo);
 			return false;
 		}
-		WikiLink fromWikiLink = LinkUtil.parseWikiLink(virtualWiki, moveFrom);
-		WikiLink destinationWikiLink = LinkUtil.parseWikiLink(virtualWiki, moveDestination);
+		WikiLink fromWikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, moveFrom);
+		WikiLink destinationWikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, moveDestination);
 		if (fromWikiLink.getNamespace() != destinationWikiLink.getNamespace()) {
 			// do not allow moving into or out of image & category namespace
 			if (fromWikiLink.getNamespace().getId().equals(Namespace.CATEGORY_ID)

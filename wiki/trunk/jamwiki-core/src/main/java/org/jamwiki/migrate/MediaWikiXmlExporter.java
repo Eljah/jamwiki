@@ -92,8 +92,8 @@ public class MediaWikiXmlExporter implements TopicExporter {
 	private String retrieveBaseUrl() throws DataAccessException {
 		VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
 		String url = Environment.getValue(Environment.PROP_SERVER_URL);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki.getName(), virtualWiki.getRootTopicName());
-		url += LinkUtil.buildTopicUrl(WikiUtil.WEBAPP_CONTEXT_PATH, wikiLink);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(WikiUtil.WEBAPP_CONTEXT_PATH, virtualWiki.getName(), virtualWiki.getRootTopicName());
+		url += LinkUtil.buildTopicUrl(wikiLink);
 		return url;
 	}
 

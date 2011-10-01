@@ -65,11 +65,11 @@ public class EditSectionTag implements JFlexParserTag {
 		}
 		sectionName = sectionName.trim();
 		String virtualWiki = parserInput.getVirtualWiki();
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, parserInput.getTopicName() + "#" + sectionName);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), virtualWiki, parserInput.getTopicName() + "#" + sectionName);
 		StringBuilder result = new StringBuilder();
 		result.append("<span class=\"").append(CSS_SECTION_COMMENT).append("\">");
 		try {
-			result.append(LinkUtil.buildInternalLinkHtml(parserInput.getContext(), wikiLink, "&rarr;", null, null, false));
+			result.append(LinkUtil.buildInternalLinkHtml(wikiLink, "&rarr;", null, null, false));
 		} catch (DataAccessException e) {
 			logger.error("Failure while building section link for " + sectionName, e);
 			throw new ParserException(e);

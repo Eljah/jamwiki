@@ -160,7 +160,7 @@ public abstract class JAMWikiServlet extends AbstractController {
 					links.put(watchlistLink, new WikiMessage(watchlistLabel));
 				}
 				if (pageInfo.isUserPage()) {
-					WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, pageName);
+					WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, pageName);
 					String contributionsLink = "Special:Contributions?contributor=" + Utilities.encodeAndEscapeTopicName(wikiLink.getArticle());
 					links.put(contributionsLink, new WikiMessage("tab.common.contributions"));
 				}

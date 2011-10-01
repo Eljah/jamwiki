@@ -604,7 +604,7 @@ public class WikiPageInfo {
 	 *  user page, otherwise <code>false</code>.
 	 */
 	public boolean isUserPage() {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(this.virtualWikiName, this.getTopicName());
+		WikiLink wikiLink = LinkUtil.parseWikiLink(null, this.virtualWikiName, this.getTopicName());
 		return (wikiLink.getNamespace().getId().equals(Namespace.USER_ID) || wikiLink.getNamespace().getId().equals(Namespace.USER_COMMENTS_ID));
 	}
 }

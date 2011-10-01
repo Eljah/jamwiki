@@ -117,9 +117,9 @@ public class JAMWikiModel extends AbstractWikiModel {
 			String virtualWiki = fParserInput.getVirtualWiki();
 			WikiLink wikiLink;
 			if (hashSection != null) {
-				wikiLink = LinkUtil.parseWikiLink(virtualWiki, topic + "#" + hashSection);
+				wikiLink = LinkUtil.parseWikiLink(fContextPath, virtualWiki, topic + "#" + hashSection);
 			} else {
-				wikiLink = LinkUtil.parseWikiLink(virtualWiki, topic);
+				wikiLink = LinkUtil.parseWikiLink(fContextPath, virtualWiki, topic);
 			}
 			String destination = wikiLink.getDestination();
 			String section = wikiLink.getSection();
@@ -305,7 +305,7 @@ public class JAMWikiModel extends AbstractWikiModel {
 		String hrefLink = getInterwikiMap().get(namespace.toLowerCase());
 		if (hrefLink != null) {
 			String virtualWiki = fParserInput.getVirtualWiki();
-			WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, namespace + Namespace.SEPARATOR + title + "|" + topicDescription);
+			WikiLink wikiLink = LinkUtil.parseWikiLink(fContextPath, virtualWiki, namespace + Namespace.SEPARATOR + title + "|" + topicDescription);
 			String destination = wikiLink.getDestination();
 			destination = destination.substring(wikiLink.getNamespace().getLabel(virtualWiki).length() + Namespace.SEPARATOR.length());
 			hrefLink = hrefLink.replace("${title}", Utilities.encodeAndEscapeTopicName(title));

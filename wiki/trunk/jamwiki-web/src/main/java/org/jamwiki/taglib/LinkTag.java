@@ -59,7 +59,7 @@ public class LinkTag extends BodyTagSupport {
 		if (StringUtils.isBlank(tagVirtualWiki)) {
 			tagVirtualWiki = VirtualWiki.defaultVirtualWiki().getName();
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(tagVirtualWiki, this.value);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), tagVirtualWiki, this.value);
 		if (!StringUtils.isBlank(this.queryParams)) {
 			wikiLink.setQuery(this.queryParams);
 		}
@@ -67,10 +67,10 @@ public class LinkTag extends BodyTagSupport {
 			if (!StringUtils.isBlank(tagText)) {
 				boolean tagEscape = (!StringUtils.equalsIgnoreCase(this.escape, "false"));
 				// return formatted link of the form "<a href="/wiki/en/Special:Edit">text</a>"
-				url = LinkUtil.buildInternalLinkHtml(request.getContextPath(), wikiLink, tagText, this.style, tagTarget, tagEscape);
+				url = LinkUtil.buildInternalLinkHtml(wikiLink, tagText, this.style, tagTarget, tagEscape);
 			} else {
 				// return raw link of the form "/wiki/en/Special:Edit"
-				url = LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink);
+				url = LinkUtil.buildTopicUrl(wikiLink);
 			}
 			this.pageContext.getOut().print(url);
 		} catch (DataAccessException e) {

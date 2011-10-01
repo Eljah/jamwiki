@@ -159,7 +159,7 @@ public class LinkUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testParseWikiLink() throws Throwable {
-		WikiLink result = LinkUtil.parseWikiLink("en", "testLinkUtilRaw");
+		WikiLink result = LinkUtil.parseWikiLink(null, "en", "testLinkUtilRaw");
 		assertEquals("result.getArticle()", "testLinkUtilRaw", result.getArticle());
 	}
 
@@ -168,7 +168,7 @@ public class LinkUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testParseWikiLink1() throws Throwable {
-		WikiLink result = LinkUtil.parseWikiLink(null, "");
+		WikiLink result = LinkUtil.parseWikiLink(null, null, "");
 		assertNull("result.getArticle()", result.getArticle());
 	}
 
