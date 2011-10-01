@@ -130,14 +130,14 @@ public abstract class LinkUtil {
 		// FIXME - hard coding
 		WikiLink wikiLink = new WikiLink(virtualWiki, "Special:Edit");
 		wikiLink.setQuery(query);
-		return LinkUtil.buildTopicUrl(context, wikiLink);
+		return wikiLink.toRelativeUrl(context);
 	}
 
 	/**
 	 * Parse a link of the form http://example.com and return the opening tag of the
 	 * form <a href="http://example.com">.
 	 */
-	public static String buildHtmlLinkOpenTag(String link, String cssClass) throws ParserException {
+	public static String buildExternalLinkHtml(String link, String cssClass, String linkText) throws ParserException {
 		Matcher matcher = LINK_PROTOCOL_PATTERN.matcher(link);
 		if (!matcher.matches()) {
 			throw new ParserException("Invalid link " + link);
@@ -153,10 +153,14 @@ public abstract class LinkUtil {
 		if (cssClass == null) {
 			cssClass = "externallink";
 		}
-		String html = "<a class=\"" + cssClass + "\" rel=\"nofollow\"";
+		StringBuilder html = new StringBuilder();
+		html.append("<a class=\"").append(cssClass).append("\" rel=\"nofollow\"");
 		String dotSlashSlash = (protocol.equals("mailto")) ? ":" : "://";
-		html += " href=\"" + protocol + dotSlashSlash + link + "\"" + target + ">";
-		return html;
+		html.append(" href=\"").append(protocol).append(dotSlashSlash).append(link).append("\"");
+		html.append(target).append(">");
+		html.append(linkText);
+		html.append("</a>");
+		return html.toString();
 	}
 
 	/**
@@ -191,22 +195,14 @@ public abstract class LinkUtil {
 				style = "edit";
 			}
 		}
-		if (!StringUtils.isBlank(style)) {
-			style = " class=\"" + style + "\"";
-		} else {
-			style = "";
-		}
-		if (!StringUtils.isBlank(target)) {
-			target = " target=\"" + target + "\"";
-		} else {
-			target = "";
-		}
+		String styleHtml = (!StringUtils.isBlank(style)) ? " class=\"" + style + "\"" : "";
+		String targetHtml = (!StringUtils.isBlank(target)) ? " target=\"" + target + "\"" : "";
 		if (StringUtils.isBlank(topic) && !StringUtils.isBlank(wikiLink.getSection())) {
 			topic = wikiLink.getSection();
 		}
 		StringBuilder html = new StringBuilder();
-		html.append("<a href=\"").append(url).append('\"').append(style);
-		html.append(" title=\"").append(StringEscapeUtils.escapeHtml4(topic)).append('\"').append(target).append('>');
+		html.append("<a href=\"").append(url).append('\"').append(styleHtml);
+		html.append(" title=\"").append(StringEscapeUtils.escapeHtml4(topic)).append('\"').append(targetHtml).append('>');
 		if (escapeHtml) {
 			html.append(StringEscapeUtils.escapeHtml4(text));
 		} else {

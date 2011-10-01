@@ -131,8 +131,7 @@ public class HtmlLinkTag implements JFlexParserTag {
 			parserInput.getTempParams().put(HTML_LINK_CAPTION_COUNTER, counter + 1);
 			caption = "[" + counter + "]";
 		}
-		String openTag = LinkUtil.buildHtmlLinkOpenTag(link, "externallink");
-		return openTag + caption + "</a>" + punctuation;
+		return LinkUtil.buildExternalLinkHtml(link, "externallink", caption) + punctuation;
 	}
 
 	/**

@@ -152,7 +152,6 @@ public abstract class ImageUtil {
 			return ImageUtil.buildUploadLink(context, linkVirtualWiki, topicName);
 		}
 		Topic topic = WikiBase.getDataHandler().lookupTopic(linkVirtualWiki, topicName, false);
-		StringBuilder html = new StringBuilder();
 		String caption = imageMetadata.getCaption();
 		if (topic.getTopicType() == TopicType.FILE) {
 			// file, not an image - use the file name, minus the translated/untranslated namespace
@@ -169,27 +168,6 @@ public abstract class ImageUtil {
 		}
 		if (wikiImage == null) {
 			return ImageUtil.buildLinkToFile(url, topic, caption, escapeHtml);
-		}
-		if (!StringUtils.isWhitespace(imageMetadata.getLink())) {
-			if (imageMetadata.getLink() == null) {
-				// no link set, link to the image topic page.  At this point we have validated
-				// that the link is an image, so do not perform further validation and link to the
-				// CURRENT virtual wiki, even if it is a shared image
-				WikiLink wikiLink = LinkUtil.parseWikiLink(linkVirtualWiki, topicName);
-				String link = wikiLink.toRelativeUrl(context);
-				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
-			} else {
-				try {
-					// try to parse as an external link
-					String openTag = LinkUtil.buildHtmlLinkOpenTag(imageMetadata.getLink(), "wikiimg");
-					html.append(openTag);
-				} catch (ParserException e) {
-					// not an external link, but an internal link
-					WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), imageMetadata.getLink());
-					String link = LinkUtil.buildTopicUrl(context, wikiLink);
-					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
-				}
-			}
 		}
 		if (StringUtils.isBlank(style)) {
 			style = "wikiimg";
@@ -210,9 +188,34 @@ public abstract class ImageUtil {
 			template = TEMPLATE_IMAGE_IMG_VERTICAL;
 			args[5] = imageMetadata.getVerticalAlignment().toString();
 		}
-		html.append(WikiUtil.formatFromTemplate(template, args));
+		StringBuilder html = new StringBuilder();
+		String imageHtml = WikiUtil.formatFromTemplate(template, args);
 		if (!StringUtils.isWhitespace(imageMetadata.getLink())) {
-			html.append("</a>");
+			// wrap the image in a link
+			if (imageMetadata.getLink() == null) {
+				// no link set, link to the image topic page.  At this point we have validated
+				// that the link is an image, so do not perform further validation and link to the
+				// CURRENT virtual wiki, even if it is a shared image
+				WikiLink wikiLink = LinkUtil.parseWikiLink(linkVirtualWiki, topicName);
+				String link = wikiLink.toRelativeUrl(context);
+				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
+				html.append(imageHtml);
+				html.append("</a>");
+			} else {
+				try {
+					// try to parse as an external link
+					html.append(LinkUtil.buildExternalLinkHtml(imageMetadata.getLink(), "wikiimg", imageHtml));
+				} catch (ParserException e) {
+					// not an external link, but an internal link
+					WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), imageMetadata.getLink());
+					String link = LinkUtil.buildTopicUrl(context, wikiLink);
+					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
+					html.append(imageHtml);
+					html.append("</a>");
+				}
+			}
+		} else {
+			html.append(imageHtml);
 		}
 		if (!StringUtils.isBlank(caption) && imageMetadata.getBorder() != ImageBorderEnum._GALLERY) {
 			// captions are only displayed for thumbnails and framed images.  galleries are handled separately.
