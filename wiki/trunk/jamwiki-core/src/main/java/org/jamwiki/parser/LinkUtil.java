@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -34,6 +35,7 @@ import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.PseudoTopicHandler;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.utils.WikiUtil;
 
 /**
  * General utility methods for handling both wiki topic links and HTML links.
@@ -48,6 +50,12 @@ public abstract class LinkUtil {
 	// pattern for links of the form "http://example.com" or "mailto:email.com".  "(?:X)" means non-capturing group.
 	private static final String LINK_PROTOCOL_REGEX = "(http(?:s)?|file|ftp|mailto|news):(?://)?(.*)";
 	private static final Pattern LINK_PROTOCOL_PATTERN = Pattern.compile(LINK_PROTOCOL_REGEX, Pattern.CASE_INSENSITIVE);
+	/** Path to the template used to format external links that open in the same browser window. */
+	private static final String TEMPLATE_LINK_EXTERNAL = "templates/link-external.template";
+	/** Path to the template used to format external links that open in a new browser window. */
+	private static final String TEMPLATE_LINK_EXTERNAL_NEW_WINDOW = "templates/link-external-new-window.template";
+	/** Path to the template used to format interwiki links. */
+	private static final String TEMPLATE_LINK_INTERWIKI = "templates/link-interwiki.template";
 
 	/**
 	 * Build a query parameter.  If root is empty, this method returns
@@ -149,18 +157,17 @@ public abstract class LinkUtil {
 		link = StringUtils.replace(link, ">", "%3E");
 		link = StringUtils.replace(link, "\"", "%22");
 		link = StringUtils.replace(link, "\'", "%27");
-		String target = (Environment.getBooleanValue(Environment.PROP_EXTERNAL_LINK_NEW_WINDOW)) ? " target=\"_blank\"" : "";
-		if (cssClass == null) {
-			cssClass = "externallink";
-		}
-		StringBuilder html = new StringBuilder();
-		html.append("<a class=\"").append(cssClass).append("\" rel=\"nofollow\"");
+		String template = (Environment.getBooleanValue(Environment.PROP_EXTERNAL_LINK_NEW_WINDOW)) ? TEMPLATE_LINK_EXTERNAL_NEW_WINDOW : TEMPLATE_LINK_EXTERNAL;
 		String dotSlashSlash = (protocol.equals("mailto")) ? ":" : "://";
-		html.append(" href=\"").append(protocol).append(dotSlashSlash).append(link).append("\"");
-		html.append(target).append(">");
-		html.append(linkText);
-		html.append("</a>");
-		return html.toString();
+		Object[] args = new Object[3];
+		args[0] = (cssClass == null) ? "externallink" : cssClass;
+		args[1] = protocol + dotSlashSlash + link;
+		args[2] = linkText;
+		try {
+			return WikiUtil.formatFromTemplate(template, args);
+		} catch (IOException e) {
+			throw new ParserException(e);
+		}
 	}
 
 	/**
@@ -354,7 +361,7 @@ public abstract class LinkUtil {
 	 * @return The HTML anchor tag for the interwiki link, or <code>null</code>
 	 *  if there is no interwiki link defined for the WikiLink.
 	 */
-	public static String interwiki(WikiLink wikiLink) {
+	public static String interwiki(WikiLink wikiLink) throws ParserException {
 		if (wikiLink.getInterwiki() == null) {
 			return null;
 		}
@@ -362,11 +369,16 @@ public abstract class LinkUtil {
 		if (!StringUtils.isBlank(wikiLink.getSection())) {
 			url += "#" + wikiLink.getSection();
 		}
-		String text = wikiLink.getText();
-		if (StringUtils.isBlank(text)) {
-			text = wikiLink.getDestination();
+		String text = !StringUtils.isBlank(wikiLink.getText()) ? wikiLink.getText() : wikiLink.getDestination();
+		Object[] args = new Object[3];
+		args[0] = text;
+		args[1] = url;
+		args[2] = text;
+		try {
+			return WikiUtil.formatFromTemplate(TEMPLATE_LINK_INTERWIKI, args);
+		} catch (IOException e) {
+			throw new ParserException(e);
 		}
-		return "<a class=\"interwiki\" title=\"" + text + "\" href=\"" + url + "\">" + text + "</a>";
 	}
 
 	/**
