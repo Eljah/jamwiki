@@ -175,7 +175,8 @@ public abstract class ImageUtil {
 				// no link set, link to the image topic page.  At this point we have validated
 				// that the link is an image, so do not perform further validation and link to the
 				// CURRENT virtual wiki, even if it is a shared image
-				String link = LinkUtil.buildTopicUrl(context, linkVirtualWiki, topicName, false);
+				WikiLink wikiLink = LinkUtil.parseWikiLink(linkVirtualWiki, topicName);
+				String link = wikiLink.toRelativeUrl(context);
 				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
 			} else {
 				try {

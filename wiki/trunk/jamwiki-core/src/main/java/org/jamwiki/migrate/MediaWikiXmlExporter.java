@@ -40,6 +40,7 @@ import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.LinkUtil;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -91,7 +92,8 @@ public class MediaWikiXmlExporter implements TopicExporter {
 	private String retrieveBaseUrl() throws DataAccessException {
 		VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
 		String url = Environment.getValue(Environment.PROP_SERVER_URL);
-		url += LinkUtil.buildTopicUrl(WikiUtil.WEBAPP_CONTEXT_PATH, virtualWiki.getName(), virtualWiki.getRootTopicName(), true);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki.getName(), virtualWiki.getRootTopicName());
+		url += LinkUtil.buildTopicUrl(WikiUtil.WEBAPP_CONTEXT_PATH, wikiLink);
 		return url;
 	}
 

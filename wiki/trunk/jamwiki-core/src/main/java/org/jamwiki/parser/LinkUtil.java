@@ -222,32 +222,6 @@ public abstract class LinkUtil {
 	 * @param context The servlet context path.  If this value is
 	 *  <code>null</code> then the resulting URL will NOT include context path,
 	 *  which breaks HTML links but is useful for servlet redirection URLs.
-	 * @param virtualWiki The virtual wiki for the link that is being created.
-	 * @param topic The topic name for the URL that is being generated.
-	 * @param validateTopic Set to <code>true</code> if the topic must exist and
-	 *  must not be a "Special:" page.  If the topic does not exist then a link to
-	 *  an edit page will be returned.
-	 * @throws DataAccessException Thrown if any error occurs while retrieving topic
-	 *  information.
-	 */
-	public static String buildTopicUrl(String context, String virtualWiki, String topic, boolean validateTopic) throws DataAccessException {
-		if (StringUtils.isBlank(topic)) {
-			return null;
-		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, topic);
-		if (validateTopic) {
-			return LinkUtil.buildTopicUrl(context, wikiLink);
-		} else {
-			return wikiLink.toRelativeUrl(context);
-		}
-	}
-
-	/**
-	 * Build a URL to the topic page for a given topic.
-	 *
-	 * @param context The servlet context path.  If this value is
-	 *  <code>null</code> then the resulting URL will NOT include context path,
-	 *  which breaks HTML links but is useful for servlet redirection URLs.
 	 * @param wikiLink The WikiLink object containing all relevant information
 	 *  about the link being generated.
 	 * @throws DataAccessException Thrown if any error occurs while retrieving topic

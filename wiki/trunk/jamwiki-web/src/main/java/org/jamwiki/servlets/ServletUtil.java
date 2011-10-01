@@ -583,8 +583,9 @@ public class ServletUtil {
 	 */
 	protected static void redirect(ModelAndView next, String virtualWiki, String destination) throws WikiException {
 		String target = null;
+		WikiLink wikiLink = LinkUtil.parseWikiLink(virtualWiki, destination);
 		try {
-			target = LinkUtil.buildTopicUrl(null, virtualWiki, destination, true);
+			target = LinkUtil.buildTopicUrl(null, wikiLink);
 		} catch (DataAccessException e) {
 			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 		}
@@ -864,8 +865,9 @@ public class ServletUtil {
 			}
 			if (!child.getName().equals(topic.getName())) {
 				String redirectUrl = null;
+				WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), topic.getName());
 				try {
-					redirectUrl = LinkUtil.buildTopicUrl(request.getContextPath(), topic.getVirtualWiki(), topic.getName(), true);
+					redirectUrl = LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink);
 				} catch (DataAccessException e) {
 					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 				}
@@ -875,11 +877,8 @@ public class ServletUtil {
 				pageInfo.setRedirectInfo(redirectUrl, redirectName);
 				pageTitle.replaceParameter(0, child.getName());
 				topic = child;
-				try {
-					pageInfo.setCanonicalUrl(LinkUtil.buildTopicUrl(request.getContextPath(), topic.getVirtualWiki(), topic.getName(), false));
-				} catch (DataAccessException e) {
-					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
-				}
+				wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), topic.getName());
+				pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl(request.getContextPath()));
 				// update the page info's virtual wiki in case this redirect is to another virtual wiki
 				pageInfo.setVirtualWikiName(topic.getVirtualWiki());
 			}
@@ -964,7 +963,8 @@ public class ServletUtil {
 						// look up the shared topic file
 						sharedImageTopic = WikiBase.getDataHandler().lookupTopicById(wikiFile.getVirtualWiki(), wikiFile.getTopicId());
 					}
-					pageInfo.setCanonicalUrl(LinkUtil.buildTopicUrl(request.getContextPath(), sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName(), false));
+					WikiLink wikiLink = LinkUtil.parseWikiLink(sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName());
+					pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl(request.getContextPath()));
 					next.addObject("sharedImageTopicObject", sharedImageTopic);
 				} catch (DataAccessException e) {
 					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);

@@ -121,15 +121,6 @@ public class LinkUtilTest extends JAMWikiUnitTest {
 	 *
 	 */
 	@Test
-	public void testbuildTopicUrl() throws Throwable {
-		String result = LinkUtil.buildTopicUrl("testLinkUtilContext", "testLinkUtilVirtualWiki", "", true);
-		assertNull("result", result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
 	public void testExtractTopicLink() throws Throwable {
 		//TODO
 		String result = LinkUtil.extractTopicLink("en", "testWikiUtilName");

@@ -33,6 +33,7 @@ import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.MathUtil;
 import org.jamwiki.utils.Utilities;
@@ -41,7 +42,7 @@ import org.jamwiki.utils.WikiLogger;
 /**
  * Process parser functions.  See http://www.mediawiki.org/wiki/Help:Magic_words#Parser_functions.
  */
-public class ParserFunctionUtil {
+public abstract class ParserFunctionUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ParserFunctionUtil.class.getName());
 	private static final String PARSER_FUNCTION_ANCHOR_ENCODE = "anchorencode:";
@@ -218,7 +219,8 @@ public class ParserFunctionUtil {
 	 * Parse the {{fileurl:}} parser function.
 	 */
 	private static String parseFileUrl(ParserInput parserInput, String[] parserFunctionArgumentArray) throws DataAccessException {
-		String result = LinkUtil.buildTopicUrl(parserInput.getContext(), parserInput.getVirtualWiki(), parserFunctionArgumentArray[0], false);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserFunctionArgumentArray[0]);
+		String result = wikiLink.toRelativeUrl(parserInput.getContext());
 		result = LinkUtil.normalize(Environment.getValue(Environment.PROP_SERVER_URL) + result);
 		if (parserFunctionArgumentArray.length > 1 && !StringUtils.isBlank(parserFunctionArgumentArray[1])) {
 			result += "?" + parserFunctionArgumentArray[1];
@@ -323,7 +325,8 @@ public class ParserFunctionUtil {
 	 * Parse the {{localurl:}} parser function.
 	 */
 	private static String parseLocalUrl(ParserInput parserInput, String[] parserFunctionArgumentArray) throws DataAccessException {
-		String result = LinkUtil.buildTopicUrl(parserInput.getContext(), parserInput.getVirtualWiki(), parserFunctionArgumentArray[0], false);
+		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getVirtualWiki(), parserFunctionArgumentArray[0]);
+		String result = wikiLink.toRelativeUrl(parserInput.getContext());
 		if (parserFunctionArgumentArray.length > 1 && !StringUtils.isBlank(parserFunctionArgumentArray[1])) {
 			result += "?" + parserFunctionArgumentArray[1];
 		}
