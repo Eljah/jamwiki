@@ -20,6 +20,7 @@
 <p><b>WikiLink1</b></p>
 <p><b>WikiLink1</b></p>
 <p><a href="/wiki/test/WikiLink1" title="WikiLink1">WikiLink1</a></p>
+<p><a href="/wiki/test/Special:Edit?topic=Non-existent_topic" class="edit" title="Non-existent topic">Non-existent topic</a></p>
 <p><b>WikiLink1</b></p>
 <p><a href="/wiki/en/Special:Edit?topic=Help:WikiLink1" class="edit" title="Help:WikiLink1">Help:WikiLink1</a></p>
 <p><a href="/wiki/en/Special:Edit?topic=Help:WikiLink1" class="edit" title="Help:WikiLink1">Help:  WikiLink1</a></p>

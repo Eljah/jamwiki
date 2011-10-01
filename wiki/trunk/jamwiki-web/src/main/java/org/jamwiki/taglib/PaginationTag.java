@@ -68,7 +68,7 @@ public class PaginationTag extends BodyTagSupport {
 		query += "&amp;offset=0";
 		wikiLink.setQuery(query);
 		try {
-			output.append(LinkUtil.buildTopicUrl(request.getContextPath(), virtualWiki, wikiLink));
+			output.append(LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink));
 		} catch (DataAccessException e) {
 			logger.warn("Failure while building pagination element", e);
 			return new StringBuilder();
@@ -123,7 +123,7 @@ public class PaginationTag extends BodyTagSupport {
 		query += "&amp;offset=" + offset;
 		wikiLink.setQuery(query);
 		try {
-			output.append(LinkUtil.buildTopicUrl(request.getContextPath(), virtualWiki, wikiLink));
+			output.append(LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink));
 		} catch (DataAccessException e) {
 			logger.warn("Failure while building pagination element", e);
 			return new StringBuilder();

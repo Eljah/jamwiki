@@ -29,7 +29,10 @@ import org.jamwiki.utils.WikiLogger;
 public class WikiLink {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiLink.class.getName());
-	/** Virtual wiki link prefix. */
+	/**
+	 * Virtual wiki link prefix, used when this link is to a virtual wiki other than the
+	 * current virtual wiki.
+	 */
 	private VirtualWiki altVirtualWiki = null;
 	/** Indicator that the link requires special handling, such as links starting with a colon. */
 	private boolean colon = false;
@@ -47,6 +50,8 @@ public class WikiLink {
 	private String section = null;
 	/** Link text. */
 	private String text = null;
+	/** The current link virtual wiki. */
+	private String virtualWiki = null;
 
 	/**
 	 * Standard constructor which initializes the destination field of
@@ -56,9 +61,13 @@ public class WikiLink {
 	 *  the namespace.  May  be <code>null</code> if (for example) this
 	 *  link is to a section within the current article of the form
 	 *  "#Section".
+	 * @param virtualWiki The current link virtual wiki.  This is the virtual
+	 *  wiki that will be used when converting this WikiLink object to a
+	 *  relative URL UNLESS there is an altVirtualWiki specified.
 	 */
-	public WikiLink(String destination) {
+	public WikiLink(String virtualWiki, String destination) {
 		this.destination = destination;
+		this.virtualWiki = virtualWiki;
 	}
 
 	/**
@@ -74,6 +83,7 @@ public class WikiLink {
 		this.query = wikiLink.query;
 		this.section = wikiLink.section;
 		this.text = wikiLink.text;
+		this.virtualWiki = wikiLink.virtualWiki;
 	}
 
 	/**
@@ -249,28 +259,36 @@ public class WikiLink {
 	}
 
 	/**
+	 * The current link virtual wiki.  This is the virtual wiki that will be used
+	 * when converting this WikiLink object to a relative URL UNLESS there is an
+	 * altVirtualWiki specified.
+	 */
+	public String getVirtualWiki() {
+		return this.virtualWiki;
+	}
+
+	/**
 	 * Utility method for converting a WikiLink to a relative URL.  This method
 	 * does NOT verify if the topic exists or if it is a "Special:" page, but
 	 * simply returns a relative URL for the topic and virtual wiki.
 	 *
 	 * @param context The servlet context path.
-	 * @param virtualWiki The default virtual wiki to use for the URL if this
-	 *  wiki link object does not specify an alternate virtual wiki.
 	 * @return A relative URL for the wiki link.  Sample return values might be
 	 *  of the form "/context/virtualwiki/Topic?param=value#Section", "#Section",
 	 *  "/context/virtualwiki/Namespace:Topic", etc.
 	 */
-	public String toRelativeUrl(String context, String virtualWiki) {
+	public String toRelativeUrl(String context) {
 		if (StringUtils.isBlank(this.getDestination()) && !StringUtils.isBlank(this.getSection())) {
 			return "#" + LinkUtil.buildAnchorText(this.getSection());
 		}
+		String linkVirtualWiki = ((this.getAltVirtualWiki() != null) ? this.getAltVirtualWiki().getName() : this.getVirtualWiki());
 		StringBuilder url = new StringBuilder();
 		if (context != null) {
 			url.append(context);
 		}
 		// context never ends with a "/" per servlet specification
 		url.append('/');
-		url.append(Utilities.encodeAndEscapeTopicName(virtualWiki));
+		url.append(Utilities.encodeAndEscapeTopicName(linkVirtualWiki));
 		url.append('/');
 		url.append(Utilities.encodeAndEscapeTopicName(this.getDestination()));
 		if (!StringUtils.isBlank(this.getQuery())) {

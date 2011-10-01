@@ -45,6 +45,8 @@
 
 [[:test:WikiLink1]]
 
+[[:test:Non-existent topic]]
+
 [[{{PAGENAME}}]]
 
 [[Help:{{PAGENAME}}]]

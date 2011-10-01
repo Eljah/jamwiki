@@ -170,3 +170,11 @@ caption test #9 [[Image:Test Image.jpg|thumb|Test ]] Caption]]
 caption test #10 [[Image:Test Image.jpg|thumb|caption1|caption2]]
 
 [[Image:Invalid Image "Name".jpg]]
+
+image link on alt virtual wiki
+
+[[:test:Image:Test Image.jpg]]
+
+non-existent image link on alt virtual wiki
+
+[[:test:Image:Non Existent Image.jpg|Caption for link]]

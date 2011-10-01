@@ -56,7 +56,7 @@ import org.jamwiki.utils.WikiUtil;
  * Utility methods for performing wiki-specific image tasks, such as generating
  * HTML to display an image or building links to images.
  */
-public class ImageUtil {
+public abstract class ImageUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageUtil.class.getName());
 	/** Cache name for the cache of image dimensions. */
@@ -87,12 +87,6 @@ public class ImageUtil {
 	private static final String TEMPLATE_IMAGE_THUMBNAIL_LEFT = "templates/image-thumbnail-left.template";
 	/** Path to the template used to format right-aligned image thumbnails. */
 	private static final String TEMPLATE_IMAGE_THUMBNAIL_RIGHT = "templates/image-thumbnail-right.template";
-
-	/**
-	 *
-	 */
-	private ImageUtil() {
-	}
 
 	/**
 	 *
@@ -191,8 +185,7 @@ public class ImageUtil {
 				} catch (ParserException e) {
 					// not an external link, but an internal link
 					WikiLink wikiLink = LinkUtil.parseWikiLink(topic.getVirtualWiki(), imageMetadata.getLink());
-					String internalLinkVirtualWiki = ((wikiLink.getAltVirtualWiki() != null) ? wikiLink.getAltVirtualWiki().getName() : linkVirtualWiki);
-					String link = LinkUtil.buildTopicUrl(context, internalLinkVirtualWiki, wikiLink);
+					String link = LinkUtil.buildTopicUrl(context, wikiLink);
 					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
 				}
 			}
@@ -319,7 +312,7 @@ public class ImageUtil {
 	 */
 	private static String buildUploadLink(String context, String virtualWiki, String topicName) throws DataAccessException {
 		WikiLink uploadLink = LinkUtil.parseWikiLink(virtualWiki, "Special:Upload?topic=" + Utilities.encodeAndEscapeTopicName(topicName));
-		return LinkUtil.buildInternalLinkHtml(context, virtualWiki, uploadLink, topicName, "edit", null, true);
+		return LinkUtil.buildInternalLinkHtml(context, uploadLink, topicName, "edit", null, true);
 	}
 
 	/**

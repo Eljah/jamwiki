@@ -67,10 +67,10 @@ public class LinkTag extends BodyTagSupport {
 			if (!StringUtils.isBlank(tagText)) {
 				boolean tagEscape = (!StringUtils.equalsIgnoreCase(this.escape, "false"));
 				// return formatted link of the form "<a href="/wiki/en/Special:Edit">text</a>"
-				url = LinkUtil.buildInternalLinkHtml(request.getContextPath(), tagVirtualWiki, wikiLink, tagText, this.style, tagTarget, tagEscape);
+				url = LinkUtil.buildInternalLinkHtml(request.getContextPath(), wikiLink, tagText, this.style, tagTarget, tagEscape);
 			} else {
 				// return raw link of the form "/wiki/en/Special:Edit"
-				url = LinkUtil.buildTopicUrl(request.getContextPath(), tagVirtualWiki, wikiLink);
+				url = LinkUtil.buildTopicUrl(request.getContextPath(), wikiLink);
 			}
 			this.pageContext.getOut().print(url);
 		} catch (DataAccessException e) {
