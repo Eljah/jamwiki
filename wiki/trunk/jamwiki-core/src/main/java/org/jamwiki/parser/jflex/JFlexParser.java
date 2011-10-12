@@ -36,8 +36,6 @@ public class JFlexParser extends AbstractParser {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JFlexParser.class.getName());
 
-	/** Any parsing that takes longer than the specified time (in ms) will trigger a log message. */
-	private static final int TIME_LIMIT_PARSE = 15;
 	/** Mode used when parsing edit comments. */
 	public static final int MODE_EDIT_COMMENT = 0;
 	/** Splice mode is used when inserting an edited topic section back into the full topic content. */

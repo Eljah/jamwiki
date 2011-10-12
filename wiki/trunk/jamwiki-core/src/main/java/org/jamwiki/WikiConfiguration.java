@@ -284,7 +284,6 @@ public class WikiConfiguration {
 	 * Retrieve the search configuration that matches the current SearchEngine object.
 	 */
 	public static WikiConfigurationObject getCurrentSearchConfiguration() {
-		List<WikiConfigurationObject> searchEngines = WikiConfiguration.getInstance().getSearchEngines();
 		for (WikiConfigurationObject wikiConfigurationObject : WikiConfiguration.getInstance().getSearchEngines()) {
 			if (StringUtils.equals(wikiConfigurationObject.getClazz(), Environment.getValue(Environment.PROP_BASE_SEARCH_ENGINE))) {
 				return wikiConfigurationObject;

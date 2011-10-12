@@ -19,7 +19,6 @@ package org.jamwiki.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;

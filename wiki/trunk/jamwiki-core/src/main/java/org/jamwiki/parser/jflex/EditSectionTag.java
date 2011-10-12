@@ -32,8 +32,6 @@ public class EditSectionTag implements JFlexParserTag {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(EditSectionTag.class.getName());
 	private static final String CSS_SECTION_COMMENT = "section-link";
-	private String comment = null;
-	private String topic = null;
 
 	/**
 	 * Parse a section link of the form "/ * section * /" and return the

@@ -54,7 +54,6 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 		}
 		StringBuilder result = new StringBuilder();
 		CustomTagItem customTagItem;
-		int last;
 		while ((customTagItem = this.popCustomTag()) != null) {
 			result.append(this.processText(customTagItem.getRawContent()));
 		}

@@ -47,7 +47,6 @@ public class ViewSourceServlet extends JAMWikiServlet {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		Topic topic = ServletUtil.initializeTopic(virtualWiki, topicName);
 		topicName = topic.getName();
-		String contents = (topic == null) ? "" : topic.getTopicContent();
 		ServletUtil.viewTopicSource(next, pageInfo, topic);
 	}
 }

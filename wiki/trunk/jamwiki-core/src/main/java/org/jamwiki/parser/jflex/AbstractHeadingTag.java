@@ -18,7 +18,6 @@ package org.jamwiki.parser.jflex;
 
 import java.io.IOException;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;

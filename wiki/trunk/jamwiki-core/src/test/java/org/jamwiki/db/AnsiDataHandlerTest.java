@@ -33,8 +33,6 @@ import static org.junit.Assert.*;
  */
 public class AnsiDataHandlerTest extends JAMWikiUnitTest {
 
-	private static boolean INITIALIZED = false;
-
 	/**
 	 *
 	 */

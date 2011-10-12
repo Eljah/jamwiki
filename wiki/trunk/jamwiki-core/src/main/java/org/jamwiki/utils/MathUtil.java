@@ -16,7 +16,6 @@
  */
 package org.jamwiki.utils;
 
-import java.math.BigDecimal;
 import java.util.EmptyStackException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

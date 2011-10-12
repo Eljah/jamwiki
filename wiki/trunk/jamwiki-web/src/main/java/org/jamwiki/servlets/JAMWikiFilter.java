@@ -39,7 +39,6 @@ public class JAMWikiFilter implements Filter {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiFilter.class.getName());
 	private String encoding = "UTF-8";
-	private FilterConfig config = null;
 
 	/**
 	 * Standard servlet filter destroy() method implementation.
@@ -69,7 +68,6 @@ public class JAMWikiFilter implements Filter {
 	 */
 	public void init(FilterConfig config) throws ServletException {
 		this.encoding = config.getInitParameter("encoding");
-		this.config = config;
 	}
 
 	/**
