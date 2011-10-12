@@ -37,7 +37,8 @@ import org.jamwiki.utils.WikiLogger;
 public class GalleryTag implements JFlexCustomTagItem {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(GalleryTag.class.getName());
-	private static Pattern IMAGE_DIMENSION_PATTERN = Pattern.compile("([0-9]+)[ ]*(px)?", Pattern.CASE_INSENSITIVE);
+	// match image dimensions of the form "450px". note that "?:" is a regex non-capturing group.
+	private static Pattern IMAGE_DIMENSION_PATTERN = Pattern.compile("([0-9]+)[ ]*(?:px)?", Pattern.CASE_INSENSITIVE);
 	private static final int DEFAULT_IMAGES_PER_ROW = 4;
 	private static final int DEFAULT_THUMBNAIL_MAX_DIMENSION = 120;
 

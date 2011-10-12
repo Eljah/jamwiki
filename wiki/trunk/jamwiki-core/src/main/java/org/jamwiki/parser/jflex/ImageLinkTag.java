@@ -40,8 +40,8 @@ import org.jamwiki.utils.WikiLogger;
 public class ImageLinkTag implements JFlexParserTag {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageLinkTag.class.getName());
-	// look for image size info in image tags
-	private static Pattern IMAGE_SIZE_PATTERN = Pattern.compile("([0-9]+)?([ ]*x[ ]*([0-9]+))?[ ]*px", Pattern.CASE_INSENSITIVE);
+	// look for image size info in image tags. note that "?:" is a regex non-capturing group.
+	private static Pattern IMAGE_SIZE_PATTERN = Pattern.compile("([0-9]+)?(?:[ ]*x[ ]*([0-9]+))?[ ]*px", Pattern.CASE_INSENSITIVE);
 	// look for alt info in image tags
 	private static Pattern IMAGE_ALT_PATTERN = Pattern.compile("alt[ ]*=[ ]*(.*)", Pattern.CASE_INSENSITIVE);
 	// look for link info in image tags
@@ -165,7 +165,7 @@ public class ImageLinkTag implements JFlexParserTag {
 				if (!StringUtils.isBlank(maxWidth)) {
 					imageMetadata.setMaxWidth(Integer.valueOf(maxWidth));
 				}
-				String maxHeight = matcher.group(3);
+				String maxHeight = matcher.group(2);
 				if (!StringUtils.isBlank(maxHeight)) {
 					imageMetadata.setMaxHeight(Integer.valueOf(maxHeight));
 				}

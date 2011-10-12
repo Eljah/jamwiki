@@ -103,7 +103,8 @@ public abstract class LinkUtil {
 		// ensure that all characters in the name are valid for use in an anchor name
 		String anchorText = Utilities.encodeAndEscapeTopicName(StringUtils.trim(text));
 		anchorText = anchorText.replace('%', '.');
-		if (!anchorText.matches("[A-Za-z].*")) {
+		if (!anchorText.substring(0, 1).matches("[A-Za-z]")) {
+			// per the spec anchors must start with an ANSI letter
 			anchorText = "a_" + anchorText;
 		}
 		return anchorText;
