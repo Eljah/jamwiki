@@ -100,7 +100,7 @@ public class ServletUtil {
 	 */
 	protected static void buildVirtualWikiLinks(HttpServletRequest request, WikiPageInfo pageInfo) throws DataAccessException {
 		String topicName = WikiUtil.getTopicFromURI(request);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), pageInfo.getVirtualWikiName(), topicName);
+		WikiLink wikiLink = new WikiLink(request.getContextPath(), pageInfo.getVirtualWikiName(), topicName);
 		List<String> virtualWikiLinks = new ArrayList<String>();
 		List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
 		for (VirtualWiki virtualWiki : virtualWikis) {
@@ -108,7 +108,7 @@ public class ServletUtil {
 				continue;
 			}
 			String virtualWikiLink = virtualWiki.getName() + Namespace.SEPARATOR + wikiLink.getNamespace().getLabel(virtualWiki.getName()) + Namespace.SEPARATOR + wikiLink.getArticle();
-			wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki.getName(), virtualWikiLink);
+			wikiLink = new WikiLink(request.getContextPath(), virtualWiki.getName(), virtualWikiLink);
 			String text = virtualWiki.getName() + Namespace.SEPARATOR + wikiLink.getArticle();
 			String url = LinkUtil.buildInternalLinkHtml(wikiLink, text, null, null, false);
 			virtualWikiLinks.add(url);
@@ -345,7 +345,7 @@ public class ServletUtil {
 			return topic;
 		}
 		topic = new Topic(virtualWiki, topicName);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, virtualWiki, topicName);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, topicName);
 		topic.setTopicType(WikiUtil.findTopicTypeForNamespace(wikiLink.getNamespace()));
 		return topic;
 	}
@@ -866,7 +866,7 @@ public class ServletUtil {
 			}
 			if (!child.getName().equals(topic.getName())) {
 				String redirectUrl = null;
-				WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
+				WikiLink wikiLink = new WikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
 				try {
 					redirectUrl = LinkUtil.buildTopicUrl(wikiLink);
 				} catch (DataAccessException e) {
@@ -878,7 +878,7 @@ public class ServletUtil {
 				pageInfo.setRedirectInfo(redirectUrl, redirectName);
 				pageTitle.replaceParameter(0, child.getName());
 				topic = child;
-				wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
+				wikiLink = new WikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
 				pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());
 				// update the page info's virtual wiki in case this redirect is to another virtual wiki
 				pageInfo.setVirtualWikiName(topic.getVirtualWiki());
@@ -964,7 +964,7 @@ public class ServletUtil {
 						// look up the shared topic file
 						sharedImageTopic = WikiBase.getDataHandler().lookupTopicById(wikiFile.getVirtualWiki(), wikiFile.getTopicId());
 					}
-					WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName());
+					WikiLink wikiLink = new WikiLink(request.getContextPath(), sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName());
 					pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());
 					next.addObject("sharedImageTopicObject", sharedImageTopic);
 				} catch (DataAccessException e) {

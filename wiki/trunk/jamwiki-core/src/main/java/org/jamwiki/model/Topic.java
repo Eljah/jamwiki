@@ -19,7 +19,6 @@ package org.jamwiki.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
@@ -144,7 +143,7 @@ public class Topic implements Serializable {
 	 * Set the full topic name, including namespace.  Example: "Help:Help Page".
 	 */
 	public void setName(String name) {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, this.virtualWiki, name);
+		WikiLink wikiLink = new WikiLink(null, this.virtualWiki, name);
 		this.namespace = wikiLink.getNamespace();
 		this.pageName = wikiLink.getArticle();
 	}

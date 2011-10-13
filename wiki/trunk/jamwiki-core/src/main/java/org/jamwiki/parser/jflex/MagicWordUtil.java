@@ -419,7 +419,7 @@ public class MagicWordUtil {
 		if (magicWordArgumentArray.length > 0 && !StringUtils.isBlank(magicWordArgumentArray[0])) {
 			topic = magicWordArgumentArray[0];
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), topic);
+		WikiLink wikiLink = new WikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), topic);
 		if (name.equals(MAGIC_FULL_PAGE_NAME)) {
 			return topic;
 		}
@@ -473,7 +473,7 @@ public class MagicWordUtil {
 		if (magicWordArgumentArray.length > 0 && !StringUtils.isBlank(magicWordArgumentArray[0])) {
 			topic = magicWordArgumentArray[0];
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), topic);
+		WikiLink wikiLink = new WikiLink(parserInput.getContext(), parserInput.getVirtualWiki(), topic);
 		if (name.equals(MAGIC_NAMESPACE)) {
 			return wikiLink.getNamespace().getLabel(parserInput.getVirtualWiki());
 		}

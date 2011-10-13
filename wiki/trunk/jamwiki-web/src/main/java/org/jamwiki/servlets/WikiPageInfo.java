@@ -32,7 +32,6 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
-import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -604,7 +603,7 @@ public class WikiPageInfo {
 	 *  user page, otherwise <code>false</code>.
 	 */
 	public boolean isUserPage() {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, this.virtualWikiName, this.getTopicName());
+		WikiLink wikiLink = new WikiLink(null, this.virtualWikiName, this.getTopicName());
 		return (wikiLink.getNamespace().getId().equals(Namespace.USER_ID) || wikiLink.getNamespace().getId().equals(Namespace.USER_COMMENTS_ID));
 	}
 }

@@ -69,12 +69,16 @@ public class WikiLink {
 	 * @param destination The topic that this link points to, including
 	 *  the namespace.  May  be <code>null</code> if (for example) this
 	 *  link is to a section within the current article of the form
-	 *  "#Section".
+	 *  "#Section".  If this value is not <code>null</code> then it must be
+	 *  clean - if it is prefixed with a virtual wiki, has a query string,
+	 *  is encoded, or otherwise requires additional processing then this
+	 *  method will not perform as expected.
 	 */
 	public WikiLink(String contextPath, String virtualWiki, String destination) {
 		this.contextPath = contextPath;
 		this.virtualWiki = virtualWiki;
 		this.destination = destination;
+		this.initialize(this.getDestination());
 	}
 
 	/**
@@ -92,6 +96,31 @@ public class WikiLink {
 		this.section = wikiLink.section;
 		this.text = wikiLink.text;
 		this.virtualWiki = wikiLink.virtualWiki;
+	}
+
+	/**
+	 * Set the namespace and article fields for this wiki link based on the destination
+	 * value.  Note that the destination must be clean - if it is prefixed with a
+	 * virtual wiki, has a query string, is encoded, or otherwise requires additional
+	 * processing then this method will not perform as expected.
+	 *
+	 * @throws IllegalStateException Thrown if a data access error occurs, which could
+	 *  indicate a database failure or other system problem.
+	 */
+	protected void initialize(String destination) throws IllegalStateException {
+		String virtualWiki = (this.getAltVirtualWiki() == null) ? this.getVirtualWiki() : this.getAltVirtualWiki().getName();
+		if (destination == null || virtualWiki == null) {
+			logger.warn("Cannot call WikiLink.initialize() with null destination or virtual wiki");
+			return;
+		}
+		Namespace namespace = LinkUtil.retrieveTopicNamespace(virtualWiki, destination);
+		String article = destination;
+		if (namespace.getId() != Namespace.MAIN_ID) {
+			int prefixPosition = LinkUtil.prefixPosition(destination);
+			article = destination.substring(prefixPosition + Namespace.SEPARATOR.length()).trim();
+		}
+		this.setNamespace(namespace);
+		this.setArticle(article);
 	}
 
 	/**

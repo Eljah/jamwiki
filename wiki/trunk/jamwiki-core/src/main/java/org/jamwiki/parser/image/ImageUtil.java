@@ -196,7 +196,7 @@ public abstract class ImageUtil {
 				// no link set, link to the image topic page.  At this point we have validated
 				// that the link is an image, so do not perform further validation and link to the
 				// CURRENT virtual wiki, even if it is a shared image
-				WikiLink wikiLink = LinkUtil.parseWikiLink(context, linkVirtualWiki, topicName);
+				WikiLink wikiLink = new WikiLink(context, linkVirtualWiki, topicName);
 				String link = wikiLink.toRelativeUrl();
 				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
 				html.append(imageHtml);
@@ -315,7 +315,8 @@ public abstract class ImageUtil {
 	 *
 	 */
 	private static String buildUploadLink(String context, String virtualWiki, String topicName) throws DataAccessException {
-		WikiLink uploadLink = LinkUtil.parseWikiLink(context, virtualWiki, "Special:Upload?topic=" + Utilities.encodeAndEscapeTopicName(topicName));
+		WikiLink uploadLink = new WikiLink(context, virtualWiki, "Special:Upload");
+		uploadLink.setQuery("?topic=" + Utilities.encodeAndEscapeTopicName(topicName));
 		return LinkUtil.buildInternalLinkHtml(uploadLink, topicName, "edit", null, true);
 	}
 

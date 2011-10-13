@@ -43,7 +43,6 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicVersion;
-import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -179,7 +178,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	 */
 	private void initCurrentTopic(String topicName) throws SAXException {
 		topicName = convertArticleNameFromWikipediaToJAMWiki(topicName);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, this.virtualWiki, topicName);
+		WikiLink wikiLink = new WikiLink(null, this.virtualWiki, topicName);
 		Topic existingTopic = null;
 		try {
 			existingTopic = WikiBase.getDataHandler().lookupTopic(this.virtualWiki, topicName, false);

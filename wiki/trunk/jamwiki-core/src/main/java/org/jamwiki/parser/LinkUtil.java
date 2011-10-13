@@ -276,7 +276,7 @@ public abstract class LinkUtil {
 		if (StringUtils.isBlank(name)) {
 			throw new IllegalArgumentException("Topic name must not be empty in extractCommentsLink");
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, virtualWiki, name);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, name);
 		Namespace commentsNamespace = null;
 		try {
 			commentsNamespace = Namespace.findCommentsNamespace(wikiLink.getNamespace());
@@ -303,7 +303,7 @@ public abstract class LinkUtil {
 		if (StringUtils.isBlank(name)) {
 			throw new IllegalArgumentException("Topic name must not be empty in extractTopicLink");
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, virtualWiki, name);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, name);
 		Namespace mainNamespace = Namespace.findMainNamespace(wikiLink.getNamespace());
 		if (mainNamespace == null) {
 			throw new IllegalArgumentException("Topic " + name + " does not have a main namespace");
@@ -393,7 +393,7 @@ public abstract class LinkUtil {
 	 *  otherwise.
 	 */
 	public static boolean isCommentsPage(String virtualWiki, String topicName) {
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, virtualWiki, topicName);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, topicName);
 		if (wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
 			return false;
 		}
@@ -448,7 +448,7 @@ public abstract class LinkUtil {
 	/**
 	 *
 	 */
-	private static int prefixPosition(String topicName) {
+	protected static int prefixPosition(String topicName) {
 		int prefixPosition = topicName.indexOf(Namespace.SEPARATOR, 1);
 		// if a match is found and it's not the last character of the name, it's a prefix.
 		return (prefixPosition != -1 && (prefixPosition + 1) < topicName.length()) ? prefixPosition : -1;
@@ -522,7 +522,9 @@ public abstract class LinkUtil {
 			virtualWiki = wikiLink.getAltVirtualWiki().getName();
 		}
 		wikiLink.setText(processed);
-		topic = LinkUtil.processNamespace(virtualWiki, topic, wikiLink);
+		// set namespace & article
+		wikiLink.initialize(processed);
+		topic = wikiLink.getArticle();
 		if (!wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID)) {
 			// store the display name WITH any extra spaces
 			wikiLink.setText(processed);
@@ -594,20 +596,6 @@ public abstract class LinkUtil {
 	}
 
 	/**
-	 *
-	 */
-	private static String processNamespace(String virtualWiki, String processed, WikiLink wikiLink) {
-		wikiLink.setNamespace(LinkUtil.retrieveTopicNamespace(virtualWiki, processed));
-		if (wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID)) {
-			return processed;
-		} else {
-			// remove the namespace
-			int prefixPosition = LinkUtil.prefixPosition(processed);
-			return processed.substring(prefixPosition + Namespace.SEPARATOR.length()).trim();
-		}
-	}
-
-	/**
 	 * Utility method for determining a topic namespace given a topic name.  This method
 	 * accepts ONLY the topic name - if the topic name is prefixed with a virtual wiki,
 	 * interwiki, or other value then it will not return the proper namespace.
@@ -631,8 +619,7 @@ public abstract class LinkUtil {
 	 * Utility method for determining a topic's page name given its namespace and full
 	 * topic name.
 	 *
-	 * @param namespace The namespace for the topic name.  Use LinkUtil.retrieveTopicNamespace
-	 *  to retrieve the namespace prior to calling this method if necessary.
+	 * @param namespace The namespace for the topic name.
 	 * @param virtualWiki The virtual wiki for the topic.
 	 * @param topicName The full topic name that is being split.
 	 * @return The pageName portion of the topic name.  If the topic is "Comments:Main Page"
@@ -673,7 +660,7 @@ public abstract class LinkUtil {
 		if (!allowSpecial && PseudoTopicHandler.isPseudoTopic(name)) {
 			throw new WikiException(new WikiMessage("common.exception.pseudotopic", name));
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, virtualWiki, name);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, name);
 		String article = StringUtils.trimToNull(wikiLink.getArticle());
 		if (StringUtils.startsWith(article, "/")) {
 			throw new WikiException(new WikiMessage("common.exception.name", name));

@@ -33,7 +33,6 @@ import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiDiff;
 import org.jamwiki.model.WikiUser;
-import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
@@ -159,7 +158,7 @@ public class EditServlet extends JAMWikiServlet {
 		ParserOutput parserOutput = ParserUtil.parseMetadata(parserInput, contents);
 		pageInfo.setPageTitle(new WikiMessage("edit.title", ((parserOutput.getPageTitle() != null) ? parserOutput.getPageTitle() : topicName)));
 		pageInfo.setTopicName(topicName);
-		WikiLink wikiLink = LinkUtil.parseWikiLink(request.getContextPath(), virtualWiki, topicName);
+		WikiLink wikiLink = new WikiLink(request.getContextPath(), virtualWiki, topicName);
 		if (wikiLink.getNamespace().getId().equals(Namespace.CATEGORY_ID)) {
 			ServletUtil.loadCategoryContent(request, next, virtualWiki, topicName);
 		}
