@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
+import org.jamwiki.ImageData;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -243,6 +244,12 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_UPDATE_VIRTUAL_WIKI = null;
 	protected static String STATEMENT_UPDATE_WIKI_FILE = null;
 	protected static String STATEMENT_UPDATE_WIKI_USER = null;
+	protected static String STATEMENT_CREATE_IMAGE_TABLE = null;
+	protected static String STATEMENT_DROP_IMAGE_TABLE = null;
+	protected static String STATEMENT_INSERT_IMAGE = null;
+	protected static String STATEMENT_DELETE_IMAGE = null;
+	protected static String STATEMENT_SELECT_IMAGE_INFO = null;
+	protected static String STATEMENT_SELECT_IMAGE_DATA = null;
 	private Properties props = null;
 
 	/**
@@ -321,6 +328,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_INTERWIKI_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_CONFIGURATION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_BLOCK_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_IMAGE_TABLE, conn);
 	}
 
 	/**
@@ -475,6 +483,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		// catch errors that might result from a partial failure during install.  also
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
+		try {
+			DatabaseConnection.executeUpdate(STATEMENT_DROP_IMAGE_TABLE, conn);
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
 		} catch (SQLException e) { logger.error(e.getMessage()); }
@@ -1357,6 +1368,12 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_UPDATE_VIRTUAL_WIKI            = props.getProperty("STATEMENT_UPDATE_VIRTUAL_WIKI");
 		STATEMENT_UPDATE_WIKI_FILE               = props.getProperty("STATEMENT_UPDATE_WIKI_FILE");
 		STATEMENT_UPDATE_WIKI_USER               = props.getProperty("STATEMENT_UPDATE_WIKI_USER");
+		STATEMENT_CREATE_IMAGE_TABLE             = props.getProperty("STATEMENT_CREATE_IMAGE_TABLE");
+		STATEMENT_DROP_IMAGE_TABLE               = props.getProperty("STATEMENT_DROP_IMAGE_TABLE");
+		STATEMENT_INSERT_IMAGE                   = props.getProperty("STATEMENT_INSERT_IMAGE");
+                STATEMENT_DELETE_IMAGE                   = props.getProperty("STATEMENT_DELETE_IMAGE");
+		STATEMENT_SELECT_IMAGE_INFO              = props.getProperty("STATEMENT_SELECT_IMAGE_INFO");
+		STATEMENT_SELECT_IMAGE_DATA              = props.getProperty("STATEMENT_SELECT_IMAGE_DATA");
 	}
 
 	/**
@@ -3394,4 +3411,80 @@ public class AnsiQueryHandler implements QueryHandler {
 			DatabaseConnection.closeStatement(stmt);
 		}
 	}
+	/**
+	 * @see org.jamwiki.db.QueryHandler#writeImage(java.lang.String, org.jamwiki.ImageData, java.sql.Connection)
+         */
+	public void insertImage(String imageName, ImageData imageData, Connection conn) throws SQLException
+        {
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_INSERT_IMAGE);
+			stmt.setString(1, imageName);
+			stmt.setString(2, imageData.mimeType);
+			stmt.setInt   (3, imageData.width);
+			stmt.setInt   (4, imageData.height);
+                        stmt.setBytes (5, imageData.data);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+        }
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#deleteImage(java.lang.String, java.sql.Connection)
+         */
+	public void deleteImage(String imageName, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_DELETE_IMAGE);
+			stmt.setString(1, imageName);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+        }
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#getImageInfo(java.lang.String, java.sql.Connection)
+         */
+        public ImageData getImageInfo(String imageName, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_INFO);
+			stmt.setString(1, imageName);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				return new ImageData(rs.getString(1), rs.getInt(2), rs.getInt(3), null);
+			}
+		} finally {
+		      //DatabaseConnection.closeStatement(stmt);
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+
+                return null;
+        }
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#getImageData(java.lang.String, java.sql.Connection)
+         */
+        public ImageData getImageData(String imageName, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+        		conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA);
+			stmt.setString(1, imageName);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+			        return new ImageData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getBytes(4));
+                        }
+		} finally {
+		      //DatabaseConnection.closeStatement(stmt);
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+
+                return null;
+        }
 }

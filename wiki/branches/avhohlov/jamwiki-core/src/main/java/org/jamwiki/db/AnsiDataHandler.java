@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
+import org.jamwiki.ImageData;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
@@ -2321,4 +2322,72 @@ public class AnsiDataHandler implements DataHandler {
 		WikiCache.addToCache(CACHE_USER_BY_USER_ID, user.getUserId(), user);
 		WikiCache.addToCache(CACHE_USER_BY_USER_NAME, user.getUsername(), user);
 	}
+
+	/**
+	 * @see org.jamwiki.DataHandler#writeImage(java.lang.String, org.jamwiki.ImageData)
+         */
+	public void writeImage(String imageName, ImageData imageData) throws DataAccessException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction();
+			Connection conn = DatabaseConnection.getConnection();
+			this.queryHandler().insertImage(imageName, imageData, conn);
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			throw new DataAccessException(e);
+              //FIXME Why no finally section
+	        }/* finally {
+			DatabaseConnection.closeConnection(conn);
+		}*/
+		DatabaseConnection.commit(status);
+        }
+
+	/**
+	 * @see org.jamwiki.DataHandler#deleteImage(java.lang.String)
+         */
+	public void deleteImage(String imageName) throws DataAccessException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction();
+			Connection conn = DatabaseConnection.getConnection();
+			this.queryHandler().deleteImage(imageName, conn);
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			throw new DataAccessException(e);
+              //FIXME Why no finally section
+	        }/* finally {
+			DatabaseConnection.closeConnection(conn);
+		}*/
+		DatabaseConnection.commit(status);
+        }
+
+	/**
+	 * @see org.jamwiki.DataHandler#getImageInfo(java.lang.String)
+         */
+        public ImageData getImageInfo(String imageName) throws DataAccessException {
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return this.queryHandler().getImageInfo(imageName, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
+        }
+
+	/**
+	 * @see org.jamwiki.DataHandler#getImageData(java.lang.String)
+         */
+        public ImageData getImageData(String imageName) throws DataAccessException {
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return this.queryHandler().getImageData(imageName, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
+        }
 }

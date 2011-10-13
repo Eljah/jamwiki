@@ -1026,4 +1026,34 @@ public interface DataHandler {
 	 * @throws WikiException Thrown if the user information is invalid.
 	 */
 	void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException;
+
+	/**
+         * Add new image or other data to database.
+         *
+	 * @param imageName The name of image.
+         * @param imageData The image and it's arrtibutes to store.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+         */
+	public void writeImage(String imageName, ImageData imageData) throws DataAccessException;
+
+	/**
+	 * @param imageName The name of deleted image.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+         */
+	public void deleteImage(String imageName) throws DataAccessException;
+
+	/**
+	 * @param imageName The name of image.
+         * @return The image info or null if image not found. Result's width and height components must
+         * be negative when data are not an image. Result's data and image components may be null.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+         */
+        public ImageData getImageInfo(String imageName) throws DataAccessException;
+
+	/**
+	 * @param imageName The name of image.
+         * @return The image data or null if image not found. Result's image components may be null.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+         */
+        public ImageData getImageData(String imageName) throws DataAccessException;
 }
