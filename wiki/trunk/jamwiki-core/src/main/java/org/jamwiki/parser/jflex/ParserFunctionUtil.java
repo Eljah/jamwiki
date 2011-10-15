@@ -52,6 +52,7 @@ public abstract class ParserFunctionUtil {
 	private static final String PARSER_FUNCTION_IF = "#if:";
 	private static final String PARSER_FUNCTION_IF_EQUAL = "#ifeq:";
 	private static final String PARSER_FUNCTION_IF_EXIST = "#ifexist:";
+	private static final String PARSER_FUNCTION_IF_EXPR = "#ifexpr:";
 	private static final String PARSER_FUNCTION_LANGUAGE = "#language:";
 	private static final String PARSER_FUNCTION_LOCAL_URL = "localurl:";
 	private static final String PARSER_FUNCTION_LOWER_CASE = "lc:";
@@ -76,6 +77,7 @@ public abstract class ParserFunctionUtil {
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_IF);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_IF_EQUAL);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_IF_EXIST);
+		PARSER_FUNCTIONS.add(PARSER_FUNCTION_IF_EXPR);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_LANGUAGE);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_LOCAL_URL);
 		PARSER_FUNCTIONS.add(PARSER_FUNCTION_LOWER_CASE);
@@ -154,6 +156,9 @@ public abstract class ParserFunctionUtil {
 		}
 		if (parserFunction.equals(PARSER_FUNCTION_IF_EXIST)) {
 			return ParserFunctionUtil.parseIfExist(parserInput, parserOutput, parserFunctionArgumentArray);
+		}
+		if (parserFunction.equals(PARSER_FUNCTION_IF_EXPR)) {
+			return ParserFunctionUtil.parseIfExpr(parserInput, parserOutput, parserFunctionArgumentArray);
 		}
 		if (parserFunction.equals(PARSER_FUNCTION_LANGUAGE)) {
 			return ParserFunctionUtil.parseLanguage(parserInput, parserOutput, parserFunctionArgumentArray);
@@ -291,6 +296,29 @@ public abstract class ParserFunctionUtil {
 		String topicName = Utilities.decodeAndEscapeTopicName(parserFunctionArgumentArray[0], true);
 		// parse to handle any embedded templates
 		if (WikiBase.getDataHandler().lookupTopic(parserInput.getVirtualWiki(), topicName, false) != null) {
+			return (parserFunctionArgumentArray.length >= 2) ? JFlexParserUtil.parseFragment(parserInput, parserOutput, parserFunctionArgumentArray[1], JFlexParser.MODE_TEMPLATE) : "";
+		} else {
+			return (parserFunctionArgumentArray.length >= 3) ? JFlexParserUtil.parseFragment(parserInput, parserOutput, parserFunctionArgumentArray[2], JFlexParser.MODE_TEMPLATE) : "";
+		}
+	}
+
+	/**
+	 * Parse the {{#ifexpr:}} parser function.  Usage: {{#if: expr | true | false}}.
+	 */
+	private static String parseIfExpr(ParserInput parserInput, ParserOutput parserOutput, String[] parserFunctionArgumentArray) throws DataAccessException,  ParserException {
+		String expr = parserFunctionArgumentArray[0];
+		boolean condition = false;
+		if (!StringUtils.isBlank(expr)) {
+			try {
+				condition = (NumberUtils.toDouble(ParserFunctionUtil.evaluateExpression(expr), 0) != 0);
+			} catch (IllegalArgumentException e) {
+				Object[] params = new Object[1];
+				params[0] = e.getMessage();
+				return "<strong class=\"error\">" + Utilities.formatMessage("common.exception.expression", parserInput.getLocale(), params) + "</strong>";
+			}
+		}
+		// parse to handle any embedded templates
+		if (condition) {
 			return (parserFunctionArgumentArray.length >= 2) ? JFlexParserUtil.parseFragment(parserInput, parserOutput, parserFunctionArgumentArray[1], JFlexParser.MODE_TEMPLATE) : "";
 		} else {
 			return (parserFunctionArgumentArray.length >= 3) ? JFlexParserUtil.parseFragment(parserInput, parserOutput, parserFunctionArgumentArray[2], JFlexParser.MODE_TEMPLATE) : "";
