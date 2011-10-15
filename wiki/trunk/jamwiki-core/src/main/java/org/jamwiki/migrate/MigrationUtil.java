@@ -121,7 +121,7 @@ public class MigrationUtil {
 			try {
 				WikiBase.getDataHandler().writeTopic(topic, topicVersion, parserOutput.getCategories(), parserOutput.getLinks());
 			} catch (DataAccessException e) {
-				throw new MigrationException("Data access exception while processing topic " + topic.getName(), e);
+				throw new MigrationException("Data access exception while processing topic " + virtualWiki + ':' + topic.getName(), e);
 			}
 			successfulImports.add(topic.getName());
 		}

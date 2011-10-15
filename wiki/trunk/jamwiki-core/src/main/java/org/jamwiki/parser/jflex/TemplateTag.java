@@ -97,7 +97,7 @@ public class TemplateTag implements JFlexParserTag {
 		try {
 			return this.parseTemplateOutput(lexer.getParserInput(), lexer.getParserOutput(), lexer.getMode(), raw, true);
 		} catch (ExcessiveNestingException e) {
-			logger.warn("Excessive template nesting in topic " + lexer.getParserInput().getTopicName());
+			logger.warn("Excessive template nesting in topic " + lexer.getParserInput().getVirtualWiki() + ':' + lexer.getParserInput().getTopicName());
 			// convert to a link so that the user can fix the template
 			WikiLink wikiLink = this.parseTemplateName(lexer.getParserInput(), lexer.getParserOutput(), templateContent);
 			String templateName = wikiLink.getDestination();
@@ -121,7 +121,7 @@ public class TemplateTag implements JFlexParserTag {
 		parserInput.incrementTemplateDepth();
 		if (parserInput.getTemplateDepth() > Environment.getIntValue(Environment.PROP_PARSER_MAX_TEMPLATE_DEPTH)) {
 			parserInput.decrementTemplateDepth();
-			throw new ExcessiveNestingException("Potentially infinite parsing loop - over " + parserInput.getTemplateDepth() + " template inclusions while parsing topic " + parserInput.getTopicName());
+			throw new ExcessiveNestingException("Potentially infinite parsing loop - over " + parserInput.getTemplateDepth() + " template inclusions while parsing topic " + parserInput.getVirtualWiki() + ':' + parserInput.getTopicName());
 		}
 		// check for magic word or parser function
 		String[] magicWordInfo = MagicWordUtil.parseMagicWordInfo(templateContent);
@@ -405,7 +405,7 @@ public class TemplateTag implements JFlexParserTag {
 		// FIXME - disable section editing
 		int inclusion = (parserInput.getTempParams().get(TEMPLATE_INCLUSION) == null) ? 1 : (Integer)parserInput.getTempParams().get(TEMPLATE_INCLUSION) + 1;
 		if (inclusion > Environment.getIntValue(Environment.PROP_PARSER_MAX_INCLUSIONS)) {
-			throw new ExcessiveNestingException("Potentially infinite inclusions - over " + inclusion + " template inclusions while parsing topic " + parserInput.getTopicName());
+			throw new ExcessiveNestingException("Potentially infinite inclusions - over " + inclusion + " template inclusions while parsing topic " + parserInput.getVirtualWiki() + ':' + parserInput.getTopicName());
 		}
 		parserInput.getTempParams().put(TEMPLATE_INCLUSION, inclusion);
 		return this.processTemplateContent(parserInput, parserOutput, templateTopic, templateContent);

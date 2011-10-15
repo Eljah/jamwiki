@@ -284,7 +284,7 @@ public abstract class LinkUtil {
 			throw new IllegalStateException("Database error while retrieving comments namespace", e);
 		}
 		if (commentsNamespace == null) {
-			throw new IllegalArgumentException("Topic " + name + " does not have a comments namespace");
+			throw new IllegalArgumentException("Topic " + virtualWiki + ':' + name + " does not have a comments namespace");
 		}
 		return (!StringUtils.isBlank(commentsNamespace.getLabel(virtualWiki))) ? commentsNamespace.getLabel(virtualWiki) + Namespace.SEPARATOR + wikiLink.getArticle() : wikiLink.getArticle();
 	}
@@ -306,7 +306,7 @@ public abstract class LinkUtil {
 		WikiLink wikiLink = new WikiLink(null, virtualWiki, name);
 		Namespace mainNamespace = Namespace.findMainNamespace(wikiLink.getNamespace());
 		if (mainNamespace == null) {
-			throw new IllegalArgumentException("Topic " + name + " does not have a main namespace");
+			throw new IllegalArgumentException("Topic " + virtualWiki + ':' + name + " does not have a main namespace");
 		}
 		return (!StringUtils.isBlank(mainNamespace.getLabel(virtualWiki))) ? mainNamespace.getLabel(virtualWiki) + Namespace.SEPARATOR + wikiLink.getArticle() : wikiLink.getArticle();
 	}
@@ -326,7 +326,7 @@ public abstract class LinkUtil {
 		int count = attempts;
 		String target = parent.getRedirectTo();
 		if (parent.getTopicType() != TopicType.REDIRECT || StringUtils.isBlank(target)) {
-			logger.error("getRedirectTarget() called for non-redirect topic " + parent.getName());
+			logger.error("getRedirectTarget() called for non-redirect topic " + parent.getVirtualWiki() + ':' + parent.getName());
 			return parent;
 		}
 		// avoid infinite redirection

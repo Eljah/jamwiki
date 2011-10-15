@@ -95,7 +95,7 @@ public class JFlexParser extends AbstractParser {
 			result = lexer.lex();
 		} catch (Exception e) {
 			this.parserInput.decrementDepth();
-			throw new ParserException("Failure while parsing topic " + this.parserInput.getTopicName(), e);
+			throw new ParserException("Failure while parsing topic " + this.parserInput.getVirtualWiki() + ':' + this.parserInput.getTopicName(), e);
 		}
 		this.parserInput.decrementDepth();
 		return result;

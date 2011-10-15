@@ -178,7 +178,7 @@ public class ParserInput {
 		// avoid infinite loops
 		if ((this.getDepth() + 1) >= Environment.getIntValue(Environment.PROP_PARSER_MAX_PARSER_ITERATIONS)) {
 			this.infiniteLoopCount++;
-			throw new ExcessiveNestingException("Potential infinite parsing loop - over " + this.getDepth() + " parser iterations while parsing topic " + this.getTopicName());
+			throw new ExcessiveNestingException("Potential infinite parsing loop - over " + this.getDepth() + " parser iterations while parsing topic " + this.getVirtualWiki() + ':' + this.getTopicName());
 		}
 		this.depth++;
 	}

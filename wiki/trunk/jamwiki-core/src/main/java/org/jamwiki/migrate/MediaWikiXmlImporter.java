@@ -183,7 +183,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 		try {
 			existingTopic = WikiBase.getDataHandler().lookupTopic(this.virtualWiki, topicName, false);
 		} catch (DataAccessException e) {
-			throw new SAXException("Failure while validating topic name: " + topicName, e);
+			throw new SAXException("Failure while validating topic name: " + this.virtualWiki + ':' + topicName, e);
 		}
 		if (existingTopic != null && existingTopic.getVirtualWiki().equals(this.virtualWiki)) {
 			// do a second comparison of capitalized topic names in a case-sensitive way
@@ -194,7 +194,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 			if (StringUtils.equals(existingTopicName, importTopicName)) {
 				// FIXME - update so that this merges any new versions instead of throwing an error
 				WikiException e = new WikiException(new WikiMessage("import.error.topicexists", topicName));
-				throw new SAXException("Topic " + topicName + " already exists and cannot be imported", e);
+				throw new SAXException("Topic " + this.virtualWiki + ':' + topicName + " already exists and cannot be imported", e);
 			}
 		}
 		this.currentTopic = new Topic(this.virtualWiki, topicName);

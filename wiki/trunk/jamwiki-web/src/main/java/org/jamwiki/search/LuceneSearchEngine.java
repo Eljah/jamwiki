@@ -233,7 +233,7 @@ public class LuceneSearchEngine implements SearchEngine {
 				logger.debug("Delete from search index for topic " + topic.getVirtualWiki() + " / " + topic.getName() + " in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
 			}
 		} catch (Exception e) {
-			logger.error("Exception while adding topic " + topic.getName(), e);
+			logger.error("Exception while adding topic " + topic.getVirtualWiki() + ':' + topic.getName(), e);
 		}
 	}
 

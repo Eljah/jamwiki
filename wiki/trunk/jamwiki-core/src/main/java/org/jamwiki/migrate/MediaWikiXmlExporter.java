@@ -152,7 +152,7 @@ public class MediaWikiXmlExporter implements TopicExporter {
 			topicVersionIds = new ArrayList<Integer>();
 			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
 			if (topic == null) {
-				throw new MigrationException("Failure while exporting: topic " + topicName + " does not exist");
+				throw new MigrationException("Failure while exporting: topic " + virtualWiki + ':' + topicName + " does not exist");
 			}
 			writer.append("\n<page>");
 			writer.append('\n');
