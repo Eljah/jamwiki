@@ -423,7 +423,7 @@ public abstract class LinkUtil {
 		if (StringUtils.isBlank(virtualWiki) || StringUtils.isBlank(articleName)) {
 			return null;
 		}
-		WikiLink wikiLink = LinkUtil.parseWikiLink(null, virtualWiki, articleName);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, articleName);
 		if (PseudoTopicHandler.isPseudoTopic(wikiLink.getDestination())) {
 			return articleName;
 		}

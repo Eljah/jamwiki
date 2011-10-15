@@ -115,11 +115,9 @@ public class JAMWikiModel extends AbstractWikiModel {
 	public void appendInternalLink(String topic, String hashSection, String topicDescription, String cssClass, boolean parseRecursive) {
 		try {
 			String virtualWiki = fParserInput.getVirtualWiki();
-			WikiLink wikiLink;
+			WikiLink wikiLink = new WikiLink(fContextPath, virtualWiki, topic);
 			if (hashSection != null) {
-				wikiLink = LinkUtil.parseWikiLink(fContextPath, virtualWiki, topic + "#" + hashSection);
-			} else {
-				wikiLink = LinkUtil.parseWikiLink(fContextPath, virtualWiki, topic);
+				wikiLink.setSection(hashSection);
 			}
 			String destination = wikiLink.getDestination();
 			String section = wikiLink.getSection();
