@@ -24,11 +24,11 @@ import java.awt.image.BufferedImage;
 public class ImageData {
 	public String	mimeType;
 
-	public int	   width;
+	public int	width;
 
-	public int	   height;
+	public int	height;
 
-	public byte	  data[];
+	public byte	data[];
 
 	/**
 	 * For temporary storing of converted data.
