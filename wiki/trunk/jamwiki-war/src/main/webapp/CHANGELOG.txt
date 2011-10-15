@@ -45,7 +45,9 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated Japanese translations (nattolover).
+  * Updated Portugese (Brazilian) translations (leokury).
+  * Updated Russian translations (shar).
 
 
 1.1.1
