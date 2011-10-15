@@ -244,8 +244,8 @@ public abstract class ImageUtil {
 			return currentUrl;
 		}
 	      //String path = FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl);
-              //FIXME Check for first slash
-              //String path = "/" + (isImagesOnFS() ? FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl) : (RESIZED_IMAGE_SUBFOLDER + currentUrl));
+	      //FIXME Check for first slash
+	      //String path = "/" + (isImagesOnFS() ? FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl) : (RESIZED_IMAGE_SUBFOLDER + currentUrl));
 		String path = (isImagesOnFS() ? FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl) : ("/" + RESIZED_IMAGE_SUBFOLDER + currentUrl));
 		String dimensionInfo = "-" + scaledWidth + "px";
 		int pos = path.lastIndexOf('.');
@@ -341,11 +341,11 @@ public abstract class ImageUtil {
 	 * the max width height are 200, and the increment is 400, the result is 400x200.
 	 */
 	private static Dimension calculateIncrementalDimensions(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions) throws IOException {
-                if (isImagesOnFS()) {
-                        return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, scaledDimensions);
-                } else {
-                        return calculateIncrementalDimensionsForImageBlob(wikiImage, originalDimensions, scaledDimensions);
-                }
+		if (isImagesOnFS()) {
+			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, scaledDimensions);
+		} else {
+			return calculateIncrementalDimensionsForImageBlob(wikiImage, originalDimensions, scaledDimensions);
+		}
 	}
 
 	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions) throws IOException {
@@ -383,27 +383,27 @@ public abstract class ImageUtil {
 		int incrementalHeight = (int)Math.round(((double)incrementalWidth / (double)originalDimensions.getWidth()) * (double)originalDimensions.getHeight());
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		String newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), incrementalWidth);
-                Dimension d1  = ImageProcessor.retrieveImageDimensions(newUrl);
-                if       (d1 != null)
-                {
-                        return d1;
-                }
+		Dimension d1  = ImageProcessor.retrieveImageDimensions(newUrl);
+		if       (d1 != null)
+		{
+			return d1;
+		}
 		// otherwise generate a scaled instance
-                ImageData imageData = ImageProcessor.resizeImage(wikiImage.getUrl(), incrementalWidth, incrementalHeight);
-                newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), imageData.width);
-              //TODO Need?
-                Dimension d2  = ImageProcessor.retrieveImageDimensions(newUrl);
-                if       (d2 != null)
-                {
-                        return d2;
-                }
-              //FIXME Remove
-              /*try {
-                        Thread.sleep(3000);
-                } catch (InterruptedException e) {}*/
-                ImageProcessor.saveImage(imageData, newUrl);
+		ImageData imageData = ImageProcessor.resizeImage(wikiImage.getUrl(), incrementalWidth, incrementalHeight);
+		newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), imageData.width);
+	      //TODO Need?
+		Dimension d2  = ImageProcessor.retrieveImageDimensions(newUrl);
+		if       (d2 != null)
+		{
+			return d2;
+		}
+	      //FIXME Remove
+	      /*try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {}*/
+		ImageProcessor.saveImage(imageData, newUrl);
 		return new Dimension(imageData.width, imageData.height);
-        }
+	}
 
 	/**
 	 * Determine the scaled dimensions, given a max width and height.  For example, if
@@ -474,12 +474,12 @@ public abstract class ImageUtil {
 		String year = Integer.toString(cal.get(Calendar.YEAR));
 		String month = Integer.toString(cal.get(Calendar.MONTH) + 1);
 		String subdirectory = "/" + virtualWiki + "/" + year + "/" + month;
-                if (isImagesOnFS()) {
-        	        File directory = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), subdirectory);
-	        	if (!directory.exists() && !directory.mkdirs()) {
-	        		throw new WikiException(new WikiMessage("upload.error.directorycreate", directory.getAbsolutePath()));
-	        	}
-                }
+		if (isImagesOnFS()) {
+			File directory = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), subdirectory);
+			if (!directory.exists() && !directory.mkdirs()) {
+				throw new WikiException(new WikiMessage("upload.error.directorycreate", directory.getAbsolutePath()));
+			}
+		}
 		return subdirectory + "/" + url;
 	}
 
@@ -515,12 +515,12 @@ public abstract class ImageUtil {
 		// get the size of the original (unresized) image
 		Dimension originalDimensions = ImageUtil.retrieveFromCache(wikiImage);
 		if (originalDimensions == null) {
-                        if (isImagesOnFS()) {
-        		        File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
-	        	        originalDimensions = ImageProcessor.retrieveImageDimensions(file);
-                        } else {
-                                originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getUrl());
-                        }
+			if (isImagesOnFS()) {
+				File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
+				originalDimensions = ImageProcessor.retrieveImageDimensions(file);
+			} else {
+				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getUrl());
+			}
 			if (originalDimensions == null) {
 				logger.info("Unable to determine dimensions for image: " + wikiImage.getUrl());
 				return null;
@@ -595,7 +595,7 @@ public abstract class ImageUtil {
 	 * @param name The object name that is being examined.
 	 * @return Returns <code>true</code> if the object is an image object.
 	 */
-        public static boolean isImage(String name) {
+	public static boolean isImage(String name) {
 		try {
 			return (ImageProcessor.retrieveImageDimensions(name) != null);
 		} catch (IOException x) {
@@ -697,22 +697,22 @@ public abstract class ImageUtil {
 		return wikiFile;
 	}
 
-        /**
-         * @return <code>true</code> if images are stored on file system and <code>false</code> if in database.
-         */
-        public static boolean isImagesOnFS() {
-                String  fileDir  = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
+	/**
+	 * @return <code>true</code> if images are stored on file system and <code>false</code> if in database.
+	 */
+	public static boolean isImagesOnFS() {
+		String  fileDir  = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
 	      //FIXME Remove and correct return expression
 		logger.warn((fileDir == null) ? ("fileDir is null") : ("fileDir is not null [" + fileDir + "]"));
-                return (fileDir != null && !fileDir.isEmpty());
-        }
+		return (fileDir != null && !fileDir.isEmpty());
+	}
 
-        /**
-         * FIXME Works only if war file name corresponds to environment properties.
-         *
-         * @return ImageServlet URL.
-         */
+	/**
+	 * FIXME Works only if war file name corresponds to environment properties.
+	 *
+	 * @return ImageServlet URL.
+	 */
 	public static String getImageServletUrl() {
-                return "/" + Environment.getValue(Environment.PROP_SITE_NAME).toLowerCase() + "-" + Environment.getValue(Environment.PROP_BASE_WIKI_VERSION) + "/" + Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT) + "/Special:Image?url=";
+		return "/" + Environment.getValue(Environment.PROP_SITE_NAME).toLowerCase() + "-" + Environment.getValue(Environment.PROP_BASE_WIKI_VERSION) + "/" + Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT) + "/Special:Image?url=";
 	}
 }

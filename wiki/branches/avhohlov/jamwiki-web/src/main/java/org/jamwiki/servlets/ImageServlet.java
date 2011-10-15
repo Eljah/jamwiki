@@ -32,26 +32,26 @@ import org.jamwiki.WikiBase;
  * Get image requests handler.
  */
 public class ImageServlet extends JAMWikiServlet {
-        protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
-                ImageData imageData;
+	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
+		ImageData imageData;
 
-                try
-                {
-                        String imageName = request.getParameter("url");
-                        imageData = WikiBase.getDataHandler().getImageData(imageName);
-                }
-                catch (DataAccessException dae)
-                {
-                        throw new ServletException(dae);
-                }
+		try
+		{
+			String imageName = request.getParameter("url");
+			imageData = WikiBase.getDataHandler().getImageData(imageName);
+		}
+		catch (DataAccessException dae)
+		{
+			throw new ServletException(dae);
+		}
 
-                response.setContentType  (imageData.mimeType);
-                response.setContentLength(imageData.data.length);
-                OutputStream os = response.getOutputStream();
-                os.write(imageData.data);
-                os.close();
+		response.setContentType  (imageData.mimeType);
+		response.setContentLength(imageData.data.length);
+		OutputStream os = response.getOutputStream();
+		os.write(imageData.data);
+		os.close();
 
-                return null;
-        } 
+		return null;
+	} 
 }
 

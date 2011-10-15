@@ -22,23 +22,23 @@ import java.awt.image.BufferedImage;
  * Class for image and other data storing and loading.
  */
 public class ImageData {
-        public String        mimeType;
+	public String	mimeType;
 
-        public int           width;
+	public int	   width;
 
-        public int           height;
+	public int	   height;
 
-        public byte          data[];
+	public byte	  data[];
 
-        /**
-         * For temporary storing of converted data.
-         */
-        public BufferedImage image;
+	/**
+	 * For temporary storing of converted data.
+	 */
+	public BufferedImage image;
 
-        public ImageData(String mimeType, int width, int height, byte data[]) {
-                this.mimeType = mimeType;
-                this.width    = width;
-                this.height   = height;
-                this.data     = data;
-        }
+	public ImageData(String mimeType, int width, int height, byte data[]) {
+		this.mimeType = mimeType;
+		this.width    = width;
+		this.height   = height;
+		this.data     = data;
+	}
 }

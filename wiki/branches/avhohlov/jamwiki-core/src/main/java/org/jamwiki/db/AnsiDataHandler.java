@@ -2325,7 +2325,7 @@ public class AnsiDataHandler implements DataHandler {
 
 	/**
 	 * @see org.jamwiki.DataHandler#writeImage(java.lang.String, org.jamwiki.ImageData)
-         */
+	 */
 	public void writeImage(String imageName, ImageData imageData) throws DataAccessException {
 		TransactionStatus status = null;
 		try {
@@ -2335,16 +2335,16 @@ public class AnsiDataHandler implements DataHandler {
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
-              //FIXME Why no finally section
-	        }/* finally {
+	      //FIXME Why no finally section
+		}/* finally {
 			DatabaseConnection.closeConnection(conn);
 		}*/
 		DatabaseConnection.commit(status);
-        }
+	}
 
 	/**
 	 * @see org.jamwiki.DataHandler#deleteImage(java.lang.String)
-         */
+	 */
 	public void deleteImage(String imageName) throws DataAccessException {
 		TransactionStatus status = null;
 		try {
@@ -2354,17 +2354,17 @@ public class AnsiDataHandler implements DataHandler {
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
-              //FIXME Why no finally section
-	        }/* finally {
+	      //FIXME Why no finally section
+		}/* finally {
 			DatabaseConnection.closeConnection(conn);
 		}*/
 		DatabaseConnection.commit(status);
-        }
+	}
 
 	/**
 	 * @see org.jamwiki.DataHandler#getImageInfo(java.lang.String)
-         */
-        public ImageData getImageInfo(String imageName) throws DataAccessException {
+	 */
+	public ImageData getImageInfo(String imageName) throws DataAccessException {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -2374,12 +2374,12 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-        }
+	}
 
 	/**
 	 * @see org.jamwiki.DataHandler#getImageData(java.lang.String)
-         */
-        public ImageData getImageData(String imageName) throws DataAccessException {
+	 */
+	public ImageData getImageData(String imageName) throws DataAccessException {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -2389,5 +2389,5 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-        }
+	}
 }

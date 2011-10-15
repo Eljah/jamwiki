@@ -92,22 +92,22 @@ public class ImageProcessor {
 	 * Given a image name, return a
 	 * ImageData object.
 	 */
-        private static ImageData loadImage(String imageName) throws IOException {
-                ImageData imageData = null;
+	private static ImageData loadImage(String imageName) throws IOException {
+		ImageData imageData = null;
 
-                try {
-                        imageData = WikiBase.getDataHandler().getImageData(imageName);
-                } catch (DataAccessException dae) {
-                        throw new IOException(dae);
-                }
+		try {
+			imageData = WikiBase.getDataHandler().getImageData(imageName);
+		} catch (DataAccessException dae) {
+			throw new IOException(dae);
+		}
 
-                if (imageData == null) {
-                        throw new FileNotFoundException("Image does not exist: " + imageName);
-                }
+		if (imageData == null) {
+			throw new FileNotFoundException("Image does not exist: " + imageName);
+		}
 
-                imageData.image = ImageIO.read(new ByteArrayInputStream(imageData.data));
+		imageData.image = ImageIO.read(new ByteArrayInputStream(imageData.data));
 
-                return imageData;
+		return imageData;
 	}
 
 	/**
@@ -169,9 +169,9 @@ public class ImageProcessor {
 	 * @param targetHeight the desired height of the scaled instance in pixels.
 	 * @return a scaled version of the original {@code BufferedImage}
 	 */
-        public static ImageData resizeImage(String imageName, int targetWidth, int targetHeight) throws IOException {
+	public static ImageData resizeImage(String imageName, int targetWidth, int targetHeight) throws IOException {
 		long start = System.currentTimeMillis();
-                ImageData imageData = ImageProcessor.loadImage(imageName);
+		ImageData imageData = ImageProcessor.loadImage(imageName);
 		BufferedImage tmp = imageData.image;
 		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		int width = tmp.getWidth();
@@ -198,9 +198,9 @@ public class ImageProcessor {
 			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for file: " + imageName;
 			logger.debug(message);
 		}
-                imageData.width  = resized.getWidth ();
-                imageData.height = resized.getHeight();
-                imageData.image  = resized;
+		imageData.width  = resized.getWidth ();
+		imageData.height = resized.getHeight();
+		imageData.image  = resized;
 		return imageData;
 	}
 
@@ -247,20 +247,20 @@ public class ImageProcessor {
 	/**
 	 * Retrieve image dimensions.
 	 */
-        protected static Dimension retrieveImageDimensions(String imageName) throws IOException {
-                ImageData imageData = null;
+	protected static Dimension retrieveImageDimensions(String imageName) throws IOException {
+		ImageData imageData = null;
 
-                try {
-                        imageData = WikiBase.getDataHandler().getImageInfo(imageName);
-                } catch (DataAccessException dae) {
-                        throw new IOException(dae);
-                }
+		try {
+			imageData = WikiBase.getDataHandler().getImageInfo(imageName);
+		} catch (DataAccessException dae) {
+			throw new IOException(dae);
+		}
 
-                if (imageData == null || imageData.width < 0) {
-                        return null;
-                }
+		if (imageData == null || imageData.width < 0) {
+			return null;
+		}
 
-                return new Dimension(imageData.width, imageData.height);
+		return new Dimension(imageData.width, imageData.height);
 	}
 
 	/**
@@ -293,34 +293,34 @@ public class ImageProcessor {
 	/**
 	 * Save an image.
 	 */
-        protected static void saveImage(ImageData imageData, String imageName) throws IOException {
+	protected static void saveImage(ImageData imageData, String imageName) throws IOException {
 	      /*int pos = imageName.lastIndexOf('.');
 		if (pos == -1 || (pos + 1) >= imageName.length()) {
 			throw new IOException("Unknown image file type " + imageName);
 		}
 		String imageType = imageName.substring(pos + 1).toLowerCase();*/
 
-                int pos = imageData.mimeType.lastIndexOf('/');
+		int pos = imageData.mimeType.lastIndexOf('/');
 		if (pos == -1 || (pos + 1) >= imageData.mimeType.length()) {
 			throw new IOException("Unknown image file type " + imageData.mimeType);
 		}
 		String imageType = imageData.mimeType.substring(pos + 1).toLowerCase();
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        	boolean result = ImageIO.write(imageData.image, imageType, baos);		if    (!result) {
+		boolean result = ImageIO.write(imageData.image, imageType, baos);		if    (!result) {
 			throw new IOException("No appropriate writer found when writing image: " + imageName);
 		}
 
-                baos.close();
+		baos.close();
 
-                imageData.data = baos.toByteArray();
+		imageData.data = baos.toByteArray();
 
-                try {
-                        WikiBase.getDataHandler().writeImage(imageName, imageData);
-                } catch (DataAccessException dae) {
-                      //FIXME
-                      //throw new IOException(dae);
-                }
+		try {
+			WikiBase.getDataHandler().writeImage(imageName, imageData);
+		} catch (DataAccessException dae) {
+		      //FIXME
+		      //throw new IOException(dae);
+		}
 	}
 }

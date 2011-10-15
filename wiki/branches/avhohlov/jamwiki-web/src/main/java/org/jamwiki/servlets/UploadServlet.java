@@ -87,12 +87,12 @@ public class UploadServlet extends JAMWikiServlet {
 	 */
 	private void upload(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// FIXME - this method is a mess and needs to be split up.
-                if (ImageUtil.isImagesOnFS()) {
-        	        File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH));
-	        	if (!file.exists()) {
-	        		throw new WikiException(new WikiMessage("upload.error.nodirectory"));
-	        	}
-                }
+		if (ImageUtil.isImagesOnFS()) {
+			File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH));
+			if (!file.exists()) {
+				throw new WikiException(new WikiMessage("upload.error.nodirectory"));
+			}
+		}
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		Iterator iterator = ServletUtil.processMultipartRequest(request, Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE));
 		String filename = null;
@@ -129,87 +129,87 @@ public class UploadServlet extends JAMWikiServlet {
 			fileSize = item.getSize();
 			contentType = item.getContentType();
 
-                        if (ImageUtil.isImagesOnFS()) {
-        		        uploadedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
-                                item.write(uploadedFile);
-        	                isImage = ImageUtil.isImage(uploadedFile);
-                        } else {
-                              //uploadedFile = new File(url);
+			if (ImageUtil.isImagesOnFS()) {
+				uploadedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
+				item.write(uploadedFile);
+				isImage = ImageUtil.isImage(uploadedFile);
+			} else {
+			      //uploadedFile = new File(url);
 
-                                byte buff[]  =  item.get();
-                                int  width   = -1;
-                                int  height  = -1; 
-                                try {
-                       			BufferedImage image = ImageIO.read(new ByteArrayInputStream(buff));
-                                        width  = image.getWidth();
-                                        height = image.getHeight();
-                                } catch (Exception ex) {
-                                        isImage = false;
-                                }
+				byte buff[]  =  item.get();
+				int  width   = -1;
+				int  height  = -1; 
+				try {
+		       			BufferedImage image = ImageIO.read(new ByteArrayInputStream(buff));
+					width  = image.getWidth();
+					height = image.getHeight();
+				} catch (Exception ex) {
+					isImage = false;
+				}
 
-                                WikiBase.getDataHandler().writeImage(url, new ImageData(item.getContentType(), width, height, buff));
-	        	}
-                }
-                if (ImageUtil.isImagesOnFS()) {
-        		if (uploadedFile == null) {
-        			throw new WikiException(new WikiMessage("upload.error.filenotfound"));
-        		}
-        		destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
-        		String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
-        		if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
-        			// delete the spam file
-        			uploadedFile.delete();
-        			this.view(request, next, pageInfo);
-        			next.addObject("contents", contents);
-        			return;
-        		}
-        		if (!StringUtils.isEmpty(destinationFilename)) {
-        			// rename the uploaded file if a destination file name was specified
-        			filename = ImageUtil.sanitizeFilename(destinationFilename);
-        			url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
-        			File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
-        			if (!uploadedFile.renameTo(renamedFile)) {
-        				throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
-        			}
-        		}
-        		String ipAddress = ServletUtil.getIpAddress(request);
-        		WikiUser user = ServletUtil.currentWikiUser();
-        		Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
-        		WikiFileVersion wikiFileVersion = new WikiFileVersion();
-        		wikiFileVersion.setUploadComment(topic.getTopicContent());
-        		ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
-        		ServletUtil.redirect(next, virtualWiki, topicName);
-                } else {
-        	      /*if (uploadedFile == null) {
-        			throw new WikiException(new WikiMessage("upload.error.filenotfound"));
-        		}*/
-        		destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
-        		String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
-                        if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
-        			// delete the spam file
-        		      //uploadedFile.delete();
-                                WikiBase.getDataHandler().deleteImage(url);
-        			this.view(request, next, pageInfo);
-        			next.addObject("contents", contents);
-        			return;
-        		}
-        	      /*if (!StringUtils.isEmpty(destinationFilename)) {
-        			// rename the uploaded file if a destination file name was specified
-        			filename = ImageUtil.sanitizeFilename(destinationFilename);
-        			url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
-        			File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
-        			if (!uploadedFile.renameTo(renamedFile)) {
-        				throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
-        			}
-        		}*/
-        		String ipAddress = ServletUtil.getIpAddress(request);
-        		WikiUser user = ServletUtil.currentWikiUser();
-        		Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
-        		WikiFileVersion wikiFileVersion = new WikiFileVersion();
-        		wikiFileVersion.setUploadComment(topic.getTopicContent());
-        		ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
-        		ServletUtil.redirect(next, virtualWiki, topicName);
-                }
+				WikiBase.getDataHandler().writeImage(url, new ImageData(item.getContentType(), width, height, buff));
+			}
+		}
+		if (ImageUtil.isImagesOnFS()) {
+			if (uploadedFile == null) {
+				throw new WikiException(new WikiMessage("upload.error.filenotfound"));
+			}
+			destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
+			String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
+			if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
+				// delete the spam file
+				uploadedFile.delete();
+				this.view(request, next, pageInfo);
+				next.addObject("contents", contents);
+				return;
+			}
+			if (!StringUtils.isEmpty(destinationFilename)) {
+				// rename the uploaded file if a destination file name was specified
+				filename = ImageUtil.sanitizeFilename(destinationFilename);
+				url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
+				File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
+				if (!uploadedFile.renameTo(renamedFile)) {
+					throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
+				}
+			}
+			String ipAddress = ServletUtil.getIpAddress(request);
+			WikiUser user = ServletUtil.currentWikiUser();
+			Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
+			WikiFileVersion wikiFileVersion = new WikiFileVersion();
+			wikiFileVersion.setUploadComment(topic.getTopicContent());
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
+			ServletUtil.redirect(next, virtualWiki, topicName);
+		} else {
+		      /*if (uploadedFile == null) {
+				throw new WikiException(new WikiMessage("upload.error.filenotfound"));
+			}*/
+			destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
+			String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
+			if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
+				// delete the spam file
+			      //uploadedFile.delete();
+				WikiBase.getDataHandler().deleteImage(url);
+				this.view(request, next, pageInfo);
+				next.addObject("contents", contents);
+				return;
+			}
+		      /*if (!StringUtils.isEmpty(destinationFilename)) {
+				// rename the uploaded file if a destination file name was specified
+				filename = ImageUtil.sanitizeFilename(destinationFilename);
+				url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
+				File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
+				if (!uploadedFile.renameTo(renamedFile)) {
+					throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
+				}
+			}*/
+			String ipAddress = ServletUtil.getIpAddress(request);
+			WikiUser user = ServletUtil.currentWikiUser();
+			Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
+			WikiFileVersion wikiFileVersion = new WikiFileVersion();
+			wikiFileVersion.setUploadComment(topic.getTopicContent());
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
+			ServletUtil.redirect(next, virtualWiki, topicName);
+		}
 	}
 
 	/**

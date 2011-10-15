@@ -1163,41 +1163,41 @@ public interface QueryHandler {
 	void updateWikiUser(WikiUser user, Connection conn) throws SQLException;
 
 	/**
-         * Add new image or other data to database.
-         *
+	 * Add new image or other data to database.
+	 *
 	 * @param imageName The name of image.
-         * @param imageData The image and it's arrtibutes to store.
+	 * @param imageData The image and it's arrtibutes to store.
 	 * @param conn A database connection to use when connecting to the database
-         *  from this method.
+	 *  from this method.
 	 * @throws SQLException Thrown if any error occurs during method execution.
-         */
+	 */
 	public void insertImage(String imageName, ImageData imageData, Connection conn) throws SQLException;
 
 	/**
 	 * @param imageName The name of deleted image.
 	 * @param conn A database connection to use when connecting to the database
-         *  from this method.
+	 *  from this method.
 	 * @throws SQLException Thrown if any error occurs during method execution.
-         */
+	 */
 	public void deleteImage(String imageName, Connection conn) throws SQLException;
 
 	/**
 	 * @param imageName The name of deleted image.
 	 * @param conn A database connection to use when connecting to the database
-         *  from this method.
-         * @return The image info or null if image not found. Result's width and height components must
-         * be negative when data are not an image. Result's data and image components may be null.
+	 *  from this method.
+	 * @return The image info or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's data and image components may be null.
 	 * @throws SQLException Thrown if any error occurs during method execution.
-         */
-        public ImageData getImageInfo(String imageName, Connection conn) throws SQLException;
+	 */
+	public ImageData getImageInfo(String imageName, Connection conn) throws SQLException;
 
 	/**
 	 * @param imageName The name of deleted image.
 	 * @param conn A database connection to use when connecting to the database
-         *  from this method.
-         * @return The image data or null if image not found. Result's width and height components must
-         * be negative when data are not an image. Result's image components may be null.
+	 *  from this method.
+	 * @return The image data or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's image components may be null.
 	 * @throws SQLException Thrown if any error occurs during method execution.
-         */
-        public ImageData getImageData(String imageName, Connection conn) throws SQLException;
+	 */
+	public ImageData getImageData(String imageName, Connection conn) throws SQLException;
 }
