@@ -107,7 +107,7 @@ public class ServletUtil {
 			if (StringUtils.equalsIgnoreCase(virtualWiki.getName(), pageInfo.getVirtualWikiName())) {
 				continue;
 			}
-			String virtualWikiLink = virtualWiki.getName() + Namespace.SEPARATOR + wikiLink.getNamespace().getLabel(virtualWiki.getName()) + Namespace.SEPARATOR + wikiLink.getArticle();
+			String virtualWikiLink = wikiLink.getNamespace().getLabel(virtualWiki.getName()) + Namespace.SEPARATOR + wikiLink.getArticle();
 			wikiLink = new WikiLink(request.getContextPath(), virtualWiki.getName(), virtualWikiLink);
 			String text = virtualWiki.getName() + Namespace.SEPARATOR + wikiLink.getArticle();
 			String url = LinkUtil.buildInternalLinkHtml(wikiLink, text, null, null, false);
