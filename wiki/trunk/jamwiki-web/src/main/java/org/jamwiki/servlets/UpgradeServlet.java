@@ -30,7 +30,10 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.WikiVersion;
 import org.jamwiki.db.DatabaseUpgrades;
 import org.jamwiki.db.WikiDatabase;
+import org.jamwiki.model.Topic;
+import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
@@ -90,6 +93,10 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			// first perform database upgrades
 			this.upgradeDatabase(true, pageInfo.getMessages());
+			// move system topics
+			if (oldVersion.before(1, 2, 0)) {
+				this.renameSystemTopics(request, pageInfo.getMessages());
+			}
 			// upgrade the search index if required & possible
 			this.upgradeSearchIndex(true, pageInfo.getMessages());
 			// refresh topic metadata if needed
@@ -164,6 +171,53 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private void renameSystemTopic(HttpServletRequest request, List<WikiMessage> messages, String virtualWiki, String fromTopicName, String toTopicName) throws DataAccessException, WikiException {
+		String ipAddress = ServletUtil.getIpAddress(request);
+		WikiUser wikiUser = ServletUtil.currentWikiUser();
+		// TODO - delete this method once the ability to upgrade to 1.2.0 has been removed.
+		Topic fromTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, fromTopicName, false);
+		WikiBase.getDataHandler().moveTopic(fromTopic, toTopicName, wikiUser, ipAddress, "Automatically moved by system upgrade");
+		// the old topic should no longer be admin-only
+		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, fromTopicName, false);
+		topic.setAdminOnly(false);
+		TopicVersion topicVersion = new TopicVersion(wikiUser, ipAddress, null, topic.getTopicContent(), 0);
+		topicVersion.setEditType(TopicVersion.EDIT_PERMISSION);
+		WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
+		String[] params = new String[3];
+		params[0] = fromTopicName;
+		params[1] = toTopicName;
+		params[2] = virtualWiki;
+		messages.add(new WikiMessage("upgrade.message.120.topic.rename", params));
+	}
+
+	/**
+	 *
+	 */
+	private boolean renameSystemTopics(HttpServletRequest request, List<WikiMessage> messages) {
+		// TODO - delete this method once the ability to upgrade to 1.2.0 has been removed.
+		try {
+			List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
+			for (VirtualWiki virtualWiki : virtualWikis) {
+				this.renameSystemTopic(request, messages, virtualWiki.getName(), "BottomArea", WikiBase.SPECIAL_PAGE_FOOTER);
+				this.renameSystemTopic(request, messages, virtualWiki.getName(), "LeftMenu", WikiBase.SPECIAL_PAGE_SIDEBAR);
+				this.renameSystemTopic(request, messages, virtualWiki.getName(), "StyleSheet", WikiBase.SPECIAL_PAGE_SYSTEM_CSS);
+			}
+			return true;
+		} catch (WikiException e) {
+			logger.warn("Failure while moving system topic", e);
+			messages.add(e.getWikiMessage());
+			messages.add(new WikiMessage("upgrade.error.fatal",  e.getMessage()));
+			return false;
+		} catch (DataAccessException e) {
+			logger.warn("Failure while moving system topic", e);
+			messages.add(new WikiMessage("upgrade.error.fatal",  e.getMessage()));
+			return false;
+		}
+	}
+
+	/**
+	 *
+	 */
 	private boolean upgradeDatabase(boolean performUpgrade, List<WikiMessage> messages) throws WikiException {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
@@ -219,7 +273,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 		try {
 			List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
 			for (VirtualWiki virtualWiki : virtualWikis) {
-				WikiBase.getDataHandler().updateSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_STYLESHEET, ServletUtil.getIpAddress(request));
+				WikiBase.getDataHandler().updateSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, ServletUtil.getIpAddress(request));
 				messages.add(new WikiMessage("upgrade.message.stylesheet.success", virtualWiki.getName()));
 			}
 			return true;

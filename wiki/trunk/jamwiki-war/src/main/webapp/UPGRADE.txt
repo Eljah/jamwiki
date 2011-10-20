@@ -51,12 +51,13 @@ To upgrade using this automated process follow these steps:
   9.  Restart the web application server and view any page on the Wiki. You
       will be redirected to the upgrade page and any required upgrade steps
       will be automatically performed.
-  10. The upgrade process will automatically upgrade the StyleSheet topic if
-      modifications are required, and any customizations will be overwritten.
-      The previous version of the topic can easily be restored by viewing the
-      "History" tab for the StyleSheet topic (for example: 
-      http://jamwiki.org/wiki/en/Special:History?topic=StyleSheet), selecting
-      the pre-upgrade version, and then editing and saving that version.
+  10. The upgrade process will automatically upgrade the JAMWiki:System.css
+      topic if modifications are required, and any customizations will be
+      overwritten.  The previous version of the topic can easily be restored by
+      viewing the "History" tab for the JAMWiki:System.css topic (for example: 
+      http://jamwiki.org/wiki/en/Special:History?topic=JAMWiki:System.css),
+      selecting the pre-upgrade version, and then editing and saving that
+      version.
   11. If you have created any virtual wikis, be sure to restore the
       configuration for each virtual wiki to the /WEB-INF/web-xml file.
 
@@ -92,6 +93,10 @@ followed by 0.6.3.
 
   1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
      "wiki-version" property to "1.2.0".
+  2. The following topics must be renamed:
+     - BottomArea is now JAMWiki:Footer
+     - LeftMenu is now JAMWiki:Sidebar
+     - StyleSheet is now JAMWiki:System.css
 
 
   JAMWiki 1.1.2

@@ -83,7 +83,7 @@ String contentJsp = (String)pageContext.getAttribute("contentJsp");
 	</div>
 </div>
 <div id="wiki-footer">
-	<div id="footer-custom"><c:out value="${bottomArea}" escapeXml="false" /></div>
+	<div id="footer-custom"><c:out value="${footer}" escapeXml="false" /></div>
 	<div id="footer-logo"><a href="http://jamwiki.org/">JAMWiki</a> <fmt:message key="footer.message.version" /> <jamwiki:wiki-version/></div>
 </div>
 </div>

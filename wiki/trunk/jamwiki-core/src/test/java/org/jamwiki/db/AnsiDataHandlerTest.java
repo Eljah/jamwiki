@@ -47,8 +47,8 @@ public class AnsiDataHandlerTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testTopicLookup1() throws DataAccessException {
-		Topic topic = WikiBase.getDataHandler().lookupTopic("en", WikiBase.SPECIAL_PAGE_STYLESHEET, false);
-		assertEquals("Incorrect topic name", topic.getName(), WikiBase.SPECIAL_PAGE_STYLESHEET);
+		Topic topic = WikiBase.getDataHandler().lookupTopic("en", WikiBase.SPECIAL_PAGE_SYSTEM_CSS, false);
+		assertEquals("Incorrect topic name", topic.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS);
 	}
 
 	/**

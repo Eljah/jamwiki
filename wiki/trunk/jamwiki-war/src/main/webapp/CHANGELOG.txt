@@ -17,6 +17,8 @@ New Features:
   * Allow page name and namespace magic words to specify the page to be
     operated on, instead of just the current page, to match Mediawiki behavior.
     Example: "{{PAGENAME:Template:Main Page}}".
+  * Move the system topics (BottomArea, LeftMenu, StyleSheet) to the
+    JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to commons-lang 3.0.1.
   * Upgrade to commons-io-2.1.

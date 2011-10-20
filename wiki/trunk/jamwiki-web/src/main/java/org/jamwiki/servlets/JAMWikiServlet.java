@@ -81,19 +81,19 @@ public abstract class JAMWikiServlet extends AbstractController {
 		}
 		VirtualWiki virtualWiki = ServletUtil.retrieveVirtualWiki(virtualWikiName);
 		// build the layout contents
-		String leftMenu = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWikiName, WikiBase.SPECIAL_PAGE_LEFT_MENU, true);
+		String leftMenu = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWikiName, WikiBase.SPECIAL_PAGE_SIDEBAR, true);
 		next.addObject("leftMenu", leftMenu);
 		next.addObject("defaultTopic", virtualWiki.getRootTopicName());
 		next.addObject("virtualWiki", virtualWiki.getName());
 		next.addObject("logo", virtualWiki.getLogoImageUrl());
-		String bottomArea = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_BOTTOM_AREA, true);
-		next.addObject("bottomArea", bottomArea);
+		String footer = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_FOOTER, true);
+		next.addObject("footer", footer);
 		next.addObject(WikiUtil.PARAMETER_VIRTUAL_WIKI, virtualWiki.getName());
 		// add cache-buster parameters for CSS & JS to ensure that browsers update
 		// cache if files change.
 		int cssRevision = 0;
 		try {
-			cssRevision = WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), WikiBase.SPECIAL_PAGE_STYLESHEET, false).getCurrentVersionId();
+			cssRevision = WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, false).getCurrentVersionId();
 		} catch (DataAccessException e) {}
 		next.addObject("cssRevision", cssRevision);
 		long jsRevision = 0;

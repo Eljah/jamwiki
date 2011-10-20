@@ -54,11 +54,11 @@ public class WikiBase {
 	/** Name of the default starting points topic. */
 	public static final String SPECIAL_PAGE_STARTING_POINTS = "StartingPoints";
 	/** Name of the default left menu topic. */
-	public static final String SPECIAL_PAGE_LEFT_MENU = "LeftMenu";
+	public static final String SPECIAL_PAGE_SIDEBAR = "JAMWiki:Sidebar";
 	/** Name of the default footer topic. */
-	public static final String SPECIAL_PAGE_BOTTOM_AREA = "BottomArea";
+	public static final String SPECIAL_PAGE_FOOTER = "JAMWiki:Footer";
 	/** Name of the default jamwiki.css topic. */
-	public static final String SPECIAL_PAGE_STYLESHEET = "StyleSheet";
+	public static final String SPECIAL_PAGE_SYSTEM_CSS = "JAMWiki:System.css";
 	/** Allow file uploads of any file type. */
 	public static final int UPLOAD_ALL = 0;
 	/** Use a blacklist to determine what file types can be uploaded. */
