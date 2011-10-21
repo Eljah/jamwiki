@@ -133,13 +133,13 @@ public abstract class JAMWikiUnitTest {
 		WikiFileVersion wikiFileVersion = new WikiFileVersion();
 		if (topic.getName().equals("Image:Test Image.jpg") && virtualWiki.getName().equals("en")) {
 			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
-			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image.jpg", "/test_image.jpg", "image/jpeg", 61136);
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image.jpg", "/test_image.jpg", "image/jpeg", 61136, null);
 		} else if (topic.getName().equals("Image:Test Image.jpg") && virtualWiki.getName().equals("test")) {
 			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
-			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image_shared.jpg", "/test_image_shared.jpg", "image/jpeg", 61136);
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image_shared.jpg", "/test_image_shared.jpg", "image/jpeg", 61136, null);
 		} else if (topic.getName().equals("Image:Test Image2.jpg") && virtualWiki.getName().equals("test")) {
 			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
-			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image2_shared.jpg", "/test_image2_shared.jpg", "image/jpeg", 61136);
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image2_shared.jpg", "/test_image2_shared.jpg", "image/jpeg", 61136, null);
 		}
 	}
 }

@@ -1874,7 +1874,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion) throws DataAccessException, WikiException {
+	public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion, ImageData imageData) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -1888,6 +1888,9 @@ public class AnsiDataHandler implements DataHandler {
 			wikiFileVersion.setFileId(wikiFile.getFileId());
 			// write version
 			addWikiFileVersion(wikiFileVersion, conn);
+			if (imageData != null) {
+				this.queryHandler().insertImage(wikiFileVersion.getFileVersionId(), 0, imageData, conn);
+			}
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
@@ -2324,14 +2327,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#writeImage(java.lang.String, org.jamwiki.ImageData)
+	 * @see org.jamwiki.DataHandler#writeImage(int, int, org.jamwiki.ImageData)
 	 */
-	public void writeImage(String imageName, ImageData imageData) throws DataAccessException {
+	public void writeImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			this.queryHandler().insertImage(imageName, imageData, conn);
+			this.queryHandler().insertImage(fileVersionId, resized, imageData, conn);
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -2343,14 +2346,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#deleteImage(java.lang.String)
+	 * @see org.jamwiki.DataHandler#deleteImage(int)
 	 */
-	public void deleteImage(String imageName) throws DataAccessException {
+	public void deleteImage(int fileVersionId) throws DataAccessException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			this.queryHandler().deleteImage(imageName, conn);
+			this.queryHandler().deleteImage(fileVersionId, conn);
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -2362,13 +2365,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#getImageInfo(java.lang.String)
+	 * @see org.jamwiki.DataHandler#getImageInfo(int, int)
 	 */
-	public ImageData getImageInfo(String imageName) throws DataAccessException {
+	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageInfo(imageName, conn);
+			return this.queryHandler().getImageInfo(fileId, resized, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		} finally {
@@ -2377,13 +2380,28 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#getImageData(java.lang.String)
+	 * @see org.jamwiki.DataHandler#getImageData(int, int)
 	 */
-	public ImageData getImageData(String imageName) throws DataAccessException {
+	public ImageData getImageData(int fileId, int resized) throws DataAccessException {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageData(imageName, conn);
+			return this.queryHandler().getImageData(fileId, resized, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
+	}
+
+	/**
+	 * @see org.jamwiki.DataHandler#getImageData2(int, int)
+	 */
+	public ImageData getImageData2(int fileVersionId, int resized) throws DataAccessException {
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return this.queryHandler().getImageData(fileVersionId, resized, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		} finally {

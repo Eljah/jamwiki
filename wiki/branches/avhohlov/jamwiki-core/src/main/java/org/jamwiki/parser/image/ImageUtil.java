@@ -243,10 +243,7 @@ public abstract class ImageUtil {
 			// no resizing necessary, return the original URL
 			return currentUrl;
 		}
-	      //String path = FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl);
-	      //FIXME Check for first slash
-	      //String path = "/" + (isImagesOnFS() ? FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl) : (RESIZED_IMAGE_SUBFOLDER + currentUrl));
-		String path = (isImagesOnFS() ? FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl) : ("/" + RESIZED_IMAGE_SUBFOLDER + currentUrl));
+		String path = FilenameUtils.normalize(RESIZED_IMAGE_SUBFOLDER + "/" + currentUrl);
 		String dimensionInfo = "-" + scaledWidth + "px";
 		int pos = path.lastIndexOf('.');
 		if (pos != -1) {
@@ -382,17 +379,15 @@ public abstract class ImageUtil {
 		}
 		int incrementalHeight = (int)Math.round(((double)incrementalWidth / (double)originalDimensions.getWidth()) * (double)originalDimensions.getHeight());
 		// check to see if an image with the desired dimensions already exists on the filesystem
-		String newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), incrementalWidth);
-		Dimension d1  = ImageProcessor.retrieveImageDimensions(newUrl);
+		Dimension d1  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), incrementalWidth);
 		if       (d1 != null)
 		{
 			return d1;
 		}
 		// otherwise generate a scaled instance
-		ImageData imageData = ImageProcessor.resizeImage(wikiImage.getUrl(), incrementalWidth, incrementalHeight);
-		newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), imageData.width);
+		ImageData imageData = ImageProcessor.resizeImage(wikiImage.getFileId(), incrementalWidth, incrementalHeight);
 	      //TODO Need?
-		Dimension d2  = ImageProcessor.retrieveImageDimensions(newUrl);
+		Dimension d2  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), imageData.width);
 		if       (d2 != null)
 		{
 			return d2;
@@ -401,7 +396,7 @@ public abstract class ImageUtil {
 	      /*try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {}*/
-		ImageProcessor.saveImage(imageData, newUrl);
+		ImageProcessor.saveImage(imageData);
 		return new Dimension(imageData.width, imageData.height);
 	}
 
@@ -519,7 +514,7 @@ public abstract class ImageUtil {
 				File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
 				originalDimensions = ImageProcessor.retrieveImageDimensions(file);
 			} else {
-				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getUrl());
+				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), 0);
 			}
 			if (originalDimensions == null) {
 				logger.info("Unable to determine dimensions for image: " + wikiImage.getUrl());
@@ -537,8 +532,14 @@ public abstract class ImageUtil {
 		wikiImage.setHeight((int)scaledDimensions.getHeight());
 		// return an appropriate WikiImage object with URL to the scaled image, proper width, and proper height
 		Dimension incrementalDimensions = calculateIncrementalDimensions(wikiImage, originalDimensions, scaledDimensions);
-		String url = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), (int)incrementalDimensions.getWidth());
-		wikiImage.setUrl(url);
+		if (isImagesOnFS()) {
+			String url = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), (int)incrementalDimensions.getWidth());
+			wikiImage.setUrl(url);
+		} else {
+			int resized  = incrementalDimensions.width != originalDimensions.width ? incrementalDimensions.width : 0;
+			String url = "?fileId=" + wikiImage.getFileId() + "&resized=" + resized;
+			wikiImage.setUrl(url);
+		}
 		return wikiImage;
 	}
 
@@ -592,12 +593,12 @@ public abstract class ImageUtil {
 	 * Given a object name, determine if the object is an image or if it is some
 	 * other type of data.
 	 *
-	 * @param name The object name that is being examined.
+	 * @param fileId The file identifier that is being examined.
 	 * @return Returns <code>true</code> if the object is an image object.
 	 */
-	public static boolean isImage(String name) {
+	public static boolean isImage(int fileId) {
 		try {
-			return (ImageProcessor.retrieveImageDimensions(name) != null);
+			return (ImageProcessor.retrieveImageDimensions(fileId, 0) != null);
 		} catch (IOException x) {
 			return false;
 		}
@@ -672,7 +673,7 @@ public abstract class ImageUtil {
 	 * @param fileSize The size of the file version record in bytes.
 	 * @return The new or updated WikiFile record.
 	 */
-	public static WikiFile writeWikiFile(Topic topic, WikiFileVersion wikiFileVersion, WikiUser user, String ipAddress, String filename, String url, String contentType, long fileSize) throws DataAccessException, WikiException {
+	public static WikiFile writeWikiFile(Topic topic, WikiFileVersion wikiFileVersion, WikiUser user, String ipAddress, String filename, String url, String contentType, long fileSize, ImageData imageData) throws DataAccessException, WikiException {
 		wikiFileVersion.setAuthorDisplay(ipAddress);
 		Integer authorId = null;
 		if (user != null && user.getUserId() > 0) {
@@ -693,7 +694,7 @@ public abstract class ImageUtil {
 		wikiFileVersion.setFileSize(fileSize);
 		wikiFile.setFileSize(fileSize);
 		wikiFile.setTopicId(topic.getTopicId());
-		WikiBase.getDataHandler().writeFile(wikiFile, wikiFileVersion);
+		WikiBase.getDataHandler().writeFile(wikiFile, wikiFileVersion, imageData);
 		return wikiFile;
 	}
 
@@ -713,6 +714,6 @@ public abstract class ImageUtil {
 	 * @return ImageServlet URL.
 	 */
 	public static String getImageServletUrl() {
-		return "/" + Environment.getValue(Environment.PROP_SITE_NAME).toLowerCase() + "-" + Environment.getValue(Environment.PROP_BASE_WIKI_VERSION) + "/" + Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT) + "/Special:Image?url=";
+		return "/" + Environment.getValue(Environment.PROP_SITE_NAME).toLowerCase() + "-" + Environment.getValue(Environment.PROP_BASE_WIKI_VERSION) + "/" + Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT) + "/Special:Image";
 	}
 }

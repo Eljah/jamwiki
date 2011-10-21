@@ -37,11 +37,23 @@ public class ImageServlet extends JAMWikiServlet {
 
 		try
 		{
-			String imageName = request.getParameter("url");
-			imageData = WikiBase.getDataHandler().getImageData(imageName);
+			String fileId        = request.getParameter("fileId");
+			String fileVersionId = request.getParameter("fileVersionId");
+			String resized       = request.getParameter("resized");
+			if    (resized      == null) {
+				resized = "0";
+			}
+
+			if (fileVersionId != null) {
+				imageData = WikiBase.getDataHandler().getImageData2(Integer.parseInt(fileVersionId), Integer.parseInt(resized));
+			} else {
+				imageData = WikiBase.getDataHandler().getImageData (Integer.parseInt(fileId),        Integer.parseInt(resized));
+			}
 		}
-		catch (DataAccessException dae)
-		{
+		catch (NumberFormatException nfe) {
+			throw new ServletException(nfe);
+		}
+		catch (DataAccessException dae) {
 			throw new ServletException(dae);
 		}
 

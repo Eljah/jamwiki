@@ -250,6 +250,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DELETE_IMAGE = null;
 	protected static String STATEMENT_SELECT_IMAGE_INFO = null;
 	protected static String STATEMENT_SELECT_IMAGE_DATA = null;
+	protected static String STATEMENT_SELECT_IMAGE_DATA2 = null;
 	private Properties props = null;
 
 	/**
@@ -1374,6 +1375,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DELETE_IMAGE                   = props.getProperty("STATEMENT_DELETE_IMAGE");
 		STATEMENT_SELECT_IMAGE_INFO              = props.getProperty("STATEMENT_SELECT_IMAGE_INFO");
 		STATEMENT_SELECT_IMAGE_DATA              = props.getProperty("STATEMENT_SELECT_IMAGE_DATA");
+		STATEMENT_SELECT_IMAGE_DATA2             = props.getProperty("STATEMENT_SELECT_IMAGE_DATA2");
+	      //FIXME Remove
+		logger.warn(STATEMENT_CREATE_IMAGE_TABLE);
 	}
 
 	/**
@@ -3412,18 +3416,18 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	/**
-	 * @see org.jamwiki.db.QueryHandler#writeImage(java.lang.String, org.jamwiki.ImageData, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#writeImage(int, int, org.jamwiki.ImageData, java.sql.Connection)
 	 */
-	public void insertImage(String imageName, ImageData imageData, Connection conn) throws SQLException
+	public void insertImage(int fileVersionId, int resized, ImageData imageData, Connection conn) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_INSERT_IMAGE);
-			stmt.setString(1, imageName);
-			stmt.setString(2, imageData.mimeType);
-			stmt.setInt   (3, imageData.width);
-			stmt.setInt   (4, imageData.height);
-			stmt.setBytes (5, imageData.data);
+			stmt.setInt  (1, fileVersionId);
+			stmt.setInt  (2, resized);
+			stmt.setInt  (3, imageData.width);
+			stmt.setInt  (4, imageData.height);
+			stmt.setBytes(5, imageData.data);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
@@ -3431,13 +3435,13 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.db.QueryHandler#deleteImage(java.lang.String, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#deleteImage(int, java.sql.Connection)
 	 */
-	public void deleteImage(String imageName, Connection conn) throws SQLException {
+	public void deleteImage(int fileVersionId, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_DELETE_IMAGE);
-			stmt.setString(1, imageName);
+			stmt.setInt(1, fileVersionId);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
@@ -3445,15 +3449,16 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.db.QueryHandler#getImageInfo(java.lang.String, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#getImageInfo(int, int, java.sql.Connection)
 	 */
-	public ImageData getImageInfo(String imageName, Connection conn) throws SQLException {
+	public ImageData getImageInfo(int fileId, int resized, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_INFO);
-			stmt.setString(1, imageName);
+			stmt.setInt(1, fileId);
+			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
 				return new ImageData(rs.getString(1), rs.getInt(2), rs.getInt(3), null);
@@ -3467,18 +3472,42 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.db.QueryHandler#getImageData(java.lang.String, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#getImageData(int, int, java.sql.Connection)
 	 */
-	public ImageData getImageData(String imageName, Connection conn) throws SQLException {
+	public ImageData getImageData(int fileId, int resized, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA);
-			stmt.setString(1, imageName);
+			stmt.setInt(1, fileId);
+			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
-				return new ImageData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getBytes(4));
+				return new ImageData(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getBytes(5));
+			}
+		} finally {
+		      //DatabaseConnection.closeStatement(stmt);
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#getImageData2(int, int, java.sql.Connection)
+	 */
+	public ImageData getImageData2(int fileVersionId, int resized, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA);
+			stmt.setInt(1, fileVersionId);
+			stmt.setInt(2, resized);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				return new ImageData(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getBytes(5));
 			}
 		} finally {
 		      //DatabaseConnection.closeStatement(stmt);

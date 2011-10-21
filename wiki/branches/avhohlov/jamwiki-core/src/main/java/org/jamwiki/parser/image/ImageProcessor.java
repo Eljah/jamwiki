@@ -89,20 +89,20 @@ public class ImageProcessor {
 	}
 
 	/**
-	 * Given a image name, return a
+	 * Given a fileId, return a
 	 * ImageData object.
 	 */
-	private static ImageData loadImage(String imageName) throws IOException {
+	private static ImageData loadImage(int fileId) throws IOException {
 		ImageData imageData = null;
 
 		try {
-			imageData = WikiBase.getDataHandler().getImageData(imageName);
+			imageData = WikiBase.getDataHandler().getImageData(fileId, 0);
 		} catch (DataAccessException dae) {
 			throw new IOException(dae);
 		}
 
 		if (imageData == null) {
-			throw new FileNotFoundException("Image does not exist: " + imageName);
+			throw new FileNotFoundException("Image does not exist: " + fileId);
 		}
 
 		imageData.image = ImageIO.read(new ByteArrayInputStream(imageData.data));
@@ -164,14 +164,14 @@ public class ImageProcessor {
 	 * Rich Clients" by Chet Haase and Romain Guy (http://filthyrichclients.org/).
 	 * That source is dual licensed: LGPL (Sun and Romain Guy) and BSD (Romain Guy).
 	 *
-	 * @param imageName The name for the original image to be scaled.
+	 * @param fileId The file identifier for the original image to be scaled.
 	 * @param targetWidth the desired width of the scaled instance in pixels.
 	 * @param targetHeight the desired height of the scaled instance in pixels.
 	 * @return a scaled version of the original {@code BufferedImage}
 	 */
-	public static ImageData resizeImage(String imageName, int targetWidth, int targetHeight) throws IOException {
+	public static ImageData resizeImage(int fileId, int targetWidth, int targetHeight) throws IOException {
 		long start = System.currentTimeMillis();
-		ImageData imageData = ImageProcessor.loadImage(imageName);
+		ImageData imageData = ImageProcessor.loadImage(fileId);
 		BufferedImage tmp = imageData.image;
 		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		int width = tmp.getWidth();
@@ -195,7 +195,7 @@ public class ImageProcessor {
 		} while (width != targetWidth || height != targetHeight);
 		if (logger.isDebugEnabled()) {
 			long current = System.currentTimeMillis();
-			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for file: " + imageName;
+			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for fileId: " + fileId;
 			logger.debug(message);
 		}
 		imageData.width  = resized.getWidth ();
@@ -247,11 +247,11 @@ public class ImageProcessor {
 	/**
 	 * Retrieve image dimensions.
 	 */
-	protected static Dimension retrieveImageDimensions(String imageName) throws IOException {
+	protected static Dimension retrieveImageDimensions(int fileId, int resized) throws IOException {
 		ImageData imageData = null;
 
 		try {
-			imageData = WikiBase.getDataHandler().getImageInfo(imageName);
+			imageData = WikiBase.getDataHandler().getImageInfo(fileId, resized);
 		} catch (DataAccessException dae) {
 			throw new IOException(dae);
 		}
@@ -293,7 +293,7 @@ public class ImageProcessor {
 	/**
 	 * Save an image.
 	 */
-	protected static void saveImage(ImageData imageData, String imageName) throws IOException {
+	protected static void saveImage(ImageData imageData) throws IOException {
 	      /*int pos = imageName.lastIndexOf('.');
 		if (pos == -1 || (pos + 1) >= imageName.length()) {
 			throw new IOException("Unknown image file type " + imageName);
@@ -309,7 +309,7 @@ public class ImageProcessor {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		boolean result = ImageIO.write(imageData.image, imageType, baos);		if    (!result) {
-			throw new IOException("No appropriate writer found when writing image: " + imageName);
+			throw new IOException("No appropriate writer found when writing image: " + imageData.fileVersionId);
 		}
 
 		baos.close();
@@ -317,7 +317,7 @@ public class ImageProcessor {
 		imageData.data = baos.toByteArray();
 
 		try {
-			WikiBase.getDataHandler().writeImage(imageName, imageData);
+			WikiBase.getDataHandler().writeImage(imageData.fileVersionId, imageData.width, imageData);
 		} catch (DataAccessException dae) {
 		      //FIXME
 		      //throw new IOException(dae);

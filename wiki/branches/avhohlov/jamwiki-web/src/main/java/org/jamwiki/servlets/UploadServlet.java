@@ -103,6 +103,7 @@ public class UploadServlet extends JAMWikiServlet {
 		boolean isImage = true;
 		File uploadedFile = null;
 		String url = null;
+		byte buff[] = null;
 		while (iterator.hasNext()) {
 			FileItem item = (FileItem)iterator.next();
 			String fieldName = item.getFieldName();
@@ -134,20 +135,7 @@ public class UploadServlet extends JAMWikiServlet {
 				item.write(uploadedFile);
 				isImage = ImageUtil.isImage(uploadedFile);
 			} else {
-			      //uploadedFile = new File(url);
-
-				byte buff[]  =  item.get();
-				int  width   = -1;
-				int  height  = -1; 
-				try {
-		       			BufferedImage image = ImageIO.read(new ByteArrayInputStream(buff));
-					width  = image.getWidth();
-					height = image.getHeight();
-				} catch (Exception ex) {
-					isImage = false;
-				}
-
-				WikiBase.getDataHandler().writeImage(url, new ImageData(item.getContentType(), width, height, buff));
+				buff = item.get();
 			}
 		}
 		if (ImageUtil.isImagesOnFS()) {
@@ -177,7 +165,7 @@ public class UploadServlet extends JAMWikiServlet {
 			Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
 			WikiFileVersion wikiFileVersion = new WikiFileVersion();
 			wikiFileVersion.setUploadComment(topic.getTopicContent());
-			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize, null);
 			ServletUtil.redirect(next, virtualWiki, topicName);
 		} else {
 		      /*if (uploadedFile == null) {
@@ -185,15 +173,14 @@ public class UploadServlet extends JAMWikiServlet {
 			}*/
 			destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
 			String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
-			if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
+		      /*if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
 				// delete the spam file
-			      //uploadedFile.delete();
-				WikiBase.getDataHandler().deleteImage(url);
+			        uploadedFile.delete();
 				this.view(request, next, pageInfo);
 				next.addObject("contents", contents);
 				return;
 			}
-		      /*if (!StringUtils.isEmpty(destinationFilename)) {
+			if (!StringUtils.isEmpty(destinationFilename)) {
 				// rename the uploaded file if a destination file name was specified
 				filename = ImageUtil.sanitizeFilename(destinationFilename);
 				url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
@@ -202,12 +189,25 @@ public class UploadServlet extends JAMWikiServlet {
 					throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
 				}
 			}*/
+
+			int  width   = -1;
+			int  height  = -1; 
+			try {
+	       			BufferedImage image = ImageIO.read(new ByteArrayInputStream(buff));
+				width  = image.getWidth();
+				height = image.getHeight();
+			} catch (Exception ex) {
+				isImage = false;
+			}
+
+			ImageData imageData = new ImageData(contentType, width, height, buff);
+
 			String ipAddress = ServletUtil.getIpAddress(request);
 			WikiUser user = ServletUtil.currentWikiUser();
 			Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
 			WikiFileVersion wikiFileVersion = new WikiFileVersion();
 			wikiFileVersion.setUploadComment(topic.getTopicContent());
-			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
+			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize, imageData);
 			ServletUtil.redirect(next, virtualWiki, topicName);
 		}
 	}
