@@ -244,13 +244,13 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_UPDATE_VIRTUAL_WIKI = null;
 	protected static String STATEMENT_UPDATE_WIKI_FILE = null;
 	protected static String STATEMENT_UPDATE_WIKI_USER = null;
-	protected static String STATEMENT_CREATE_IMAGE_TABLE = null;
-	protected static String STATEMENT_DROP_IMAGE_TABLE = null;
-	protected static String STATEMENT_INSERT_IMAGE = null;
-	protected static String STATEMENT_DELETE_IMAGE = null;
-	protected static String STATEMENT_SELECT_IMAGE_INFO = null;
-	protected static String STATEMENT_SELECT_IMAGE_DATA = null;
-	protected static String STATEMENT_SELECT_IMAGE_DATA2 = null;
+	protected static String STATEMENT_CREATE_FILE_DATA_TABLE = null;
+	protected static String STATEMENT_DROP_FILE_DATA_TABLE = null;
+	protected static String STATEMENT_INSERT_FILE_DATA = null;
+	protected static String STATEMENT_DELETE_FILE_DATA = null;
+	protected static String STATEMENT_SELECT_FILE_INFO = null;
+	protected static String STATEMENT_SELECT_FILE_DATA = null;
+	protected static String STATEMENT_SELECT_FILE_DATA2 = null;
 	private Properties props = null;
 
 	/**
@@ -329,7 +329,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_INTERWIKI_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_CONFIGURATION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_BLOCK_TABLE, conn);
-		DatabaseConnection.executeUpdate(STATEMENT_CREATE_IMAGE_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_FILE_DATA_TABLE, conn);
 	}
 
 	/**
@@ -485,7 +485,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
 		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_IMAGE_TABLE, conn);
+			DatabaseConnection.executeUpdate(STATEMENT_DROP_FILE_DATA_TABLE, conn);
 		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
@@ -1369,13 +1369,13 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_UPDATE_VIRTUAL_WIKI            = props.getProperty("STATEMENT_UPDATE_VIRTUAL_WIKI");
 		STATEMENT_UPDATE_WIKI_FILE               = props.getProperty("STATEMENT_UPDATE_WIKI_FILE");
 		STATEMENT_UPDATE_WIKI_USER               = props.getProperty("STATEMENT_UPDATE_WIKI_USER");
-		STATEMENT_CREATE_IMAGE_TABLE             = props.getProperty("STATEMENT_CREATE_IMAGE_TABLE");
-		STATEMENT_DROP_IMAGE_TABLE               = props.getProperty("STATEMENT_DROP_IMAGE_TABLE");
-		STATEMENT_INSERT_IMAGE                   = props.getProperty("STATEMENT_INSERT_IMAGE");
-		STATEMENT_DELETE_IMAGE                   = props.getProperty("STATEMENT_DELETE_IMAGE");
-		STATEMENT_SELECT_IMAGE_INFO              = props.getProperty("STATEMENT_SELECT_IMAGE_INFO");
-		STATEMENT_SELECT_IMAGE_DATA              = props.getProperty("STATEMENT_SELECT_IMAGE_DATA");
-		STATEMENT_SELECT_IMAGE_DATA2             = props.getProperty("STATEMENT_SELECT_IMAGE_DATA2");
+		STATEMENT_CREATE_FILE_DATA_TABLE         = props.getProperty("STATEMENT_CREATE_FILE_DATA_TABLE");
+		STATEMENT_DROP_FILE_DATA_TABLE           = props.getProperty("STATEMENT_DROP_FILE_DATA_TABLE");
+		STATEMENT_INSERT_FILE_DATA               = props.getProperty("STATEMENT_INSERT_FILE_DATA");
+		STATEMENT_DELETE_FILE_DATA               = props.getProperty("STATEMENT_DELETE_FILE_DATA");
+		STATEMENT_SELECT_FILE_INFO               = props.getProperty("STATEMENT_SELECT_FILE_INFO");
+		STATEMENT_SELECT_FILE_DATA               = props.getProperty("STATEMENT_SELECT_FILE_DATA");
+		STATEMENT_SELECT_FILE_DATA2              = props.getProperty("STATEMENT_SELECT_FILE_DATA2");
 	}
 
 	/**
@@ -3420,7 +3420,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	{
 		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(STATEMENT_INSERT_IMAGE);
+			stmt = conn.prepareStatement(STATEMENT_INSERT_FILE_DATA);
 			stmt.setInt  (1, fileVersionId);
 			stmt.setInt  (2, resized);
 			stmt.setInt  (3, imageData.width);
@@ -3438,7 +3438,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	public void deleteImage(int fileVersionId, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(STATEMENT_DELETE_IMAGE);
+			stmt = conn.prepareStatement(STATEMENT_DELETE_FILE_DATA);
 			stmt.setInt(1, fileVersionId);
 			stmt.executeUpdate();
 		} finally {
@@ -3454,7 +3454,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_INFO);
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_INFO);
 			stmt.setInt(1, fileId);
 			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();
@@ -3477,7 +3477,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA);
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_DATA);
 			stmt.setInt(1, fileId);
 			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();
@@ -3500,7 +3500,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA2);
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_DATA2);
 			stmt.setInt(1, fileVersionId);
 			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();
