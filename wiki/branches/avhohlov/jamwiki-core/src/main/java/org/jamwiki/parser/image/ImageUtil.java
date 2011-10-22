@@ -113,7 +113,7 @@ public abstract class ImageUtil {
 		if (wikiFile == null) {
 			return null;
 		}
-		return buildRelativeImageUrl(wikiFile.getUrl());
+		return buildRelativeImageUrl(isImagesOnFS() ? wikiFile.getUrl() : ("?fileId=" + wikiFile.getFileId()));
 	}
 
 	/**

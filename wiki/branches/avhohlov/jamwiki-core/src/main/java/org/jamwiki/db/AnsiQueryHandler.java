@@ -1376,8 +1376,6 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_IMAGE_INFO              = props.getProperty("STATEMENT_SELECT_IMAGE_INFO");
 		STATEMENT_SELECT_IMAGE_DATA              = props.getProperty("STATEMENT_SELECT_IMAGE_DATA");
 		STATEMENT_SELECT_IMAGE_DATA2             = props.getProperty("STATEMENT_SELECT_IMAGE_DATA2");
-	      //FIXME Remove
-		logger.warn(STATEMENT_CREATE_IMAGE_TABLE);
 	}
 
 	/**
