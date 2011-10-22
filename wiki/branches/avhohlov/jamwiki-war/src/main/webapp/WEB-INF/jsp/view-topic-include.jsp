@@ -17,7 +17,6 @@
 
 --%>
 
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page import="org.jamwiki.parser.image.ImageUtil" %>
 
 <c:choose>
@@ -32,8 +31,8 @@
 			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<c:out value="${fileVersions[0].url}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
 			</c:if>
 			<c:if test="<%= !ImageUtil.isImagesOnFS() %>">
-			<c:if test="${topicImage}"><a href="<%= ImageUtil.getImageServletUrl() %><c:out value="${fn:substring(fileVersions[0].url, 1, fn:length(fileVersions[0].url))}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
-			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<%= ImageUtil.getImageServletUrl() %><c:out value="${fn:substring(fileVersions[0].url, 1, fn:length(fileVersions[0].url))}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
+			<c:if test="${topicImage}"><a href="<%= ImageUtil.getImageServletUrl() %>?fileVersionId=<c:out value="${fileVersions[0].fileVersionId}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
+			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<%= ImageUtil.getImageServletUrl() %>?fileVersionId=<c:out value="${fileVersions[0].fileVersionId}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
 			</c:if>
 			<c:out value="${topicObject.topicContent}" escapeXml="false" />
 			</div>
@@ -48,7 +47,7 @@
 					<c:if test="<%=  ImageUtil.isImagesOnFS() %>">
 					<a href="<c:out value="${fileVersion.url}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>					</c:if>
 					<c:if test="<%= !ImageUtil.isImagesOnFS() %>">
-					<a href="<%= ImageUtil.getImageServletUrl() %><c:out value="${fn:substring(fileVersion.url, 1, fn:length(fileVersion.url))}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>
+					<a href="<%= ImageUtil.getImageServletUrl() %>?fileVersionId=<c:out value="${fileVersion.fileVersionId}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>
 					</c:if>
 					&#160;(<fmt:message key="topic.filesize.bytes"><fmt:param value="${fileVersion.fileSize}" /></fmt:message>)
 					&#160;.&#160;.&#160;

@@ -3502,7 +3502,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA);
+			stmt = conn.prepareStatement(STATEMENT_SELECT_IMAGE_DATA2);
 			stmt.setInt(1, fileVersionId);
 			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();

@@ -2401,7 +2401,7 @@ public class AnsiDataHandler implements DataHandler {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageData(fileVersionId, resized, conn);
+			return this.queryHandler().getImageData2(fileVersionId, resized, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		} finally {
