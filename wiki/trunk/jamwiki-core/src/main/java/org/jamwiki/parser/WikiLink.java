@@ -82,9 +82,18 @@ public class WikiLink {
 	}
 
 	/**
+	 * Constructor used by LinkUtil.parseWikiLink that allows that
+	 * method to manually initialize most fields.
+	 */
+	protected WikiLink(String contextPath, String virtualWiki) {
+		this.contextPath = contextPath;
+		this.virtualWiki = virtualWiki;
+	}
+
+	/**
 	 * Copy constructor.
 	 */
-	public WikiLink(WikiLink wikiLink) {
+	protected WikiLink(WikiLink wikiLink) {
 		this.altVirtualWiki = wikiLink.altVirtualWiki;
 		this.colon = wikiLink.colon;
 		this.contextPath = wikiLink.contextPath;
@@ -106,12 +115,13 @@ public class WikiLink {
 	 *
 	 * @throws IllegalStateException Thrown if a data access error occurs, which could
 	 *  indicate a database failure or other system problem.
+	 * @throws IllegalArgumentException Thrown if this method is called with a null
+	 *  destination or virtual wiki.
 	 */
-	protected void initialize(String destination) throws IllegalStateException {
+	protected void initialize(String destination) throws IllegalStateException, IllegalArgumentException {
 		String virtualWiki = (this.getAltVirtualWiki() == null) ? this.getVirtualWiki() : this.getAltVirtualWiki().getName();
 		if (destination == null || virtualWiki == null) {
-			logger.warn("Cannot call WikiLink.initialize() with null destination or virtual wiki");
-			return;
+			throw new IllegalArgumentException("Cannot call WikiLink.initialize() with null destination or virtual wiki");
 		}
 		Namespace namespace = LinkUtil.retrieveTopicNamespace(virtualWiki, destination);
 		String article = destination;

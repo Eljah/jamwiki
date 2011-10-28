@@ -85,7 +85,7 @@ public class JFlexParserUtil {
 	protected static WikiLink parseWikiLink(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
 		String virtualWiki = parserInput.getVirtualWiki();
 		if (StringUtils.isBlank(raw)) {
-			return new WikiLink(parserInput.getContext(), virtualWiki, null);
+			throw new IllegalArgumentException("Cannot call JFlexParserUtil.parseWikiLink() without text to parse.");
 		}
 		raw = raw.trim();
 		String suffix = ((!raw.endsWith("]]")) ? raw.substring(raw.lastIndexOf("]]") + 2) : null);

@@ -489,7 +489,7 @@ public abstract class LinkUtil {
 		// expression, but the expression caused CPU usage to spike to 100%
 		// with topics such as "Urnordisch oder Nordwestgermanisch?"
 		String processed = raw.trim();
-		WikiLink wikiLink = new WikiLink(contextPath, virtualWiki, null);
+		WikiLink wikiLink = new WikiLink(contextPath, virtualWiki);
 		if (wikiLink.getNamespace() == null) {
 			throw new IllegalStateException("Unable to determine namespace for topic.  This error generally indicates a configuration or database issue.  Check the logs for additional information.");
 		}

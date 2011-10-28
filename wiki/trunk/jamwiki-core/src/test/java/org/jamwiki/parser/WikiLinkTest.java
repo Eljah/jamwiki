@@ -33,7 +33,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testConstructor() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		assertNull("wikiLink.getQuery()", wikiLink.getQuery());
 		assertNull("wikiLink.getSection()", wikiLink.getSection());
 		assertNull("wikiLink.getText()", wikiLink.getText());
@@ -48,7 +48,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testSetArticle() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setArticle("testWikiLinkArticle");
 		assertEquals("wikiLink.getArticle()", "testWikiLinkArticle", wikiLink.getArticle());
 	}
@@ -58,7 +58,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testSetColon() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setColon(true);
 		assertTrue("wikiLink.getColon()", wikiLink.getColon());
 	}
@@ -77,7 +77,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testSetNamespace() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setNamespace(Namespace.namespace(Namespace.FILE_ID));
 		assertEquals("wikiLink.getNamespace()", Namespace.namespace(Namespace.FILE_ID), wikiLink.getNamespace());
 	}
@@ -87,7 +87,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void testSetNamespace2() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setNamespace(null);
 		assertEquals("wikiLink.getNamespace()", Namespace.namespace(Namespace.FILE_ID), wikiLink.getNamespace());
 	}
@@ -97,7 +97,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testSetQuery() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setQuery("testWikiLinkQuery");
 		assertEquals("wikiLink.getQuery()", "testWikiLinkQuery", wikiLink.getQuery());
 	}
@@ -107,7 +107,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testSetSection() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setSection("testWikiLinkSection");
 		assertEquals("wikiLink.getSection()", "testWikiLinkSection", wikiLink.getSection());
 	}
@@ -117,7 +117,7 @@ public class WikiLinkTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testSetText() throws Throwable {
-		WikiLink wikiLink = new WikiLink("/wiki", "en", null);
+		WikiLink wikiLink = new WikiLink("/wiki", "en");
 		wikiLink.setText("testWikiLinkText");
 		assertEquals("wikiLink.getText()", "testWikiLinkText", wikiLink.getText());
 	}
