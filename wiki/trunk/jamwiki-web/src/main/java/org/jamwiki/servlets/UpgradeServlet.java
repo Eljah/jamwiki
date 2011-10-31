@@ -95,7 +95,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			this.upgradeDatabase(true, pageInfo.getMessages());
 			// move system topics
 			if (oldVersion.before(1, 2, 0)) {
-				this.renameSystemTopics(request, pageInfo.getMessages());
+				this.updateSystemTopics(request, pageInfo.getMessages());
 			}
 			// upgrade the search index if required & possible
 			this.upgradeSearchIndex(true, pageInfo.getMessages());
@@ -171,9 +171,8 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	private void renameSystemTopic(HttpServletRequest request, List<WikiMessage> messages, String virtualWiki, String fromTopicName, String toTopicName) throws DataAccessException, WikiException {
+	private void renameSystemTopic(HttpServletRequest request, List<WikiMessage> messages, String virtualWiki, WikiUser wikiUser, String fromTopicName, String toTopicName) throws DataAccessException, WikiException {
 		String ipAddress = ServletUtil.getIpAddress(request);
-		WikiUser wikiUser = ServletUtil.currentWikiUser();
 		// TODO - delete this method once the ability to upgrade to 1.2.0 has been removed.
 		Topic fromTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, fromTopicName, false);
 		WikiBase.getDataHandler().moveTopic(fromTopic, toTopicName, wikiUser, ipAddress, "Automatically moved by system upgrade");
@@ -193,14 +192,16 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	private boolean renameSystemTopics(HttpServletRequest request, List<WikiMessage> messages) {
+	private boolean updateSystemTopics(HttpServletRequest request, List<WikiMessage> messages) {
 		// TODO - delete this method once the ability to upgrade to 1.2.0 has been removed.
+		WikiUser wikiUser = ServletUtil.currentWikiUser();
 		try {
 			List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
 			for (VirtualWiki virtualWiki : virtualWikis) {
-				this.renameSystemTopic(request, messages, virtualWiki.getName(), "BottomArea", WikiBase.SPECIAL_PAGE_FOOTER);
-				this.renameSystemTopic(request, messages, virtualWiki.getName(), "LeftMenu", WikiBase.SPECIAL_PAGE_SIDEBAR);
-				this.renameSystemTopic(request, messages, virtualWiki.getName(), "StyleSheet", WikiBase.SPECIAL_PAGE_SYSTEM_CSS);
+				WikiDatabase.setupSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, wikiUser, true);
+				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "BottomArea", WikiBase.SPECIAL_PAGE_FOOTER);
+				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "LeftMenu", WikiBase.SPECIAL_PAGE_SIDEBAR);
+				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "StyleSheet", WikiBase.SPECIAL_PAGE_SYSTEM_CSS);
 			}
 			return true;
 		} catch (WikiException e) {

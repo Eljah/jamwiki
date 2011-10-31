@@ -97,6 +97,7 @@ followed by 0.6.3.
      - BottomArea is now JAMWiki:Footer
      - LeftMenu is now JAMWiki:Sidebar
      - StyleSheet is now JAMWiki:System.css
+  3. A new JAMWiki:Header topic must be created.
 
 
   JAMWiki 1.1.2

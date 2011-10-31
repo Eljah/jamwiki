@@ -4,6 +4,7 @@ Az lapokat az oldal tetején található "szerkesztés" fülre való kattintáss
 
 * [[JAMWiki:Sidebar]] - a bal oldali navigációs menü, ami minden oldalon megtalálható.
 * [[JAMWiki:Footer]] - az oldal alján megjelenõ lábjegyzet.
+* [[JAMWiki:Header]]
 * [[JAMWiki:System.css]] - a CSS kódot tartalmazó oldal.
 
 Támogasd azzal a JAMWiki-t, hogy leírod a telepítés sikerességét a [http://jamwiki.org/ jamwiki.org] oldalon.  Kérdéseket, hibajelentéseket és ötleteket is hagyhatsz az oldalon, ezzel is segítve a wikit.  Ezen kívül ott megtalálhatod a legújabb JAMWiki dokumentációt is.

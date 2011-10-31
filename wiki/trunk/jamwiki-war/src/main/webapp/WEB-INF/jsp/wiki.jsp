@@ -69,6 +69,7 @@
 	<%@ include file="user-menu.jsp"%>
 	<%@ include file="top-menu.jsp"%>
 	<div id="contents" >
+	<div id="siteNotice"><c:out value="${pageHeader}" escapeXml="false" /></div>
 	<h1 id="contents-header"><jamwiki_t:wikiMessage message="${pageInfo.pageTitle}" /></h1>
 	<c:if test="${!empty pageInfo.redirectUrl}">
 	<div id="contentSub"><fmt:message key="topic.redirect.from"><fmt:param><a href="<c:out value="${pageInfo.redirectUrl}" />"><c:out value="${pageInfo.redirectName}" /></a></fmt:param></fmt:message></div>

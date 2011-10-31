@@ -57,6 +57,8 @@ public class WikiBase {
 	public static final String SPECIAL_PAGE_SIDEBAR = "JAMWiki:Sidebar";
 	/** Name of the default footer topic. */
 	public static final String SPECIAL_PAGE_FOOTER = "JAMWiki:Footer";
+	/** Name of the default header topic. */
+	public static final String SPECIAL_PAGE_HEADER = "JAMWiki:Header";
 	/** Name of the default jamwiki.css topic. */
 	public static final String SPECIAL_PAGE_SYSTEM_CSS = "JAMWiki:System.css";
 	/** Allow file uploads of any file type. */

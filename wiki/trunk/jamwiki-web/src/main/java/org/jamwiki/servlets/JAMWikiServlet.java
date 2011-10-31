@@ -88,6 +88,8 @@ public abstract class JAMWikiServlet extends AbstractController {
 		next.addObject("logo", virtualWiki.getLogoImageUrl());
 		String footer = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_FOOTER, true);
 		next.addObject("footer", footer);
+		String pageHeader = ServletUtil.cachedContent(request.getContextPath(), request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, true);
+		next.addObject("pageHeader", pageHeader);
 		next.addObject(WikiUtil.PARAMETER_VIRTUAL_WIKI, virtualWiki.getName());
 		// add cache-buster parameters for CSS & JS to ensure that browsers update
 		// cache if files change.

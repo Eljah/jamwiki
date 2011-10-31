@@ -6,6 +6,7 @@
 
 * [[JAMWiki:Sidebar]] - すべてのページの左に表示されるメニュー。
 * [[JAMWiki:Footer]] - すべてのページの下に表示されるフッター。
+* [[JAMWiki:Header]]
 * [[JAMWiki:System.css]] - このサイトのCSSスタイルを保持するスタイルシート。
 
 最後にJAMWikiプロジェクトへのご協力のお願いです。インストールの成否を、ぜひ、[http://jamwiki.org/ jamwiki.org]でお知らせください。

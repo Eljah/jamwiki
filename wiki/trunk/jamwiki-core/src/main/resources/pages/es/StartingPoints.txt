@@ -4,6 +4,7 @@ Puede editar cualquier página haciendo clic en la pestaña "Editar" en la parte
 
 * [[JAMWiki:Sidebar]] - El menú izquierdo de navegación que aparece en cada página.
 * [[JAMWiki:Footer]] - El pie de página que aparece en cada página.
+* [[JAMWiki:Header]]
 * [[JAMWiki:System.css]] - La hoja de estilos que contiene información de estilo CSS para su wiki.
 
 Por último, por favor contribuyan al proyecto JAMWiki presentando informes  del éxito o fracaso de su instalación en [http://jamwiki.org/ jamiki.org] de modo que JAMWiki pueda seguir mejorando.  Además, en [http://jamwiki.org/ jamwiki.org] se encuentra la documentación actualizada de JAMWiki,  incluyendo instrucciones para personalizar aún más su instalación.

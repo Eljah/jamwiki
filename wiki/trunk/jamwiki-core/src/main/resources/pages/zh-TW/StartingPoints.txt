@@ -6,6 +6,7 @@
 
 * [[JAMWiki:Sidebar]] - 出現在每個頁面左邊的導覽選單。
 * [[JAMWiki:Footer]] - 每個頁面的頁尾。
+* [[JAMWiki:Header]]
 * [[JAMWiki:System.css]] - 包含整個網站 CSS 樣式資訊的樣式表。
 
 最後，希望您能為 JAMWiki 盡點棉薄之力，將安裝的成功與否回報到 [http://jamwiki.org/ jamwiki.org]。

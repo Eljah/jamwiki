@@ -2,7 +2,7 @@
 
 === Next steps ===
 
-# Customize the look and feel of your wiki by editing the [[JAMWiki:Sidebar|sidebar]], [[JAMWiki:Footer|footer]] and (for advanced users) [[JAMWiki:System.css|CSS styles]].
+# Customize the look and feel of your wiki by editing the [[JAMWiki:Sidebar|sidebar]], [[JAMWiki:Footer|footer]], [[JAMWiki:Header|header]] and (for advanced users) [[JAMWiki:System.css|CSS styles]].
 # Update configuration settings from the [[Special:Admin]] page.  From this page a vast number of options can be changed, including the site name, description, and default settings.
 # Visit http://jamwiki.org/ for detailed documentation, to report bugs, and to provide feedback.
 # Go to https://lists.sourceforge.net/lists/listinfo/jamwiki-announce and sign up for the jamwiki-announce mailing list to be notified of future JAMWiki releases.
