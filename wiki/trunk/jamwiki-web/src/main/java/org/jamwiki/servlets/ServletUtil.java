@@ -144,6 +144,10 @@ public class ServletUtil {
 		}
 		try {
 			Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
+			if (topic == null) {
+				logger.warn("Missing system topic, this should be created to avoid errors: " + virtualWiki + " / " + topicName);
+				return content;
+			}
 			content = topic.getTopicContent();
 			if (cook) {
 				ParserInput parserInput = new ParserInput(virtualWiki, topicName);
