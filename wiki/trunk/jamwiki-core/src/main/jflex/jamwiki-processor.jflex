@@ -24,7 +24,7 @@ whitespace         = [ \n\t\f]
 entity             = (&#([0-9]{2,4});) | (&[A-Za-z]{2,6};)
 
 /* non-container expressions */
-hr                 = "----" ({newline})
+hr                 = "---" "-"+
 wikiheading6       = "======" (.+) "======" ({whitespace})*
 wikiheading5       = "=====" (.+) "=====" ({whitespace})*
 wikiheading4       = "====" (.+) "====" ({whitespace})*
@@ -301,8 +301,6 @@ endparagraph       = {newline} (({whitespace})*{newline})*
 <YYINITIAL> {
     ^{hr} {
         if (logger.isTraceEnabled()) logger.trace("hr: " + yytext() + " (" + yystate() + ")");
-        // pushback the closing newline
-        yypushback(1);
         this.pushTag(null, "<hr />");
         this.popTag("hr");
     }
