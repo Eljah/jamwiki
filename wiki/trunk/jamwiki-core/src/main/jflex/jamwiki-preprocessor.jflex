@@ -26,7 +26,7 @@ htmlpreattribute   = ([ \t]+) {htmlpreattributes} ([ \t]*=[^>\n]+[ \t]*)*
 htmlprestart       = (<[ \t]*pre ({htmlpreattribute})* [ \t]* (\/)? [ \t]*>)
 htmlpreend         = (<[ \t]*\/[ \t]*pre[ \t]*>)
 htmlpre            = ({htmlprestart}) ~({htmlpreend})
-wikipre            = (" ") ([^\n])+ ~({newline})
+wikipre            = (" ") ([^\n])
 wikipreend         = [^ ] | {newline}
 
 /* processing commands */

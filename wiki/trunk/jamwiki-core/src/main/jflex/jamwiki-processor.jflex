@@ -37,7 +37,7 @@ italic             = "''"
 
 /* lists */
 listitem           = [\*#\:;]+ [^\*#\:;]
-listend            = ({newline})+ [^\*#\:;\n]+ (.)+
+listend            = ({newline})+ [^\*#\:;\n\t\f ]
 listdt             = ":"
 
 /* nowiki */
@@ -50,7 +50,7 @@ attributeValueNoQuotes = [^>\n]+
 htmlattribute      = ([ \t]+) [a-zA-Z:]+ ([ \t]*=[ \t]*({attributeValueInQuotes}|{attributeValueInSingleQuotes}|{attributeValueNoQuotes}))*
 htmlprestart       = (<[ \t]*pre ({htmlattribute})* [ \t]* (\/)? [ \t]*>)
 htmlpreend         = (<[ \t]*\/[ \t]*pre[ \t]*>)
-wikipre            = (" ") ([^\n])+ ~({newline})
+wikipre            = (" ") ([^\n])
 wikipreend         = [^ ] | {newline}
 
 /* allowed html */
