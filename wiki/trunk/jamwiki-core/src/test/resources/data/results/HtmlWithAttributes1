@@ -1,6 +1,6 @@
 <p><font style="test">text</font></p>
 <p><font style="test" color="red">text</font></p>
-<p><font style="test" color="red">text</font></p>
+<p>&lt; font   style=&quot;test&quot; color=&quot;red&quot;  &gt;text&lt;  /  font  &gt;</p>
 <p><font color="red">text</font></p>
 <p><font color="red">text</font></p>
 <p><br style="height:10px" /></p>

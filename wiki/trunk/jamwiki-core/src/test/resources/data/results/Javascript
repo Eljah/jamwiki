@@ -1,5 +1,5 @@
 <p>&lt;script type=&quot;text/javascript&quot;&gt;alert(&quot;Hello!&quot;);&lt;/script&gt;</p>
-<p>&lt; script  type=&quot;text/javascript&quot;  &gt;alert(&quot;Hello!&quot;);&lt;  / script  &gt;</p>
+<p>&lt; script  type=&quot;text/javascript&quot;  &gt; alert(&quot;Hello!&quot;); &lt;  / script  &gt;</p>
 <p>&lt;script type=&quot;text/javascript&quot; foo='bar'&gt;alert(&quot;Hello!&quot;);&lt;/script&gt;</p>
 <p>&lt;script type=&quot;text/javascript&quot; style=&quot;invalid&quot;&gt;alert(&quot;Hello!&quot;);&lt;/script&gt;</p>
 <div>test</div>

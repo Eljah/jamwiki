@@ -18,16 +18,16 @@ newline            = "\n"
 whitespace         = {newline} | [ \t\f]
 
 /* nowiki */
-nowiki             = (<[ \t]*nowiki[ \t]*>) ~(<[ \t]*\/[ \t]*nowiki[ \t]*>)
+nowiki             = (<nowiki[ \t]*>) ~(<\/[ \t]*nowiki[ \t]*>)
 
 /* pre */
 htmlpreattributes  = class|dir|id|lang|style|title
 htmlpreattribute   = ([ \t]+) {htmlpreattributes} ([ \t]*=[^>\n]+[ \t]*)*
-htmlprestart       = (<[ \t]*pre ({htmlpreattribute})* [ \t]* (\/)? [ \t]*>)
-htmlpreend         = (<[ \t]*\/[ \t]*pre[ \t]*>)
+htmlprestart       = (<pre ({htmlpreattribute})* [ \t]* (\/)? >)
+htmlpreend         = (<\/[ \t]*pre[ \t]*>)
 
 /* javascript */
-javascript         = (<[ \t]*script[^>]*>) ~(<[ \t]*\/[ \t]*script[ \t]*>)
+javascript         = (<script[^>]*>) ~(<\/[ \t]*script[ \t]*>)
 
 /* processing commands */
 toc                = ({newline})? "__TOC__" ({newline})?

@@ -41,15 +41,15 @@ listend            = ({newline})+ [^\*#\:;\n\t\f ]
 listdt             = ":"
 
 /* nowiki */
-nowiki             = (<[ \t]*nowiki[ \t]*>) ~(<[ \t]*\/[ \t]*nowiki[ \t]*>)
+nowiki             = (<nowiki[ \t]*>) ~(<\/[ \t]*nowiki[ \t]*>)
 
 /* pre */
 attributeValueInQuotes = "\"" ~"\""
 attributeValueInSingleQuotes = "'" ~"'"
 attributeValueNoQuotes = [^>\n]+
 htmlattribute      = ([ \t]+) [a-zA-Z:]+ ([ \t]*=[ \t]*({attributeValueInQuotes}|{attributeValueInSingleQuotes}|{attributeValueNoQuotes}))*
-htmlprestart       = (<[ \t]*pre ({htmlattribute})* [ \t]* (\/)? [ \t]*>)
-htmlpreend         = (<[ \t]*\/[ \t]*pre[ \t]*>)
+htmlprestart       = (<pre ({htmlattribute})* [ \t]* (\/)? >)
+htmlpreend         = (<\/[ \t]*pre[ \t]*>)
 wikipre            = (" ") ([^\n])
 wikipreend         = [^ ] | {newline}
 
@@ -58,16 +58,16 @@ heading            = h1|h2|h3|h4|h5|h6
 inlinetag          = abbr|br|b|big|cite|code|del|em|font|i|ins|s|small|span|strike|strong|sub|sup|tt|u|var
 blockleveltag      = blockquote|caption|center|col|colgroup|dd|div|dl|dt|{heading}|hr|li|ol|p|table|tbody|td|tfoot|th|thead|tr|ul
 htmlkeyword        = {inlinetag}|{blockleveltag}
-htmlbr             = <[ \t]* (\/)? [ \t]* br ({htmlattribute})* [ \t]* (\/)? [ \t]*>
-htmlparagraphopen  = <[ \t]* p ({htmlattribute})* [ \t]* (\/)? [ \t]*>
-htmlparagraphclose = (<[ \t]*\/[ \t]*) p ([ \t]*>)
-htmltagopen        = <[ \t]* ({htmlkeyword}) ({htmlattribute})* [ \t]* (\/)? [ \t]*>
-htmltagclose       = (<[ \t]*\/[ \t]*) {htmlkeyword} ([ \t]*>)
-htmltagnocontent   = (<[ \t]*) {htmlkeyword} ({htmlattribute})* ([ \t]*\/[ \t]*>)
-htmlheading        = (<[ \t]*h[1-6][^>]*>) ~(<[ \t]*\/[ \t]*h[1-6][ \t]*>)
+htmlbr             = "<" (\/)? [ \t]* br ({htmlattribute})* [ \t]* (\/)? >
+htmlparagraphopen  = "<p" ({htmlattribute})* [ \t]* (\/)? >
+htmlparagraphclose = (<\/[ \t]*) p ([ \t]*>)
+htmltagopen        = < ({htmlkeyword}) ({htmlattribute})* [ \t]* (\/)? >
+htmltagclose       = (<\/[ \t]*) {htmlkeyword} ([ \t]*>)
+htmltagnocontent   = (<) {htmlkeyword} ({htmlattribute})* ([ \t]*\/[ \t]*>)
+htmlheading        = (<h[1-6][^>]*>) ~(<\/[ \t]*h[1-6][ \t]*>)
 
 /* javascript */
-javascript         = {newline}* (<[ \t]*script[^>]*>) ~(<[ \t]*\/[ \t]*script[ \t]*>)
+javascript         = {newline}* (<script[^>]*>) ~(<\/[ \t]*script[ \t]*>)
 
 /* processing commands */
 notoc              = "__NOTOC__"
@@ -95,9 +95,9 @@ wikilink           = "[[" ({wikilinkcontent})+ "]]" [a-z]*
 nestedwikilink     = "[[" ({wikilinkcontent})+ "|" ({wikilinkcontent} | {wikilink})+ "]]"
 
 /* references */
-reference          = (<[ \t]*) "ref" ([ \t]+name[ \t]*=[^>\/\n]+[ \t]*)? ([ \t]*>) ~(<[ \t]*\/[ \t]*ref[ \t]*>)
-referencenocontent = (<[ \t]*) "ref" ([ \t]+name[ \t]*=[^>\/\n]+[ \t]*) ([ \t]*\/[ \t]*>)
-references         = (<[ \t]*) "references" ([ \t]*[\/]?[ \t]*>)
+reference          = "<ref" ([ \t]+name[ \t]*=[^>\/\n]+[ \t]*)? ([ \t]*>) ~(<\/[ \t]*ref[ \t]*>)
+referencenocontent = "<ref" ([ \t]+name[ \t]*=[^>\/\n]+[ \t]*) ([ \t]*\/[ \t]*>)
+references         = "<references" ([ \t]*[\/]?[ \t]*>)
 
 /* paragraphs */
 endparagraph       = {newline} (({whitespace})*{newline})*

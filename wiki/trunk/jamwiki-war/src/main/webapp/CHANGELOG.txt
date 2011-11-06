@@ -21,6 +21,9 @@ New Features:
     JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
   * Add a new JAMWiki:Header system topic that allows adding a custom message
     to the top of all pages, just below the tab bar.
+  * Be more strict with HTML-like tags: tags of the form "< tag>" or "< / tag>"
+    are no longer supported and must be of the form "<tag>" or "</tag>".  This
+    matches Mediawiki.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to commons-lang 3.0.1.
   * Upgrade to commons-io-2.1.
