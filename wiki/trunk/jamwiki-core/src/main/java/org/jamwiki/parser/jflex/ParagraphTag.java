@@ -47,7 +47,7 @@ public class ParagraphTag implements JFlexParserTag {
 			// convert newlines to a single space.
 			return " ";
 		}
-		if (jamwikiLexer.peekTag().isTableTag()) {
+		if (jamwikiLexer.peekTag().isTableTag() && !jamwikiLexer.peekTag().getTagType().equals("td") && !jamwikiLexer.peekTag().getTagType().equals("th")) {
 			// this should never happen for a wiki table, but if parsing an HTML
 			// table do not perform any paragraph parsing within the table, just
 			// convert newlines to a single space.

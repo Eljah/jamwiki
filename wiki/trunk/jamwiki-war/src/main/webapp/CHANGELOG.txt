@@ -37,6 +37,8 @@ Bugfixes:
     compatibility.  For example, paragraphs can now start with "<".
   * Fix wiki line break ("----") to match Mediawiki by allowing four or more
     dashes as well as text on the same line as the dashes.
+  * Newlines in table cells will now start a paragraph, matching Mediawiki
+    behavior.
 
 Translation Updates:
 

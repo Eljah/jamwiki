@@ -107,7 +107,7 @@ endparagraph       = {newline} (({whitespace})*{newline})*
 
 /* ----- paragraphs ----- */
 
-<YYINITIAL> {
+<YYINITIAL, TABLE> {
     {endparagraph} {
         if (logger.isTraceEnabled()) logger.trace("endparagraph: " + yytext() + " (" + yystate() + ")");
         return this.parse(TAG_TYPE_PARAGRAPH, yytext());

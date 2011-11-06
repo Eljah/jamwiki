@@ -17,8 +17,8 @@ right side
 {| border="0"
 |+''A table in a table''
 |-
-| align="center" width="150px" | [[Image:Wiki.png]]
-| align="center" width="150px" | [[Image:Wiki.png]]
+| align="center" width="150px" | [[Image:Test Image.jpg]]
+| align="center" width="150px" | [[Image:Test Image.jpg]]
 |-
 | align="center" colspan="2" style="border-top:1px solid red; border-right:1px solid red; border-bottom:2px solid red; border-left:1px solid red;" |
 Two Wikimedia logos
