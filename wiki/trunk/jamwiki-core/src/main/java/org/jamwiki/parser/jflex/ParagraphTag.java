@@ -17,16 +17,7 @@
 package org.jamwiki.parser.jflex;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.DataAccessException;
-import org.jamwiki.Environment;
-import org.jamwiki.WikiException;
-import org.jamwiki.model.Namespace;
-import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
-import org.jamwiki.parser.ParserInput;
-import org.jamwiki.parser.ParserOutput;
-import org.jamwiki.parser.WikiLink;
-import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -50,7 +41,6 @@ public class ParagraphTag implements JFlexParserTag {
 			return raw;
 		}
 		JAMWikiLexer jamwikiLexer = (JAMWikiLexer)lexer;
-		String parentTagType = jamwikiLexer.peekTag().getTagType();
 		if (jamwikiLexer.peekTag().isListTag()) {
 			// this should never happen for a wiki list, but if parsing an HTML
 			// list do not perform any paragraph parsing within the list, just
