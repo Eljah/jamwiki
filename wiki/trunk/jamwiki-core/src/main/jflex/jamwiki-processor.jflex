@@ -54,9 +54,8 @@ wikipre            = (" ") ([^\n])
 wikipreend         = [^ ] | {newline}
 
 /* allowed html */
-heading            = h1|h2|h3|h4|h5|h6
-inlinetag          = abbr|br|b|big|cite|code|del|em|font|i|ins|s|small|span|strike|strong|sub|sup|tt|u|var
-blockleveltag      = blockquote|caption|center|col|colgroup|dd|div|dl|dt|{heading}|hr|li|ol|p|table|tbody|td|tfoot|th|thead|tr|ul
+inlinetag          = abbr|b|big|cite|code|del|em|font|i|ins|s|small|span|strike|strong|sub|sup|tt|u|var
+blockleveltag      = blockquote|caption|center|col|colgroup|dd|div|dl|dt|hr|li|ol|table|tbody|td|tfoot|th|thead|tr|ul
 htmlkeyword        = {inlinetag}|{blockleveltag}
 htmlbr             = "<" (\/)? [ \t]* br ({htmlattribute})* [ \t]* (\/)? >
 htmlparagraphopen  = "<p" ({htmlattribute})* [ \t]* (\/)? >
