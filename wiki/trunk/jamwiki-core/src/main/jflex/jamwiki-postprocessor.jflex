@@ -30,10 +30,10 @@ htmlpreend         = (<[ \t]*\/[ \t]*pre[ \t]*>)
 javascript         = (<[ \t]*script[^>]*>) ~(<[ \t]*\/[ \t]*script[ \t]*>)
 
 /* processing commands */
-toc                = "__TOC__"
+toc                = ({newline})? "__TOC__" ({newline})?
 
 /* references */
-references         = (<[ \t]*) "references" ([ \t]*[\/]?[ \t]*>)
+references         = "<references />"
 
 %state PRE
 
@@ -75,7 +75,7 @@ references         = (<[ \t]*) "references" ([ \t]*[\/]?[ \t]*>)
 
     {toc} {
         if (logger.isTraceEnabled()) logger.trace("toc: " + yytext() + " (" + yystate() + ")");
-        return this.parserInput.getTableOfContents().attemptTOCInsertion(this.parserInput);
+        return this.parserInput.getTableOfContents().attemptTOCInsertion(this.parserInput, yytext());
     }
 
     /* ----- references ----- */

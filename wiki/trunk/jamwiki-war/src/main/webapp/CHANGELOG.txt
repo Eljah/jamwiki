@@ -30,6 +30,8 @@ Bugfixes:
   * "{{ns:}}" should return the same value as "{{ns:0}}" to match Mediawiki.
   * Topic exports containing UTF-8 should not escape unicode characters.
     Reported by cstenkes.
+  * Overhaul paragraph parsing to fix several edge cases and improve Mediawiki
+    compatibility.  For example, paragraphs can now start with "<".
 
 Translation Updates:
 

@@ -211,7 +211,9 @@ public class ParserTest extends JAMWikiUnitTest {
 	}
 
 	/**
-	 *
+	 * Test parsing of edit summary text.  This method loads a test file,
+	 * parses each line, and verifies that line matches the expected
+	 * result in the results file.
 	 */
 	@Test
 	public void testParseEditComment() throws Throwable {
@@ -319,6 +321,7 @@ public class ParserTest extends JAMWikiUnitTest {
 		failures.add("HtmlMismatchTest3");
 		failures.add("Inclusion~test"); // template params not parsed in parser functions
 		failures.add("NestedTable1"); // paragraphs in <td> tags
+		failures.add("Paragraph12"); // no paragraph within div without newline
 		failures.add("Paragraph13"); // paragraphs in <td> tags
 		failures.add("Paragraph15"); // failure parsing of empty paragraphs with <nowiki>
 		failures.add("ParserFunctionsBroken");

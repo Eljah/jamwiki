@@ -22,24 +22,22 @@ import org.jamwiki.utils.Utilities;
 newline            = "\n"
 whitespace         = [ \n\t\f]
 entity             = (&#([0-9]{2,4});) | (&[A-Za-z]{2,6};)
-emptyline          = ([ \t])* ({newline})
 
 /* non-container expressions */
-hr                 = ({newline})? "----" ({newline})
-wikiheading6       = "======" (.+) "======"
-wikiheading5       = "=====" (.+) "====="
-wikiheading4       = "====" (.+) "===="
-wikiheading3       = "===" (.+) "==="
-wikiheading2       = "==" (.+) "=="
-wikiheading1       = "=" (.+) "="
-wikiheading        = ({wikiheading6})|({wikiheading5})|({wikiheading4})|({wikiheading3})|({wikiheading2})|({wikiheading1})
+hr                 = "----" ({newline})
+wikiheading6       = "======" (.+) "======" ({whitespace})*
+wikiheading5       = "=====" (.+) "=====" ({whitespace})*
+wikiheading4       = "====" (.+) "====" ({whitespace})*
+wikiheading3       = "===" (.+) "===" ({whitespace})*
+wikiheading2       = "==" (.+) "==" ({whitespace})*
+wikiheading1       = "=" (.+) "=" ({whitespace})*
 bold               = "'''"
 bolditalic         = "'''''"
 italic             = "''"
 
 /* lists */
 listitem           = [\*#\:;]+ [^\*#\:;]
-listend            = [^\*#\:;\n]+ (.)+
+listend            = ({newline})+ [^\*#\:;\n]+ (.)+
 listdt             = ":"
 
 /* nowiki */
@@ -63,16 +61,13 @@ htmlkeyword        = {inlinetag}|{blockleveltag}
 htmlbr             = <[ \t]* (\/)? [ \t]* br ({htmlattribute})* [ \t]* (\/)? [ \t]*>
 htmlparagraphopen  = <[ \t]* p ({htmlattribute})* [ \t]* (\/)? [ \t]*>
 htmlparagraphclose = (<[ \t]*\/[ \t]*) p ([ \t]*>)
-inlinetagopen      = <[ \t]* ({inlinetag}) ({htmlattribute})* [ \t]* (\/)? [ \t]*>
-blockleveltagopen  = <[ \t]* ({blockleveltag}) ({htmlattribute})* [ \t]* (\/)? [ \t]*>
-blockleveltagclose = (<[ \t]*\/[ \t]*) {blockleveltag} ([ \t]*>)
 htmltagopen        = <[ \t]* ({htmlkeyword}) ({htmlattribute})* [ \t]* (\/)? [ \t]*>
 htmltagclose       = (<[ \t]*\/[ \t]*) {htmlkeyword} ([ \t]*>)
 htmltagnocontent   = (<[ \t]*) {htmlkeyword} ({htmlattribute})* ([ \t]*\/[ \t]*>)
 htmlheading        = (<[ \t]*h[1-6][^>]*>) ~(<[ \t]*\/[ \t]*h[1-6][ \t]*>)
 
 /* javascript */
-javascript         = (<[ \t]*script[^>]*>) ~(<[ \t]*\/[ \t]*script[ \t]*>)
+javascript         = {newline}* (<[ \t]*script[^>]*>) ~(<[ \t]*\/[ \t]*script[ \t]*>)
 
 /* processing commands */
 notoc              = "__NOTOC__"
@@ -105,45 +100,24 @@ referencenocontent = (<[ \t]*) "ref" ([ \t]+name[ \t]*=[^>\/\n]+[ \t]*) ([ \t]*\
 references         = (<[ \t]*) "references" ([ \t]*[\/]?[ \t]*>)
 
 /* paragraphs */
-/* TODO: this pattern does not match text such as "< is a less than sign" */
-startparagraph     = ({emptyline})? ({emptyline})? ([^< \n])|{inlinetagopen}|{wikilink}|{nestedwikilink}|{htmllink}|{bold}|{bolditalic}|{italic}|{entity}|{nowiki}
-paragraphempty     = ({emptyline}) ({emptyline})+
-endparagraph1      = ({newline}){1,2} ({hr}|{wikiheading}|{listitem}|{wikipre}|{tablestart})
-endparagraph2      = (({newline})([ \t]*)){2}
-endparagraph3      = {blockleveltagopen}|{htmlprestart}|{blockleveltagclose}
-endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
+endparagraph       = {newline} (({whitespace})*{newline})*
 
-%state TABLE, LIST, PRE, WIKIPRE, PARAGRAPH
+%state TABLE, LIST, PRE, WIKIPRE
 
 %%
 
 /* ----- paragraphs ----- */
 
 <YYINITIAL> {
-    ^{startparagraph} {
-        if (logger.isTraceEnabled()) logger.trace("startparagraph: " + yytext() + " (" + yystate() + ")");
-        this.parseParagraphStart(yytext());
-        beginState(PARAGRAPH);
-        return "";
-    }
-    ^{paragraphempty} {
-        if (logger.isTraceEnabled()) logger.trace("paragraphempty: " + yytext() + " (" + yystate() + ")");
-        this.parseParagraphEmpty(yytext());
-        return "";
-    }
-}
-<PARAGRAPH> {
     {endparagraph} {
         if (logger.isTraceEnabled()) logger.trace("endparagraph: " + yytext() + " (" + yystate() + ")");
-        this.parseParagraphEnd(yytext());
-        endState();
-        return "";
+        return this.parse(TAG_TYPE_PARAGRAPH, yytext());
     }
 }
 
 /* ----- nowiki ----- */
 
-<YYINITIAL, WIKIPRE, PRE, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, WIKIPRE, PRE, LIST, TABLE> {
     {nowiki} {
         if (logger.isTraceEnabled()) logger.trace("nowiki: " + yytext() + " (" + yystate() + ")");
         String content = JFlexParserUtil.tagContent(yytext());
@@ -198,7 +172,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- table of contents ----- */
 
-<YYINITIAL, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, LIST, TABLE> {
     {notoc} {
         if (logger.isTraceEnabled()) logger.trace("notoc: " + yytext() + " (" + yystate() + ")");
         this.parserInput.getTableOfContents().setStatus(TableOfContents.STATUS_NO_TOC);
@@ -219,14 +193,12 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- tables ----- */
 
-<YYINITIAL, TABLE, PARAGRAPH> {
+<YYINITIAL, TABLE> {
     ^{tablestart} {
         if (logger.isTraceEnabled()) logger.trace("tablestart: " + yytext() + " (" + yystate() + ")");
-        if (this.peekTag().getTagType().equals("p")) {
-            popTag("p");
-        }
-        if (yystate() == PARAGRAPH) {
-            endState();
+        if (this.paragraphIsOpen()) {
+            // make sure a previous paragraph doesn't need to be closed
+            this.popTag("p");
         }
         beginState(TABLE);
         String tagAttributes = yytext().trim().substring(2).trim();
@@ -331,26 +303,27 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
         if (logger.isTraceEnabled()) logger.trace("hr: " + yytext() + " (" + yystate() + ")");
         // pushback the closing newline
         yypushback(1);
-        return "<hr />";
+        this.pushTag(null, "<hr />");
+        this.popTag("hr");
     }
 }
-<YYINITIAL, PARAGRAPH, TABLE> {
-    ^{newline}? {wikiheading6} {
+<YYINITIAL, TABLE> {
+    ^{wikiheading6}$ {
         return this.parse(TAG_TYPE_WIKI_HEADING, yytext(), 6);
     }
-    ^{newline}? {wikiheading5} {
+    ^{wikiheading5}$ {
         return this.parse(TAG_TYPE_WIKI_HEADING, yytext(), 5);
     }
-    ^{newline}? {wikiheading4} {
+    ^{wikiheading4}$ {
         return this.parse(TAG_TYPE_WIKI_HEADING, yytext(), 4);
     }
-    ^{newline}? {wikiheading3} {
+    ^{wikiheading3}$ {
         return this.parse(TAG_TYPE_WIKI_HEADING, yytext(), 3);
     }
-    ^{newline}? {wikiheading2} {
+    ^{wikiheading2}$ {
         return this.parse(TAG_TYPE_WIKI_HEADING, yytext(), 2);
     }
-    ^{newline}? {wikiheading1} {
+    ^{wikiheading1}$ {
         return this.parse(TAG_TYPE_WIKI_HEADING, yytext(), 1);
     }
     {htmlheading} {
@@ -360,15 +333,9 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- lists ----- */
 
-<YYINITIAL, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, LIST, TABLE> {
     ^{listitem} {
         if (logger.isTraceEnabled()) logger.trace("listitem: " + yytext() + " (" + yystate() + ")");
-        if (this.peekTag().getTagType().equals("p")) {
-            popTag("p");
-        }
-        if (yystate() == PARAGRAPH) {
-            endState();
-        }
         if (yystate() != LIST) beginState(LIST);
         // one non-list character matched, roll it back
         yypushback(1);
@@ -377,7 +344,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     }
 }
 <LIST> {
-    ^{listend} {
+    {listend} {
         if (logger.isTraceEnabled()) logger.trace("listend: " + yytext() + " (" + yystate() + ")");
         String raw = yytext();
         // roll back any matches to allow re-parsing
@@ -400,7 +367,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- wiki links ----- */
 
-<YYINITIAL, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, LIST, TABLE> {
     {wikilink} {
         if (logger.isTraceEnabled()) logger.trace("wikilink: " + yytext() + " (" + yystate() + ")");
         return this.parse(TAG_TYPE_WIKI_LINK, yytext());
@@ -421,7 +388,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- bold / italic ----- */
 
-<YYINITIAL, WIKIPRE, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, WIKIPRE, LIST, TABLE> {
     {bold} {
         return this.parse(TAG_TYPE_WIKI_BOLD_ITALIC, yytext(), "b");
     }
@@ -435,7 +402,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- references ----- */
 
-<YYINITIAL, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, LIST, TABLE> {
     {reference} {
         return this.parse(TAG_TYPE_WIKI_REFERENCE, yytext());
     }
@@ -444,7 +411,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
     }
     {references} {
         logger.trace("references: " + yytext() + " (" + yystate() + ")");
-        if (this.peekTag().getTagType().equals("p")) {
+        if (this.paragraphIsOpen()) {
             // if a paragraph is already opened, close it
             this.popTag("p");
         }
@@ -454,7 +421,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- html ----- */
 
-<YYINITIAL, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, LIST, TABLE> {
     {htmlbr} {
         if (logger.isTraceEnabled()) logger.trace("htmlbr: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
@@ -470,14 +437,11 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
         if (!allowHTML()) {
             return StringEscapeUtils.escapeHtml4(yytext());
         }
-        if (this.peekTag().getTagType().equals("p")) {
-            // if a paragraph is already opened, close it before opening a new paragraph
+        if (this.paragraphIsOpen()) {
+            // make sure a previous paragraph doesn't need to be closed
             this.popTag("p");
         }
-        this.pushTag("p", yytext());
-        if (yystate() != PARAGRAPH) {
-            beginState(PARAGRAPH);
-        }
+        this.pushTag(null, yytext());
         return "";
     }
     {htmlparagraphclose} {
@@ -485,24 +449,26 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
         if (!allowHTML()) {
             return StringEscapeUtils.escapeHtml4(yytext());
         }
-        if (this.peekTag().getTagType().equals("p")) {
+        if (this.paragraphIsOpen()) {
             // only perform processing if a paragraph is open.  otherwise just suppress this tag.
-            this.popTag("p");
-        }
-        if (yystate() == PARAGRAPH) {
-            endState();
+            this.parse(TAG_TYPE_PARAGRAPH, null);
         }
         return "";
     }
 }
-<YYINITIAL, WIKIPRE, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, WIKIPRE, LIST, TABLE> {
     {htmltagnocontent} {
         if (logger.isTraceEnabled()) logger.trace("htmltagnocontent: " + yytext() + " (" + yystate() + ")");
         if (!allowHTML()) {
             return StringEscapeUtils.escapeHtml4(yytext());
         }
-        HtmlTagItem tagItem = JFlexParserUtil.sanitizeHtmlTag(yytext());
-        return (tagItem == null) ? "" : tagItem.toHtml();
+        HtmlTagItem htmlTagItem = JFlexParserUtil.sanitizeHtmlTag(yytext());
+        if (htmlTagItem != null) {
+            JFlexTagItem jflexTagItem = new JFlexTagItem(htmlTagItem);
+            this.pushTag(jflexTagItem);
+            this.popTag(jflexTagItem.getTagType());
+        }
+        return "";
     }
     {htmltagopen} {
         if (logger.isTraceEnabled()) logger.trace("htmltagopen: " + yytext() + " (" + yystate() + ")");
@@ -524,7 +490,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- javascript ----- */
 
-<YYINITIAL, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, LIST, TABLE> {
     {javascript} {
         return this.parse(TAG_TYPE_JAVASCRIPT, yytext());
     }
@@ -532,19 +498,7 @@ endparagraph       = {endparagraph1}|{endparagraph2}|{endparagraph3}
 
 /* ----- other ----- */
 
-<YYINITIAL> {
-    ^{emptyline} {
-        // suppress superfluous empty lines
-        return "";
-    }
-}
-<PARAGRAPH> {
-    {newline} {
-        // convert newlines within paragraphs to spaces
-        return " ";
-    }
-}
-<YYINITIAL, WIKIPRE, PRE, LIST, TABLE, PARAGRAPH> {
+<YYINITIAL, WIKIPRE, PRE, LIST, TABLE> {
     {entity} {
         if (logger.isTraceEnabled()) logger.trace("entity: " + yytext() + " (" + yystate() + ")");
         String raw = yytext();

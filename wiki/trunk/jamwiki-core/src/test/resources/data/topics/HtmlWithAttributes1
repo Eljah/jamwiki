@@ -39,6 +39,10 @@
 <s>s</s>
 <strike>strike</strike>
 
+<div id="div_id">
+test
+</div>
+
 <blockquote id="blockquote" cite="cite" foo="bar">
 blockquote
 </blockquote>

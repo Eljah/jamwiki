@@ -158,7 +158,7 @@ public class JFlexParser extends AbstractParser {
 		// layout should not be done while parsing fragments
 		preMode = (mode > JFlexParser.MODE_PROCESS) ? JFlexParser.MODE_PROCESS : mode;
 		output = this.parseProcess(parserOutput, output, preMode);
-		return output;
+		return output.trim();
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class JFlexParser extends AbstractParser {
 		}
 		String topicName = (!StringUtils.isBlank(this.parserInput.getTopicName())) ? this.parserInput.getTopicName() : null;
 		logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
-		return output;
+		return output.trim();
 	}
 
 	/**

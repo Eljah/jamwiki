@@ -95,15 +95,16 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 	/**
 	 *
 	 */
-	private String generateOutput(JFlexLexer lexer, String tagName, String tocText, String tagText, int level, String raw, Object... args) throws ParserException {
-		StringBuilder output = new StringBuilder(this.updateToc(lexer.getParserInput(), tagName, tocText, level));
+	private String generateOutput(JAMWikiLexer lexer, String tagName, String tocText, String tagText, int level, String raw, Object... args) throws ParserException {
+		lexer.peekTag().getTagContent().append(this.updateToc(lexer.getParserInput(), tagName, tocText, level));
 		int nextSection = lexer.getParserInput().getTableOfContents().size();
-		output.append(generateTagOpen(raw, args));
-		output.append(this.buildSectionEditLink(lexer.getParserInput(), nextSection));
+		String tagType = "h" + level;
+		lexer.pushTag(tagType, this.generateTagOpen(raw, args));
+		lexer.peekTag().getTagContent().append(this.buildSectionEditLink(lexer.getParserInput(), nextSection));
 		String parsedTocText = this.processTocText(lexer.getParserInput(), lexer.getParserOutput(), tagText, lexer.getMode());
-		output.append("<span id=\"").append(tagName).append("\">").append(parsedTocText).append("</span>");
-		output.append("</h").append(level).append('>');
-		return output.toString();
+		lexer.peekTag().getTagContent().append("<span id=\"").append(tagName).append("\">").append(parsedTocText).append("</span>");
+		lexer.popTag(tagType);
+		return "";
 	}
 
 	/**
@@ -133,12 +134,6 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 		raw = raw.trim();
 		int level = this.generateTagLevel(raw, args);
 		String tagText = this.generateTagText(raw, args);
-		if (lexer instanceof JAMWikiLexer && ((JAMWikiLexer)lexer).peekTag().getTagType().equals("p")) {
-			((JAMWikiLexer)lexer).popTag("p");
-		}
-		if (lexer instanceof JAMWikiLexer && lexer.yystate() == JAMWikiLexer.PARAGRAPH) {
-			lexer.endState();
-		}
 		String tocText = this.buildTocText(lexer, tagText);
 		String tagName = this.buildTagName(lexer, tocText);
 		if (lexer.getMode() <= JFlexParser.MODE_SLICE) {
@@ -146,7 +141,15 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 			lexer.getParserOutput().setSectionName(sectionName);
 			return raw;
 		}
-		return this.generateOutput(lexer, tagName, tocText, tagText, level, raw, args);
+		if (!(lexer instanceof JAMWikiLexer)) {
+			throw new IllegalStateException("Cannot parse heading tags except with instances of JAMWikiLexer or in slice/splice mode");
+		}
+		JAMWikiLexer jamwikiLexer = (JAMWikiLexer)lexer;
+		if (jamwikiLexer.paragraphIsOpen()) {
+			// close any open paragraph
+			jamwikiLexer.popTag("p");
+		}
+		return this.generateOutput(jamwikiLexer, tagName, tocText, tagText, level, raw, args);
 	}
 
 	/**

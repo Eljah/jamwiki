@@ -37,8 +37,9 @@ class JFlexTagItem {
 	private static final List<String> LIST_TAGS = Arrays.asList("dd", "dl", "dt", "li", "ol", "ul");
 	private static final List<String> NON_NESTING_TAGS = Arrays.asList("col", "colgroup", "dd", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
 	private static final List<String> NON_TEXT_BODY_TAGS = Arrays.asList("col", "colgroup", "dl", "ol", "table", "tbody", "tfoot", "thead", "tr", "ul");
-	private static final List<String> NON_INLINE_TAGS = Arrays.asList("caption", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
-	private static final String nonInlineTagPattern = "(caption|col|colgroup|dd|div|dl|dt|h1|h2|h3|h4|h5|h6|hr|li|ol|p|table|tbody|td|tfoot|th|thead|tr|ul)";
+	private static final List<String> NON_INLINE_TAGS = Arrays.asList("blockquote", "caption", "center", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
+	private static final List<String> TABLE_TAGS = Arrays.asList("caption", "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr");
+	private static final String nonInlineTagPattern = "(blockquote|caption|center|col|colgroup|dd|div|dl|dt|h1|h2|h3|h4|h5|h6|hr|li|ol|p|pre|table|tbody|td|tfoot|th|thead|tr|ul)";
 	private static final String nonInlineTagStartPattern = "<" + nonInlineTagPattern + "[ >].*";
 	private static final String nonInlineTagEndPattern = ".*</" + nonInlineTagPattern + ">";
 	private static final Pattern NON_INLINE_TAG_START_PATTERN = Pattern.compile(nonInlineTagStartPattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -48,6 +49,27 @@ class JFlexTagItem {
 	private HtmlTagItem htmlTagItem = null;
 	private final StringBuilder tagContent = new StringBuilder();
 	private String tagType = null;
+
+	/**
+	 *
+	 */
+	JFlexTagItem(String tagType) {
+		if (tagType == null) {
+			throw new IllegalArgumentException("tagType must not be null");
+		}
+		this.tagType = tagType;
+	}
+
+	/**
+	 *
+	 */
+	JFlexTagItem(HtmlTagItem htmlTagItem) {
+		if (htmlTagItem == null) {
+			throw new IllegalArgumentException("htmlTagItem must not be null");
+		}
+		this.htmlTagItem = htmlTagItem;
+		this.tagType = this.htmlTagItem.getTagType();
+	}
 
 	/**
 	 *
@@ -116,7 +138,14 @@ class JFlexTagItem {
 		if (this.isRootTag()) {
 			return true;
 		}
-		return (EMPTY_BODY_TAGS.indexOf(this.tagType) != -1);
+		return (EMPTY_BODY_TAGS.contains(this.tagType));
+	}
+
+	/**
+	 * Determine if the tag is an empty paragraph tag.
+	 */
+	protected boolean isEmptyParagraphTag() {
+		return (this.getTagType().equals("p") && StringUtils.isBlank(this.getTagContent()));
 	}
 
 	/**
@@ -128,7 +157,7 @@ class JFlexTagItem {
 		if (this.isRootTag()) {
 			return true;
 		}
-		return (NON_INLINE_TAGS.indexOf(this.tagType) == -1);
+		return (!NON_INLINE_TAGS.contains(this.tagType));
 	}
 
 	/**
@@ -142,7 +171,7 @@ class JFlexTagItem {
 	 * Determine if the tag is a list item tag (dd, dt, li).
 	 */
 	protected static boolean isListItemTag(String tagType) {
-		return (LIST_ITEM_TAGS.indexOf(tagType) != -1);
+		return (LIST_ITEM_TAGS.contains(tagType));
 	}
 
 	/**
@@ -156,7 +185,7 @@ class JFlexTagItem {
 	 * Determine if the tag is a list tag (dd, dl, dt, li, ol, ul).
 	 */
 	protected static boolean isListTag(String tagType) {
-		return (LIST_TAGS.indexOf(tagType) != -1);
+		return (LIST_TAGS.contains(tagType));
 	}
 
 	/**
@@ -172,7 +201,7 @@ class JFlexTagItem {
 	 * another "li" tag.
 	 */
 	protected static boolean isNonNestingTag(String tagType) {
-		return (NON_NESTING_TAGS.indexOf(tagType) != -1);
+		return (NON_NESTING_TAGS.contains(tagType));
 	}
 
 	/**
@@ -198,6 +227,13 @@ class JFlexTagItem {
 	}
 
 	/**
+	 * Determine if the tag is a table tag.
+	 */
+	protected boolean isTableTag() {
+		return (TABLE_TAGS.contains(this.tagType));
+	}
+
+	/**
 	 * Determine whether the tag allows text body content.  Some tags, such
 	 * as "table", allow only tag content and no text content.
 	 */
@@ -205,7 +241,7 @@ class JFlexTagItem {
 		if (this.isRootTag()) {
 			return true;
 		}
-		return (NON_TEXT_BODY_TAGS.indexOf(this.tagType) == -1);
+		return (!NON_TEXT_BODY_TAGS.contains(this.tagType));
 	}
 
 	/**
@@ -221,9 +257,14 @@ class JFlexTagItem {
 	 */
 	public String toHtml() {
 		String content = this.tagContent.toString();
-		// if no content do not generate a tag
-		if (StringUtils.isBlank(content) && !this.isEmptyBodyTag()) {
-			return "";
+		if (StringUtils.isBlank(content)) {
+			if (!this.isEmptyBodyTag()) {
+				// if no content do not generate a tag
+				return "";
+			} else if (this.htmlTagItem != null) {
+				// generate an empty tag
+				return this.htmlTagItem.toHtml();
+			}
 		}
 		StringBuilder result = new StringBuilder();
 		if (!this.isRootTag()) {
@@ -262,7 +303,7 @@ class JFlexTagItem {
 		if (!this.isRootTag()) {
 			result.append("</").append(this.tagType).append('>');
 		}
-		if (this.isTextBodyTag() && !this.isRootTag() && this.isInlineTag() && !this.tagType.equals("pre")) {
+		if (this.isTextBodyTag() && !this.isRootTag() && this.isInlineTag() && !this.tagType.equals("pre") && !this.tagType.equals("script")) {
 			// work around issues such as "text''' text'''", where the output should
 			// be "text <b>text</b>", by moving the whitespace to the parent tag
 			int firstWhitespaceIndex = content.indexOf(content.trim());

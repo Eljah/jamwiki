@@ -39,10 +39,9 @@ public class JavascriptTag implements JFlexParserTag {
 			logger.trace("javascript: " + raw + " (" + lexer.yystate() + ")");
 		}
 		if (StringUtils.isBlank(raw)) {
-			// no link to display
 			return raw;
 		}
-		return this.parseScriptTag(lexer.getParserInput(), lexer.getParserOutput(), raw, lexer.getMode());
+		return this.parseScriptTag(lexer, raw, lexer.getMode());
 	}
 
 	/**
@@ -64,12 +63,18 @@ public class JavascriptTag implements JFlexParserTag {
 	/**
 	 *
 	 */
-	private String parseScriptTag(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
+	private String parseScriptTag(JFlexLexer lexer, String raw, int mode) throws ParserException {
 		if (mode >= JFlexParser.MODE_POSTPROCESS) {
-			return this.parsePostProcess(parserInput, raw);
+			return this.parsePostProcess(lexer.getParserInput(), raw);
 		}
 		// get open <script> tag
-		int pos = raw.indexOf('>');
+		String openingWhitespace = "";
+		int pos = raw.indexOf('<');
+		if (pos != 0) {
+			openingWhitespace = raw.substring(0, pos);
+			raw = raw.substring(pos);
+		}
+		pos = raw.indexOf('>');
 		String openTag = raw.substring(0, pos + 1);
 		// get closing </script> tag
 		raw = raw.substring(pos + 1);
@@ -77,10 +82,18 @@ public class JavascriptTag implements JFlexParserTag {
 		String closeTag = raw.substring(pos);
 		raw = raw.substring(0, pos);
 		if (!Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_JAVASCRIPT)) {
-			return StringEscapeUtils.escapeHtml4(openTag) + JFlexParserUtil.parseFragment(parserInput, parserOutput, raw, mode) + StringEscapeUtils.escapeHtml4(closeTag);
+			// parse any opening whitespace as a paragraphs
+			if (openingWhitespace.length() > 0) {
+				lexer.parse(JFlexLexer.TAG_TYPE_PARAGRAPH, openingWhitespace);
+			}
+			return StringEscapeUtils.escapeHtml4(openTag) + JFlexParserUtil.parseFragment(lexer.getParserInput(), lexer.getParserOutput(), raw, mode) + StringEscapeUtils.escapeHtml4(closeTag);
+		}
+		if (lexer instanceof JAMWikiLexer && ((JAMWikiLexer)lexer).isStartOfFile()) {
+			// pop the opening paragraph tag
+			((JAMWikiLexer)lexer).popTag("p");
 		}
 		JFlexTagItem tag = new JFlexTagItem("script", openTag);
 		tag.getTagContent().append(raw);
-		return tag.toHtml();
+		return openingWhitespace + tag.toHtml();
 	}
 }

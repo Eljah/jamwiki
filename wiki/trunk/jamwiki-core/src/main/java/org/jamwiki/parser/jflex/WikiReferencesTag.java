@@ -38,7 +38,9 @@ public class WikiReferencesTag implements JFlexParserTag {
 			logger.trace("references: " + raw + " (" + lexer.yystate() + ")");
 		}
 		if (lexer.getMode() < JFlexParser.MODE_POSTPROCESS) {
-			return raw;
+			// return static text so that this is standardized for further
+			// parsing
+			return "<references />";
 		}
 		// retrieve all references, then loop through in order, building an HTML
 		// reference list for display.  While looping, if there are multiple citations

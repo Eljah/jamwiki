@@ -103,29 +103,34 @@ public class TableOfContents {
 	 *  or an empty string if the table of contents can not be inserted due
 	 *  to an inadequate number of entries or some other reason.
 	 */
-	public String attemptTOCInsertion(ParserInput parserInput) throws IOException {
+	public String attemptTOCInsertion(ParserInput parserInput, String raw) throws IOException {
+		// if a TOC is not inserted make sure that any matched newlines are returned
+		String emptyResult = "";
+		for (int i = 0; i < StringUtils.countMatches(raw, "\n"); i++) {
+			emptyResult += '\n';
+		}
 		this.insertionAttempt++;
 		if (!parserInput.getAllowTableOfContents()) {
 			// TOC forbidden due to configuration
-			return "";
+			return emptyResult;
 		}
 		if (this.size() == 0 || (this.size() < MINIMUM_HEADINGS && !this.forceTOC)) {
 			// too few headings
-			return "";
+			return emptyResult;
 		}
 		if (this.getStatus() == TableOfContents.STATUS_NO_TOC) {
 			// TOC disallowed
-			return "";
+			return emptyResult;
 		}
 		if (!Environment.getBooleanValue(Environment.PROP_PARSER_TOC)) {
 			// TOC turned off for the wiki
-			return "";
+			return emptyResult;
 		}
 		if (this.insertionAttempt < this.insertTagCount) {
 			// user specified a TOC location, only insert there
-			return "";
+			return emptyResult;
 		}
-		return this.toHTML(parserInput.getLocale());
+		return '\n' + this.toHTML(parserInput.getLocale()) + '\n';
 	}
 
 	/**
@@ -287,7 +292,7 @@ public class TableOfContents {
 		args[1] = Utilities.formatMessage("topic.toc.label.hide", locale);
 		args[2] = Utilities.formatMessage("topic.toc.label.show", locale);
 		args[3] = text.toString();
-		return WikiUtil.formatFromTemplate(TEMPLATE_TOC_CONTAINER, args) + '\n';
+		return WikiUtil.formatFromTemplate(TEMPLATE_TOC_CONTAINER, args);
 	}
 
 	/**
