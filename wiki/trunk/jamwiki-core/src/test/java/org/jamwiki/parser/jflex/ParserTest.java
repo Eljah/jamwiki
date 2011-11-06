@@ -323,7 +323,6 @@ public class ParserTest extends JAMWikiUnitTest {
 		failures.add("NestedTable1"); // paragraphs in <td> tags
 		failures.add("Paragraph12"); // no paragraph within div without newline
 		failures.add("Paragraph13"); // paragraphs in <td> tags
-		failures.add("Paragraph15"); // failure parsing of empty paragraphs with <nowiki>
 		failures.add("ParserFunctionsBroken");
 		failures.add("PreformattedInvalid1");
 		failures.add("Template_-_Paramtest"); // issues with params when parsing a template page
