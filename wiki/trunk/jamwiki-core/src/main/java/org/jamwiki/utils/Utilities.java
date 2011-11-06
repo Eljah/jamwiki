@@ -342,6 +342,19 @@ public abstract class Utilities {
 	}
 
 	/**
+	 * Initialize a hash map from a list of strings for use in lookups.  The performance
+	 * of a lookup against a hash map is superior to that of a list, so this approach is
+	 * useful for critical-path lookups.
+	 */
+	public static Map<String, String> initializeLookupMap(String... args) {
+		Map<String, String> lookupMap = new HashMap<String, String>();
+		for (int i = 0; i < args.length; i++) {
+			lookupMap.put(args[i], args[i]);
+		}
+		return lookupMap;
+	}
+
+	/**
 	 * Utility method for determining common elements in two Map objects.
 	 */
 	public static <K, V> Map<K, V> intersect(Map<K, V> map1, Map<K, V> map2) {

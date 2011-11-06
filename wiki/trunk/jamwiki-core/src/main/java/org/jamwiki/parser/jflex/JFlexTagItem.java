@@ -16,12 +16,12 @@
  */
 package org.jamwiki.parser.jflex;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.parser.ParserException;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -32,18 +32,18 @@ class JFlexTagItem {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JFlexTagItem.class.getName());
 
-	private static final List<String> EMPTY_BODY_TAGS = Arrays.asList("br", "col", "div", "hr", "td", "th");
-	private static final List<String> LIST_ITEM_TAGS = Arrays.asList("dd", "dt", "li");
-	private static final List<String> LIST_TAGS = Arrays.asList("dd", "dl", "dt", "li", "ol", "ul");
-	private static final List<String> NON_NESTING_TAGS = Arrays.asList("col", "colgroup", "dd", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
-	private static final List<String> NON_TEXT_BODY_TAGS = Arrays.asList("col", "colgroup", "dl", "ol", "table", "tbody", "tfoot", "thead", "tr", "ul");
-	private static final List<String> NON_INLINE_TAGS = Arrays.asList("blockquote", "caption", "center", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
-	private static final List<String> TABLE_TAGS = Arrays.asList("caption", "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr");
-	private static final String nonInlineTagPattern = "(blockquote|caption|center|col|colgroup|dd|div|dl|dt|h1|h2|h3|h4|h5|h6|hr|li|ol|p|pre|table|tbody|td|tfoot|th|thead|tr|ul)";
-	private static final String nonInlineTagStartPattern = "<" + nonInlineTagPattern + "[ >].*";
-	private static final String nonInlineTagEndPattern = ".*</" + nonInlineTagPattern + ">";
-	private static final Pattern NON_INLINE_TAG_START_PATTERN = Pattern.compile(nonInlineTagStartPattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-	private static final Pattern NON_INLINE_TAG_END_PATTERN = Pattern.compile(nonInlineTagEndPattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	private static final Map<String, String> EMPTY_BODY_TAGS = Utilities.initializeLookupMap("br", "col", "div", "hr", "td", "th");
+	private static final Map<String, String> LIST_ITEM_TAGS = Utilities.initializeLookupMap("dd", "dt", "li");
+	private static final Map<String, String> LIST_TAGS = Utilities.initializeLookupMap("dd", "dl", "dt", "li", "ol", "ul");
+	private static final Map<String, String> NON_NESTING_TAGS = Utilities.initializeLookupMap("col", "colgroup", "dd", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
+	private static final Map<String, String> NON_TEXT_BODY_TAGS = Utilities.initializeLookupMap("col", "colgroup", "dl", "ol", "table", "tbody", "tfoot", "thead", "tr", "ul");
+	private static final Map<String, String> NON_INLINE_TAGS = Utilities.initializeLookupMap("blockquote", "caption", "center", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
+	private static final Map<String, String> TABLE_TAGS = Utilities.initializeLookupMap("caption", "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr");
+	private static final String nonInlineTagPattern = "(?:blockquote|caption|center|col|colgroup|dd|div|dl|dt|h1|h2|h3|h4|h5|h6|hr|li|ol|p|pre|table|tbody|td|tfoot|th|thead|tr|ul)";
+	private static final String nonInlineTagStartPattern = "<" + nonInlineTagPattern + "[ >]";
+	private static final String nonInlineTagEndPattern = "</" + nonInlineTagPattern + ">";
+	private static final Pattern NON_INLINE_TAG_START_PATTERN = Pattern.compile(nonInlineTagStartPattern);
+	private static final Pattern NON_INLINE_TAG_END_PATTERN = Pattern.compile(nonInlineTagEndPattern);
 	protected static final String ROOT_TAG = "jflex-root";
 	private String closeTagOverride = null;
 	private HtmlTagItem htmlTagItem = null;
@@ -138,7 +138,7 @@ class JFlexTagItem {
 		if (this.isRootTag()) {
 			return true;
 		}
-		return (EMPTY_BODY_TAGS.contains(this.tagType));
+		return (EMPTY_BODY_TAGS.containsKey(this.tagType));
 	}
 
 	/**
@@ -157,7 +157,7 @@ class JFlexTagItem {
 		if (this.isRootTag()) {
 			return true;
 		}
-		return (!NON_INLINE_TAGS.contains(this.tagType));
+		return (!NON_INLINE_TAGS.containsKey(this.tagType));
 	}
 
 	/**
@@ -171,7 +171,7 @@ class JFlexTagItem {
 	 * Determine if the tag is a list item tag (dd, dt, li).
 	 */
 	protected static boolean isListItemTag(String tagType) {
-		return (LIST_ITEM_TAGS.contains(tagType));
+		return (LIST_ITEM_TAGS.containsKey(tagType));
 	}
 
 	/**
@@ -185,7 +185,7 @@ class JFlexTagItem {
 	 * Determine if the tag is a list tag (dd, dl, dt, li, ol, ul).
 	 */
 	protected static boolean isListTag(String tagType) {
-		return (LIST_TAGS.contains(tagType));
+		return (LIST_TAGS.containsKey(tagType));
 	}
 
 	/**
@@ -201,36 +201,44 @@ class JFlexTagItem {
 	 * another "li" tag.
 	 */
 	protected static boolean isNonNestingTag(String tagType) {
-		return (NON_NESTING_TAGS.contains(tagType));
+		return (NON_NESTING_TAGS.containsKey(tagType));
 	}
 
 	/**
 	 *
 	 */
 	private boolean isNonInlineTagEnd(String tagText) {
+		// this method is frequently invoked by the parser, so do a few inexpensive
+		// checks prior to invoking the regular expression to optimize performance.
 		if (!tagText.endsWith(">")) {
 			return false;
 		}
-		Matcher matcher = NON_INLINE_TAG_END_PATTERN.matcher(tagText);
-		return matcher.matches();
+		int pos = tagText.lastIndexOf("</");
+		if (pos == -1) {
+			return false;
+		}
+		Matcher matcher = NON_INLINE_TAG_END_PATTERN.matcher(tagText.substring(pos));
+		return (matcher.matches());
 	}
 
 	/**
 	 *
 	 */
 	private boolean isNonInlineTagStart(String tagText) {
+		// this method is frequently invoked by the parser, so do a simple check
+		// prior to invoking the regular expression to optimize performance.
 		if (!tagText.startsWith("<")) {
 			return false;
 		}
 		Matcher matcher = NON_INLINE_TAG_START_PATTERN.matcher(tagText);
-		return matcher.matches();
+		return (matcher.find() && matcher.start() == 0);
 	}
 
 	/**
 	 * Determine if the tag is a table tag.
 	 */
 	protected boolean isTableTag() {
-		return (TABLE_TAGS.contains(this.tagType));
+		return (TABLE_TAGS.containsKey(this.tagType));
 	}
 
 	/**
@@ -241,7 +249,7 @@ class JFlexTagItem {
 		if (this.isRootTag()) {
 			return true;
 		}
-		return (!NON_TEXT_BODY_TAGS.contains(this.tagType));
+		return (!NON_TEXT_BODY_TAGS.containsKey(this.tagType));
 	}
 
 	/**

@@ -483,7 +483,8 @@ endparagraph       = {newline} (({whitespace})*{newline})*
         if (!allowHTML()) {
             return StringEscapeUtils.escapeHtml4(yytext());
         }
-        this.popTag(null, yytext());
+        HtmlTagItem htmlTagItem = JFlexParserUtil.sanitizeHtmlTag(yytext());
+        this.popTag(htmlTagItem.getTagType());
         return "";
     }
 }

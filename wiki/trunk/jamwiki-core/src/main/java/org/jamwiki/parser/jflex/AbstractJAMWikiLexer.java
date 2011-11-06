@@ -17,13 +17,14 @@
 package org.jamwiki.parser.jflex;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -40,7 +41,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 * is overzealous with paragraph insertion and empty paragraph tags are
 	 * resolved to empty text by the JFlexTagItem.toHtml() method.
 	 */
-	private static final List<String> PARAGRAPH_OPEN_LOCATION_LIST = Arrays.asList("blockquote", "center", "div", "dl", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "ol", "pre", "script", "table", "ul");
+	private static final Map<String, String> PARAGRAPH_OPEN_LOCATION_LIST = Utilities.initializeLookupMap("blockquote", "center", "div", "dl", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "ol", "pre", "table", "ul");
 	/** Stack of currently parsed tag content. */
 	private Stack<JFlexTagItem> tagStack = new Stack<JFlexTagItem>();
 
@@ -337,36 +338,32 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 			// only pop if not the root tag
 			currentTag = this.tagStack.pop();
 		}
+		String html = currentTag.toHtml();
+		if (StringUtils.isBlank(html)) {
+			// if the tag results in no content being generated then there is
+			// nothing more to do.
+			return;
+		}
 		JFlexTagItem previousTag = this.peekTag();
 		if (!currentTag.isInlineTag() || currentTag.getTagType().equals("pre")) {
-			// if the current tag is not an inline tag, make sure it is on its own lines
-			String trimmedContent = StringUtils.stripEnd(previousTag.getTagContent().toString(), null);
-			previousTag.getTagContent().replace(0, previousTag.getTagContent().length(), trimmedContent);
+			if (previousTag.getTagContent().length() > 0 && Character.isWhitespace(previousTag.getTagContent().charAt(previousTag.getTagContent().length() - 1))) {
+				// if the current tag is not an inline tag, make sure it is on its own lines
+				String trimmedContent = StringUtils.stripEnd(previousTag.getTagContent().toString(), null);
+				previousTag.getTagContent().delete(trimmedContent.length(), previousTag.getTagContent().length());
+			}
 			previousTag.getTagContent().append('\n');
-			previousTag.getTagContent().append(currentTag.toHtml());
+			previousTag.getTagContent().append(html);
 			previousTag.getTagContent().append('\n');
 		} else {
-			previousTag.getTagContent().append(currentTag.toHtml());
+			previousTag.getTagContent().append(html);
 		}
-		if (PARAGRAPH_OPEN_LOCATION_LIST.contains(tagType)) {
+		if (PARAGRAPH_OPEN_LOCATION_LIST.containsKey(tagType)) {
 			// force a paragraph open after block tags.  this tag may not actually
 			// end up in the final output if there aren't any newlines in the
 			// wikitext after the block tag.  make sure that PARAGRAPH_OPEN_LOCATION_LIST
 			// does not contain "p", otherwise we loop infinitely.
 			this.pushTag("p", null);
 		}
-	}
-
-	/**
-	 * Pop the most recent HTML tag from the lexer stack.
-	 */
-	protected void popTag(String tagType, String closeTagRaw) throws ParserException {
-		if (tagType != null) {
-			this.popTag(tagType);
-			return;
-		}
-		HtmlTagItem htmlTagItem = JFlexParserUtil.sanitizeHtmlTag(closeTagRaw);
-		this.popTag(htmlTagItem.getTagType());
 	}
 
 	/**
