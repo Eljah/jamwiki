@@ -30,7 +30,6 @@ New Features:
 
 Bugfixes:
 
-  * "{{ns:}}" should return the same value as "{{ns:0}}" to match Mediawiki.
   * Topic exports containing UTF-8 should not escape unicode characters.
     Reported by cstenkes.
   * Overhaul paragraph parsing to fix several edge cases and improve Mediawiki
@@ -50,14 +49,15 @@ Translation Updates:
 
 New Features:
 
-  * None.
+  * Updated spam filter patterns.
 
 Bugfixes:
 
-  * None.
+  * "{{ns:}}" should return the same value as "{{ns:0}}" to match Mediawiki.
 
 Translation Updates:
 
+  * Updated Japanese translations (jfujikawa).
   * Updated Japanese translations (nattolover).
   * Updated Portugese (Brazilian) translations (leokury).
   * Updated Russian translations (shar).
