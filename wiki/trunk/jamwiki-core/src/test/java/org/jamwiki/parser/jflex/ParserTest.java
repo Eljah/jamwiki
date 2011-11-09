@@ -320,7 +320,6 @@ public class ParserTest extends JAMWikiUnitTest {
 		failures.add("Heading9"); // see JAMWIKI-27
 		failures.add("HtmlMismatchTest3");
 		failures.add("Inclusion~test"); // template params not parsed in parser functions
-		failures.add("Paragraph12"); // no paragraph within div without newline
 		failures.add("ParserFunctionsBroken");
 		failures.add("PreformattedInvalid1");
 		failures.add("Template_-_Paramtest"); // issues with params when parsing a template page
