@@ -42,6 +42,8 @@ public class WikiBase {
 	private static DataHandler dataHandler = null;
 	/** The search engine instance. */
 	private static SearchEngine searchEngine = null;
+	/** An instance of the current parser. */
+	private static JAMWikiParser parserInstance = null;
 
 	/** Cache name for the cache of parsed topic content. */
 	public static final String CACHE_PARSED_TOPIC_CONTENT = "org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_CONTENT";
@@ -116,6 +118,15 @@ public class WikiBase {
 	}
 
 	/**
+	 * Get an instance of the current parser instance.
+	 *
+	 * @return The current parser instance.
+	 */
+	public static JAMWikiParser getParserInstance() {
+		return WikiBase.parserInstance;
+	}
+
+	/**
 	 * Get an instance of the current search engine.
 	 *
 	 * @return The current search engine instance.
@@ -134,6 +145,7 @@ public class WikiBase {
 			WikiBase.searchEngine.shutdown();
 		}
 		WikiBase.searchEngine = WikiUtil.searchEngineInstance();
+		WikiBase.parserInstance = WikiUtil.parserInstance();
 	}
 
 	/**

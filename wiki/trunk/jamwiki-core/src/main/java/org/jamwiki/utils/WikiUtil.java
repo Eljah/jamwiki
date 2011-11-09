@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
+import org.jamwiki.JAMWikiParser;
 import org.jamwiki.SearchEngine;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
@@ -402,6 +403,20 @@ public class WikiUtil {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
 		WikiVersion currentVersion = new WikiVersion(WikiVersion.CURRENT_WIKI_VERSION);
 		return oldVersion.before(currentVersion);
+	}
+
+	/**
+	 * Utility method to retrieve an instance of the current system parser.
+	 *
+	 * @return An instance of the system parser.
+	 */
+	public static JAMWikiParser parserInstance() {
+		String parserInstanceClass = Environment.getValue(Environment.PROP_PARSER_CLASS);
+		try {
+			return (JAMWikiParser)ResourceUtil.instantiateClass(parserInstanceClass);
+		} catch (ClassCastException e) {
+			throw new IllegalStateException("Parser instance specified in jamwiki.properties does not implement org.jamwiki.JAMWikiParser: " + parserInstanceClass);
+		}
 	}
 
 	/**

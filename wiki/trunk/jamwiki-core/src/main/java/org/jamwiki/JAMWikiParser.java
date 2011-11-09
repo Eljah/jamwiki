@@ -14,31 +14,18 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.parser;
+package org.jamwiki;
 
-import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.parser.ParserException;
+import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.ParserOutput;
 
 /**
- * Abstract class to be used when implementing new parsers.  New parsers
- * should extend this class and override any methods that need to be
+ * Interface to be used when implementing new parsers.  New parsers
+ * should implement this interface and override any methods that need to be
  * implemented differently.
  */
-public abstract class AbstractParser {
-
-	private static final WikiLogger logger = WikiLogger.getLogger(AbstractParser.class.getName());
-	/** Parser configuration information. */
-	protected ParserInput parserInput = null;
-
-	/**
-	 * The constructor creates a parser instance, initialized with the
-	 * specified parser input settings.
-	 *
-	 * @param parserInput Input configuration settings for this parser
-	 *  instance.
-	 */
-	public AbstractParser(ParserInput parserInput) {
-		this.parserInput = parserInput;
-	}
+public interface JAMWikiParser {
 
 	/**
 	 * Return a parser-specific value that can be used as the content of a
@@ -49,18 +36,19 @@ public abstract class AbstractParser {
 	 * @return A parser-specific value that can be used as the content of a
 	 *  topic representing a redirect.
 	 */
-	public abstract String buildRedirectContent(String topicName);
+	String buildRedirectContent(String topicName);
 
 	/**
 	 * Parse an edit comment and return HTML for online representation.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param parserOutput A ParserOutput object containing parser
 	 *  metadata output.
 	 * @param raw The raw Wiki syntax to be converted into HTML.
 	 * @return The parsed content.
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
-	public abstract String parseEditComment(ParserOutput parserOutput, String raw) throws ParserException;
+	String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException;
 
 	/**
 	 * This method parses content, performing all transformations except for
@@ -68,6 +56,7 @@ public abstract class AbstractParser {
 	 * when parsing the contents of a link or performing similar internal
 	 * manipulation.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param parserOutput A ParserOutput object containing parser
 	 *  metadata output.
 	 * @param raw The raw Wiki syntax to be converted into HTML.
@@ -77,41 +66,44 @@ public abstract class AbstractParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	// FIXME - should this have a mode flag???
-	public abstract String parseFragment(ParserOutput parserOutput, String raw, int mode) throws ParserException;
+	String parseFragment(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException;
 
 	/**
 	 * Returns a HTML representation of the given wiki raw text for online
 	 * representation.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param parserOutput A ParserOutput object containing parser
 	 *  metadata output.
 	 * @param raw The raw Wiki syntax to be converted into HTML.
 	 * @return The parsed content.
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
-	public abstract String parseHTML(ParserOutput parserOutput, String raw) throws ParserException;
+	String parseHTML(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException;
 
 	/**
 	 * This method provides a way to parse content and set all output
 	 * metadata, such as link values used by the search engine.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param parserOutput A ParserOutput object containing parser
 	 *  metadata output.
 	 * @param raw The raw Wiki syntax to be converted into HTML.
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
-	public abstract void parseMetadata(ParserOutput parserOutput, String raw) throws ParserException;
+	void parseMetadata(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException;
 
 	/**
 	 * Perform a bare minimum of parsing as required prior to saving a topic
 	 * to the database.  In general this method will simply parse signature
 	 * tags are return.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param raw The raw Wiki syntax to be converted into HTML.
 	 * @return The parsed content.
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
-	public abstract String parseMinimal(String raw) throws ParserException;
+	String parseMinimal(ParserInput parserInput, String raw) throws ParserException;
 
 	/**
 	 * When making a section edit this function provides the capability to retrieve
@@ -120,6 +112,7 @@ public abstract class AbstractParser {
 	 * will return the heading tag and all text up to either the next &lt;h2&gt;,
 	 * &lt;h1&gt;, or the end of the document, whichever comes first.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param parserOutput A ParserOutput object containing parser
 	 *  metadata output.
 	 * @param raw The raw Wiki text that is to be parsed.
@@ -127,7 +120,7 @@ public abstract class AbstractParser {
 	 * @return Returns the raw topic content for the target section.
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
-	public abstract String parseSlice(ParserOutput parserOutput, String raw, int targetSection) throws ParserException;
+	String parseSlice(ParserInput parserInput, ParserOutput parserOutput, String raw, int targetSection) throws ParserException;
 
 	/**
 	 * This method provides the capability for re-integrating a section edit back
@@ -135,6 +128,7 @@ public abstract class AbstractParser {
 	 * full Wiki text and a targetSection.  All of the content of targetSection
 	 * is then replaced with the new text.
 	 *
+	 * @param parserInput Input configuration settings.
 	 * @param parserOutput A ParserOutput object containing parser
 	 *  metadata output.
 	 * @param raw The raw Wiki text that is to be parsed.
@@ -143,5 +137,5 @@ public abstract class AbstractParser {
 	 * @return The raw topic content including the new replacement text.
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
-	public abstract String parseSplice(ParserOutput parserOutput, String raw, int targetSection, String replacementText) throws ParserException;
+	String parseSplice(ParserInput parserInput, ParserOutput parserOutput, String raw, int targetSection, String replacementText) throws ParserException;
 }

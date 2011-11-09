@@ -36,6 +36,7 @@ import org.jamwiki.utils.WikiLogger;
 public class JFlexParserUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JFlexParserUtil.class.getName());
+	private static final JFlexParser JFLEX_PARSER = new JFlexParser();
 
 	/**
 	 *
@@ -52,8 +53,7 @@ public class JFlexParserUtil {
 		if (StringUtils.isBlank(raw)) {
 			return raw;
 		}
-		JFlexParser parser = new JFlexParser(parserInput);
-		return parser.parseFragment(parserOutput, raw, mode);
+		return JFLEX_PARSER.parseFragment(parserInput, parserOutput, raw, mode);
 	}
 
 	/**

@@ -16,10 +16,7 @@
  */
 package org.jamwiki.parser;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
-import org.apache.commons.lang3.ClassUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
@@ -52,8 +49,7 @@ public class ParserUtil {
 		if (parserOutput == null) {
 			parserOutput = new ParserOutput();
 		}
-		AbstractParser parser = parserInstance(parserInput);
-		return parser.parseHTML(parserOutput, content);
+		return WikiBase.getParserInstance().parseHTML(parserInput, parserOutput, content);
 	}
 
 	/**
@@ -70,8 +66,7 @@ public class ParserUtil {
 			return null;
 		}
 		ParserOutput parserOutput = new ParserOutput();
-		AbstractParser parser = parserInstance(parserInput);
-		return parser.parseEditComment(parserOutput, content);
+		return WikiBase.getParserInstance().parseEditComment(parserInput, parserOutput, content);
 	}
 
 	/**
@@ -102,9 +97,8 @@ public class ParserUtil {
 	 * @throws ParserException Thrown if there are any parsing errors.
 	 */
 	public static ParserOutput parseMetadata(ParserInput parserInput, String content) throws ParserException {
-		AbstractParser parser = parserInstance(parserInput);
 		ParserOutput parserOutput = new ParserOutput();
-		parser.parseMetadata(parserOutput, content);
+		WikiBase.getParserInstance().parseMetadata(parserInput, parserOutput, content);
 		return parserOutput;
 	}
 
@@ -120,39 +114,7 @@ public class ParserUtil {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public static String parseMinimal(ParserInput parserInput, String raw) throws ParserException {
-		AbstractParser parser = parserInstance(parserInput);
-		return parser.parseMinimal(raw);
-	}
-
-	/**
-	 * Utility method to retrieve an instance of the current system parser.
-	 *
-	 * @param parserInput A ParserInput object that contains parser configuration
-	 *  information.
-	 * @return An instance of the system parser.
-	 * @throws ParserException Thrown if a parser instance can not be instantiated.
-	 */
-	private static AbstractParser parserInstance(ParserInput parserInput) throws ParserException {
-		String parserClass = Environment.getValue(Environment.PROP_PARSER_CLASS);
-		try {
-			Class clazz = ClassUtils.getClass(parserClass);
-			Class[] parameterTypes = new Class[1];
-			parameterTypes[0] = ClassUtils.getClass("org.jamwiki.parser.ParserInput");
-			Constructor constructor = clazz.getConstructor(parameterTypes);
-			Object[] initArgs = new Object[1];
-			initArgs[0] = parserInput;
-			return (AbstractParser)constructor.newInstance(initArgs);
-		} catch (ClassNotFoundException e) {
-			throw new ParserException(e);
-		} catch (NoSuchMethodException e) {
-			throw new ParserException(e);
-		} catch (IllegalAccessException e) {
-			throw new ParserException(e);
-		} catch (InstantiationException e) {
-			throw new ParserException(e);
-		} catch (InvocationTargetException e) {
-			throw new ParserException(e);
-		}
+		return WikiBase.getParserInstance().parseMinimal(parserInput, raw);
 	}
 
 	/**
@@ -165,8 +127,7 @@ public class ParserUtil {
 	 *  if any other parser error occurs.
 	 */
 	public static String parserRedirectContent(String topicName) throws ParserException {
-		AbstractParser parser = parserInstance(null);
-		return parser.buildRedirectContent(topicName);
+		return WikiBase.getParserInstance().buildRedirectContent(topicName);
 	}
 
 	/**
@@ -225,12 +186,11 @@ public class ParserUtil {
 		ParserInput parserInput = new ParserInput(virtualWiki, topicName);
 		parserInput.setContext(context);
 		parserInput.setLocale(locale);
-		AbstractParser parser = ParserUtil.parserInstance(parserInput);
 		String content = null;
 		if (isSlice) {
-			content = parser.parseSlice(parserOutput, topic.getTopicContent(), targetSection);
+			content = WikiBase.getParserInstance().parseSlice(parserInput, parserOutput, topic.getTopicContent(), targetSection);
 		} else {
-			content = parser.parseSplice(parserOutput, topic.getTopicContent(), targetSection, replacementText);
+			content = WikiBase.getParserInstance().parseSplice(parserInput, parserOutput, topic.getTopicContent(), targetSection, replacementText);
 		}
 		String sectionName = parserOutput.getSectionName();
 		return new String[]{sectionName, content};
