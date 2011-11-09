@@ -263,9 +263,13 @@ class JFlexTagItem {
 	/**
 	 *
 	 */
-	public String toHtml() {
-		String content = this.tagContent.toString();
-		if (StringUtils.isBlank(content)) {
+	protected CharSequence toHtml() {
+		// root tag just returns its contents
+		if (this.isRootTag()) {
+			return this.tagContent;
+		}
+		// handle empty tags
+		if (StringUtils.isBlank(this.tagContent)) {
 			if (!this.isEmptyBodyTag()) {
 				// if no content do not generate a tag
 				return "";
@@ -275,54 +279,51 @@ class JFlexTagItem {
 			}
 		}
 		StringBuilder result = new StringBuilder();
-		if (!this.isRootTag()) {
-			if (this.htmlTagItem != null) {
-				result.append(this.htmlTagItem.toHtml());
-			} else {
-				result.append('<').append(this.tagType).append('>');
-			}
+		if (this.htmlTagItem != null) {
+			result.append(this.htmlTagItem.toHtml());
+		} else {
+			result.append('<').append(this.tagType).append('>');
 		}
-		if (this.isRootTag()) {
-			result.append(content);
-		} else if (this.tagType.equals("pre")) {
+		if (this.tagType.equals("pre")) {
 			// pre-formatted, no trimming but make sure the open and close tags appear on their own lines
-			if (!content.startsWith("\n")) {
+			if (this.tagContent.charAt(0) != '\n') {
 				result.append('\n');
 			}
-			result.append(content);
-			if (!content.endsWith("\n")) {
+			result.append(this.tagContent);
+			if (this.tagContent.charAt(this.tagContent.length() - 1) != '\n') {
 				result.append('\n');
 			}
+			result.append("</").append(this.tagType).append('>');
 		} else if (this.isTextBodyTag()) {
+			String trimmedTagContent = this.tagContent.toString().trim();
 			// ugly hack to handle cases such as "<li><ul>" where the "<ul>" should be on its own line
-			if (this.isNonInlineTagStart(content.trim())) {
+			if (this.isNonInlineTagStart(trimmedTagContent)) {
 				result.append('\n');
 			}
-			result.append(content.trim());
+			result.append(trimmedTagContent);
 			// ugly hack to handle cases such as "</ul></li>" where the "</li>" should be on its own line
-			if (this.isNonInlineTagEnd(content.trim())) {
+			if (this.isNonInlineTagEnd(trimmedTagContent)) {
 				result.append('\n');
+			}
+			result.append("</").append(this.tagType).append('>');
+			if (this.isInlineTag() && !this.tagType.equals("script") && this.tagContent.length() != trimmedTagContent.length()) {
+				// work around issues such as "text''' text'''", where the output should
+				// be "text <b>text</b>", by moving the whitespace to the parent tag
+				int firstWhitespaceIndex = this.tagContent.indexOf(trimmedTagContent);
+				if (firstWhitespaceIndex > 0) {
+					result.insert(0, this.tagContent.substring(0, firstWhitespaceIndex));
+				}
+				int lastWhitespaceIndex = firstWhitespaceIndex + trimmedTagContent.length();
+				if (lastWhitespaceIndex > this.tagContent.length()) {
+					result.append(this.tagContent.substring(lastWhitespaceIndex));
+				}
 			}
 		} else {
 			result.append('\n');
-			result.append(content.trim());
+			result.append(this.tagContent.toString().trim());
 			result.append('\n');
-		}
-		if (!this.isRootTag()) {
 			result.append("</").append(this.tagType).append('>');
 		}
-		if (this.isTextBodyTag() && !this.isRootTag() && this.isInlineTag() && !this.tagType.equals("pre") && !this.tagType.equals("script")) {
-			// work around issues such as "text''' text'''", where the output should
-			// be "text <b>text</b>", by moving the whitespace to the parent tag
-			int firstWhitespaceIndex = content.indexOf(content.trim());
-			if (firstWhitespaceIndex > 0) {
-				result.insert(0, content.substring(0, firstWhitespaceIndex));
-			}
-			int lastWhitespaceIndex = firstWhitespaceIndex + content.trim().length();
-			if (lastWhitespaceIndex > content.length()) {
-				result.append(content.substring(lastWhitespaceIndex));
-			}
-		}
-		return result.toString();
+		return result;
 	}
 }

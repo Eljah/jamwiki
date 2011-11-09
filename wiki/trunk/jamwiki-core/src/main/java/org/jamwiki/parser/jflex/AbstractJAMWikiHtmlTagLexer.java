@@ -36,8 +36,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	 *
 	 */
 	protected String closeTag(int tagPattern) {
-		HtmlTagItem htmlTagItem = new HtmlTagItem(this.tagType, this.tagPattern, this.attributes);
-		return htmlTagItem.toHtml();
+		return new HtmlTagItem(this.tagType, this.tagPattern, this.attributes).toHtml();
 	}
 
 	/**

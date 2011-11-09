@@ -80,12 +80,12 @@ public class HtmlTagItem {
 	 * Convert the tag to an HTML or HTML-like representation.
 	 */
 	public String toHtml() {
-		String value;
 		StringBuilder result = new StringBuilder("<");
 		if (this.tagPattern == TAG_PATTERN_CLOSE) {
 			result.append("/");
 		}
 		result.append(this.tagType);
+		String value;
 		for (String key : this.attributes.keySet()) {
 			result.append(' ').append(key);
 			value = this.attributes.get(key);

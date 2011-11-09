@@ -213,7 +213,7 @@ public class JFlexParserUtil {
 		} catch (Exception e) {
 			throw new ParserException("Failure while parsing: " + tag, e);
 		}
-		return (lexer.getHtmlTagItem() != null) ? lexer.getHtmlTagItem() : null;
+		return lexer.getHtmlTagItem();
 	}
 
 	/**

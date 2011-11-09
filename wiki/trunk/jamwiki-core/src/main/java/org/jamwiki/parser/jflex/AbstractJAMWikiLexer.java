@@ -255,12 +255,14 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	private String popAllTags() throws ParserException {
 		// pop the stack down to (but not including) the root tag
 		while (this.tagStack.size() > 1) {
-			JFlexTagItem currentTag = this.peekTag();
-			this.popTag(currentTag.getTagType());
+			this.popTag(this.peekTag().getTagType());
 		}
 		// now pop the root tag
-		JFlexTagItem currentTag = this.tagStack.pop();
-		return (this.mode >= JFlexParser.MODE_LAYOUT) ? currentTag.toHtml().trim() : currentTag.toHtml();
+		if (this.mode >= JFlexParser.MODE_LAYOUT) {
+			return this.tagStack.pop().toHtml().toString().trim();
+		} else {
+			return this.tagStack.pop().toHtml().toString();
+		}
 	}
 
 	/**
@@ -345,7 +347,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 			// only pop if not the root tag
 			currentTag = this.tagStack.pop();
 		}
-		String html = currentTag.toHtml();
+		CharSequence html = currentTag.toHtml();
 		if (StringUtils.isBlank(html)) {
 			// if the tag results in no content being generated then there is
 			// nothing more to do.
