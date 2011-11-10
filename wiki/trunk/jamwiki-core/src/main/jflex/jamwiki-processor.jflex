@@ -75,14 +75,14 @@ forcetoc           = "__FORCETOC__"
 
 /* tables */
 tableattribute     = ([ \t]*) [a-zA-Z:]+ ([ \t]*=[^>\n\|]+[ \t]*)*
-tablestart         = "{|" (.)* {newline}
-tableend           = "|}" ({newline})?
-tablecell          = "|" [^\+\-\}] | "|" ({tableattribute})+ "|" [^\|]
+tablestart         = [ \t]* "{|" (.)* {newline}
+tableend           = [ \t]* "|}" ({newline})?
+tablecell          = [ \t]* "|" [^\+\-\}] | "|" ({tableattribute})+ "|" [^\|]
 tablecells         = "||" | "!!"
 tablecellsstyle    = "||" ({tableattribute})+ "|" ([^|])
-tableheading       = "!" | "!" ({tableattribute})+ "|" [^\|]
-tablerow           = "|-" [ \t]* ({tableattribute})* {newline}
-tablecaption       = "|+" | "|+" ({tableattribute})+ "|" [^\|]
+tableheading       = [ \t]* "!" | [ \t]* "!" ({tableattribute})+ "|" [^\|]
+tablerow           = [ \t]* "|-" [ \t]* ({tableattribute})* {newline}
+tablecaption       = [ \t]* "|+" | [ \t]* "|+" ({tableattribute})+ "|" [^\|]
 
 /* wiki links */
 protocol           = "http://" | "https://" | "mailto:" | "mailto://" | "ftp://" | "file://"
@@ -224,7 +224,7 @@ endparagraph       = {newline} (({whitespace})*{newline})*
         if (!this.peekTag().getTagType().equals("tr")) {
             this.pushTag("tr", null);
         }
-        if (yytext().length() > 2) {
+        if (yytext().trim().length() > 2) {
             // for headings with CSS specified an extra character is matched
             yypushback(1);
         }
