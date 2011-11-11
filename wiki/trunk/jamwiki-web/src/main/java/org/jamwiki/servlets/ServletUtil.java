@@ -39,6 +39,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
+import org.jamwiki.JAMWikiParser;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
@@ -746,7 +747,7 @@ public class ServletUtil {
 		}
 		// verify valid parser class
 		String parserClass = props.getProperty(Environment.PROP_PARSER_CLASS);
-		String abstractParserClass = "org.jamwiki.parser.AbstractParser";
+		String abstractParserClass = JAMWikiParser.class.getName();
 		boolean validParser = (parserClass != null && !parserClass.equals(abstractParserClass));
 		if (validParser) {
 			try {
