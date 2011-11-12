@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser.jflex;
 
+import java.io.Reader;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.WikiLogger;
 
@@ -34,5 +35,13 @@ public abstract class AbstractJAMWikiTemplateLexer extends JFlexLexer {
 	 */
 	protected boolean allowTemplates() {
 		return Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_TEMPLATES);
+	}
+
+	/**
+	 *
+	 */
+	protected void reset(Reader reader) {
+		this.templateString = "";
+		super.reset(reader);
 	}
 }

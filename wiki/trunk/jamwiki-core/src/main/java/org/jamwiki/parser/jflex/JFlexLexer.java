@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser.jflex;
 
+import java.io.Reader;
 import java.util.Stack;
 import org.jamwiki.Environment;
 import org.jamwiki.parser.ParserOutput;
@@ -245,6 +246,13 @@ public abstract class JFlexLexer {
 	}
 
 	/**
+	 * Reset the lexer state to allow re-use.
+	 */
+	protected void reset(Reader reader) {
+		this.yyreset(reader);
+	}
+
+	/**
 	 * JFlex internal method used to change the lexer state values.
 	 */
 	public abstract void yybegin(int newState);
@@ -258,6 +266,11 @@ public abstract class JFlexLexer {
 	 * JFlex internal method used to push text back onto the parser stack.
 	 */
 	public abstract void yypushback(int number);
+
+	/**
+	 * JFlex internal method used to retrieve the current lexer state value.
+	 */
+	public abstract void yyreset(Reader reader);
 
 	/**
 	 * JFlex internal method used to retrieve the current lexer state value.
