@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.jamwiki.WikiBase;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.WikiReference;
 import org.jamwiki.parser.LinkUtil;
@@ -36,7 +37,6 @@ import org.jamwiki.utils.WikiLogger;
 public class JFlexParserUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JFlexParserUtil.class.getName());
-	private static final JFlexParser JFLEX_PARSER = new JFlexParser();
 
 	/**
 	 *
@@ -53,7 +53,7 @@ public class JFlexParserUtil {
 		if (StringUtils.isBlank(raw)) {
 			return raw;
 		}
-		return JFLEX_PARSER.parseFragment(parserInput, parserOutput, raw, mode);
+		return WikiBase.getParserInstance().parseFragment(parserInput, parserOutput, raw, mode);
 	}
 
 	/**
