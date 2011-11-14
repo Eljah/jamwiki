@@ -385,19 +385,7 @@ public abstract class ImageUtil {
 			return d1;
 		}
 		// otherwise generate a scaled instance
-		ImageData imageData = ImageProcessor.resizeImage(wikiImage.getFileId(), incrementalWidth, incrementalHeight);
-	      //TODO Need?
-		Dimension d2  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), imageData.width);
-		if       (d2 != null)
-		{
-			return d2;
-		}
-	      //FIXME Remove
-	      /*try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {}*/
-		ImageProcessor.saveImage(imageData);
-		return new Dimension(imageData.width, imageData.height);
+		return ImageProcessor.resizeImage(wikiImage.getFileId(), incrementalWidth, incrementalHeight);
 	}
 
 	/**
@@ -703,9 +691,7 @@ public abstract class ImageUtil {
 	 */
 	public static boolean isImagesOnFS() {
 		String  fileDir  = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
-	      //FIXME Remove and correct return expression
-		logger.warn((fileDir == null) ? ("fileDir is null") : ("fileDir is not null [" + fileDir + "]"));
-		return (fileDir != null && !fileDir.isEmpty());
+		return !fileDir.isEmpty();
 	}
 
 	/**

@@ -167,9 +167,9 @@ public class ImageProcessor {
 	 * @param fileId The file identifier for the original image to be scaled.
 	 * @param targetWidth the desired width of the scaled instance in pixels.
 	 * @param targetHeight the desired height of the scaled instance in pixels.
-	 * @return a scaled version of the original {@code BufferedImage}
+	 * @return a dimensions of scaled image
 	 */
-	public static ImageData resizeImage(int fileId, int targetWidth, int targetHeight) throws IOException {
+	public static Dimension resizeImage(int fileId, int targetWidth, int targetHeight) throws IOException {
 		long start = System.currentTimeMillis();
 		ImageData imageData = ImageProcessor.loadImage(fileId);
 		BufferedImage tmp = imageData.image;
@@ -201,7 +201,12 @@ public class ImageProcessor {
 		imageData.width  = resized.getWidth ();
 		imageData.height = resized.getHeight();
 		imageData.image  = resized;
-		return imageData;
+	      //FIXME Remove
+	      /*try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {}*/
+		saveImage(imageData);
+		return new Dimension(imageData.width, imageData.height);
 	}
 
 	/**
@@ -321,6 +326,7 @@ public class ImageProcessor {
 		} catch (DataAccessException dae) {
 		      //FIXME
 		      //throw new IOException(dae);
+			logger.warn(dae.toString());
 		}
 	}
 }
