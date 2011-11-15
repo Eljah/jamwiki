@@ -88,6 +88,16 @@ followed by 0.6.3.
 
   * This release updates the default StyleSheet topic.  See below for
     instructions on manaully updating this topic with the new styles.
+  * The system topics must be renamed on all virtual wikis: "BottomArea" is now
+    "JAMWiki:Footer", "LeftMenu" is now "JAMWiki:Sidebar", and "StyleSheet" is
+    now "JAMWiki:System.css".
+  * A new "JAMWiki:Header" system topic should be created for all virtual
+    wikis.
+  * The /WEB-INF/spam-blacklist.txt file and the
+    /WEB-INF/classes/jamwiki-configuration.xml have been moved to the
+    "resources" sub-directory within the JAMWiki system folder.  If these files
+    have been customized then they will need to be manually copied to the new
+    folder, otherwise JAMWiki will create fresh versions automatically.
 
   UPGRADE STEPS:
 
