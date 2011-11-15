@@ -53,7 +53,7 @@ public class WikiConfiguration {
 	private Map<String, String> translations = null;
 
 	/** Name of the configuration file. */
-	public static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration.xml";
+	private static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration.xml";
 	private static final String XML_CONFIGURATION_ROOT = "configuration";
 	private static final String XML_DATA_HANDLER = "data-handler";
 	private static final String XML_DATA_HANDLER_ROOT = "data-handlers";
@@ -144,7 +144,7 @@ public class WikiConfiguration {
 		File file = null;
 		Document document = null;
 		try {
-			file = ResourceUtil.getClassLoaderFile(JAMWIKI_CONFIGURATION_FILE);
+			file = ResourceUtil.getJAMWikiResourceFile(JAMWIKI_CONFIGURATION_FILE);
 			document = XMLUtil.parseXML(file, false);
 		} catch (ParseException e) {
 			// this should never happen unless someone mangles the config file

@@ -18,6 +18,7 @@ package org.jamwiki.utils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -26,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jamwiki.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
@@ -37,6 +39,10 @@ import org.springframework.util.ClassUtils;
 public abstract class ResourceUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ResourceUtil.class.getName());
+	/** Sub-directory within the JAMWiki system directory that holds resource files. */
+	private static final String RESOURCES_DIR = "resources";
+	/** Sub-directory within the JAMWiki webapp root that holds resource setup files. */
+	private static final String RESOURCES_SETUP_DIR = "setup";
 
 	/**
 	 * This method is a wrapper for Class.forName that will attempt to load a
@@ -115,6 +121,32 @@ public abstract class ResourceUtil {
 			throw new IOException("Unable to find class loader root");
 		}
 		return file.getParentFile().getParentFile();
+	}
+
+	/**
+	 * Retrieve a file from the JAMWiki system resources directory.  If the file
+	 * does exist then an attempt will be made to retrieve it from the classpath
+	 * setup folder.
+	 *
+	 * @param filename The name of the file (relative to the JAMWiki system
+	 *  resource directory) that is to be retrieved.
+	 * @return A file object representing the requested filename.
+	 * @throws IOException Thrown if the file can not be found in the
+	 *  JAMWiki system resources directory.
+	 */
+	public static File getJAMWikiResourceFile(String filename) throws IOException {
+		File resourceDirectory = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), RESOURCES_DIR);
+		File resourceFile = FileUtils.getFile(resourceDirectory, filename);
+		if (!resourceFile.exists()) {
+			File setupFile = ResourceUtil.getClassLoaderFile(new File(RESOURCES_SETUP_DIR, filename).getPath());
+			if (setupFile.exists()) {
+				FileUtils.copyFile(setupFile, resourceFile);
+			}
+		}
+		if (!resourceFile.exists()) {
+			throw new FileNotFoundException("Resource file " + filename + " not found in system directory " + resourceDirectory.getAbsolutePath());
+		}
+		return resourceFile;
 	}
 
 	/**

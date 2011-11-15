@@ -35,7 +35,7 @@ public class SpamFilter {
 	/** Logger */
 	public static final WikiLogger logger = WikiLogger.getLogger(SpamFilter.class.getName());
 	/** Spam blacklist file name. */
-	public static final String SPAM_BLACKLIST_FILE = "spam-blacklist.txt";
+	private static final String SPAM_BLACKLIST_FILE = "spam-blacklist.txt";
 	private static Pattern spamRegexPattern = null;
 
 	/**
@@ -82,7 +82,7 @@ public class SpamFilter {
 	private static void initialize() throws DataAccessException {
 		File file = null;
 		try {
-			file = ResourceUtil.getClassLoaderFile(SPAM_BLACKLIST_FILE);
+			file = ResourceUtil.getJAMWikiResourceFile(SPAM_BLACKLIST_FILE);
 		} catch (IOException e) {
 			throw new DataAccessException("I/O exception while initlaizing spam blacklist", e);
 		}
@@ -109,7 +109,7 @@ public class SpamFilter {
 		} catch (PatternSyntaxException e) {
 			throw new DataAccessException("Failure while parsing spam regular expression list", e);
 		}
-		logger.info("Loading spam filter regular expression:" + regex);
+		logger.info("Loading spam filter regular expressions from " + file.getAbsolutePath());
 	}
 
 	/**
