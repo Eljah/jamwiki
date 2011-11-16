@@ -508,7 +508,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 *
 	 */
 	protected void reset(Reader reader) {
-		this.tagStack = new Stack<JFlexTagItem>();
+		this.tagStack.clear();
 		super.reset(reader);
 	}
 }

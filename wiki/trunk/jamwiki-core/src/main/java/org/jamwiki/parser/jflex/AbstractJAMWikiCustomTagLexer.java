@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser.jflex;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,6 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 	static {
 		initializeCustomTagRegistry();
 	}
-
 	/** Stack of currently parsed tag content. */
 	private List<CustomTagItem> customTagStack = new ArrayList<CustomTagItem>();
 
@@ -203,6 +203,14 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 		}
 		this.customTagStack.get(this.customTagStack.size() - 1).getTagContent().append(text);
 		return "";
+	}
+
+	/**
+	 *
+	 */
+	protected void reset(Reader reader) {
+		this.customTagStack.clear();
+		super.reset(reader);
 	}
 
 	/**
