@@ -61,6 +61,8 @@ public class JFlexParser implements JAMWikiParser {
 	/** Post-process mode indicates that the pre-processor, processor and post-processor should be run in full, parsing all Wiki syntax into formatted output and adding layout tags such as paragraphs and TOC. */
 	public static final int MODE_POSTPROCESS = 10;
 	// Implement lexer pools to avoid unnecessary object creation and garbage collection.
+	private List<JAMWikiCustomTagLexer> customTagLexerPool = new ArrayList<JAMWikiCustomTagLexer>();
+	private List<JAMWikiEditCommentLexer> editCommentLexerPool = new ArrayList<JAMWikiEditCommentLexer>();
 	private List<JAMWikiLexer> lexerPool = new ArrayList<JAMWikiLexer>();
 	private List<JAMWikiPostLexer> postLexerPool = new ArrayList<JAMWikiPostLexer>();
 	private List<JAMWikiPreLexer> preLexerPool = new ArrayList<JAMWikiPreLexer>();
@@ -109,9 +111,14 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	private String parseCustom(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
 		StringReader reader = toStringReader(raw);
-		JFlexLexer lexer = new JAMWikiCustomTagLexer(reader);
-		int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
-		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
+		JAMWikiCustomTagLexer lexer = null;
+		try {
+			lexer = this.retrieveJAMWikiCustomTagLexer(reader);
+			int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
+			return this.lex(lexer, raw, parserInput, parserOutput, preMode);
+		} finally {
+			this.releaseLexer(this.customTagLexerPool, lexer);
+		}
 	}
 
 	/**
@@ -126,8 +133,13 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	public String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
 		StringReader reader = toStringReader(raw);
-		JFlexLexer lexer = new JAMWikiEditCommentLexer(reader);
+		JAMWikiEditCommentLexer lexer = null;
+		try {
+			lexer = this.retrieveJAMWikiEditCommentLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, MODE_EDIT_COMMENT).trim();
+		} finally {
+			this.releaseLexer(this.editCommentLexerPool, lexer);
+		}
 	}
 
 	/**
@@ -449,6 +461,24 @@ public class JFlexParser implements JAMWikiParser {
 		T lexer = lexerPool.remove(0);
 		lexer.reset(reader);
 		return lexer;
+	}
+
+	/**
+	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
+	 * a new instance.
+	 */
+	private JAMWikiCustomTagLexer retrieveJAMWikiCustomTagLexer(StringReader reader) {
+		JAMWikiCustomTagLexer lexer = this.retrieveLexer(this.customTagLexerPool, reader);
+		return (lexer == null) ? new JAMWikiCustomTagLexer(reader) : lexer;
+	}
+
+	/**
+	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
+	 * a new instance.
+	 */
+	private JAMWikiEditCommentLexer retrieveJAMWikiEditCommentLexer(StringReader reader) {
+		JAMWikiEditCommentLexer lexer = this.retrieveLexer(this.editCommentLexerPool, reader);
+		return (lexer == null) ? new JAMWikiEditCommentLexer(reader) : lexer;
 	}
 
 	/**
