@@ -1194,6 +1194,8 @@ public interface QueryHandler {
 	public ImageData getImageInfo(int fileId, int resized, Connection conn) throws SQLException;
 
 	/**
+	 * Get latest version of image.
+	 *
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
 	 * @param conn A database connection to use when connecting to the database
@@ -1205,6 +1207,8 @@ public interface QueryHandler {
 	public ImageData getImageData(int fileId, int resized, Connection conn) throws SQLException;
 
 	/**
+	 * Get desired version of image.
+	 *
 	 * @param fileVersionId File identifier.
 	 * @param resized Image width or zero for original.
 	 * @param conn A database connection to use when connecting to the database
@@ -1213,5 +1217,5 @@ public interface QueryHandler {
 	 * be negative when data are not an image. Result's image components may be null.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public ImageData getImageData2(int fileVersionId, int resized, Connection conn) throws SQLException;
+	public ImageData getImageVersionData(int fileVersionId, int resized, Connection conn) throws SQLException;
 }

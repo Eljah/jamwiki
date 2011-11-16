@@ -105,8 +105,6 @@ public class ImageProcessor {
 			throw new FileNotFoundException("Image does not exist: " + fileId);
 		}
 
-		imageData.image = ImageIO.read(new ByteArrayInputStream(imageData.data));
-
 		return imageData;
 	}
 
@@ -172,7 +170,7 @@ public class ImageProcessor {
 	public static Dimension resizeImage(int fileId, int targetWidth, int targetHeight) throws IOException {
 		long start = System.currentTimeMillis();
 		ImageData imageData = ImageProcessor.loadImage(fileId);
-		BufferedImage tmp = imageData.image;
+		BufferedImage tmp = ImageIO.read(new ByteArrayInputStream(imageData.data));
 		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		int width = tmp.getWidth();
 		int height = tmp.getHeight();
@@ -198,13 +196,19 @@ public class ImageProcessor {
 			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for fileId: " + fileId;
 			logger.debug(message);
 		}
-		imageData.width  = resized.getWidth ();
-		imageData.height = resized.getHeight();
-		imageData.image  = resized;
-	      //FIXME Remove
-	      /*try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {}*/
+		int pos = imageData.mimeType.lastIndexOf('/');
+		if (pos == -1 || (pos + 1) >= imageData.mimeType.length()) {
+			throw new IOException("Unknown image file type " + imageData.mimeType);
+		}
+		String imageType = imageData.mimeType.substring(pos + 1).toLowerCase();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		boolean result = ImageIO.write(resized, imageType, baos);		if    (!result) {
+			throw new IOException("No appropriate writer found when writing image: " + imageData.fileVersionId);
+		}
+		baos.close();
+		imageData.width  = resized.getWidth   ();
+		imageData.height = resized.getHeight  ();
+		imageData.data   = baos   .toByteArray();
 		saveImage(imageData);
 		return new Dimension(imageData.width, imageData.height);
 	}
@@ -298,29 +302,7 @@ public class ImageProcessor {
 	/**
 	 * Save an image.
 	 */
-	protected static void saveImage(ImageData imageData) throws IOException {
-	      /*int pos = imageName.lastIndexOf('.');
-		if (pos == -1 || (pos + 1) >= imageName.length()) {
-			throw new IOException("Unknown image file type " + imageName);
-		}
-		String imageType = imageName.substring(pos + 1).toLowerCase();*/
-
-		int pos = imageData.mimeType.lastIndexOf('/');
-		if (pos == -1 || (pos + 1) >= imageData.mimeType.length()) {
-			throw new IOException("Unknown image file type " + imageData.mimeType);
-		}
-		String imageType = imageData.mimeType.substring(pos + 1).toLowerCase();
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		boolean result = ImageIO.write(imageData.image, imageType, baos);		if    (!result) {
-			throw new IOException("No appropriate writer found when writing image: " + imageData.fileVersionId);
-		}
-
-		baos.close();
-
-		imageData.data = baos.toByteArray();
-
+	private static void saveImage(ImageData imageData) throws IOException {
 		try {
 			WikiBase.getDataHandler().writeImage(imageData.fileVersionId, imageData.width, imageData);
 		} catch (DataAccessException dae) {

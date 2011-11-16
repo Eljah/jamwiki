@@ -32,11 +32,6 @@ public class ImageData {
 
 	public byte	data[];
 
-	/**
-	 * For temporary storing of converted data.
-	 */
-	public BufferedImage image;
-
 	public ImageData(int fileVersionId, String mimeType, int width, int height, byte data[]) {
 		this.fileVersionId = fileVersionId;
 		this.mimeType      = mimeType;

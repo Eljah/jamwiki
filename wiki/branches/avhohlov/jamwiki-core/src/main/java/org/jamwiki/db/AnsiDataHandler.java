@@ -2395,13 +2395,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#getImageData2(int, int)
+	 * @see org.jamwiki.DataHandler#getImageVersionData(int, int)
 	 */
-	public ImageData getImageData2(int fileVersionId, int resized) throws DataAccessException {
+	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageData2(fileVersionId, resized, conn);
+			return this.queryHandler().getImageVersionData(fileVersionId, resized, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		} finally {

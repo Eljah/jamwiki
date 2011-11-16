@@ -250,7 +250,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DELETE_FILE_DATA = null;
 	protected static String STATEMENT_SELECT_FILE_INFO = null;
 	protected static String STATEMENT_SELECT_FILE_DATA = null;
-	protected static String STATEMENT_SELECT_FILE_DATA2 = null;
+	protected static String STATEMENT_SELECT_FILE_VERSION_DATA = null;
 	private Properties props = null;
 
 	/**
@@ -1375,7 +1375,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DELETE_FILE_DATA               = props.getProperty("STATEMENT_DELETE_FILE_DATA");
 		STATEMENT_SELECT_FILE_INFO               = props.getProperty("STATEMENT_SELECT_FILE_INFO");
 		STATEMENT_SELECT_FILE_DATA               = props.getProperty("STATEMENT_SELECT_FILE_DATA");
-		STATEMENT_SELECT_FILE_DATA2              = props.getProperty("STATEMENT_SELECT_FILE_DATA2");
+		STATEMENT_SELECT_FILE_VERSION_DATA       = props.getProperty("STATEMENT_SELECT_FILE_VERSION_DATA");
 	}
 
 	/**
@@ -3493,14 +3493,14 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.db.QueryHandler#getImageData2(int, int, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#getImageVersionData(int, int, java.sql.Connection)
 	 */
-	public ImageData getImageData2(int fileVersionId, int resized, Connection conn) throws SQLException {
+	public ImageData getImageVersionData(int fileVersionId, int resized, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_DATA2);
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_VERSION_DATA);
 			stmt.setInt(1, fileVersionId);
 			stmt.setInt(2, resized);
 			rs = stmt.executeQuery();

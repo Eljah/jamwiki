@@ -1054,6 +1054,8 @@ public interface DataHandler {
 	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException;
 
 	/**
+	 * Get latest version of image.
+	 *
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
 	 * @return The image data or null if image not found. Result's image components may be null.
@@ -1062,10 +1064,12 @@ public interface DataHandler {
 	public ImageData getImageData(int fileId, int resized) throws DataAccessException;
 
 	/**
+	 * Get desired version of image.
+	 *
 	 * @param fileVersionId File identifier.
 	 * @param resized Image width or zero for original.
-	 * @return The image data or null if image not found. Result's image components may be null.
+	 * @return The image data or null if image version not found. Result's image components may be null.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	public ImageData getImageData2(int fileVersionId, int resized) throws DataAccessException;
+	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException;
 }

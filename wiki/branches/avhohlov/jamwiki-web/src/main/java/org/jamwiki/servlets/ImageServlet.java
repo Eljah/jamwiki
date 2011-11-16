@@ -45,9 +45,9 @@ public class ImageServlet extends JAMWikiServlet {
 			}
 
 			if (fileVersionId != null) {
-				imageData = WikiBase.getDataHandler().getImageData2(Integer.parseInt(fileVersionId), Integer.parseInt(resized));
+				imageData = WikiBase.getDataHandler().getImageVersionData(Integer.parseInt(fileVersionId), Integer.parseInt(resized));
 			} else {
-				imageData = WikiBase.getDataHandler().getImageData (Integer.parseInt(fileId),        Integer.parseInt(resized));
+				imageData = WikiBase.getDataHandler().getImageData       (Integer.parseInt(fileId),        Integer.parseInt(resized));
 			}
 		}
 		catch (NumberFormatException nfe) {
