@@ -93,16 +93,16 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			// first perform database upgrades
 			this.upgradeDatabase(true, pageInfo.getMessages());
-			// move system topics
 			if (oldVersion.before(1, 2, 0)) {
+				// move system topics
 				this.updateSystemTopics(request, pageInfo.getMessages());
 			}
 			// upgrade the search index if required & possible
 			this.upgradeSearchIndex(true, pageInfo.getMessages());
 			// refresh topic metadata if needed
 			try {
-				int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
 				if (oldVersion.before(1, 1, 0)) {
+					int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
 					if (topicCount < MAX_TOPICS_FOR_AUTOMATIC_UPDATE) {
 						int[] resultArray = WikiDatabase.rebuildTopicMetadata();
 						pageInfo.addMessage(new WikiMessage("admin.maintenance.message.metadata", Integer.toString(resultArray[0])));
@@ -245,8 +245,8 @@ public class UpgradeServlet extends JAMWikiServlet {
 			upgradeRequired = true;
 			if (performUpgrade) {
 				try {
-					int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
 					if (oldVersion.before(1, 1, 0)) {
+						int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
 						if (topicCount < MAX_TOPICS_FOR_AUTOMATIC_UPDATE) {
 							// refresh search engine
 							WikiBase.getSearchEngine().refreshIndex();
