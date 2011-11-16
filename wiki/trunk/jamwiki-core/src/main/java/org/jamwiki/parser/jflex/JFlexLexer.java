@@ -268,7 +268,8 @@ public abstract class JFlexLexer {
 	public abstract void yypushback(int number);
 
 	/**
-	 * JFlex internal method used to retrieve the current lexer state value.
+	 * JFlex internal method used to reset the current lexer to its initial
+	 * state to allow re-use.
 	 */
 	public abstract void yyreset(Reader reader);
 
