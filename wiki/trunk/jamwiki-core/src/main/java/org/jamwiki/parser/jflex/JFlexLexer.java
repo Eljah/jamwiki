@@ -249,6 +249,10 @@ public abstract class JFlexLexer {
 	 * Reset the lexer state to allow re-use.
 	 */
 	protected void reset(Reader reader) {
+		this.states.clear();
+		this.parserInput = null;
+		this.parserOutput = null;
+		this.mode = JFlexParser.MODE_POSTPROCESS;
 		this.yyreset(reader);
 	}
 
