@@ -1175,14 +1175,6 @@ public interface QueryHandler {
 	public void insertImage(int fileVersionId, int resized, ImageData imageData, Connection conn) throws SQLException;
 
 	/**
-	 * @param fileVersionId File version identifier.
-	 * @param conn A database connection to use when connecting to the database
-	 *  from this method.
-	 * @throws SQLException Thrown if any error occurs during method execution.
-	 */
-	public void deleteImage(int fileVersionId, Connection conn) throws SQLException;
-
-	/**
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
 	 * @param conn A database connection to use when connecting to the database

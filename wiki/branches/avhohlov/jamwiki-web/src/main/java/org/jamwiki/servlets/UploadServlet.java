@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -168,40 +169,25 @@ public class UploadServlet extends JAMWikiServlet {
 			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize, null);
 			ServletUtil.redirect(next, virtualWiki, topicName);
 		} else {
-		      /*if (uploadedFile == null) {
-				throw new WikiException(new WikiMessage("upload.error.filenotfound"));
-			}*/
 			destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
 			String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
-		      /*if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
-				// delete the spam file
-			        uploadedFile.delete();
+		        if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
 				this.view(request, next, pageInfo);
 				next.addObject("contents", contents);
 				return;
 			}
-			if (!StringUtils.isEmpty(destinationFilename)) {
-				// rename the uploaded file if a destination file name was specified
-				filename = ImageUtil.sanitizeFilename(destinationFilename);
-				url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
-				File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
-				if (!uploadedFile.renameTo(renamedFile)) {
-					throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
-				}
-			}*/
-
-			int  width   = -1;
-			int  height  = -1; 
+			int	width;
+			int	height; 
 			try {
 	       			BufferedImage image = ImageIO.read(new ByteArrayInputStream(buff));
-				width  = image.getWidth();
-				height = image.getHeight();
-			} catch (Exception ex) {
-				isImage = false;
+				width   =  image.getWidth();
+				height  =  image.getHeight();
+			} catch (IOException ex) {
+				width   = -1;
+				height  = -1;
+				isImage =  false;
 			}
-
 			ImageData imageData = new ImageData(contentType, width, height, buff);
-
 			String ipAddress = ServletUtil.getIpAddress(request);
 			WikiUser user = ServletUtil.currentWikiUser();
 			Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);

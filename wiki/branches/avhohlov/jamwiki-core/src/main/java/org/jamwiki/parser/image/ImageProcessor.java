@@ -304,7 +304,7 @@ public class ImageProcessor {
 	 */
 	private static void saveImage(ImageData imageData) throws IOException {
 		try {
-			WikiBase.getDataHandler().writeImage(imageData.fileVersionId, imageData.width, imageData);
+			WikiBase.getDataHandler().insertImage(imageData.fileVersionId, imageData.width, imageData);
 		} catch (DataAccessException dae) {
 		      //FIXME
 		      //throw new IOException(dae);

@@ -2327,33 +2327,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#writeImage(int, int, org.jamwiki.ImageData)
+	 * @see org.jamwiki.DataHandler#insertImage(int, int, org.jamwiki.ImageData)
 	 */
-	public void writeImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException {
+	public void insertImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
 			this.queryHandler().insertImage(fileVersionId, resized, imageData, conn);
-		} catch (SQLException e) {
-			DatabaseConnection.rollbackOnException(status, e);
-			throw new DataAccessException(e);
-	      //FIXME Why no finally section
-		}/* finally {
-			DatabaseConnection.closeConnection(conn);
-		}*/
-		DatabaseConnection.commit(status);
-	}
-
-	/**
-	 * @see org.jamwiki.DataHandler#deleteImage(int)
-	 */
-	public void deleteImage(int fileVersionId) throws DataAccessException {
-		TransactionStatus status = null;
-		try {
-			status = DatabaseConnection.startTransaction();
-			Connection conn = DatabaseConnection.getConnection();
-			this.queryHandler().deleteImage(fileVersionId, conn);
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);

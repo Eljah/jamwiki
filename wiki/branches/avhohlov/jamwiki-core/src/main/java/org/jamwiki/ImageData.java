@@ -16,8 +16,6 @@
  */
 package org.jamwiki;
 
-import java.awt.image.BufferedImage;
-
 /**
  * Class for image and other data storing and loading.
  */

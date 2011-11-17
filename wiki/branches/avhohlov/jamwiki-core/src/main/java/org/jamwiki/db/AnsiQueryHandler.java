@@ -247,7 +247,6 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_CREATE_FILE_DATA_TABLE = null;
 	protected static String STATEMENT_DROP_FILE_DATA_TABLE = null;
 	protected static String STATEMENT_INSERT_FILE_DATA = null;
-	protected static String STATEMENT_DELETE_FILE_DATA = null;
 	protected static String STATEMENT_SELECT_FILE_INFO = null;
 	protected static String STATEMENT_SELECT_FILE_DATA = null;
 	protected static String STATEMENT_SELECT_FILE_VERSION_DATA = null;
@@ -1372,7 +1371,6 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_CREATE_FILE_DATA_TABLE         = props.getProperty("STATEMENT_CREATE_FILE_DATA_TABLE");
 		STATEMENT_DROP_FILE_DATA_TABLE           = props.getProperty("STATEMENT_DROP_FILE_DATA_TABLE");
 		STATEMENT_INSERT_FILE_DATA               = props.getProperty("STATEMENT_INSERT_FILE_DATA");
-		STATEMENT_DELETE_FILE_DATA               = props.getProperty("STATEMENT_DELETE_FILE_DATA");
 		STATEMENT_SELECT_FILE_INFO               = props.getProperty("STATEMENT_SELECT_FILE_INFO");
 		STATEMENT_SELECT_FILE_DATA               = props.getProperty("STATEMENT_SELECT_FILE_DATA");
 		STATEMENT_SELECT_FILE_VERSION_DATA       = props.getProperty("STATEMENT_SELECT_FILE_VERSION_DATA");
@@ -3414,7 +3412,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	/**
-	 * @see org.jamwiki.db.QueryHandler#writeImage(int, int, org.jamwiki.ImageData, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#insertImage(int, int, org.jamwiki.ImageData, java.sql.Connection)
 	 */
 	public void insertImage(int fileVersionId, int resized, ImageData imageData, Connection conn) throws SQLException
 	{
@@ -3426,20 +3424,6 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt  (3, imageData.width);
 			stmt.setInt  (4, imageData.height);
 			stmt.setBytes(5, imageData.data);
-			stmt.executeUpdate();
-		} finally {
-			DatabaseConnection.closeStatement(stmt);
-		}
-	}
-
-	/**
-	 * @see org.jamwiki.db.QueryHandler#deleteImage(int, java.sql.Connection)
-	 */
-	public void deleteImage(int fileVersionId, Connection conn) throws SQLException {
-		PreparedStatement stmt = null;
-		try {
-			stmt = conn.prepareStatement(STATEMENT_DELETE_FILE_DATA);
-			stmt.setInt(1, fileVersionId);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);

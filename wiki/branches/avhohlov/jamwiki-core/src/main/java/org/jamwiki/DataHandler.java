@@ -1036,19 +1036,15 @@ public interface DataHandler {
 	 * @param imageData The image and it's arrtibutes to store.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	public void writeImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException;
+	public void insertImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException;
 
 	/**
-	 * @param fileVersionId File version identifier.
-	 * @throws DataAccessException Thrown if any error occurs during method execution.
-	 */
-	public void deleteImage(int fileVersionId) throws DataAccessException;
-
-	/**
+	 * Get info of latest version of image.
+	 *
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
 	 * @return The image info or null if image not found. Result's width and height components must
-	 * be negative when data are not an image. Result's data and image components may be null.
+	 * be negative when data are not an image. Result's data component may be null.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException;
@@ -1058,7 +1054,7 @@ public interface DataHandler {
 	 *
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
-	 * @return The image data or null if image not found. Result's image components may be null.
+	 * @return The image data or null if image not found.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public ImageData getImageData(int fileId, int resized) throws DataAccessException;
@@ -1068,7 +1064,7 @@ public interface DataHandler {
 	 *
 	 * @param fileVersionId File identifier.
 	 * @param resized Image width or zero for original.
-	 * @return The image data or null if image version not found. Result's image components may be null.
+	 * @return The image data or null if image version not found.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException;
