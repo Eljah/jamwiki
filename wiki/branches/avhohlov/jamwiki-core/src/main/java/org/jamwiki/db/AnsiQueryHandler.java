@@ -247,6 +247,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_CREATE_FILE_DATA_TABLE = null;
 	protected static String STATEMENT_DROP_FILE_DATA_TABLE = null;
 	protected static String STATEMENT_INSERT_FILE_DATA = null;
+	protected static String STATEMENT_DELETE_RESIZED_IMAGES = null;
 	protected static String STATEMENT_SELECT_FILE_INFO = null;
 	protected static String STATEMENT_SELECT_FILE_DATA = null;
 	protected static String STATEMENT_SELECT_FILE_VERSION_DATA = null;
@@ -1371,6 +1372,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_CREATE_FILE_DATA_TABLE         = props.getProperty("STATEMENT_CREATE_FILE_DATA_TABLE");
 		STATEMENT_DROP_FILE_DATA_TABLE           = props.getProperty("STATEMENT_DROP_FILE_DATA_TABLE");
 		STATEMENT_INSERT_FILE_DATA               = props.getProperty("STATEMENT_INSERT_FILE_DATA");
+		STATEMENT_DELETE_RESIZED_IMAGES          = props.getProperty("STATEMENT_DELETE_RESIZED_IMAGES");
 		STATEMENT_SELECT_FILE_INFO               = props.getProperty("STATEMENT_SELECT_FILE_INFO");
 		STATEMENT_SELECT_FILE_DATA               = props.getProperty("STATEMENT_SELECT_FILE_DATA");
 		STATEMENT_SELECT_FILE_VERSION_DATA       = props.getProperty("STATEMENT_SELECT_FILE_VERSION_DATA");
@@ -3412,18 +3414,33 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	/**
-	 * @see org.jamwiki.db.QueryHandler#insertImage(int, int, org.jamwiki.ImageData, java.sql.Connection)
+	 * @see org.jamwiki.db.QueryHandler#insertImage(org.jamwiki.ImageData, boolean, java.sql.Connection)
 	 */
-	public void insertImage(int fileVersionId, int resized, ImageData imageData, Connection conn) throws SQLException
+	public void insertImage(ImageData imageData, boolean isResized, Connection conn) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_INSERT_FILE_DATA);
-			stmt.setInt  (1, fileVersionId);
-			stmt.setInt  (2, resized);
+			stmt.setInt  (1, imageData.fileVersionId);
+			stmt.setInt  (2, isResized ? imageData.width : 0);
 			stmt.setInt  (3, imageData.width);
 			stmt.setInt  (4, imageData.height);
 			stmt.setBytes(5, imageData.data);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#deleteResizedImages(int, java.sql.Connection)
+	 */
+	public void deleteResizedImages(int fileId, Connection conn) throws SQLException
+	{
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_DELETE_RESIZED_IMAGES);
+			stmt.setInt  (1, fileId);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);

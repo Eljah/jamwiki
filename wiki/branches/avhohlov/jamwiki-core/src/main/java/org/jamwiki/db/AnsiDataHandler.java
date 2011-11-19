@@ -1889,7 +1889,10 @@ public class AnsiDataHandler implements DataHandler {
 			// write version
 			addWikiFileVersion(wikiFileVersion, conn);
 			if (imageData != null) {
-				this.queryHandler().insertImage(wikiFileVersion.getFileVersionId(), 0, imageData, conn);
+				// No more needs of old resized images 
+				this.queryHandler().deleteResizedImages(wikiFile.getFileId(), conn);
+				imageData.fileVersionId = wikiFileVersion.getFileVersionId();
+				this.queryHandler().insertImage(imageData, false, conn);
 			}
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
@@ -2327,14 +2330,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#insertImage(int, int, org.jamwiki.ImageData)
+	 * @see org.jamwiki.DataHandler#insertImage(int, int, org.jamwiki.ImageData, boolean)
 	 */
-	public void insertImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException {
+	public void insertImage(ImageData imageData, boolean resized) throws DataAccessException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			this.queryHandler().insertImage(fileVersionId, resized, imageData, conn);
+			this.queryHandler().insertImage(imageData, resized, conn);
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);

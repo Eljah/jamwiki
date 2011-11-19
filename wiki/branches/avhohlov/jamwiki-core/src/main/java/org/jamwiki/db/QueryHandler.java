@@ -1165,14 +1165,21 @@ public interface QueryHandler {
 	/**
 	 * Add new image or other data to database.
 	 *
-	 * @param fileVersionId File version identifier.
-	 * @param resized Image width or zero for original.
 	 * @param imageData The image and it's arrtibutes to store.
+	 * @param isResized Must be true when inserting resized version of image and false otherwise.
 	 * @param conn A database connection to use when connecting to the database
 	 *  from this method.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public void insertImage(int fileVersionId, int resized, ImageData imageData, Connection conn) throws SQLException;
+	public void insertImage(ImageData imageData, boolean isResized, Connection conn) throws SQLException;
+
+	/**
+	 * @param fileId File identifier.
+	 * @param conn A database connection to use when connecting to the database
+	 *  from this method.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	public void deleteResizedImages(int fileId, Connection conn) throws SQLException;
 
 	/**
 	 * @param fileId File identifier.

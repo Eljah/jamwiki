@@ -1031,12 +1031,11 @@ public interface DataHandler {
 	/**
 	 * Add new image or other data to database.
 	 *
-	 * @param fileVersionId File version identifier.
-	 * @param resized Image width or zero for original.
 	 * @param imageData The image and it's arrtibutes to store.
+	 * @param resized Must be true when inserting resized version of image and false otherwise.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	public void insertImage(int fileVersionId, int resized, ImageData imageData) throws DataAccessException;
+	public void insertImage(ImageData imageData, boolean resized) throws DataAccessException;
 
 	/**
 	 * Get info of latest version of image.
