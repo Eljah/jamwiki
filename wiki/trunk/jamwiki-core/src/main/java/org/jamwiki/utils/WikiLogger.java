@@ -142,6 +142,14 @@ public class WikiLogger {
 	}
 
 	/**
+	 * Return <code>true</code> if a log message of level {@link org.slf4j.Logger#WARN}
+	 * can be logged.
+	 */
+	public boolean isWarnEnabled() {
+		return this.logger.isWarnEnabled();
+	}
+
+	/**
 	 * Log a message at the {@link org.slf4j.Logger#TRACE} level,
 	 * provided that the current log level is {@link org.slf4j.Logger#TRACE}
 	 * or greater.

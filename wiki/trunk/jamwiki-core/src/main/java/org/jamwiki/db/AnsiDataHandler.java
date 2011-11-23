@@ -2127,7 +2127,9 @@ public class AnsiDataHandler implements DataHandler {
 		DatabaseConnection.commit(status);
 		// update the cache AFTER the commit
 		this.cacheTopicRefresh(topic);
-		logger.debug("Wrote topic " + topic.getVirtualWiki() + ':' + topic.getName() + " with params [categories is null: " + (categories == null) + "] / [links is null: " + (links == null) + "] in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Wrote topic " + topic.getVirtualWiki() + ':' + topic.getName() + " with params [categories is null: " + (categories == null) + "] / [links is null: " + (links == null) + "] in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
+		}
 	}
 
 	/**

@@ -96,7 +96,9 @@ public class MigrationUtil {
 			// re-enable the write updates to the search engine
 			WikiBase.getSearchEngine().setDisabled(false);
 		}
-		logger.debug("Parsed XML " + file.getAbsolutePath() + " in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Parsed XML " + file.getAbsolutePath() + " in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
+		}
 		if (parsedTopics.isEmpty()) {
 			throw new WikiException(new WikiMessage("import.error.notopic"));
 		}

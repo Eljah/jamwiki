@@ -201,13 +201,17 @@ public class DatabaseConnection {
 		try {
 			long start = System.currentTimeMillis();
 			stmt = conn.createStatement();
-			logger.info("Executing SQL: " + sql);
+			if (logger.isInfoEnabled()) {
+				logger.info("Executing SQL: " + sql);
+			}
 			int result = stmt.executeUpdate(sql);
 			long execution = System.currentTimeMillis() - start;
-			if (execution > DatabaseConnection.SLOW_QUERY_LIMIT) {
+			if (execution > DatabaseConnection.SLOW_QUERY_LIMIT && logger.isWarnEnabled()) {
 				logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
 			}
-			logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
+			}
 			return result;
 		} catch (SQLException e) {
 			logger.error("Failure while executing " + sql, e);

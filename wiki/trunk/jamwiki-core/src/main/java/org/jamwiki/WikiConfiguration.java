@@ -277,7 +277,9 @@ public class WikiConfiguration {
 	 * @param child
 	 */
 	private void logUnknownChild(Node node, Node child) {
-		logger.trace("Unknown child of " + node.getNodeName() + " tag: " + child.getNodeName() + " / " + child.getNodeValue());
+		if (logger.isTraceEnabled()) {
+			logger.trace("Unknown child of " + node.getNodeName() + " tag: " + child.getNodeName() + " / " + child.getNodeValue());
+		}
 	}
 
 	/**

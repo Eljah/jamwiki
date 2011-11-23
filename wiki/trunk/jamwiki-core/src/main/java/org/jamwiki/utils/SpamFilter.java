@@ -71,8 +71,10 @@ public class SpamFilter {
 		if (m.find()) {
 			result = m.group(0);
 		}
-		long execution = System.currentTimeMillis() - start;
-		logger.debug("Executed spam filter (" + (execution / 1000.000) + " s.)");
+		if (logger.isDebugEnabled()) {
+			long execution = System.currentTimeMillis() - start;
+			logger.debug("Executed spam filter (" + (execution / 1000.000) + " s.)");
+		}
 		return result;
 	}
 

@@ -298,14 +298,18 @@ public class WikiUtil {
 		String topic = retrieveDirectoriesFromURI(request, 1);
 		if (topic == null) {
 			// may be the root URL, ie: http://example.com/wiki/en/
-			logger.debug("No topic in URL: " + request.getRequestURI());
+			if (logger.isDebugEnabled()) {
+				logger.debug("No topic in URL: " + request.getRequestURI());
+			}
 			return null;
 		}
 		int pos = topic.indexOf('#');
 		if (pos != -1) {
 			// strip everything after and including '#'
 			if (pos == 0) {
-				logger.debug("No topic in URL: " + request.getRequestURI());
+				if (logger.isDebugEnabled()) {
+					logger.debug("No topic in URL: " + request.getRequestURI());
+				}
 				return null;
 			}
 			topic = topic.substring(0, pos);
@@ -314,7 +318,9 @@ public class WikiUtil {
 		if (pos != -1) {
 			// strip everything after and including '?'
 			if (pos == 0) {
-				logger.debug("No topic in URL: " + request.getRequestURI());
+				if (logger.isDebugEnabled()) {
+					logger.debug("No topic in URL: " + request.getRequestURI());
+				}
 				return null;
 			}
 			topic = topic.substring(0, pos);
@@ -323,7 +329,9 @@ public class WikiUtil {
 		if (pos != -1) {
 			// some servlet containers return parameters of the form ";jsessionid=1234" when getRequestURI is called.
 			if (pos == 0) {
-				logger.debug("No topic in URL: " + request.getRequestURI());
+				if (logger.isDebugEnabled()) {
+					logger.debug("No topic in URL: " + request.getRequestURI());
+				}
 				return null;
 			}
 			topic = topic.substring(0, pos);

@@ -177,8 +177,10 @@ public class JFlexParser implements JAMWikiParser {
 			// redirects are parsed differently
 			output = this.parseRedirect(parserInput, parserOutput, raw);
 		}
-		String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
-		logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		if (logger.isInfoEnabled()) {
+			String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
+			logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		}
 		return output.trim();
 	}
 
@@ -223,8 +225,10 @@ public class JFlexParser implements JAMWikiParser {
 		String output = raw;
 		ParserOutput parserOutput = new ParserOutput();
 		output = this.parseTemplate(parserInput, parserOutput, output, JFlexParser.MODE_MINIMAL);
-		String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
-		logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		if (logger.isInfoEnabled()) {
+			String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
+			logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		}
 		return output;
 	}
 
@@ -364,8 +368,10 @@ public class JFlexParser implements JAMWikiParser {
 		JAMWikiSpliceLexer lexer = new JAMWikiSpliceLexer(reader);
 		lexer.setTargetSection(targetSection);
 		String output = this.lex(lexer, raw, parserInput, parserOutput, JFlexParser.MODE_SLICE);
-		String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
-		logger.debug("Parse time (parseSlice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		if (logger.isDebugEnabled()) {
+			String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
+			logger.debug("Parse time (parseSlice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		}
 		return output;
 	}
 
@@ -394,8 +400,10 @@ public class JFlexParser implements JAMWikiParser {
 		lexer.setReplacementText(replacementText);
 		lexer.setTargetSection(targetSection);
 		String output = this.lex(lexer, raw, parserInput, parserOutput, JFlexParser.MODE_SPLICE);
-		String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
-		logger.debug("Parse time (parseSplice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		if (logger.isDebugEnabled()) {
+			String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
+			logger.debug("Parse time (parseSplice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		}
 		return output;
 	}
 

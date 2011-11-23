@@ -161,7 +161,9 @@ public abstract class ResourceUtil {
 		if (StringUtils.isBlank(className)) {
 			throw new IllegalArgumentException("Cannot call instantiateClass with an empty class name");
 		}
-		logger.debug("Instantiating class: " + className);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Instantiating class: " + className);
+		}
 		try {
 			Class clazz = ClassUtils.forName(className, ClassUtils.getDefaultClassLoader());
 			Class[] parameterTypes = new Class[0];

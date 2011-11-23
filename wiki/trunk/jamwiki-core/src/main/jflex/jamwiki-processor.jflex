@@ -407,7 +407,7 @@ endparagraph       = {newline} (({whitespace})*{newline})*
         return this.parse(TAG_TYPE_WIKI_REFERENCE, yytext());
     }
     {references} {
-        logger.trace("references: " + yytext() + " (" + yystate() + ")");
+        if (logger.isTraceEnabled()) logger.trace("references: " + yytext() + " (" + yystate() + ")");
         if (this.paragraphIsOpen()) {
             // if a paragraph is already opened, close it
             this.popTag("p");

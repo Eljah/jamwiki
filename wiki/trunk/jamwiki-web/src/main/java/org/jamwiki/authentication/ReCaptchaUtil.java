@@ -127,7 +127,9 @@ public class ReCaptchaUtil {
 			// throws a NPE without them
 			result = reCaptcha.checkAnswer(request.getRemoteAddr(), challenge, response).isValid();
 		}
-		logger.debug("Captcha validation " + (result ? "successful" : "failed") + " for " + request.getRemoteAddr());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Captcha validation " + (result ? "successful" : "failed") + " for " + request.getRemoteAddr());
+		}
 		return result;
 	}
 }
