@@ -651,26 +651,50 @@ public abstract class LinkUtil {
 	 * @throws WikiException Thrown if the topic name is invalid.
 	 */
 	public static void validateTopicName(String virtualWiki, String name, boolean allowSpecial) throws WikiException {
-		if (StringUtils.isBlank(virtualWiki)) {
+		WikiLink wikiLink = null;
+		try {
+			wikiLink = new WikiLink(null, virtualWiki, name);
+		} catch (IllegalArgumentException e) {
+			if (StringUtils.isBlank(virtualWiki)) {
+				throw new WikiException(new WikiMessage("common.exception.novirtualwiki"));
+			} else {
+				throw new WikiException(new WikiMessage("common.exception.notopic"));
+			}
+		}
+		LinkUtil.validateTopicName(wikiLink, allowSpecial);
+	}
+
+	/**
+	 * Utility method for determining if a topic name is valid for use on the Wiki,
+	 * meaning that it is not empty and does not contain any invalid characters.  This
+	 * method offers improved performance for cases where a WikiLink object is
+	 * already available.
+	 *
+	 * @param wikiLink The WikiLink object to validate.
+	 * @param allowSpecial Set to <code>true</code> if topics in the Special: namespace
+	 *  should be considered valid.  These topics cannot be created, so (for example)
+	 *  this method should not allow them when editing topics.
+	 * @throws WikiException Thrown if the topic name is invalid.
+	 */
+	public static void validateTopicName(WikiLink wikiLink, boolean allowSpecial) throws WikiException {
+		if (StringUtils.isBlank(wikiLink.getVirtualWiki())) {
 			throw new WikiException(new WikiMessage("common.exception.novirtualwiki"));
 		}
-		if (StringUtils.isBlank(name)) {
+		if (StringUtils.isBlank(wikiLink.getDestination())) {
 			throw new WikiException(new WikiMessage("common.exception.notopic"));
 		}
-		if (!allowSpecial && PseudoTopicHandler.isPseudoTopic(name)) {
-			throw new WikiException(new WikiMessage("common.exception.pseudotopic", name));
+		if (!allowSpecial && PseudoTopicHandler.isPseudoTopic(wikiLink.getDestination())) {
+			throw new WikiException(new WikiMessage("common.exception.pseudotopic", wikiLink.getDestination()));
 		}
-		WikiLink wikiLink = new WikiLink(null, virtualWiki, name);
-		String article = StringUtils.trimToNull(wikiLink.getArticle());
-		if (StringUtils.startsWith(article, "/")) {
-			throw new WikiException(new WikiMessage("common.exception.name", name));
+		if (StringUtils.startsWith(wikiLink.getArticle().trim(), "/")) {
+			throw new WikiException(new WikiMessage("common.exception.name", wikiLink.getDestination()));
 		}
 		if (!allowSpecial && wikiLink.getNamespace().getId().equals(Namespace.SPECIAL_ID)) {
-			throw new WikiException(new WikiMessage("common.exception.name", name));
+			throw new WikiException(new WikiMessage("common.exception.name", wikiLink.getDestination()));
 		}
-		Matcher m = LinkUtil.INVALID_TOPIC_NAME_PATTERN.matcher(name);
+		Matcher m = LinkUtil.INVALID_TOPIC_NAME_PATTERN.matcher(wikiLink.getDestination());
 		if (m.find()) {
-			throw new WikiException(new WikiMessage("common.exception.name", name));
+			throw new WikiException(new WikiMessage("common.exception.name", wikiLink.getDestination()));
 		}
 	}
 }
