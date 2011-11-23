@@ -19,8 +19,6 @@ package org.jamwiki.parser.jflex;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
@@ -47,7 +45,6 @@ public class TemplateTag implements JFlexParserTag {
 	private static final WikiLogger logger = WikiLogger.getLogger(TemplateTag.class.getName());
 	protected static final String TEMPLATE_INCLUSION = "template-inclusion";
 	protected static final String TEMPLATE_ONLYINCLUDE = "template-onlyinclude";
-	private static final Pattern PARAM_NAME_VALUE_PATTERN = Pattern.compile("[\\s]*([A-Za-z0-9_\\ \\-]+)[\\s]*\\=([\\s\\S]*)");
 
 	/**
 	 * Once the template call has been parsed and the template values have been
@@ -421,16 +418,21 @@ public class TemplateTag implements JFlexParserTag {
 	}
 
 	/**
-	 *
+	 * Determine if params are of the form name=value, and if so split
+	 * them into an array pairing.
 	 */
 	private String[] tokenizeNameValue(String content) {
 		String[] results = new String[2];
 		results[0] = null;
 		results[1] = content;
-		Matcher m = PARAM_NAME_VALUE_PATTERN.matcher(content);
-		if (m.matches()) {
-			results[0] = m.group(1);
-			results[1] = m.group(2);
+		int pos = content.indexOf('=');
+		if (pos > 0) {
+			String param = content.substring(0, pos);
+			if (!StringUtils.isBlank(param)) {
+				results[0] = param.trim();
+				// set to null unless there is content after the equals sign
+				results[1] = (pos < (content.length() - 2)) ? content.substring(pos + 1) : null;
+			}
 		}
 		return results;
 	}

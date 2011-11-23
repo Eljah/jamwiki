@@ -159,27 +159,33 @@ public class ImageLinkTag implements JFlexParserTag {
 				}
 			}
 			// if none of the above tokens matched then check for size or caption
-			matcher = IMAGE_SIZE_PATTERN.matcher(token);
-			if (matcher.find()) {
-				String maxWidth = matcher.group(1);
-				if (!StringUtils.isBlank(maxWidth)) {
-					imageMetadata.setMaxWidth(Integer.valueOf(maxWidth));
+			if (token.toLowerCase().endsWith("px")) {
+				matcher = IMAGE_SIZE_PATTERN.matcher(token);
+				if (matcher.find()) {
+					String maxWidth = matcher.group(1);
+					if (!StringUtils.isBlank(maxWidth)) {
+						imageMetadata.setMaxWidth(Integer.valueOf(maxWidth));
+					}
+					String maxHeight = matcher.group(2);
+					if (!StringUtils.isBlank(maxHeight)) {
+						imageMetadata.setMaxHeight(Integer.valueOf(maxHeight));
+					}
+					continue tokenLoop;
 				}
-				String maxHeight = matcher.group(2);
-				if (!StringUtils.isBlank(maxHeight)) {
-					imageMetadata.setMaxHeight(Integer.valueOf(maxHeight));
+			}
+			if (token.toLowerCase().startsWith("alt")) {
+				matcher = IMAGE_ALT_PATTERN.matcher(token);
+				if (matcher.find()) {
+					imageMetadata.setAlt(matcher.group(1).trim());
+					continue tokenLoop;
 				}
-				continue tokenLoop;
 			}
-			matcher = IMAGE_ALT_PATTERN.matcher(token);
-			if (matcher.find()) {
-				imageMetadata.setAlt(matcher.group(1).trim());
-				continue tokenLoop;
-			}
-			matcher = IMAGE_LINK_PATTERN.matcher(token);
-			if (matcher.find()) {
-				imageMetadata.setLink(matcher.group(1).trim());
-				continue tokenLoop;
+			if (token.toLowerCase().startsWith("link")) {
+				matcher = IMAGE_LINK_PATTERN.matcher(token);
+				if (matcher.find()) {
+					imageMetadata.setLink(matcher.group(1).trim());
+					continue tokenLoop;
+				}
 			}
 			// this is a bit hackish.  string together any remaining content as a possible
 			// caption, then parse it and strip out anything after the first pipe character

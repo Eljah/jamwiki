@@ -132,6 +132,7 @@ public class ImageProcessor {
 	 * relatively fast.
 	 */
 	protected static Dimension retrieveImageDimensions(File imageFile) throws IOException {
+		long start = System.currentTimeMillis();
 		if (!imageFile.exists()) {
 			logger.info("No file found while determining image dimensions: " + imageFile.getAbsolutePath());
 			return null;
@@ -163,6 +164,10 @@ public class ImageProcessor {
 				}
 			}
 			IOUtils.closeQuietly(fis);
+		}
+		if (logger.isDebugEnabled()) {
+			long execution = (System.currentTimeMillis() - start);
+			logger.debug("Image dimension lookup for " + imageFile.getAbsolutePath() + " took " + (execution / 1000.000) + " s");
 		}
 		return dimensions;
 	}
