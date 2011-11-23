@@ -60,13 +60,6 @@ public class JFlexParser implements JAMWikiParser {
 	public static final int MODE_LAYOUT = 9;
 	/** Post-process mode indicates that the pre-processor, processor and post-processor should be run in full, parsing all Wiki syntax into formatted output and adding layout tags such as paragraphs and TOC. */
 	public static final int MODE_POSTPROCESS = 10;
-	// Implement lexer pools to avoid unnecessary object creation and garbage collection.
-	private List<JAMWikiCustomTagLexer> customTagLexerPool = new ArrayList<JAMWikiCustomTagLexer>();
-	private List<JAMWikiEditCommentLexer> editCommentLexerPool = new ArrayList<JAMWikiEditCommentLexer>();
-	private List<JAMWikiLexer> lexerPool = new ArrayList<JAMWikiLexer>();
-	private List<JAMWikiPostLexer> postLexerPool = new ArrayList<JAMWikiPostLexer>();
-	private List<JAMWikiPreLexer> preLexerPool = new ArrayList<JAMWikiPreLexer>();
-	private List<JAMWikiTemplateLexer> templateLexerPool = new ArrayList<JAMWikiTemplateLexer>();
 
 	/**
 	 * Return a parser-specific value that can be used as the content of a
@@ -88,15 +81,13 @@ public class JFlexParser implements JAMWikiParser {
 		lexer.init(parserInput, parserOutput, mode);
 		validate(lexer);
 		parserInput.incrementDepth();
-		String result = null;
 		try {
-			result = lexer.lex();
+			return lexer.lex();
 		} catch (Exception e) {
-			parserInput.decrementDepth();
 			throw new ParserException("Failure while parsing topic " + parserInput.getVirtualWiki() + ':' + parserInput.getTopicName(), e);
+		} finally {
+			parserInput.decrementDepth();
 		}
-		parserInput.decrementDepth();
-		return result;
 	}
 
 	/**
@@ -111,14 +102,9 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	private String parseCustom(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
 		StringReader reader = toStringReader(raw);
-		JAMWikiCustomTagLexer lexer = null;
-		try {
-			lexer = this.retrieveJAMWikiCustomTagLexer(reader);
-			int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
-			return this.lex(lexer, raw, parserInput, parserOutput, preMode);
-		} finally {
-			this.releaseLexer(this.customTagLexerPool, lexer);
-		}
+		JAMWikiCustomTagLexer lexer = new JAMWikiCustomTagLexer(reader);
+		int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
+		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
 	}
 
 	/**
@@ -133,13 +119,8 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	public String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
 		StringReader reader = toStringReader(raw);
-		JAMWikiEditCommentLexer lexer = null;
-		try {
-			lexer = this.retrieveJAMWikiEditCommentLexer(reader);
+		JAMWikiEditCommentLexer lexer = new JAMWikiEditCommentLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, MODE_EDIT_COMMENT).trim();
-		} finally {
-			this.releaseLexer(this.editCommentLexerPool, lexer);
-		}
 	}
 
 	/**
@@ -259,14 +240,9 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	private String parseTemplate(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
 		StringReader reader = toStringReader(raw);
-		JAMWikiTemplateLexer lexer = null;
-		try {
-			lexer = this.retrieveJAMWikiTemplateLexer(reader);
-			int preMode = (mode > JFlexParser.MODE_TEMPLATE) ? JFlexParser.MODE_TEMPLATE : mode;
-			return this.lex(lexer, raw, parserInput, parserOutput, preMode);
-		} finally {
-			this.releaseLexer(this.templateLexerPool, lexer);
-		}
+		JAMWikiTemplateLexer lexer = new JAMWikiTemplateLexer(reader);
+		int preMode = (mode > JFlexParser.MODE_TEMPLATE) ? JFlexParser.MODE_TEMPLATE : mode;
+		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
 	}
 
 	/**
@@ -284,14 +260,9 @@ public class JFlexParser implements JAMWikiParser {
 			return raw;
 		}
 		StringReader reader = toStringReader(raw);
-		JAMWikiPreLexer lexer = null;
-		try {
-			lexer = this.retrieveJAMWikiPreLexer(reader);
-			int preMode = (mode > JFlexParser.MODE_PREPROCESS) ? JFlexParser.MODE_PREPROCESS : mode;
-			return this.lex(lexer, raw, parserInput, parserOutput, preMode);
-		} finally {
-			this.releaseLexer(this.preLexerPool, lexer);
-		}
+		JAMWikiPreLexer lexer = new JAMWikiPreLexer(reader);
+		int preMode = (mode > JFlexParser.MODE_PREPROCESS) ? JFlexParser.MODE_PREPROCESS : mode;
+		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
 	}
 
 	/**
@@ -310,13 +281,8 @@ public class JFlexParser implements JAMWikiParser {
 			return raw;
 		}
 		StringReader reader = toStringReader(raw);
-		JAMWikiLexer lexer = null;
-		try {
-			lexer = this.retrieveJAMWikiLexer(reader);
-			return this.lex(lexer, raw, parserInput, parserOutput, mode);
-		} finally {
-			this.releaseLexer(this.lexerPool, lexer);
-		}
+		JAMWikiLexer lexer = new JAMWikiLexer(reader);
+		return this.lex(lexer, raw, parserInput, parserOutput, mode);
 	}
 
 	/**
@@ -336,13 +302,8 @@ public class JFlexParser implements JAMWikiParser {
 			return raw;
 		}
 		StringReader reader = toStringReader(raw);
-		JAMWikiPostLexer lexer = null;
-		try {
-			lexer = this.retrieveJAMWikiPostLexer(reader);
-			return this.lex(lexer, raw, parserInput, parserOutput, mode);
-		} finally {
-			this.releaseLexer(this.postLexerPool, lexer);
-		}
+		JAMWikiPostLexer lexer = new JAMWikiPostLexer(reader);
+		return this.lex(lexer, raw, parserInput, parserOutput, mode);
 	}
 
 	/**
@@ -436,85 +397,6 @@ public class JFlexParser implements JAMWikiParser {
 		String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
 		logger.debug("Parse time (parseSplice) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
 		return output;
-	}
-
-	/**
-	 * Release a lexer instance back into the pool for re-use.
-	 */
-	private <T extends JFlexLexer> void releaseLexer(List<T> lexerPool, T lexer) {
-		if (lexer != null) {
-			lexerPool.add(lexer);
-		}
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, or return
-	 * <code>null</code> if no lexer is available.
-	 */
-	private synchronized <T extends JFlexLexer> T retrieveLexer(List<T> lexerPool, StringReader reader) {
-		// synchronize this method so that a thread won't be able to grab
-		// a lexer after a previous thread has checked to see if the pool
-		// is empty or not
-		if (lexerPool.isEmpty()) {
-			return null;
-		}
-		T lexer = lexerPool.remove(0);
-		lexer.reset(reader);
-		return lexer;
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
-	 * a new instance.
-	 */
-	private JAMWikiCustomTagLexer retrieveJAMWikiCustomTagLexer(StringReader reader) {
-		JAMWikiCustomTagLexer lexer = this.retrieveLexer(this.customTagLexerPool, reader);
-		return (lexer == null) ? new JAMWikiCustomTagLexer(reader) : lexer;
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
-	 * a new instance.
-	 */
-	private JAMWikiEditCommentLexer retrieveJAMWikiEditCommentLexer(StringReader reader) {
-		JAMWikiEditCommentLexer lexer = this.retrieveLexer(this.editCommentLexerPool, reader);
-		return (lexer == null) ? new JAMWikiEditCommentLexer(reader) : lexer;
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
-	 * a new instance.
-	 */
-	private JAMWikiLexer retrieveJAMWikiLexer(StringReader reader) {
-		JAMWikiLexer lexer = this.retrieveLexer(this.lexerPool, reader);
-		return (lexer == null) ? new JAMWikiLexer(reader) : lexer;
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
-	 * a new instance.
-	 */
-	private JAMWikiPostLexer retrieveJAMWikiPostLexer(StringReader reader) {
-		JAMWikiPostLexer lexer = this.retrieveLexer(this.postLexerPool, reader);
-		return (lexer == null) ? new JAMWikiPostLexer(reader) : lexer;
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
-	 * a new instance.
-	 */
-	private JAMWikiPreLexer retrieveJAMWikiPreLexer(StringReader reader) {
-		JAMWikiPreLexer lexer = this.retrieveLexer(this.preLexerPool, reader);
-		return (lexer == null) ? new JAMWikiPreLexer(reader) : lexer;
-	}
-
-	/**
-	 * Retrieve a lexer from the lexer pool if one is available, otherwise create
-	 * a new instance.
-	 */
-	private JAMWikiTemplateLexer retrieveJAMWikiTemplateLexer(StringReader reader) {
-		JAMWikiTemplateLexer lexer = this.retrieveLexer(this.templateLexerPool, reader);
-		return (lexer == null) ? new JAMWikiTemplateLexer(reader) : lexer;
 	}
 
 	/**

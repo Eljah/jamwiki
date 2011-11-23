@@ -16,7 +16,6 @@
  */
 package org.jamwiki.parser.jflex;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -502,13 +501,5 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 			this.popTag(this.peekTag().getTagType());
 		}
 		this.tagStack.push(tag);
-	}
-
-	/**
-	 *
-	 */
-	protected void reset(Reader reader) {
-		this.tagStack.clear();
-		super.reset(reader);
 	}
 }
