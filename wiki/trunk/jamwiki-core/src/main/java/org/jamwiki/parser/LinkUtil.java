@@ -46,7 +46,7 @@ public abstract class LinkUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(LinkUtil.class.getName());
 
-	private static final Pattern INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_NAME));
+	private static final Pattern INVALID_TOPIC_NAME_PATTERN = Pattern.compile(Environment.getValue(Environment.PROP_PATTERN_INVALID_TOPIC_PATTERN));
 	// pattern for links of the form "http://example.com" or "mailto:email.com".  "(?:X)" means non-capturing group.
 	private static final String LINK_PROTOCOL_REGEX = "(http(?:s)?|file|ftp|mailto|news):(?://)?(.*)";
 	private static final Pattern LINK_PROTOCOL_PATTERN = Pattern.compile(LINK_PROTOCOL_REGEX, Pattern.CASE_INSENSITIVE);

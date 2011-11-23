@@ -113,7 +113,7 @@ public class Environment {
 	public static final String PROP_PARSER_USE_NUMBERED_HTML_LINKS = "use-numbered-html-links";
 	public static final String PROP_PATTERN_INVALID_NAMESPACE_NAME = "pattern-namespace-name-invalid";
 	public static final String PROP_PATTERN_INVALID_ROLE_NAME = "pattern-role-name-invalid";
-	public static final String PROP_PATTERN_INVALID_TOPIC_NAME = "pattern-topic-name-invalid";
+	public static final String PROP_PATTERN_INVALID_TOPIC_PATTERN = "pattern-topic-name-invalid";
 	public static final String PROP_PATTERN_VALID_USER_LOGIN = "pattern-login-valid";
 	public static final String PROP_PATTERN_VALID_VIRTUAL_WIKI = "pattern-virtualwiki-valid";
 	public static final String PROP_PRINT_NEW_WINDOW = "print-new-window";
@@ -262,7 +262,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_PARSER_USE_NUMBERED_HTML_LINKS, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_PATTERN_INVALID_NAMESPACE_NAME, "([\\n\\r\\\\<>\\[\\]\\:_%/?&#]+)");
 		this.defaults.setProperty(PROP_PATTERN_INVALID_ROLE_NAME, "([A-Za-z0-9_]+)");
-		this.defaults.setProperty(PROP_PATTERN_INVALID_TOPIC_NAME, "([\\n\\r\\\\<>\\[\\]?#]+)");
+		this.defaults.setProperty(PROP_PATTERN_INVALID_TOPIC_PATTERN, "[\\n\\r\\\\<>\\[\\]?#]");
 		this.defaults.setProperty(PROP_PATTERN_VALID_USER_LOGIN, "([A-Za-z0-9_]+)");
 		this.defaults.setProperty(PROP_PATTERN_VALID_VIRTUAL_WIKI, "([A-Za-z0-9_]+)");
 		this.defaults.setProperty(PROP_PRINT_NEW_WINDOW, Boolean.FALSE.toString());
