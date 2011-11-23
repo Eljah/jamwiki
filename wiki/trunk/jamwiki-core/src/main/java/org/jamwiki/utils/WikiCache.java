@@ -127,8 +127,6 @@ public class WikiCache {
 				defaultCacheConfiguration.setOverflowToDisk(true);
 				configuration.addDefaultCache(defaultCacheConfiguration);
 				DiskStoreConfiguration diskStoreConfiguration = new DiskStoreConfiguration();
-//				diskStoreConfiguration.addExpiryThreadPool(new ThreadPoolConfiguration("", 5, 5));
-//				diskStoreConfiguration.addSpoolThreadPool(new ThreadPoolConfiguration("", 5, 5));
 				diskStoreConfiguration.setPath(directory.getPath());
 				configuration.addDiskStore(diskStoreConfiguration);
 				WikiCache.cacheManager = new CacheManager(configuration);
@@ -137,9 +135,12 @@ public class WikiCache {
 			logger.error("Failure while initializing cache", e);
 			throw new RuntimeException(e);
 		}
-		logger.info("Initializing cache 9");
+		logger.info("Initializing cache");
 	}
 
+	/**
+	 * Close the cache manager.
+	 */
 	public static void shutdown() {
 		if (WikiCache.cacheManager != null) {
 			WikiCache.cacheManager.shutdown();
@@ -175,8 +176,7 @@ public class WikiCache {
 	 *  removed.
 	 */
 	public static void removeAllFromCache(String cacheName) {
-		Cache cache = WikiCache.getCache(cacheName);
-		cache.removeAll();
+		WikiCache.getCache(cacheName).removeAll();
 	}
 
 	/**
@@ -197,8 +197,7 @@ public class WikiCache {
 	 * @param key The key for the record that is being removed from the cache.
 	 */
 	public static void removeFromCache(String cacheName, Object key) {
-		Cache cache = WikiCache.getCache(cacheName);
-		cache.remove(key);
+		WikiCache.getCache(cacheName).remove(key);
 	}
 
 	/**
@@ -231,12 +230,10 @@ public class WikiCache {
 	 *  object value.
 	 */
 	public static Element retrieveFromCache(String cacheName, Object key) throws DataAccessException {
-		Cache cache = null;
 		try {
-			cache = WikiCache.getCache(cacheName);
+			return WikiCache.getCache(cacheName).get(key);
 		} catch (CacheException e) {
 			throw new DataAccessException("Failure while retrieving data from cache " + cacheName, e);
 		}
-		return cache.get(key);
 	}
 }
