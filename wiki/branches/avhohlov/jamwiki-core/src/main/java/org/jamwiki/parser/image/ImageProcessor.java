@@ -171,6 +171,9 @@ public class ImageProcessor {
 		long start = System.currentTimeMillis();
 		ImageData imageData = ImageProcessor.loadImage(fileId);
 		BufferedImage tmp = ImageIO.read(new ByteArrayInputStream(imageData.data));
+		if (tmp == null) {
+			throw new IOException("JDK is unable to process image data, possibly indicating data corruption: " + fileId);
+		}
 		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		int width = tmp.getWidth();
 		int height = tmp.getHeight();

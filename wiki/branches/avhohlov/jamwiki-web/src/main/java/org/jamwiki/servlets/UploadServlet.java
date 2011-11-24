@@ -176,18 +176,8 @@ public class UploadServlet extends JAMWikiServlet {
 				next.addObject("contents", contents);
 				return;
 			}
-			int	width;
-			int	height; 
-			try {
-	       			BufferedImage image = ImageIO.read(new ByteArrayInputStream(buff));
-				width   =  image.getWidth();
-				height  =  image.getHeight();
-			} catch (IOException ex) {
-				width   = -1;
-				height  = -1;
-				isImage =  false;
-			}
-			ImageData imageData = new ImageData(contentType, width, height, buff);
+			ImageData imageData = processImageData(contentType, buff);
+			isImage =(imageData.width >= 0);
 			String ipAddress = ServletUtil.getIpAddress(request);
 			WikiUser user = ServletUtil.currentWikiUser();
 			Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
@@ -196,6 +186,24 @@ public class UploadServlet extends JAMWikiServlet {
 			ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize, imageData);
 			ServletUtil.redirect(next, virtualWiki, topicName);
 		}
+	}
+
+	/**
+	 * @return ImageData object from uploaded binary data.
+	 */
+	private ImageData processImageData(String contentType, byte buff[]) {
+		int	width  = -1;
+		int	height = -1; 
+		try {
+       			BufferedImage image  = ImageIO.read(new ByteArrayInputStream(buff));
+			if           (image != null) {
+				width  =  image.getWidth ();
+				height =  image.getHeight();
+			}
+		} catch (IOException ex) {
+		      //Nothing
+		}
+		return	new ImageData(contentType, width, height, buff);
 	}
 
 	/**
