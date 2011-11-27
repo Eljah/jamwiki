@@ -79,7 +79,7 @@ public class LuceneSearchEngine implements SearchEngine {
 	/** Name of the search index field that holds the un-processed topic namespace. */
 	private static final String FIELD_TOPIC_NAMESPACE = "topic_namespace";
 	/** Lucene compatibility version. */
-	protected static final Version USE_LUCENE_VERSION = Version.LUCENE_34;
+	protected static final Version USE_LUCENE_VERSION = Version.LUCENE_35;
 	/** Maximum number of results to return per search. */
 	// FIXME - make this configurable
 	protected static final int MAXIMUM_RESULTS_PER_SEARCH = 200;
@@ -371,13 +371,6 @@ public class LuceneSearchEngine implements SearchEngine {
 			} catch (Exception ex) {
 				logger.error("Failure while refreshing search index", ex);
 			} finally {
-				try {
-					if (writer != null) {
-						writer.optimize();
-					}
-				} catch (Exception e) {
-					logger.error("Exception during optimize", e);
-				}
 				try {
 					if (writer != null) {
 						writer.close();
