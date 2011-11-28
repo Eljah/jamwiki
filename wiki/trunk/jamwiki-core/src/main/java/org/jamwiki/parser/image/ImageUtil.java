@@ -198,7 +198,11 @@ public abstract class ImageUtil {
 				// CURRENT virtual wiki, even if it is a shared image
 				WikiLink wikiLink = new WikiLink(context, linkVirtualWiki, topicName);
 				String link = wikiLink.toRelativeUrl();
-				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
+				html.append("<a class=\"wikiimg\" href=\"").append(link).append("\"");
+				if (!StringUtils.isBlank(imageMetadata.getTitle())) {
+					html.append(" title=\"").append(StringEscapeUtils.escapeHtml4(imageMetadata.getTitle())).append("\"");
+				}
+				html.append(">");
 				html.append(imageHtml);
 				html.append("</a>");
 			} else {
@@ -209,7 +213,11 @@ public abstract class ImageUtil {
 					// not an external link, but an internal link
 					WikiLink wikiLink = LinkUtil.parseWikiLink(context, topic.getVirtualWiki(), imageMetadata.getLink());
 					String link = LinkUtil.buildTopicUrl(wikiLink);
-					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\">");
+					html.append("<a class=\"wikiimg\" href=\"").append(link).append("\"");
+					if (!StringUtils.isBlank(imageMetadata.getTitle())) {
+						html.append(" title=\"").append(StringEscapeUtils.escapeHtml4(imageMetadata.getTitle())).append("\"");
+					}
+					html.append(">");
 					html.append(imageHtml);
 					html.append("</a>");
 				}
