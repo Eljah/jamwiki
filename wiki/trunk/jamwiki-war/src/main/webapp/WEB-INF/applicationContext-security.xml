@@ -23,6 +23,7 @@
 		  * IS_AUTHENTICATED_FULLY - Allow access to logged-in users.
 		To remove all Spring Security processing from a page use the filters="none" attribute.
 		-->
+		<intercept-url pattern="/**/Special:Account" access="ROLE_REGISTER,IS_AUTHENTICATED_REMEMBERED" />
 		<intercept-url pattern="/**/Special:Admin" access="ROLE_SYSADMIN" />
 		<intercept-url pattern="/**/Special:Block" access="ROLE_ADMIN" />
 		<intercept-url pattern="/**/Special:Edit" access="ROLE_EDIT_EXISTING,ROLE_EDIT_NEW" />

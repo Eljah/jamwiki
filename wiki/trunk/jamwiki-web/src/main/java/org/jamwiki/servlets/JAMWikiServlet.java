@@ -210,7 +210,9 @@ public abstract class JAMWikiServlet extends AbstractController {
 				loginLink += LinkUtil.appendQueryParam("", PARAM_LOGIN_SUCCESS_TARGET, pageInfo.getTopicName());
 			}
 			links.put(loginLink, new WikiMessage("common.login"));
-			links.put("Special:Account", new WikiMessage("usermenu.register"));
+			if (userDetails.hasRole(Role.ROLE_REGISTER)) {
+				links.put("Special:Account", new WikiMessage("usermenu.register"));
+			}
 		}
 		if (!userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
 			WikiUser user = ServletUtil.currentWikiUser();

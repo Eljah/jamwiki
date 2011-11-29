@@ -93,6 +93,9 @@ followed by 0.6.3.
     "resources" sub-directory within the JAMWiki system folder.  If these files
     have been customized then they will need to be manually copied to the new
     folder, otherwise JAMWiki will create fresh versions automatically.
+  * The /WEB-INF/applicationContext-security.xml file has been modified so that
+    the Special:Account page requires ROLE_REGISTER for anonymous users. If you
+    have customized this file be sure to add an appropriate intercept-url.
 
   UPGRADE STEPS:
 
@@ -103,6 +106,10 @@ followed by 0.6.3.
      - LeftMenu is now JAMWiki:Sidebar
      - StyleSheet is now JAMWiki:System.css
   3. A new JAMWiki:Header topic must be created on all virtual wikis.
+  4. Update the database schema by executing the following SQL statements:
+       a) Add the ROLE_REGISTER role and assign it to the anonymous group:
+              insert into jam_role (role_name) values ('ROLE_REGISTER');
+              insert into jam_group_authorities (group_id, authority) values (1, 'ROLE_REGISTER');
 
 
   JAMWiki 1.1.3

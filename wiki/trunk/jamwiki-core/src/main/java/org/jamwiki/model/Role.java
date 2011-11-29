@@ -57,6 +57,8 @@ public class Role {
 	 * that allows account management.
 	 */
 	public static final Role ROLE_NO_ACCOUNT = new Role("ROLE_NO_ACCOUNT");
+	/** Allow users to self-register. */
+	public static final Role ROLE_REGISTER = new Role("ROLE_REGISTER");
 	/** ROLE_SYSADMIN provides the ability to change system settings. */
 	public static final Role ROLE_SYSADMIN = new Role("ROLE_SYSADMIN");
 	public static final Role ROLE_TRANSLATE = new Role("ROLE_TRANSLATE");

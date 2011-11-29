@@ -740,6 +740,7 @@ public class WikiDatabase {
 		List<String> anonymousRoles = new ArrayList<String>();
 		anonymousRoles.add(Role.ROLE_EDIT_EXISTING.getAuthority());
 		anonymousRoles.add(Role.ROLE_EDIT_NEW.getAuthority());
+		anonymousRoles.add(Role.ROLE_REGISTER.getAuthority());
 		anonymousRoles.add(Role.ROLE_UPLOAD.getAuthority());
 		anonymousRoles.add(Role.ROLE_VIEW.getAuthority());
 		WikiBase.getDataHandler().writeRoleMapGroup(group.getGroupId(), anonymousRoles);
@@ -797,6 +798,10 @@ public class WikiDatabase {
 		role = Role.ROLE_VIEW;
 		// FIXME - use message key
 		role.setDescription("Allows a user to view topics on the wiki.");
+		WikiBase.getDataHandler().writeRole(role, false);
+		role = Role.ROLE_REGISTER;
+		// FIXME - use message key
+		role.setDescription("Allows anonymous users to self-register.");
 		WikiBase.getDataHandler().writeRole(role, false);
 	}
 

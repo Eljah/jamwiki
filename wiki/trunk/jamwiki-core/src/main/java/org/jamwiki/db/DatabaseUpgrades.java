@@ -47,6 +47,9 @@ public class DatabaseUpgrades {
 	private DatabaseUpgrades() {
 	}
 
+	/**
+	 *
+	 */
 	private static TransactionDefinition getTransactionDefinition() {
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -83,7 +86,8 @@ public class DatabaseUpgrades {
 	}
 
 	/**
-	 *
+	 * Perform the required database upgrade steps when upgrading from versions
+	 * older than JAMWiki 1.1.
 	 */
 	public static void upgrade110(List<WikiMessage> messages) throws WikiException {
 		TransactionStatus status = null;
@@ -145,5 +149,27 @@ public class DatabaseUpgrades {
 		if (status != null) {
 			DatabaseConnection.commit(status);
 		}
+	}
+
+	/**
+	 * Perform the required database upgrade steps when upgrading from versions
+	 * older than JAMWiki 1.2.
+	 */
+	public static void upgrade120(List<WikiMessage> messages) throws WikiException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction(getTransactionDefinition());
+			Connection conn = DatabaseConnection.getConnection();
+			// create ROLE_REGISTER
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_120_ADD_ROLE_REGISTER", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_role"));
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_120_ADD_ROLE_REGISTER_TO_ANONYMOUS", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_group_authorities"));
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			logger.error("Database failure during upgrade", e);
+			throw new WikiException(new WikiMessage("upgrade.error.fatal", e.getMessage()));
+		}
+		DatabaseConnection.commit(status);
 	}
 }
