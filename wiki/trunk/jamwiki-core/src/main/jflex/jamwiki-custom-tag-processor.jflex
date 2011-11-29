@@ -21,19 +21,19 @@ package org.jamwiki.parser.jflex;
 whitespace         = [ \t\f\n]
 
 /* nowiki */
-nowiki             = (<nowiki[ \t]*>) ~(<\/[ \t]*nowiki[ \t]*>)
+nowiki             = "<nowiki>" ~"</nowiki>"
 
 /* pre */
 htmlpreattributes  = class|dir|id|lang|style|title
 htmlpreattribute   = ([ \t]+) {htmlpreattributes} ([ \t]*=[^>\n]+[ \t]*)*
-htmlprestart       = (<pre ({htmlpreattribute})* [ \t]* (\/)? >)
-htmlpreend         = (<\/[ \t]*pre[ \t]*>)
+htmlprestart       = "<pre" ({htmlpreattribute})* [ \t]* (\/)? ">"
+htmlpreend         = "</pre>"
 htmlpre            = ({htmlprestart}) ~({htmlpreend})
 
 /* tags */
-tagopen            = "<" [ \t]* [^>\/] [^>]* ">"
-tagnocontent       = "<" [ \t]* [^>]+ "/" [ \t]* ">"
-tagclose           = "<" [ \t]* "/" [ \t]* [^>]+ [ \t]* ">"
+tagopen            = "<" [^>\/] [^>]* ">"
+tagnocontent       = "<" [^>]+ "/>"
+tagclose           = "</" [^>]+ ">"
 
 %%
 

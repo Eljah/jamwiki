@@ -32,22 +32,19 @@ wikiheading3       = "===" [^=\n]+ ~"==="
 wikiheading4       = "====" [^=\n]+ ~"===="
 wikiheading5       = "=====" [^=\n]+ ~"====="
 wikiheading6       = "======" [^=\n]+ ~"======"
-h1                 = (<h1 ({htmlattribute})* [ \t]*>) ~(<\/[ \t]*h1[ \t]*>)
-h2                 = (<h2 ({htmlattribute})* [ \t]*>) ~(<\/[ \t]*h2[ \t]*>)
-h3                 = (<h3 ({htmlattribute})* [ \t]*>) ~(<\/[ \t]*h3[ \t]*>)
-h4                 = (<h4 ({htmlattribute})* [ \t]*>) ~(<\/[ \t]*h4[ \t]*>)
-h5                 = (<h5 ({htmlattribute})* [ \t]*>) ~(<\/[ \t]*h5[ \t]*>)
-h6                 = (<h6 ({htmlattribute})* [ \t]*>) ~(<\/[ \t]*h6[ \t]*>)
-
-/* html headings */
-nowiki             = (<nowiki[ \t]*>) ~(<\/[ \t]*nowiki[ \t]*>)
+h1                 = "<h1" ({htmlattribute})* [ \t]* ">" ~"</h1>"
+h2                 = "<h2" ({htmlattribute})* [ \t]* ">" ~"</h2>"
+h3                 = "<h3" ({htmlattribute})* [ \t]* ">" ~"</h3>"
+h4                 = "<h4" ({htmlattribute})* [ \t]* ">" ~"</h4>"
+h5                 = "<h5" ({htmlattribute})* [ \t]* ">" ~"</h5>"
+h6                 = "<h6" ({htmlattribute})* [ \t]* ">" ~"</h6>"
 
 /* nowiki */
-nowiki             = (<nowiki[ \t]*>) ~(<\/[ \t]*nowiki[ \t]*>)
+nowiki             = "<nowiki>" ~"</nowiki>"
 
 /* pre */
-htmlprestart       = (<pre ({htmlattribute})* [ \t]* (\/)? >)
-htmlpreend         = (<\/[ \t]*pre[ \t]*>)
+htmlprestart       = "<pre" ({htmlattribute})* [ \t]* (\/)? ">"
+htmlpreend         = "</pre>"
 
 /* comments */
 htmlcomment        = "<!--" ~"-->"
