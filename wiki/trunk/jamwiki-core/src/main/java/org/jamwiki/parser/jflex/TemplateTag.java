@@ -121,36 +121,24 @@ public class TemplateTag implements JFlexParserTag {
 			throw new ExcessiveNestingException("Potentially infinite parsing loop - over " + parserInput.getTemplateDepth() + " template inclusions while parsing topic " + parserInput.getVirtualWiki() + ':' + parserInput.getTopicName());
 		}
 		// check for magic word or parser function
-		String[] magicWordInfo = MagicWordUtil.parseMagicWordInfo(templateContent);
-		String[] parserFunctionInfo = ParserFunctionUtil.parseParserFunctionInfo(templateContent);
-		String result = null;
-		if (magicWordInfo != null || parserFunctionInfo != null) {
-			if (mode <= JFlexParser.MODE_MINIMAL) {
-				result = raw;
-			} else if (magicWordInfo != null) {
-				result = MagicWordUtil.processMagicWord(parserInput, parserOutput, mode, magicWordInfo[0], magicWordInfo[1]);
-			} else {
-				result = ParserFunctionUtil.processParserFunction(parserInput, parserOutput, mode, parserFunctionInfo[0], parserFunctionInfo[1]);
-			}
+		String result = this.processParserFunctionAndMagicWord(parserInput, parserOutput, mode, templateContent, raw);
+		if (result != null) {
 			parserInput.decrementTemplateDepth();
 			return result;
 		}
 		// update the raw value to handle cases such as a signature in the template content
 		raw = "{{" + templateContent + "}}";
 		// check for substitution ("{{subst:Template}}")
-		String subst = this.parseSubstitution(parserInput, parserOutput, raw, templateContent);
-		if (subst != null) {
+		result = this.parseSubstitution(parserInput, parserOutput, raw, templateContent);
+		if (result != null) {
 			parserInput.decrementTemplateDepth();
-			return subst;
+			return result;
 		}
 		// extract the template name
 		WikiLink wikiLink = this.parseTemplateName(parserInput, parserOutput, templateContent);
 		String name = wikiLink.getDestination();
 		// parse in case of something like "{{PAGENAME}}/template"
 		name = JFlexParserUtil.parseFragment(parserInput, parserOutput, name, JFlexParser.MODE_TEMPLATE);
-		// now see if a template with that name exists or if this is an inclusion
-		Topic templateTopic = null;
-		boolean inclusion = wikiLink.getColon();
 		String templateName = name;
 		try {
 			// do not process the template if it's an invalid topic name
@@ -158,12 +146,15 @@ public class TemplateTag implements JFlexParserTag {
 		} catch (WikiException e) {
 			return raw;
 		}
+		// now see if a template with that name exists or if this is an inclusion
+		Topic templateTopic = null;
 		if (!wikiLink.getColon()) {
 			if (!wikiLink.getNamespace().equals(Namespace.namespace(Namespace.TEMPLATE_ID))) {
 				templateName = Namespace.namespace(Namespace.TEMPLATE_ID).getLabel(parserInput.getVirtualWiki()) + Namespace.SEPARATOR + StringUtils.capitalize(name);
 			}
 			templateTopic = WikiBase.getDataHandler().lookupTopic(parserInput.getVirtualWiki(), templateName, false);
 		}
+		boolean inclusion = wikiLink.getColon();
 		if (templateTopic != null) {
 			name = templateName;
 		} else {
@@ -255,56 +246,69 @@ public class TemplateTag implements JFlexParserTag {
 	 * embedded parameters or templates.
 	 */
 	private String parseTemplateBody(ParserInput parserInput, ParserOutput parserOutput, String content, Map<String, String> parameterValues) throws ParserException {
-		StringBuilder output = new StringBuilder();
-		char current;
-		// find template parameters of the form {{{0}}}
-		for (int pos = 0; pos < content.length(); pos++) {
-			current = content.charAt(pos);
-			String substring = content.substring(pos);
-			if (!substring.startsWith("{{{")) {
-				// not a template parameter, move to the next character
-				output.append(current);
-				continue;
+		int pos = content.indexOf("{{{");
+		if (pos != -1) {
+			StringBuilder output = new StringBuilder();
+			if (pos != 0) {
+				output.append(content.substring(0, pos));
 			}
-			// this may be a template parameter, but check for various sub-patterns to be sure
-			int endPos = Utilities.findMatchingEndTag(content, pos, "{{{", "}}}");
-			if (endPos == -1) {
-				// no matching end tag
-				output.append(current);
-				continue;
-			}
-			// there are several sub-patterns that need to be analyzed:
-			// 1. {{{1|{{PAGENAME}}}}}
-			// 2. {{{{{1}}}}}
-			// 3. {{{template}} x {{template}}}
-			// 4. {{{1|{{{2}}}}}}
-			int case1EndPos = Utilities.findMatchingEndTag(content, pos, "{", "}");
-			if (endPos < case1EndPos && content.substring(case1EndPos - 3, case1EndPos).equals("}}}")) {
-				// case #1
-				endPos = case1EndPos;
-			}
-			if (substring.startsWith("{{{{{") && content.substring(endPos - 5, endPos).equals("}}}}}")) {
-				// case #2 (note: endPos updated in the previous step)
-				output.append("{{");
-				pos++;
-				continue;
-			}
-			int case3EndPos = Utilities.findMatchingEndTag(content, pos + 1, "{{", "}}");
-			if (case3EndPos != (endPos - 1)) {
-				// either case #3 or case #4
-				char case4Char = content.charAt(case3EndPos + 1);
-				if (case4Char != '}') {
-					// case #3
+			char current, case4Char;
+			String param, substring;
+			int oldPos, endPos, case1EndPos, case3EndPos;
+			// find template parameters of the form {{{0}}}
+			for ( ; pos < content.length(); pos++) {
+				substring = content.substring(pos);
+				if (!substring.startsWith("{{{")) {
+					// not a template parameter, move to the next match
+					oldPos = pos;
+					pos = content.indexOf("{{{", pos + 1);
+					if (pos == -1) {
+						output.append(content.substring(oldPos));
+						break;
+					}
+					output.append(content.substring(oldPos, pos));
+				}
+				current = content.charAt(pos);
+				// this may be a template parameter, but check for various sub-patterns to be sure
+				endPos = Utilities.findMatchingEndTag(content, pos, "{{{", "}}}");
+				if (endPos == -1) {
+					// no matching end tag
 					output.append(current);
 					continue;
 				}
+				// there are several sub-patterns that need to be analyzed:
+				// 1. {{{1|{{PAGENAME}}}}}
+				// 2. {{{{{1}}}}}
+				// 3. {{{template}} x {{template}}}
+				// 4. {{{1|{{{2}}}}}}
+				case1EndPos = Utilities.findMatchingEndTag(content, pos, "{", "}");
+				if (endPos < case1EndPos && content.substring(case1EndPos - 3, case1EndPos).equals("}}}")) {
+					// case #1
+					endPos = case1EndPos;
+				}
+				if (substring.startsWith("{{{{{") && content.substring(endPos - 5, endPos).equals("}}}}}")) {
+					// case #2 (note: endPos updated in the previous step)
+					output.append("{{");
+					pos++;
+					continue;
+				}
+				case3EndPos = Utilities.findMatchingEndTag(content, pos + 1, "{{", "}}");
+				if (case3EndPos != (endPos - 1)) {
+					// either case #3 or case #4
+					case4Char = content.charAt(case3EndPos + 1);
+					if (case4Char != '}') {
+						// case #3
+						output.append(current);
+						continue;
+					}
+				}
+				param = content.substring(pos, endPos);
+				output.append(this.applyParameter(parserInput, parserOutput, param, parameterValues));
+				pos = endPos - 1;
 			}
-			String param = content.substring(pos, endPos);
-			output.append(this.applyParameter(parserInput, parserOutput, param, parameterValues));
-			pos = endPos - 1;
+			content = output.toString();
 		}
-		String result = JFlexParserUtil.parseFragment(parserInput, parserOutput, output.toString().trim(), JFlexParser.MODE_TEMPLATE);
-		return result;
+		return JFlexParserUtil.parseFragment(parserInput, parserOutput, content.trim(), JFlexParser.MODE_TEMPLATE);
 	}
 
 	/**
@@ -368,6 +372,31 @@ public class TemplateTag implements JFlexParserTag {
 			}
 		}
 		return parameterValues;
+	}
+
+	/**
+	 * Determine if the parser content represents a magic word or parser
+	 * function, and if so return the appropriate parsed content.  Otherwise
+	 * return <code>null</code>.
+	 */
+	private String processParserFunctionAndMagicWord(ParserInput parserInput, ParserOutput parserOutput, int mode, String templateContent, String raw) throws DataAccessException, ParserException {
+		String[] magicWordInfo = MagicWordUtil.parseMagicWordInfo(templateContent);
+		if (magicWordInfo != null) {
+			if (mode <= JFlexParser.MODE_MINIMAL) {
+				return raw;
+			} else {
+				return MagicWordUtil.processMagicWord(parserInput, parserOutput, mode, magicWordInfo[0], magicWordInfo[1]);
+			}
+		}
+		String[] parserFunctionInfo = ParserFunctionUtil.parseParserFunctionInfo(templateContent);
+		if (parserFunctionInfo != null) {
+			if (mode <= JFlexParser.MODE_MINIMAL) {
+				return raw;
+			} else {
+				return ParserFunctionUtil.processParserFunction(parserInput, parserOutput, mode, parserFunctionInfo[0], parserFunctionInfo[1]);
+			}
+		}
+		return null;
 	}
 
 	/**

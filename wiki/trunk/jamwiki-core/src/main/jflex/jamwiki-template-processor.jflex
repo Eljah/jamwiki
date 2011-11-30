@@ -35,7 +35,8 @@ htmlpre            = ({htmlprestart}) ~({htmlpreend})
 htmlcomment        = "<!--" ~"-->"
 
 /* templates */
-templatestart      = "{{" (.{2})
+templatestart      = "{{" | "{{{{"
+paramstart         = "{{{"
 templateendchar    = "}"
 templateparam      = "{{{" [^\{\}\n]+ "}}}"
 includeonly        = "<includeonly>" ~"</includeonly>"
@@ -69,33 +70,34 @@ wikisignature      = ([~]{3,5})
 /* ----- templates ----- */
 
 <YYINITIAL, TEMPLATE> {
+    // template start possibilities:
+    //   * "{{xy" = template start
+    //   * "{{{x" = possibly a param start
+    //   * "{{{{" = template start + either another template or a param
     {templatestart} {
         if (logger.isTraceEnabled()) logger.trace("templatestart: " + yytext() + " (" + yystate() + ")");
-        // four characters will be matched.  there are multiple possibilities:
-        //   * "{{xy" = template start
-        //   * "{{{x" = possibly a param start
-        //   * "{{{{" = template start + either another template or a param
-        String raw = yytext();
-        boolean isParam = (!raw.equals("{{{{") && raw.startsWith("{{{"));
-        if (isParam) {
-            yypushback(3);
-            if (yystate() == YYINITIAL) {
-                return raw.substring(0, 1);
-            } else {
-                this.templateString += raw.substring(0, 1);
-                return "";
-            }
+        if (yytext().length() == 4) {
+            // push back the two extra characters
+            yypushback(2);
         }
-        // push back the two extra characters
-        yypushback(2);
         if (!allowTemplates()) {
             return yytext();
         }
-        this.templateString += raw.substring(0, 2);
+        this.templateString += yytext().substring(0, 2);
         if (yystate() != TEMPLATE) {
             beginState(TEMPLATE);
         }
         return "";
+    }
+    {paramstart} {
+        if (logger.isTraceEnabled()) logger.trace("paramstart: " + yytext() + " (" + yystate() + ")");
+        yypushback(2);
+        if (yystate() == YYINITIAL) {
+            return yytext().substring(0, 1);
+        } else {
+            this.templateString += yytext().substring(0, 1);
+            return "";
+        }
     }
     {includeonly} {
         if (logger.isTraceEnabled()) logger.trace("includeonly: " + yytext() + " (" + yystate() + ")");
@@ -123,8 +125,7 @@ wikisignature      = ([~]{3,5})
 <TEMPLATE> {
     {templateendchar} {
         if (logger.isTraceEnabled()) logger.trace("templateendchar: " + yytext() + " (" + yystate() + ")");
-        String raw = yytext();
-        this.templateString += raw;
+        this.templateString += yytext();
         if (Utilities.findMatchingEndTag(this.templateString, 0, "{", "}") != -1) {
             endState();
             String result = this.parse(TAG_TYPE_TEMPLATE, this.templateString);
@@ -173,11 +174,10 @@ wikisignature      = ([~]{3,5})
 
 <<EOF>> {
     if (logger.isTraceEnabled()) logger.trace("EOF (" + yystate() + ")");
-    StringBuilder output = new StringBuilder();
+    String output = this.templateString;
     if (!StringUtils.isBlank(this.templateString)) {
         // FIXME - this leaves unparsed text
-        output.append(this.templateString);
         this.templateString = "";
     }
-    return (output.length() == 0) ? null : output.toString();
+    return (StringUtils.isBlank(output)) ? null : output;
 }
