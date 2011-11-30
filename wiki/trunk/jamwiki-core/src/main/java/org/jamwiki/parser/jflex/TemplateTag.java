@@ -458,7 +458,7 @@ public class TemplateTag implements JFlexParserTag {
 			if (!StringUtils.isBlank(param)) {
 				results[0] = param.trim();
 				// set to null unless there is content after the equals sign
-				results[1] = (pos < (content.length() - 2)) ? content.substring(pos + 1) : null;
+				results[1] = (pos < (content.length() - 2)) ? content.substring(pos + 1) : "";
 			}
 		}
 		return results;
