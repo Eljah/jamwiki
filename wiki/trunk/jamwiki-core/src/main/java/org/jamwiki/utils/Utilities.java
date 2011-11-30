@@ -222,6 +222,9 @@ public abstract class Utilities {
 		if (StringUtils.isBlank(content) || start >= content.length()) {
 			return -1;
 		}
+		if (content.indexOf(startToken) == -1 || content.indexOf(endToken) == -1) {
+			return -1;
+		}
 		int pos = start;
 		int count = 0;
 		String substring = null;

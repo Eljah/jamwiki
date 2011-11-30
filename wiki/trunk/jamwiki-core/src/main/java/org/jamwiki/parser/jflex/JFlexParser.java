@@ -104,7 +104,7 @@ public class JFlexParser implements JAMWikiParser {
 		if (mode < JFlexParser.MODE_CUSTOM) {
 			return raw;
 		}
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, false);
 		JAMWikiCustomTagLexer lexer = new JAMWikiCustomTagLexer(reader);
 		int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
 		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
@@ -121,7 +121,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, true);
 		JAMWikiEditCommentLexer lexer = new JAMWikiEditCommentLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, MODE_EDIT_COMMENT).trim();
 	}
@@ -144,14 +144,11 @@ public class JFlexParser implements JAMWikiParser {
 	public String parseFragment(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
 		String output = raw;
 		// maintain the original output, which has all of the category and link info
-		int preMode = (mode > JFlexParser.MODE_TEMPLATE) ? JFlexParser.MODE_TEMPLATE : mode;
-		output = this.parseTemplate(parserInput, parserOutput, output, preMode);
-		preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
-		output = this.parseCustom(parserInput, parserOutput, output, preMode);
-		preMode = (mode > JFlexParser.MODE_PREPROCESS) ? JFlexParser.MODE_PREPROCESS : mode;
-		output = this.parsePreProcess(parserInput, parserOutput, output, preMode);
+		output = this.parseTemplate(parserInput, parserOutput, output, mode);
+		output = this.parseCustom(parserInput, parserOutput, output, mode);
+		output = this.parsePreProcess(parserInput, parserOutput, output, mode);
 		// layout should not be done while parsing fragments
-		preMode = (mode > JFlexParser.MODE_PROCESS) ? JFlexParser.MODE_PROCESS : mode;
+		int preMode = (mode > JFlexParser.MODE_PROCESS) ? JFlexParser.MODE_PROCESS : mode;
 		output = this.parseProcess(parserInput, parserOutput, output, preMode);
 		return output.trim();
 	}
@@ -246,7 +243,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	private String parseTemplate(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, true);
 		JAMWikiTemplateLexer lexer = new JAMWikiTemplateLexer(reader);
 		int preMode = (mode > JFlexParser.MODE_TEMPLATE) ? JFlexParser.MODE_TEMPLATE : mode;
 		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
@@ -266,7 +263,7 @@ public class JFlexParser implements JAMWikiParser {
 		if (mode < JFlexParser.MODE_PREPROCESS) {
 			return raw;
 		}
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, false);
 		JAMWikiPreLexer lexer = new JAMWikiPreLexer(reader);
 		int preMode = (mode > JFlexParser.MODE_PREPROCESS) ? JFlexParser.MODE_PREPROCESS : mode;
 		return this.lex(lexer, raw, parserInput, parserOutput, preMode);
@@ -287,7 +284,7 @@ public class JFlexParser implements JAMWikiParser {
 		if (mode < JFlexParser.MODE_PROCESS) {
 			return raw;
 		}
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, false);
 		JAMWikiLexer lexer = new JAMWikiLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, mode);
 	}
@@ -308,7 +305,7 @@ public class JFlexParser implements JAMWikiParser {
 		if (mode < JFlexParser.MODE_POSTPROCESS) {
 			return raw;
 		}
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, false);
 		JAMWikiPostLexer lexer = new JAMWikiPostLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, mode);
 	}
@@ -367,7 +364,7 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	public String parseSlice(ParserInput parserInput, ParserOutput parserOutput, String raw, int targetSection) throws ParserException {
 		long start = System.currentTimeMillis();
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, true);
 		JAMWikiSpliceLexer lexer = new JAMWikiSpliceLexer(reader);
 		lexer.setTargetSection(targetSection);
 		String output = this.lex(lexer, raw, parserInput, parserOutput, JFlexParser.MODE_SLICE);
@@ -398,7 +395,7 @@ public class JFlexParser implements JAMWikiParser {
 	 */
 	public String parseSplice(ParserInput parserInput, ParserOutput parserOutput, String raw, int targetSection, String replacementText) throws ParserException {
 		long start = System.currentTimeMillis();
-		StringReader reader = toStringReader(raw);
+		StringReader reader = toStringReader(raw, true);
 		JAMWikiSpliceLexer lexer = new JAMWikiSpliceLexer(reader);
 		lexer.setReplacementText(replacementText);
 		lexer.setTargetSection(targetSection);
@@ -414,8 +411,8 @@ public class JFlexParser implements JAMWikiParser {
 	 * Convert a string of text to be parsed into a StringReader, performing any
 	 * preprocessing, such as removing linefeeds, in the process.
 	 */
-	private StringReader toStringReader(String raw) {
-		return new StringReader(StringUtils.remove(raw, '\r'));
+	private StringReader toStringReader(String raw, boolean stripControlChars) {
+		return (stripControlChars) ? new StringReader(StringUtils.remove(raw, '\r')) : new StringReader(raw);
 	}
 
 	/**

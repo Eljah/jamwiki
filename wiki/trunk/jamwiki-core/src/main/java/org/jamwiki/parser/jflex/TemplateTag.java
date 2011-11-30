@@ -67,31 +67,23 @@ public class TemplateTag implements JFlexParserTag {
 	}
 
 	/**
-	 * Determine if the template text is of the form "subst:XXX".
-	 */
-	private boolean isSubstitution(String templateContent) {
-		// is it a substitution?
-		templateContent = templateContent.trim();
-		return (templateContent.startsWith("subst:") && templateContent.length() > "subst:".length());
-	}
-
-	/**
 	 * Parse a call to a Mediawiki template of the form "{{template|param1|param2}}"
 	 * and return the resulting template output.
 	 */
 	public String parse(JFlexLexer lexer, String raw, Object... args) throws ParserException {
 		// validate and extract the template content
-		if (StringUtils.isBlank(raw)) {
-			throw new ParserException("Empty template text");
+		if (StringUtils.isBlank(raw) || !raw.startsWith("{{") || !raw.endsWith("}}")) {
+			throw new ParserException("Empty or invalid template text: " + raw);
 		}
-		if (!raw.startsWith("{{") || !raw.endsWith("}}")) {
-			throw new ParserException ("Invalid template text: " + raw);
-		}
-		String templateContent = raw.substring("{{".length(), raw.length() - "}}".length());
-		if ((!this.isSubstitution(templateContent) && lexer.getMode() < JFlexParser.MODE_TEMPLATE) || lexer.getMode() < JFlexParser.MODE_MINIMAL) {
+		String templateContent = raw.substring("{{".length(), raw.length() - "}}".length()).trim();
+		boolean isSubstitution = (templateContent.startsWith("subst:") && templateContent.length() > "subst:".length());
+		if (!isSubstitution && lexer.getMode() < JFlexParser.MODE_TEMPLATE) {
 			return raw;
 		}
 		try {
+			if (isSubstitution && lexer.getMode() >= JFlexParser.MODE_MINIMAL) {
+				return this.parseSubstitution(lexer.getParserInput(), lexer.getParserOutput(), raw, templateContent);
+			}
 			return this.parseTemplateOutput(lexer.getParserInput(), lexer.getParserOutput(), lexer.getMode(), raw, true);
 		} catch (ExcessiveNestingException e) {
 			logger.warn("Excessive template nesting in topic " + lexer.getParserInput().getVirtualWiki() + ':' + lexer.getParserInput().getTopicName());
@@ -128,17 +120,11 @@ public class TemplateTag implements JFlexParserTag {
 		}
 		// update the raw value to handle cases such as a signature in the template content
 		raw = "{{" + templateContent + "}}";
-		// check for substitution ("{{subst:Template}}")
-		result = this.parseSubstitution(parserInput, parserOutput, raw, templateContent);
-		if (result != null) {
-			parserInput.decrementTemplateDepth();
-			return result;
-		}
 		// extract the template name
 		WikiLink wikiLink = this.parseTemplateName(parserInput, parserOutput, templateContent);
 		String name = wikiLink.getDestination();
 		// parse in case of something like "{{PAGENAME}}/template"
-		name = JFlexParserUtil.parseFragment(parserInput, parserOutput, name, JFlexParser.MODE_TEMPLATE);
+		name = this.processNestedTemplates(parserInput, parserOutput, name);
 		String templateName = name;
 		try {
 			// do not process the template if it's an invalid topic name
@@ -202,7 +188,7 @@ public class TemplateTag implements JFlexParserTag {
 		// the first parameter to avoid having to implement special table logic
 		String param1 = tokens.get(0);
 		String value = raw.substring(param1.length() + 1);
-		return JFlexParserUtil.parseFragment(parserInput, parserOutput, value, JFlexParser.MODE_TEMPLATE);
+		return this.processNestedTemplates(parserInput, parserOutput, value);
 	}
 
 	/**
@@ -224,11 +210,6 @@ public class TemplateTag implements JFlexParserTag {
 	 * process it, otherwise return <code>null</code>.
 	 */
 	private String parseSubstitution(ParserInput parserInput, ParserOutput parserOutput, String raw, String templateContent) throws DataAccessException, ParserException {
-		// is it a substitution?
-		templateContent = templateContent.trim();
-		if (!this.isSubstitution(templateContent)) {
-			return null;
-		}
 		// get the substitution content
 		String substContent = templateContent.trim().substring("subst:".length()).trim();
 		if (substContent.length() == 0) {
@@ -317,7 +298,7 @@ public class TemplateTag implements JFlexParserTag {
 	 */
 	private WikiLink parseTemplateName(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
 		// parse to handle cases such as "Example{{padleft:3|2|0}}"
-		String name = JFlexParserUtil.parseFragment(parserInput, parserOutput, raw, JFlexParser.MODE_TEMPLATE);
+		String name = this.processNestedTemplates(parserInput, parserOutput, raw);
 		int pos = name.indexOf('|');
 		if (pos != -1) {
 			name = name.substring(0, pos);
@@ -372,6 +353,23 @@ public class TemplateTag implements JFlexParserTag {
 			}
 		}
 		return parameterValues;
+	}
+
+	/**
+	 * Parsing is expensive, so when testing for nested templates first do a
+	 * sanity check to see if there is template syntax in the string being
+	 * parsed.
+	 */
+	private String processNestedTemplates(ParserInput parserInput, ParserOutput parserOutput, String content) throws ParserException {
+		int pos = content.indexOf("{{");
+		if (pos == -1) {
+			return content;
+		}
+		pos = content.indexOf("}}", pos);
+		if (pos == -1) {
+			return content;
+		}
+		return JFlexParserUtil.parseFragment(parserInput, parserOutput, content, JFlexParser.MODE_TEMPLATE);
 	}
 
 	/**
