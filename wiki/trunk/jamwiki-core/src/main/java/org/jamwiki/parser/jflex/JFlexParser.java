@@ -101,6 +101,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	private String parseCustom(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
+		if (mode < JFlexParser.MODE_CUSTOM) {
+			return raw;
+		}
 		StringReader reader = toStringReader(raw);
 		JAMWikiCustomTagLexer lexer = new JAMWikiCustomTagLexer(reader);
 		int preMode = (mode > JFlexParser.MODE_CUSTOM) ? JFlexParser.MODE_CUSTOM : mode;
