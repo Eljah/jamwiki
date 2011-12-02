@@ -227,69 +227,57 @@ public class TemplateTag implements JFlexParserTag {
 	 * embedded parameters or templates.
 	 */
 	private String parseTemplateBody(ParserInput parserInput, ParserOutput parserOutput, String content, Map<String, String> parameterValues) throws ParserException {
-		int pos = content.indexOf("{{{");
-		if (pos != -1) {
-			StringBuilder output = new StringBuilder();
-			if (pos != 0) {
-				output.append(content.substring(0, pos));
+		StringBuilder output = new StringBuilder();
+		char current, case4Char;
+		String substring, param;
+		int endPos, case1EndPos, case3EndPos;
+		// find template parameters of the form {{{0}}}
+		for (int pos = 0; pos < content.length(); pos++) {
+			current = content.charAt(pos);
+			substring = content.substring(pos);
+			if (!substring.startsWith("{{{")) {
+				// not a template parameter, move to the next character
+				output.append(current);
+				continue;
 			}
-			char current, case4Char;
-			String param, substring;
-			int oldPos, endPos, case1EndPos, case3EndPos;
-			// find template parameters of the form {{{0}}}
-			for ( ; pos < content.length(); pos++) {
-				substring = content.substring(pos);
-				if (!substring.startsWith("{{{")) {
-					// not a template parameter, move to the next match
-					oldPos = pos;
-					pos = content.indexOf("{{{", pos + 1);
-					if (pos == -1) {
-						output.append(content.substring(oldPos));
-						break;
-					}
-					output.append(content.substring(oldPos, pos));
-				}
-				current = content.charAt(pos);
-				// this may be a template parameter, but check for various sub-patterns to be sure
-				endPos = Utilities.findMatchingEndTag(content, pos, "{{{", "}}}");
-				if (endPos == -1) {
-					// no matching end tag
+			// this may be a template parameter, but check for various sub-patterns to be sure
+			endPos = Utilities.findMatchingEndTag(content, pos, "{{{", "}}}");
+			if (endPos == -1) {
+				// no matching end tag
+				output.append(current);
+				continue;
+			}
+			// there are several sub-patterns that need to be analyzed:
+			// 1. {{{1|{{PAGENAME}}}}}
+			// 2. {{{{{1}}}}}
+			// 3. {{{template}} x {{template}}}
+			// 4. {{{1|{{{2}}}}}}
+			case1EndPos = Utilities.findMatchingEndTag(content, pos, "{", "}");
+			if (endPos < case1EndPos && content.substring(case1EndPos - 3, case1EndPos).equals("}}}")) {
+				// case #1
+				endPos = case1EndPos;
+			}
+			if (substring.startsWith("{{{{{") && content.substring(endPos - 5, endPos).equals("}}}}}")) {
+				// case #2 (note: endPos updated in the previous step)
+				output.append("{{");
+				pos++;
+				continue;
+			}
+			case3EndPos = Utilities.findMatchingEndTag(content, pos + 1, "{{", "}}");
+			if (case3EndPos != (endPos - 1)) {
+				// either case #3 or case #4
+				case4Char = content.charAt(case3EndPos + 1);
+				if (case4Char != '}') {
+					// case #3
 					output.append(current);
 					continue;
 				}
-				// there are several sub-patterns that need to be analyzed:
-				// 1. {{{1|{{PAGENAME}}}}}
-				// 2. {{{{{1}}}}}
-				// 3. {{{template}} x {{template}}}
-				// 4. {{{1|{{{2}}}}}}
-				case1EndPos = Utilities.findMatchingEndTag(content, pos, "{", "}");
-				if (endPos < case1EndPos && content.substring(case1EndPos - 3, case1EndPos).equals("}}}")) {
-					// case #1
-					endPos = case1EndPos;
-				}
-				if (substring.startsWith("{{{{{") && content.substring(endPos - 5, endPos).equals("}}}}}")) {
-					// case #2 (note: endPos updated in the previous step)
-					output.append("{{");
-					pos++;
-					continue;
-				}
-				case3EndPos = Utilities.findMatchingEndTag(content, pos + 1, "{{", "}}");
-				if (case3EndPos != (endPos - 1)) {
-					// either case #3 or case #4
-					case4Char = content.charAt(case3EndPos + 1);
-					if (case4Char != '}') {
-						// case #3
-						output.append(current);
-						continue;
-					}
-				}
-				param = content.substring(pos, endPos);
-				output.append(this.applyParameter(parserInput, parserOutput, param, parameterValues));
-				pos = endPos - 1;
 			}
-			content = output.toString();
+			param = content.substring(pos, endPos);
+			output.append(this.applyParameter(parserInput, parserOutput, param, parameterValues));
+			pos = endPos - 1;
 		}
-		return JFlexParserUtil.parseFragment(parserInput, parserOutput, content.trim(), JFlexParser.MODE_TEMPLATE);
+		return JFlexParserUtil.parseFragment(parserInput, parserOutput, output.toString().trim(), JFlexParser.MODE_TEMPLATE);
 	}
 
 	/**
