@@ -55,6 +55,11 @@ public class RegisterServlet extends JAMWikiServlet {
 	 *
 	 */
 	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+		// verify that the user is not blocked from registering
+		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
+		if (blockedUserModelAndView != null) {
+			return blockedUserModelAndView;
+		}
 		if (request.getParameter("function") == null) {
 			view(request, next, pageInfo);
 		} else {
@@ -210,6 +215,10 @@ public class RegisterServlet extends JAMWikiServlet {
 		}
 		if (user.getUserId() < 1 && !ReCaptchaUtil.isValidForRegistration(request)) {
 			pageInfo.addError(new WikiMessage("common.exception.recaptcha"));
+		}
+		String result = ServletUtil.checkForSpam(request, user.getUsername());
+		if (result != null) {
+			pageInfo.addError(new WikiMessage("edit.exception.spam", result));
 		}
 	}
 

@@ -73,6 +73,10 @@
 			</div>
 		</c:if>
 		</fieldset>
+		<div id="antispam-container" style="display: none;">
+			<label for="jamAntispam"><fmt:message key="edit.caption.antispam" /></label>
+			<input type="text" name="jamAntispam" id="jamAntispam" value="" />
+		</div>
 	</c:when>
 	<c:otherwise>
 		<%-- existing user --%>

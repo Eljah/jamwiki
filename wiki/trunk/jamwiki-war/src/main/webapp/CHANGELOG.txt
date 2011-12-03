@@ -29,6 +29,7 @@ New Features:
   * Be more strict with HTML-like tags: tags of the form "< tag>" or "< / tag>"
     are no longer supported and must be of the form "<tag>" or "</tag>".  This
     matches Mediawiki.
+  * Add a honeypot input during registration to deter spambots.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to Lucene Search 3.5.
   * Upgrade to commons-lang 3.1.

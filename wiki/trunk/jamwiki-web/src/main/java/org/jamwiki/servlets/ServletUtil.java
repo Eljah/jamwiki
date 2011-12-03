@@ -173,26 +173,32 @@ public class ServletUtil {
 	 * information about the offending spam and user to the logs.
 	 *
 	 * @param request The current servlet request.
-	 * @param topicName The name of the current topic being edited.
-	 * @param contents The text for the current topic that the user is trying to
-	 *  add.
-	 * @param editComment (Optional) The topic edit comment, which has also been a
-	 *  target for spambots.
+	 * @param identifier An identifier used in logging to specify where spam was found.
+	 * @param args Any number of strings that should be validated againts the blacklist
+	 *  to see if they contain spam.
 	 * @return <code>null</code> if nothing in the topic content matches a current
 	 *  spam pattern, or the text that matches a spam pattern if one is found.
 	 */
-	protected static String checkForSpam(HttpServletRequest request, String topicName, String contents, String editComment) throws DataAccessException {
+	protected static String checkForSpam(HttpServletRequest request, String identifier, String... args) throws DataAccessException {
 		// check the blacklist
-		String result = SpamFilter.containsSpam(contents);
+		String result = null;
 		String message = null;
-		if (StringUtils.isBlank(result) && !StringUtils.isBlank(editComment)) {
-			message = "SPAM found in topic " + topicName;
-			result = SpamFilter.containsSpam(editComment);
+		if (args != null) {
+			for (String arg : args) {
+				if (StringUtils.isBlank(arg)) {
+					continue;
+				}
+				result = SpamFilter.containsSpam(arg);
+				if (result != null) {
+					message = "SPAM found in " + identifier;
+					break;
+				}
+			}
 		}
 		// verify that the hidden input field is not populated
 		String honeyPotInput = request.getParameter("jamAntispam");
 		if (StringUtils.isBlank(result) && !StringUtils.isBlank(honeyPotInput)) {
-			message = "SPAM honey pot triggered for topic " + topicName;
+			message = "SPAM honey pot triggered for " + identifier;
 			result = (honeyPotInput.length() > 100) ? honeyPotInput.substring(0, 100) : honeyPotInput;
 		}
 		if (StringUtils.isBlank(result)) {
