@@ -46,6 +46,8 @@ Bugfixes:
   * Newlines in table cells will now start a paragraph, matching Mediawiki
     behavior.
   * Allow whitespace in front of wiki table syntax (" {|") to match Mediawiki.
+  * Allow thumbnail images to be specified using "thumnbail" in addition to
+    "thumb" to match Mediawiki.
 
 Translation Updates:
 

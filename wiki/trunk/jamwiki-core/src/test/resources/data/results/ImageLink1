@@ -187,3 +187,9 @@
 <p><a href="/wiki/test/Image:Test_Image.jpg" title="Image:Test Image.jpg">Image:Test Image.jpg</a></p>
 <p>non-existent image link on alt virtual wiki</p>
 <p><a href="/wiki/test/Special:Edit?topic=Image:Non_Existent_Image.jpg" class="edit" title="Image:Non Existent Image.jpg">Caption for link</a></p>
+<p>support legacy thumbnails</p>
+<div class="thumb tright">
+<div class="thumbinner" style="width:222px"><a class="wikiimg" href="/wiki/en/Image:Test_Image.jpg"><img class="wikiimg" src="/files/resized/test_image-300px.jpg" width="220" height="147" alt="Test Image.jpg" /></a>
+<div class="thumbcaption">This is the caption</div>
+</div>
+</div>

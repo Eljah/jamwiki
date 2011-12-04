@@ -186,3 +186,7 @@ image link on alt virtual wiki
 non-existent image link on alt virtual wiki
 
 [[:test:Image:Non Existent Image.jpg|Caption for link]]
+
+support legacy thumbnails
+
+[[Image:Test Image.jpg|thumbnail|print=float|220px|This is the caption]]

@@ -135,6 +135,10 @@ public class ImageLinkTag implements JFlexParserTag {
 			}
 			token = token.trim();
 			for (ImageBorderEnum border : EnumSet.allOf(ImageBorderEnum.class)) {
+				// special case - for legacy reasons Mediawiki supports "thumbnail" instead of "thumb"
+				if (StringUtils.equalsIgnoreCase(token, "thumbnail")) {
+					token = "thumb";
+				}
 				if (border.toString().equalsIgnoreCase(token)) {
 					if (border == ImageBorderEnum.BORDER) {
 						// border can be combined with frameless, so set a second attribute to track it
