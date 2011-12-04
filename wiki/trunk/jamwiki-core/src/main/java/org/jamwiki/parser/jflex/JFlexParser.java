@@ -121,6 +121,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
+		if (raw.length() == 0) {
+			return raw;
+		}
 		StringReader reader = toStringReader(raw, true);
 		JAMWikiEditCommentLexer lexer = new JAMWikiEditCommentLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, MODE_EDIT_COMMENT).trim();
@@ -142,6 +145,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseFragment(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
+		if (raw.length() == 0) {
+			return raw;
+		}
 		String output = raw;
 		// maintain the original output, which has all of the category and link info
 		output = this.parseTemplate(parserInput, parserOutput, output, mode);
@@ -164,6 +170,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseHTML(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
+		if (raw.length() == 0) {
+			return raw;
+		}
 		long start = System.currentTimeMillis();
 		// some parser expressions require that lines end in a newline, so add a newline
 		// to the end of the content for good measure
@@ -193,6 +202,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @param raw The raw Wiki syntax to be converted into HTML.
 	 */
 	public void parseMetadata(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
+		if (raw.length() == 0) {
+			return;
+		}
 		long start = System.currentTimeMillis();
 		// FIXME - set a bogus context value to avoid parser errors
 		if (parserInput.getContext() == null) {
@@ -221,6 +233,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseMinimal(ParserInput parserInput, String raw) throws ParserException {
+		if (raw.length() == 0) {
+			return raw;
+		}
 		long start = System.currentTimeMillis();
 		String output = raw;
 		ParserOutput parserOutput = new ParserOutput();
@@ -323,6 +338,9 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	protected String parseRedirect(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
+		if (raw.length() == 0) {
+			return raw;
+		}
 		// flush any existing links or categories since this will be re-parsed
 		parserOutput.reset();
 		// pre-process the text to get the redirect and process metadata
