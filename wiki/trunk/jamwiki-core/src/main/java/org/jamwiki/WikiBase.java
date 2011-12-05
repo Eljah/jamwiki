@@ -61,8 +61,10 @@ public class WikiBase {
 	public static final String SPECIAL_PAGE_FOOTER = "JAMWiki:Footer";
 	/** Name of the default header topic. */
 	public static final String SPECIAL_PAGE_HEADER = "JAMWiki:Header";
-	/** Name of the default jamwiki.css topic. */
+	/** Name of the jamwiki.css topic that holds system styles. */
 	public static final String SPECIAL_PAGE_SYSTEM_CSS = "JAMWiki:System.css";
+	/** Name of the jamwiki.css topic that holds custom styles. */
+	public static final String SPECIAL_PAGE_CUSTOM_CSS = "JAMWiki:Custom.css";
 	/** Allow file uploads of any file type. */
 	public static final int UPLOAD_ALL = 0;
 	/** Use a blacklist to determine what file types can be uploaded. */

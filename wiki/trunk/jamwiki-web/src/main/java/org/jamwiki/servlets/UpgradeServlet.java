@@ -198,10 +198,11 @@ public class UpgradeServlet extends JAMWikiServlet {
 		try {
 			List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
 			for (VirtualWiki virtualWiki : virtualWikis) {
-				WikiDatabase.setupSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, wikiUser, true);
+				WikiDatabase.setupSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, wikiUser, true, false);
 				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "BottomArea", WikiBase.SPECIAL_PAGE_FOOTER);
 				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "LeftMenu", WikiBase.SPECIAL_PAGE_SIDEBAR);
 				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "StyleSheet", WikiBase.SPECIAL_PAGE_SYSTEM_CSS);
+				WikiDatabase.setupSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, wikiUser, true, false);
 			}
 			return true;
 		} catch (WikiException e) {

@@ -19,6 +19,9 @@ New Features:
     Example: "{{PAGENAME:Template:Main Page}}".
   * Move the system topics (BottomArea, LeftMenu, StyleSheet) to the
     JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
+  * Add a new JAMWiki:Custom.css stylesheet.  Starting with JAMWiki 1.2
+    System.css will be used for base CSS styles, while Custom.css should be
+    used for site-specific customizations.
   * Add a new JAMWiki:Header system topic that allows adding a custom message
     to the top of all pages, just below the tab bar.
   * Move several system configuration files (jamwiki-configuration.xml, spam

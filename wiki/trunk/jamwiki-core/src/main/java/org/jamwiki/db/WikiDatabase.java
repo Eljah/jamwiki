@@ -809,7 +809,7 @@ public class WikiDatabase {
 	 *
 	 */
 	// TODO - change this back to protected once the ability to upgrade to 1.2 has been removed
-	public static void setupSpecialPage(Locale locale, String virtualWiki, String topicName, WikiUser user, boolean adminOnly) throws DataAccessException, WikiException {
+	public static void setupSpecialPage(Locale locale, String virtualWiki, String topicName, WikiUser user, boolean adminOnly, boolean readOnly) throws DataAccessException, WikiException {
 		logger.info("Setting up special page " + virtualWiki + " / " + topicName);
 		if (user == null) {
 			throw new IllegalArgumentException("Cannot pass null WikiUser object to setupSpecialPage");
@@ -823,6 +823,7 @@ public class WikiDatabase {
 		Topic topic = new Topic(virtualWiki, topicName);
 		topic.setTopicContent(contents);
 		topic.setAdminOnly(adminOnly);
+		topic.setReadOnly(readOnly);
 		int charactersChanged = StringUtils.length(contents);
 		// FIXME - hard coding
 		TopicVersion topicVersion = new TopicVersion(user, user.getLastLoginIpAddress(), "Automatically created by system setup", contents, charactersChanged);
@@ -839,11 +840,12 @@ public class WikiDatabase {
 		List<VirtualWiki> all = WikiBase.getDataHandler().getVirtualWikiList();
 		for (VirtualWiki virtualWiki : all) {
 			// create the default topics
-			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_STARTING_POINTS, user, false);
-			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SIDEBAR, user, true);
-			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_FOOTER, user, true);
-			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, user, true);
-			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, user, true);
+			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_STARTING_POINTS, user, false, false);
+			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SIDEBAR, user, true, false);
+			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_FOOTER, user, true, false);
+			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, user, true, false);
+			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, user, true, true);
+			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, user, true, false);
 		}
 	}
 }

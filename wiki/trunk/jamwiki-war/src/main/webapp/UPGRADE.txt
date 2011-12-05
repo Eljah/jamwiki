@@ -105,7 +105,9 @@ followed by 0.6.3.
      - BottomArea is now JAMWiki:Footer
      - LeftMenu is now JAMWiki:Sidebar
      - StyleSheet is now JAMWiki:System.css
-  3. A new JAMWiki:Header topic must be created on all virtual wikis.
+  3. Two new topics should be created for all virtual wikis:
+     - JAMWiki:Custom.css
+     - JAMWiki:Header
   4. Update the database schema by executing the following SQL statements:
        a) Add the ROLE_REGISTER role and assign it to the anonymous group:
               insert into jam_role (role_name) values ('ROLE_REGISTER');
