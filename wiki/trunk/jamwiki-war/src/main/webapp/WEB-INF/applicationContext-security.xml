@@ -136,6 +136,7 @@
 	<b:bean id="jamwikiErrorMessageProvider" class="org.jamwiki.authentication.JAMWikiErrorMessageProvider">
 		<b:property name="urlPatterns">
 			<b:map>
+				<b:entry key="/**/Special:Account" value="login.message.account" />
 				<b:entry key="/**/Special:Admin" value="login.message.admin" />
 				<b:entry key="/**/Special:Edit" value="login.message.edit" />
 				<b:entry key="/**/Special:Maintenance" value="login.message.admin" />
