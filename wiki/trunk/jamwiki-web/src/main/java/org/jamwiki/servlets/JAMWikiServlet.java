@@ -28,6 +28,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
+import org.jamwiki.model.Topic;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiUser;
@@ -95,9 +96,15 @@ public abstract class JAMWikiServlet extends AbstractController {
 		// cache if files change.
 		String cssRevision = "0";
 		try {
-			cssRevision = Integer.toString(WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, false).getCurrentVersionId());
+			Topic systemCss = WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, false);
+			if (systemCss != null) {
+				cssRevision = Integer.toString(systemCss.getCurrentVersionId());
+			}
 			cssRevision += '_';
-			cssRevision += Integer.toString(WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, false).getCurrentVersionId());
+			Topic customCss = WikiBase.getDataHandler().lookupTopic(virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, false);
+			if (customCss != null) {
+				cssRevision += Integer.toString(customCss.getCurrentVersionId());
+			}
 		} catch (DataAccessException e) {}
 		next.addObject("cssRevision", cssRevision);
 		long jsRevision = 0;

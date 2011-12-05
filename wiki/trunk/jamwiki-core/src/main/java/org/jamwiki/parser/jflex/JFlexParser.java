@@ -121,7 +121,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseEditComment(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
-		if (raw.length() == 0) {
+		if (raw != null && raw.length() == 0) {
 			return raw;
 		}
 		StringReader reader = toStringReader(raw, true);
@@ -145,7 +145,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseFragment(ParserInput parserInput, ParserOutput parserOutput, String raw, int mode) throws ParserException {
-		if (raw.length() == 0) {
+		if (raw != null && raw.length() == 0) {
 			return raw;
 		}
 		String output = raw;
@@ -170,7 +170,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseHTML(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
-		if (raw.length() == 0) {
+		if (raw != null && raw.length() == 0) {
 			return raw;
 		}
 		long start = System.currentTimeMillis();
@@ -202,7 +202,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @param raw The raw Wiki syntax to be converted into HTML.
 	 */
 	public void parseMetadata(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
-		if (raw.length() == 0) {
+		if (raw != null && raw.length() == 0) {
 			return;
 		}
 		long start = System.currentTimeMillis();
@@ -233,7 +233,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	public String parseMinimal(ParserInput parserInput, String raw) throws ParserException {
-		if (raw.length() == 0) {
+		if (raw != null && raw.length() == 0) {
 			return raw;
 		}
 		long start = System.currentTimeMillis();
@@ -338,7 +338,7 @@ public class JFlexParser implements JAMWikiParser {
 	 * @throws ParserException Thrown if any error occurs during parsing.
 	 */
 	protected String parseRedirect(ParserInput parserInput, ParserOutput parserOutput, String raw) throws ParserException {
-		if (raw.length() == 0) {
+		if (raw != null && raw.length() == 0) {
 			return raw;
 		}
 		// flush any existing links or categories since this will be re-parsed
