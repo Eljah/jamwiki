@@ -346,17 +346,17 @@ public class ServletUtil {
 	 */
 	protected static Topic initializeTopic(String virtualWiki, String topicName) throws WikiException {
 		LinkUtil.validateTopicName(virtualWiki, topicName, false);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, topicName);
 		Topic topic = null;
 		try {
-			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
+			topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle(), false);
 		} catch (DataAccessException e) {
 			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 		}
 		if (topic != null) {
 			return topic;
 		}
-		topic = new Topic(virtualWiki, topicName);
-		WikiLink wikiLink = new WikiLink(null, virtualWiki, topicName);
+		topic = new Topic(virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle());
 		topic.setTopicType(WikiUtil.findTopicTypeForNamespace(wikiLink.getNamespace()));
 		return topic;
 	}

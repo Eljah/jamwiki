@@ -43,15 +43,6 @@ public class Topic implements Serializable {
 	private static final WikiLogger logger = WikiLogger.getLogger(Topic.class.getName());
 
 	/**
-	 * Initialize a topic, passing in the virtual wiki and the full topic name,
-	 * including namespace.  Example: "Help:Help Page".
-	 */
-	public Topic(String virtualWiki, String name) {
-		this.virtualWiki = virtualWiki;
-		this.setName(name);
-	}
-
-	/**
 	 * Initialize a topic, passing in the virtual wiki, namespace and page name.  Note
 	 * that page name does NOT include namespace, so for a topic of "Help:Help Page"
 	 * the page name is "Help Page".

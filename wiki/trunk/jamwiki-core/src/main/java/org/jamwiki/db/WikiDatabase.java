@@ -48,6 +48,7 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiLogger;
@@ -123,6 +124,7 @@ public class WikiDatabase {
 		int count = 0;
 		Map<Integer, String> topicNames;
 		List<Topic> topics;
+		WikiLink wikiLink;
 		List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
 		Connection conn = null;
 		try {
@@ -134,7 +136,8 @@ public class WikiDatabase {
 				}
 				topics = new ArrayList<Topic>();
 				for (int topicId : topicNames.keySet()) {
-					Topic topic = new Topic(virtualWiki.getName(), topicNames.get(topicId));
+					wikiLink = new WikiLink(null, virtualWiki.getName(), topicNames.get(topicId));
+					Topic topic = new Topic(virtualWiki.getName(), wikiLink.getNamespace(), wikiLink.getArticle());
 					topic.setTopicId(topicId);
 					topics.add(topic);
 				}
@@ -820,7 +823,8 @@ public class WikiDatabase {
 		} catch (IOException e) {
 			throw new DataAccessException(e);
 		}
-		Topic topic = new Topic(virtualWiki, topicName);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, topicName);
+		Topic topic = new Topic(virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle());
 		topic.setTopicContent(contents);
 		topic.setAdminOnly(adminOnly);
 		topic.setReadOnly(readOnly);

@@ -29,6 +29,7 @@ import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.WikiLink;
 import org.jamwiki.parser.image.ImageUtil;
 import org.junit.Before;
 
@@ -98,7 +99,8 @@ public abstract class JAMWikiUnitTest {
 		if (virtualWiki == null) {
 			virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki("en");
 		}
-		Topic topic = new Topic(virtualWiki.getName(), topicName);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki.getName(), topicName);
+		Topic topic = new Topic(virtualWiki.getName(), wikiLink.getNamespace(), wikiLink.getArticle());
 		topic.setTopicContent(contents);
 		if (topicName.toLowerCase().startsWith("image:")) {
 			this.setupImage(virtualWiki, topic);

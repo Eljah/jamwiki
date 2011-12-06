@@ -34,6 +34,7 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicType;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.WikiLink;
 
 /**
  * This class parse a TiddlyWiki file and imports it to JamWiki
@@ -200,7 +201,8 @@ public class TiddlyWikiParser {
 	 *
 	 */
 	private void saveTopic(String name, Date lastMod, String content) throws DataAccessException, WikiException {
-		Topic topic = new Topic(virtualWiki, name);
+		WikiLink wikiLink = new WikiLink(null, virtualWiki, name);
+		Topic topic = new Topic(virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle());
 		topic.setTopicContent(content);
 		int charactersChanged = StringUtils.length(content);
 		TopicVersion topicVersion = new TopicVersion(user, authorDisplay, "imported", content, charactersChanged);

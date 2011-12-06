@@ -341,7 +341,7 @@ public abstract class LinkUtil {
 			virtualWiki = wikiLink.getAltVirtualWiki().getName();
 		}
 		// get the topic that is being redirected to
-		Topic child = WikiBase.getDataHandler().lookupTopic(virtualWiki, wikiLink.getDestination(), false);
+		Topic child = WikiBase.getDataHandler().lookupTopic(virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle(), false);
 		if (child == null) {
 			// child being redirected to doesn't exist, return parent
 			return parent;

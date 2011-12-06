@@ -129,8 +129,8 @@ public class UploadServlet extends JAMWikiServlet {
 			throw new WikiException(new WikiMessage("upload.error.filenotfound"));
 		}
 		destinationFilename = processDestinationFilename(virtualWiki, destinationFilename, filename);
-		String topicName = ImageUtil.generateFileTopicName(virtualWiki, (!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
-		if (this.handleSpam(request, pageInfo, topicName, contents, null)) {
+		String pageName = ImageUtil.generateFilePageName((!StringUtils.isEmpty(destinationFilename) ? destinationFilename : filename));
+		if (this.handleSpam(request, pageInfo, pageName, contents, null)) {
 			// delete the spam file
 			uploadedFile.delete();
 			this.view(request, next, pageInfo);
@@ -148,11 +148,11 @@ public class UploadServlet extends JAMWikiServlet {
 		}
 		String ipAddress = ServletUtil.getIpAddress(request);
 		WikiUser user = ServletUtil.currentWikiUser();
-		Topic topic = ImageUtil.writeImageTopic(virtualWiki, topicName, contents, user, isImage, ipAddress);
+		Topic topic = ImageUtil.writeImageTopic(virtualWiki, pageName, contents, user, isImage, ipAddress);
 		WikiFileVersion wikiFileVersion = new WikiFileVersion();
 		wikiFileVersion.setUploadComment(topic.getTopicContent());
 		ImageUtil.writeWikiFile(topic, wikiFileVersion, user, ipAddress, filename, url, contentType, fileSize);
-		ServletUtil.redirect(next, virtualWiki, topicName);
+		ServletUtil.redirect(next, virtualWiki, topic.getName());
 	}
 
 	/**

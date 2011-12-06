@@ -197,7 +197,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 				throw new SAXException("Topic " + this.virtualWiki + ':' + topicName + " already exists and cannot be imported", e);
 			}
 		}
-		this.currentTopic = new Topic(this.virtualWiki, topicName);
+		this.currentTopic = new Topic(this.virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle());
 		this.currentTopic.setTopicType(WikiUtil.findTopicTypeForNamespace(wikiLink.getNamespace()));
 	}
 

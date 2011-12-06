@@ -148,7 +148,7 @@ public class LinkUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testFindRedirectedTopic1() throws Throwable {
-		Topic parent = new Topic("en", "Test");
+		Topic parent = new Topic("en", Namespace.namespace(Namespace.MAIN_ID), "Test");
 		parent.setTopicType(TopicType.REDIRECT);
 		Topic result = LinkUtil.findRedirectedTopic(parent, 100);
 		assertSame("result", parent, result);

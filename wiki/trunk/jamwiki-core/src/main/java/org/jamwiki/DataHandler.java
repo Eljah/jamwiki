@@ -477,6 +477,24 @@ public interface DataHandler {
 	Topic lookupTopic(String virtualWiki, String topicName, boolean deleteOK) throws DataAccessException;
 
 	/**
+	 * Retrieve a Topic object that matches the given virtual wiki, namespace
+	 * and page name.  Note that when a shared image repository is in use this
+	 * method should first try to retrieve images from the specified virtual
+	 * wiki, but if that search fails then a second search should be performed
+	 * against the shared repository.
+	 *
+	 * @param virtualWiki The virtual wiki for the topic being queried.
+	 * @param namespace The namespace of the topic being queried.
+	 * @param pageName The page name of the topic being queried.
+	 * @param deleteOK Set to <code>true</code> if deleted topics can be
+	 *  retrieved, <code>false</code> otherwise.
+	 * @return A Topic object that matches the given virtual wiki, namespace
+	 *  and page name, or <code>null</code> if no matching topic exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	public Topic lookupTopic(String virtualWiki, Namespace namespace, String pageName, boolean deleteOK) throws DataAccessException;
+
+	/**
 	 * Retrieve a Topic object that matches the given topic id and virtual wiki.  Note
 	 * that this method can return deleted topics.
 	 *

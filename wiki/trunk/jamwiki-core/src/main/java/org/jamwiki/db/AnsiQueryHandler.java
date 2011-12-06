@@ -1454,7 +1454,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	 *
 	 */
 	private Topic initTopic(ResultSet rs, String virtualWikiName) throws SQLException {
-		Topic topic = new Topic(virtualWikiName, rs.getString("topic_name"));
+		Topic topic = new Topic(virtualWikiName, Namespace.namespace(rs.getInt("namespace_id")), rs.getString("page_name"));
 		topic.setAdminOnly(rs.getInt("topic_admin_only") != 0);
 		int currentVersionId = rs.getInt("current_version_id");
 		if (currentVersionId > 0) {

@@ -190,11 +190,12 @@ public class TranslationServlet extends JAMWikiServlet {
 	private void writeTopic(HttpServletRequest request, WikiPageInfo pageInfo) throws Exception {
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		String language = request.getParameter("language");
-		String topicName = Namespace.namespace(Namespace.JAMWIKI_ID).getLabel(virtualWiki) + Namespace.SEPARATOR + Utilities.decodeTopicName(filename(language), true);
+		Namespace namespace = Namespace.namespace(Namespace.JAMWIKI_ID);
+		String pageName = Utilities.decodeTopicName(filename(language), true);
 		String contents = "<pre><nowiki>\n" + ResourceUtil.readFile(filename(language)) + "\n</nowiki></pre>";
-		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
+		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, namespace, pageName, false);
 		if (topic == null) {
-			topic = new Topic(virtualWiki, topicName);
+			topic = new Topic(virtualWiki, namespace, pageName);
 		}
 		int charactersChanged = StringUtils.length(contents) - StringUtils.length(topic.getTopicContent());
 		topic.setTopicContent(contents);

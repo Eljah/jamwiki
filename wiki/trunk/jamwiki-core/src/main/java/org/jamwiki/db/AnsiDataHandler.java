@@ -497,9 +497,8 @@ public class AnsiDataHandler implements DataHandler {
 	 * Determine the largest namespace ID for all current defined namespaces.
 	 */
 	private int findMaxNamespaceId() throws DataAccessException {
-		List<Namespace> namespaces = this.lookupNamespaces();
 		int namespaceEnd = 0;
-		for (Namespace namespace : namespaces) {
+		for (Namespace namespace : this.lookupNamespaces()) {
 			namespaceEnd = (namespace.getId() > namespaceEnd) ? namespace.getId() : namespaceEnd;
 		}
 		return namespaceEnd;
@@ -796,8 +795,7 @@ public class AnsiDataHandler implements DataHandler {
 		if (interwikiPrefix == null) {
 			return null;
 		}
-		List<Interwiki> interwikis = this.lookupInterwikis();
-		for (Interwiki interwiki : interwikis) {
+		for (Interwiki interwiki : this.lookupInterwikis()) {
 			if (interwiki.getInterwikiPrefix().equalsIgnoreCase(interwikiPrefix.trim())) {
 				// found a match, return it
 				return interwiki;
@@ -838,8 +836,7 @@ public class AnsiDataHandler implements DataHandler {
 		if (namespaceString == null) {
 			return null;
 		}
-		List<Namespace> namespaces = this.lookupNamespaces();
-		for (Namespace namespace : namespaces) {
+		for (Namespace namespace : this.lookupNamespaces()) {
 			if (namespace.getDefaultLabel().equals(namespaceString) || namespace.getLabel(virtualWiki).equalsIgnoreCase(namespaceString)) {
 				// found a match, return it
 				return namespace;
@@ -853,8 +850,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public Namespace lookupNamespaceById(int namespaceId) throws DataAccessException {
-		List<Namespace> namespaces = this.lookupNamespaces();
-		for (Namespace namespace : namespaces) {
+		for (Namespace namespace : this.lookupNamespaces()) {
 			if (namespace.getId() != null && namespace.getId().intValue() == namespaceId) {
 				// found a match, return it
 				return namespace;
@@ -893,6 +889,13 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	public Topic lookupTopic(String virtualWiki, String topicName, boolean deleteOK) throws DataAccessException {
 		return this.lookupTopic(virtualWiki, topicName, deleteOK, null);
+	}
+
+	/**
+	 *
+	 */
+	public Topic lookupTopic(String virtualWiki, Namespace namespace, String pageName, boolean deleteOK) throws DataAccessException {
+		return this.lookupTopic(virtualWiki, namespace, pageName, deleteOK, null);
 	}
 
 	/**

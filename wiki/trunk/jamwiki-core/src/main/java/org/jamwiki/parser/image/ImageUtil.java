@@ -442,12 +442,11 @@ public abstract class ImageUtil {
 	}
 
 	/**
-	 * Given an image file name, generate the appropriate topic name for the image.
+	 * Given an image file name, generate the appropriate page name for the image.
+	 * Note that this is the page name and does NOT include the image namespace.
 	 */
-	public static String generateFileTopicName(String virtualWiki, String filename) {
-		String topicName = Namespace.namespace(Namespace.FILE_ID).getLabel(virtualWiki) + Namespace.SEPARATOR;
-		topicName += Utilities.decodeAndEscapeTopicName(filename, true);
-		return topicName;
+	public static String generateFilePageName(String filename) {
+		return Utilities.decodeAndEscapeTopicName(filename, true);
 	}
 
 	/**
@@ -570,14 +569,28 @@ public abstract class ImageUtil {
 	}
 
 	/**
+	 * Given appropriate parameters write the topic record that corresponds
+	 * to a file object to the database.
 	 *
+	 * @param virtualWiki The virtual wiki for the record being written.
+	 * @param pageName The page name for the record being written.  This value
+	 *  should NOT include a namespace as the namespace is implicitly assumed
+	 *  to be the FILE namespace.
+	 * @param contents The topic contents for the file record.
+	 * @param user The author of the topic record, or <code>null</code> if the
+	 *  author is anonymous.
+	 * @param isImage Flag indicating whether the topic is an image or just a
+	 *  file.
+	 * @param ipAddress The IP address of the topic record author.
+	 * @return The Topic that is written for the image record.
 	 */
-	public static Topic writeImageTopic(String virtualWiki, String topicName, String contents, WikiUser user, boolean isImage, String ipAddress) throws DataAccessException, ParserException, WikiException {
-		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
+	public static Topic writeImageTopic(String virtualWiki, String pageName, String contents, WikiUser user, boolean isImage, String ipAddress) throws DataAccessException, ParserException, WikiException {
+		Namespace namespace = Namespace.namespace(Namespace.FILE_ID);
+		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, namespace, pageName, false);
 		int charactersChanged = 0;
 		if (topic == null || !StringUtils.equals(virtualWiki, topic.getVirtualWiki())) {
 			// if topic doesn't exist or the shared version was returned, create a new record
-			topic = new Topic(virtualWiki, topicName);
+			topic = new Topic(virtualWiki, namespace, pageName);
 			topic.setTopicContent(contents);
 			charactersChanged = StringUtils.length(contents);
 		}
@@ -588,7 +601,7 @@ public abstract class ImageUtil {
 		}
 		TopicVersion topicVersion = new TopicVersion(user, ipAddress, contents, topic.getTopicContent(), charactersChanged);
 		topicVersion.setEditType(TopicVersion.EDIT_UPLOAD);
-		ParserOutput parserOutput = ParserUtil.parserOutput(topic.getTopicContent(), virtualWiki, topicName);
+		ParserOutput parserOutput = ParserUtil.parserOutput(topic.getTopicContent(), virtualWiki, topic.getName());
 		WikiBase.getDataHandler().writeTopic(topic, topicVersion, parserOutput.getCategories(), parserOutput.getLinks());
 		return topic;
 	}
