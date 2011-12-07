@@ -23,6 +23,7 @@
 				<prop key="/**/Special:Export">Export</prop>
 				<prop key="/**/Special:FileList">Items</prop>
 				<prop key="/**/Special:History">History</prop>
+				<prop key="/**/Special:Image">Image</prop>
 				<prop key="/**/Special:Import">Import</prop>
 				<prop key="/**/Special:ImportTiddly">ImportTiddly</prop>
 				<prop key="/**/Special:ImageList">Items</prop>
@@ -67,6 +68,7 @@
 	<bean id="Edit" class="org.jamwiki.servlets.EditServlet" />
 	<bean id="Export" class="org.jamwiki.servlets.ExportServlet" />
 	<bean id="History" class="org.jamwiki.servlets.HistoryServlet" />
+	<bean id="Image" class="org.jamwiki.servlets.ImageServlet" />
 	<bean id="Import" class="org.jamwiki.servlets.ImportServlet" />
 	<bean id="ImportTiddly" class="org.jamwiki.servlets.ImportTiddlyWikiServlet" />
 	<bean id="Items" class="org.jamwiki.servlets.ItemsServlet" />

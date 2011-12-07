@@ -856,10 +856,11 @@ public interface DataHandler {
 	 *  performed.
 	 * @param wikiFileVersion A WikiFileVersion containing the author, date, and
 	 *  other information about the version being added.
+	 * @param imageData Image data or null
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 * @throws WikiException Thrown if the file information is invalid.
 	 */
-	void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion) throws DataAccessException, WikiException;
+	void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion, ImageData imageData) throws DataAccessException, WikiException;
 
 	/**
 	 * Add or update an Interwiki record.  This method will first delete any
@@ -1044,4 +1045,44 @@ public interface DataHandler {
 	 * @throws WikiException Thrown if the user information is invalid.
 	 */
 	void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException;
+
+	/**
+	 * Add new image or other data to database.
+	 *
+	 * @param imageData The image and it's arrtibutes to store.
+	 * @param resized Must be true when inserting resized version of image and false otherwise.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	public void insertImage(ImageData imageData, boolean resized) throws DataAccessException;
+
+	/**
+	 * Get info of latest version of image.
+	 *
+	 * @param fileId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image info or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's data component may be null.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException;
+
+	/**
+	 * Get latest version of image.
+	 *
+	 * @param fileId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image data or null if image not found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	public ImageData getImageData(int fileId, int resized) throws DataAccessException;
+
+	/**
+	 * Get desired version of image.
+	 *
+	 * @param fileVersionId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image data or null if image version not found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException;
 }

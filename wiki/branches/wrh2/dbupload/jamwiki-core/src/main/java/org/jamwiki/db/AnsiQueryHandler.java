@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
+import org.jamwiki.ImageData;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -243,6 +244,13 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_UPDATE_VIRTUAL_WIKI = null;
 	protected static String STATEMENT_UPDATE_WIKI_FILE = null;
 	protected static String STATEMENT_UPDATE_WIKI_USER = null;
+	protected static String STATEMENT_CREATE_FILE_DATA_TABLE = null;
+	protected static String STATEMENT_DROP_FILE_DATA_TABLE = null;
+	protected static String STATEMENT_INSERT_FILE_DATA = null;
+	protected static String STATEMENT_DELETE_RESIZED_IMAGES = null;
+	protected static String STATEMENT_SELECT_FILE_INFO = null;
+	protected static String STATEMENT_SELECT_FILE_DATA = null;
+	protected static String STATEMENT_SELECT_FILE_VERSION_DATA = null;
 	private Properties props = null;
 
 	/**
@@ -321,6 +329,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_INTERWIKI_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_CONFIGURATION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_BLOCK_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_FILE_DATA_TABLE, conn);
 	}
 
 	/**
@@ -475,6 +484,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		// catch errors that might result from a partial failure during install.  also
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
+		try {
+			DatabaseConnection.executeUpdate(STATEMENT_DROP_FILE_DATA_TABLE, conn);
+		} catch (SQLException e) { logger.error(e.getMessage()); }
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
 		} catch (SQLException e) { logger.error(e.getMessage()); }
@@ -1357,6 +1369,13 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_UPDATE_VIRTUAL_WIKI            = props.getProperty("STATEMENT_UPDATE_VIRTUAL_WIKI");
 		STATEMENT_UPDATE_WIKI_FILE               = props.getProperty("STATEMENT_UPDATE_WIKI_FILE");
 		STATEMENT_UPDATE_WIKI_USER               = props.getProperty("STATEMENT_UPDATE_WIKI_USER");
+		STATEMENT_CREATE_FILE_DATA_TABLE         = props.getProperty("STATEMENT_CREATE_FILE_DATA_TABLE");
+		STATEMENT_DROP_FILE_DATA_TABLE           = props.getProperty("STATEMENT_DROP_FILE_DATA_TABLE");
+		STATEMENT_INSERT_FILE_DATA               = props.getProperty("STATEMENT_INSERT_FILE_DATA");
+		STATEMENT_DELETE_RESIZED_IMAGES          = props.getProperty("STATEMENT_DELETE_RESIZED_IMAGES");
+		STATEMENT_SELECT_FILE_INFO               = props.getProperty("STATEMENT_SELECT_FILE_INFO");
+		STATEMENT_SELECT_FILE_DATA               = props.getProperty("STATEMENT_SELECT_FILE_DATA");
+		STATEMENT_SELECT_FILE_VERSION_DATA       = props.getProperty("STATEMENT_SELECT_FILE_VERSION_DATA");
 	}
 
 	/**
@@ -3393,5 +3412,107 @@ public class AnsiQueryHandler implements QueryHandler {
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}
+	}
+	/**
+	 * @see org.jamwiki.db.QueryHandler#insertImage(org.jamwiki.ImageData, boolean, java.sql.Connection)
+	 */
+	public void insertImage(ImageData imageData, boolean isResized, Connection conn) throws SQLException
+	{
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_INSERT_FILE_DATA);
+			stmt.setInt  (1, imageData.fileVersionId);
+			stmt.setInt  (2, isResized ? imageData.width : 0);
+			stmt.setInt  (3, imageData.width);
+			stmt.setInt  (4, imageData.height);
+			stmt.setBytes(5, imageData.data);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#deleteResizedImages(int, java.sql.Connection)
+	 */
+	public void deleteResizedImages(int fileId, Connection conn) throws SQLException
+	{
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_DELETE_RESIZED_IMAGES);
+			stmt.setInt  (1, fileId);
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#getImageInfo(int, int, java.sql.Connection)
+	 */
+	public ImageData getImageInfo(int fileId, int resized, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_INFO);
+			stmt.setInt(1, fileId);
+			stmt.setInt(2, resized);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				return new ImageData(rs.getString(1), rs.getInt(2), rs.getInt(3), null);
+			}
+		} finally {
+		      //DatabaseConnection.closeStatement(stmt);
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#getImageData(int, int, java.sql.Connection)
+	 */
+	public ImageData getImageData(int fileId, int resized, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_DATA);
+			stmt.setInt(1, fileId);
+			stmt.setInt(2, resized);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				return new ImageData(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getBytes(5));
+			}
+		} finally {
+		      //DatabaseConnection.closeStatement(stmt);
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @see org.jamwiki.db.QueryHandler#getImageVersionData(int, int, java.sql.Connection)
+	 */
+	public ImageData getImageVersionData(int fileVersionId, int resized, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_FILE_VERSION_DATA);
+			stmt.setInt(1, fileVersionId);
+			stmt.setInt(2, resized);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				return new ImageData(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getBytes(5));
+			}
+		} finally {
+		      //DatabaseConnection.closeStatement(stmt);
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+
+		return null;
 	}
 }

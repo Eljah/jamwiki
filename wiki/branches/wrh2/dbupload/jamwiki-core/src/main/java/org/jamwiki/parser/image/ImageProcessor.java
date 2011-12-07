@@ -16,6 +16,8 @@
  */
 package org.jamwiki.parser.image;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -32,6 +34,10 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jamwiki.WikiBase;
+import org.jamwiki.ImageData;
+import org.jamwiki.Environment;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
@@ -83,6 +89,26 @@ public class ImageProcessor {
 	}
 
 	/**
+	 * Given a fileId, return a
+	 * ImageData object.
+	 */
+	private static ImageData loadImage(int fileId) throws IOException {
+		ImageData imageData = null;
+
+		try {
+			imageData = WikiBase.getDataHandler().getImageData(fileId, 0);
+		} catch (DataAccessException dae) {
+			throw new IOException(dae);
+		}
+
+		if (imageData == null) {
+			throw new FileNotFoundException("Image does not exist: " + fileId);
+		}
+
+		return imageData;
+	}
+
+	/**
 	 * Convenience method that returns a scaled instance of the provided image.
 	 * This method never resizes by more than 50% since resizing by more than that
 	 * amount causes quality issues with the BICUBIC and BILINEAR algorithms.
@@ -125,6 +151,69 @@ public class ImageProcessor {
 			logger.debug(message);
 		}
 		return resized;
+	}
+
+	/**
+	 * Convenience method that returns a scaled instance of the provided image.
+	 * This method never resizes by more than 50% since resizing by more than that
+	 * amount causes quality issues with the BICUBIC and BILINEAR algorithms.
+	 *
+	 * Based on examples from the GraphicsUtilities sample from the book "Filthy
+	 * Rich Clients" by Chet Haase and Romain Guy (http://filthyrichclients.org/).
+	 * That source is dual licensed: LGPL (Sun and Romain Guy) and BSD (Romain Guy).
+	 *
+	 * @param fileId The file identifier for the original image to be scaled.
+	 * @param targetWidth the desired width of the scaled instance in pixels.
+	 * @param targetHeight the desired height of the scaled instance in pixels.
+	 * @return a dimensions of scaled image
+	 */
+	public static Dimension resizeImage(int fileId, int targetWidth, int targetHeight) throws IOException {
+		long start = System.currentTimeMillis();
+		ImageData imageData = ImageProcessor.loadImage(fileId);
+		BufferedImage tmp = ImageIO.read(new ByteArrayInputStream(imageData.data));
+		if (tmp == null) {
+			throw new IOException("JDK is unable to process image data, possibly indicating data corruption: " + fileId);
+		}
+		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+		int width = tmp.getWidth();
+		int height = tmp.getHeight();
+		BufferedImage resized = tmp;
+		do {
+			width /= 2;
+			if (width < targetWidth) {
+				width = targetWidth;
+			}
+			height /= 2;
+			if (height < targetHeight) {
+				height = targetHeight;
+			}
+			tmp = new BufferedImage(width, height, type);
+			Graphics2D g2 = tmp.createGraphics();
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.drawImage(resized, 0, 0, width, height, null);
+			g2.dispose();
+			resized = tmp;
+		} while (width != targetWidth || height != targetHeight);
+		if (logger.isDebugEnabled()) {
+			long current = System.currentTimeMillis();
+			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for fileId: " + fileId;
+			logger.debug(message);
+		}
+		int pos = imageData.mimeType.lastIndexOf('/');
+		if (pos == -1 || (pos + 1) >= imageData.mimeType.length()) {
+			throw new IOException("Unknown image file type " + imageData.mimeType);
+		}
+		String imageType = imageData.mimeType.substring(pos + 1).toLowerCase();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		boolean result = ImageIO.write(resized, imageType, baos);		if    (!result) {
+			throw new IOException("No appropriate writer found when writing image: " + imageData.fileVersionId);
+		}
+		baos.close();
+		imageData.width  = resized.getWidth   ();
+		imageData.height = resized.getHeight  ();
+		imageData.data   = baos   .toByteArray();
+		saveImage(imageData);
+		return new Dimension(imageData.width, imageData.height);
 	}
 
 	/**
@@ -173,6 +262,25 @@ public class ImageProcessor {
 	}
 
 	/**
+	 * Retrieve image dimensions.
+	 */
+	protected static Dimension retrieveImageDimensions(int fileId, int resized) throws IOException {
+		ImageData imageData = null;
+
+		try {
+			imageData = WikiBase.getDataHandler().getImageInfo(fileId, resized);
+		} catch (DataAccessException dae) {
+			throw new IOException(dae);
+		}
+
+		if (imageData == null || imageData.width < 0) {
+			return null;
+		}
+
+		return new Dimension(imageData.width, imageData.height);
+	}
+
+	/**
 	 * Save an image to a specified file.
 	 */
 	protected static void saveImage(BufferedImage image, File file) throws IOException {
@@ -196,6 +304,19 @@ public class ImageProcessor {
 			}
 		} finally {
 			IOUtils.closeQuietly(fos);
+		}
+	}
+
+	/**
+	 * Save an image.
+	 */
+	private static void saveImage(ImageData imageData) throws IOException {
+		try {
+			WikiBase.getDataHandler().insertImage(imageData, true);
+		} catch (DataAccessException dae) {
+		      //FIXME
+		      //throw new IOException(dae);
+			logger.warn(dae.toString());
 		}
 	}
 }

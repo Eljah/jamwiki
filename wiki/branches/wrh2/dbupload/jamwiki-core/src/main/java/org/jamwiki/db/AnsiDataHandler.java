@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
+import org.jamwiki.ImageData;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
@@ -1888,7 +1889,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion) throws DataAccessException, WikiException {
+	public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion, ImageData imageData) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -1902,6 +1903,12 @@ public class AnsiDataHandler implements DataHandler {
 			wikiFileVersion.setFileId(wikiFile.getFileId());
 			// write version
 			addWikiFileVersion(wikiFileVersion, conn);
+			if (imageData != null) {
+				// No more needs of old resized images 
+				this.queryHandler().deleteResizedImages(wikiFile.getFileId(), conn);
+				imageData.fileVersionId = wikiFileVersion.getFileVersionId();
+				this.queryHandler().insertImage(imageData, false, conn);
+			}
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
@@ -2337,5 +2344,69 @@ public class AnsiDataHandler implements DataHandler {
 		// update the cache AFTER the commit
 		WikiCache.addToCache(CACHE_USER_BY_USER_ID, user.getUserId(), user);
 		WikiCache.addToCache(CACHE_USER_BY_USER_NAME, user.getUsername(), user);
+	}
+
+	/**
+	 * @see org.jamwiki.DataHandler#insertImage(int, int, org.jamwiki.ImageData, boolean)
+	 */
+	public void insertImage(ImageData imageData, boolean resized) throws DataAccessException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction();
+			Connection conn = DatabaseConnection.getConnection();
+			this.queryHandler().insertImage(imageData, resized, conn);
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			throw new DataAccessException(e);
+	      //FIXME Why no finally section
+		}/* finally {
+			DatabaseConnection.closeConnection(conn);
+		}*/
+		DatabaseConnection.commit(status);
+	}
+
+	/**
+	 * @see org.jamwiki.DataHandler#getImageInfo(int, int)
+	 */
+	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException {
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return this.queryHandler().getImageInfo(fileId, resized, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
+	}
+
+	/**
+	 * @see org.jamwiki.DataHandler#getImageData(int, int)
+	 */
+	public ImageData getImageData(int fileId, int resized) throws DataAccessException {
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return this.queryHandler().getImageData(fileId, resized, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
+	}
+
+	/**
+	 * @see org.jamwiki.DataHandler#getImageVersionData(int, int)
+	 */
+	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException {
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return this.queryHandler().getImageVersionData(fileVersionId, resized, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
 	}
 }
