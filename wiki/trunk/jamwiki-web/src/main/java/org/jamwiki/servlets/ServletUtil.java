@@ -29,7 +29,6 @@ import java.util.Properties;
 import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import net.sf.ehcache.Element;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -136,12 +135,10 @@ public class ServletUtil {
 	 *  parameter) topic content.
 	 */
 	protected static String cachedContent(String context, Locale locale, String virtualWiki, String topicName, boolean cook) throws DataAccessException {
-		String content = null;
 		String key = WikiCache.key(virtualWiki, topicName);
-		Element cacheElement = WikiCache.retrieveFromCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
-		if (cacheElement != null) {
-			content = (String)cacheElement.getObjectValue();
-			return (content == null) ? null : content;
+		String content = WikiBase.CACHE_PARSED_TOPIC_CONTENT.retrieveFromCache(key);
+		if (content != null || WikiBase.CACHE_PARSED_TOPIC_CONTENT.isKeyInCache(key)) {
+			return content;
 		}
 		try {
 			Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, false);
@@ -158,7 +155,7 @@ public class ServletUtil {
 				parserInput.setLocale(locale);
 				content = ParserUtil.parse(parserInput, null, content);
 			}
-			WikiCache.addToCache(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key, content);
+			WikiBase.CACHE_PARSED_TOPIC_CONTENT.addToCache(key, content);
 		} catch (Exception e) {
 			logger.warn("error getting cached page " + virtualWiki + " / " + topicName, e);
 			return null;

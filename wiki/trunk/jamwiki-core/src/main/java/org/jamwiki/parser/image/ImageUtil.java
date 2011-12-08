@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import net.sf.ehcache.Element;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -60,7 +59,7 @@ public abstract class ImageUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageUtil.class.getName());
 	/** Cache name for the cache of image dimensions. */
-	private static final String CACHE_IMAGE_DIMENSIONS = "org.jamwiki.parser.image.ImageUtil.CACHE_IMAGE_DIMENSIONS";
+	private static final WikiCache<String, Dimension> CACHE_IMAGE_DIMENSIONS = new WikiCache<String, Dimension>("org.jamwiki.parser.image.ImageUtil.CACHE_IMAGE_DIMENSIONS");
 	/** Sub-folder of the "files" directory into which to place resized images. */
 	private static final String RESIZED_IMAGE_SUBFOLDER = "resized";
 	/** Path to the template used to format a center-aligned image. */
@@ -93,7 +92,7 @@ public abstract class ImageUtil {
 	 */
 	private static void addToCache(WikiImage wikiImage, Dimension dimensions) {
 		String key = wikiImage.getVirtualWiki() + "/" + wikiImage.getUrl();
-		WikiCache.addToCache(CACHE_IMAGE_DIMENSIONS, key, dimensions);
+		CACHE_IMAGE_DIMENSIONS.addToCache(key, dimensions);
 	}
 
 	/**
@@ -547,8 +546,7 @@ public abstract class ImageUtil {
 	 */
 	private static Dimension retrieveFromCache(WikiImage wikiImage) throws DataAccessException {
 		String key = wikiImage.getVirtualWiki() + "/" + wikiImage.getUrl();
-		Element cachedDimensions = WikiCache.retrieveFromCache(CACHE_IMAGE_DIMENSIONS, key);
-		return (cachedDimensions != null) ? (Dimension)cachedDimensions.getObjectValue() : null;
+		return CACHE_IMAGE_DIMENSIONS.retrieveFromCache(key);
 	}
 
 	/**

@@ -18,7 +18,6 @@ package org.jamwiki.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.ehcache.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.incava.util.diff.Diff;
 import org.incava.util.diff.Difference;
@@ -36,7 +35,7 @@ public class DiffUtil {
 	// FIXME - make this a property value
 	private static final int DIFF_UNCHANGED_LINE_DISPLAY = 2;
 	/** Cache name for the cache of diff information. */
-	private static final String CACHE_DIFF_INFORMATION = "org.jamwiki.utils.DiffUtil.CACHE_DIFF_INFORMATION";
+	private static final WikiCache<String, List<WikiDiff>> CACHE_DIFF_INFORMATION = new WikiCache<String, List<WikiDiff>>("org.jamwiki.utils.DiffUtil.CACHE_DIFF_INFORMATION");
 
 	/**
 	 *
@@ -49,7 +48,7 @@ public class DiffUtil {
 	 */
 	private static void addToCache(String newVersion, String oldVersion, List<WikiDiff> results) {
 		String key = generateCacheKey(newVersion, oldVersion);
-		WikiCache.addToCache(CACHE_DIFF_INFORMATION, key, results);
+		CACHE_DIFF_INFORMATION.addToCache(key, results);
 	}
 
 	/**
@@ -397,8 +396,7 @@ public class DiffUtil {
 	 */
 	private static List<WikiDiff> retrieveFromCache(String newVersion, String oldVersion) throws DataAccessException {
 		String key = generateCacheKey(newVersion, oldVersion);
-		Element cachedDiffInformation = WikiCache.retrieveFromCache(CACHE_DIFF_INFORMATION, key);
-		return (cachedDiffInformation != null) ? (List<WikiDiff>)cachedDiffInformation.getObjectValue() : null;
+		return CACHE_DIFF_INFORMATION.retrieveFromCache(key);
 	}
 
 	/**

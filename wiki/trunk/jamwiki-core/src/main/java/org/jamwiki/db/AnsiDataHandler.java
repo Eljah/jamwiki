@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import net.sf.ehcache.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.DataHandler;
@@ -72,17 +71,17 @@ public class AnsiDataHandler implements DataHandler {
 
 	/** Any topic lookup that takes longer than the specified time (in ms) will trigger a log message. */
 	private static final int TIME_LIMIT_TOPIC_LOOKUP = 20;
-	private static final String CACHE_INTERWIKI_LIST = "org.jamwiki.db.AnsiDataHandler.CACHE_INTERWIKI_LIST";
-	private static final String CACHE_NAMESPACE_LIST = "org.jamwiki.db.AnsiDataHandler.CACHE_NAMESPACE_LIST";
-	private static final String CACHE_ROLE_MAP_GROUP = "org.jamwiki.db.AnsiDataHandler.CACHE_ROLE_MAP_GROUP";
-	private static final String CACHE_TOPIC_NAMES_BY_NAME = "org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_NAMES_BY_NAME";
-	private static final String CACHE_TOPICS_BY_ID = "org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS_BY_ID";
-	private static final String CACHE_TOPICS_BY_NAME = "org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS_BY_NAME";
-	private static final String CACHE_TOPIC_VERSIONS = "org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_VERSIONS";
-	private static final String CACHE_USER_BLOCKS_ACTIVE = "org.jamwiki.db.AnsiDataHandler.CACHE_USER_BLOCKS_ACTIVE";
-	private static final String CACHE_USER_BY_USER_ID = "org.jamwiki.db.AnsiDataHandler.CACHE_USER_BY_USER_ID";
-	private static final String CACHE_USER_BY_USER_NAME = "org.jamwiki.db.AnsiDataHandler.CACHE_USER_BY_USER_NAME";
-	private static final String CACHE_VIRTUAL_WIKI_LIST = "org.jamwiki.db.AnsiDataHandler.CACHE_VIRTUAL_WIKI_LIST";
+	private static final WikiCache<String, List<Interwiki>> CACHE_INTERWIKI_LIST = new WikiCache<String, List<Interwiki>>("org.jamwiki.db.AnsiDataHandler.CACHE_INTERWIKI_LIST");
+	private static final WikiCache<String, List<Namespace>> CACHE_NAMESPACE_LIST = new WikiCache<String, List<Namespace>>("org.jamwiki.db.AnsiDataHandler.CACHE_NAMESPACE_LIST");
+	private static final WikiCache<String, List<RoleMap>> CACHE_ROLE_MAP_GROUP = new WikiCache<String, List<RoleMap>>("org.jamwiki.db.AnsiDataHandler.CACHE_ROLE_MAP_GROUP");
+	private static final WikiCache<String, String> CACHE_TOPIC_NAMES_BY_NAME = new WikiCache<String, String>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_NAMES_BY_NAME");
+	private static final WikiCache<Integer, Topic> CACHE_TOPICS_BY_ID = new WikiCache<Integer, Topic>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS_BY_ID");
+	private static final WikiCache<String, Topic> CACHE_TOPICS_BY_NAME = new WikiCache<String, Topic>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS_BY_NAME");
+	private static final WikiCache<Integer, TopicVersion> CACHE_TOPIC_VERSIONS = new WikiCache<Integer, TopicVersion>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_VERSIONS");
+	private static final WikiCache<String, Map<Object, UserBlock>> CACHE_USER_BLOCKS_ACTIVE = new WikiCache<String, Map<Object, UserBlock>>("org.jamwiki.db.AnsiDataHandler.CACHE_USER_BLOCKS_ACTIVE");
+	private static final WikiCache<Integer, WikiUser> CACHE_USER_BY_USER_ID = new WikiCache<Integer, WikiUser>("org.jamwiki.db.AnsiDataHandler.CACHE_USER_BY_USER_ID");
+	private static final WikiCache<String, WikiUser> CACHE_USER_BY_USER_NAME = new WikiCache<String, WikiUser>("org.jamwiki.db.AnsiDataHandler.CACHE_USER_BY_USER_NAME");
+	private static final WikiCache<String, List<VirtualWiki>> CACHE_VIRTUAL_WIKI_LIST = new WikiCache<String, List<VirtualWiki>>("org.jamwiki.db.AnsiDataHandler.CACHE_VIRTUAL_WIKI_LIST");
 	private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
 
 	protected QueryHandler queryHandler;
@@ -350,14 +349,14 @@ public class AnsiDataHandler implements DataHandler {
 		String key = this.cacheTopicKey(topic.getVirtualWiki(), topic.getNamespace(), topic.getPageName());
 		// because some topics may be cached in a case-insensitive manner remove all possible
 		// cache keys for the topic, regardless of case
-		WikiCache.removeFromCacheCaseInsensitive(WikiBase.CACHE_PARSED_TOPIC_CONTENT, key);
-		WikiCache.removeFromCacheCaseInsensitive(CACHE_TOPIC_NAMES_BY_NAME, key);
-		WikiCache.removeFromCacheCaseInsensitive(CACHE_TOPICS_BY_NAME, key);
+		WikiBase.CACHE_PARSED_TOPIC_CONTENT.removeFromCacheCaseInsensitive(key);
+		CACHE_TOPIC_NAMES_BY_NAME.removeFromCacheCaseInsensitive(key);
+		CACHE_TOPICS_BY_NAME.removeFromCacheCaseInsensitive(key);
 		if (topic.getDeleteDate() == null) {
-			WikiCache.addToCache(CACHE_TOPIC_NAMES_BY_NAME, key, topic.getName());
+			CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, topic.getName());
 		}
-		WikiCache.addToCache(CACHE_TOPICS_BY_NAME, key, topic);
-		WikiCache.addToCache(CACHE_TOPICS_BY_ID, topic.getTopicId(), topic);
+		CACHE_TOPICS_BY_NAME.addToCache(key, topic);
+		CACHE_TOPICS_BY_ID.addToCache(topic.getTopicId(), topic);
 	}
 
 	/**
@@ -402,7 +401,7 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-		WikiCache.removeAllFromCache(CACHE_INTERWIKI_LIST);
+		CACHE_INTERWIKI_LIST.removeAllFromCache();
 	}
 
 	/**
@@ -597,18 +596,17 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	public List<RoleMap> getRoleMapByRole(String authority) throws DataAccessException {
 		// first check the cache
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_ROLE_MAP_GROUP, authority);
-		if (cacheElement != null) {
-			return (List<RoleMap>)cacheElement.getObjectValue();
+		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority);
+		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority)) {
+			return roleMapList;
 		}
 		// if not in the cache, go to the database
-		List<RoleMap> roleMapList = null;
 		try {
 			roleMapList = this.queryHandler().getRoleMapByRole(authority);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		WikiCache.addToCache(CACHE_ROLE_MAP_GROUP, authority, roleMapList);
+		CACHE_ROLE_MAP_GROUP.addToCache(authority, roleMapList);
 		return roleMapList;
 	}
 
@@ -680,13 +678,13 @@ public class AnsiDataHandler implements DataHandler {
 		// rather than hit the database for every page request to verify whether
 		// or not the user is blocked it is far more efficient to cache the few
 		// active blocks and query against that cached list.
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_USER_BLOCKS_ACTIVE, CACHE_USER_BLOCKS_ACTIVE);
-		if (cacheElement != null) {
+		Map<Object, UserBlock> userBlocks = CACHE_USER_BLOCKS_ACTIVE.retrieveFromCache(CACHE_USER_BLOCKS_ACTIVE.getCacheName());
+		if (userBlocks != null || CACHE_USER_BLOCKS_ACTIVE.isKeyInCache(CACHE_USER_BLOCKS_ACTIVE.getCacheName())) {
 			// note that due to caching some blocks may have expired, so the caller
 			// should be sure to check whether a result is still active or not
-			return (Map<Object, UserBlock>)cacheElement.getObjectValue();
+			return userBlocks;
 		}
-		Map<Object, UserBlock> userBlocks = new LinkedHashMap<Object, UserBlock>();
+		userBlocks = new LinkedHashMap<Object, UserBlock>();
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -696,7 +694,7 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-		WikiCache.addToCache(CACHE_USER_BLOCKS_ACTIVE, CACHE_USER_BLOCKS_ACTIVE, userBlocks);
+		CACHE_USER_BLOCKS_ACTIVE.addToCache(CACHE_USER_BLOCKS_ACTIVE.getCacheName(), userBlocks);
 		return userBlocks;
 	}
 
@@ -719,11 +717,11 @@ public class AnsiDataHandler implements DataHandler {
 	 * Return a List of all VirtualWiki objects that exist for the Wiki.
 	 */
 	public List<VirtualWiki> getVirtualWikiList() throws DataAccessException {
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_VIRTUAL_WIKI_LIST, CACHE_VIRTUAL_WIKI_LIST);
-		if (cacheElement != null) {
-			return (List<VirtualWiki>)cacheElement.getObjectValue();
+		List<VirtualWiki> virtualWikis = CACHE_VIRTUAL_WIKI_LIST.retrieveFromCache(CACHE_VIRTUAL_WIKI_LIST.getCacheName());
+		if (virtualWikis != null || CACHE_VIRTUAL_WIKI_LIST.isKeyInCache(CACHE_VIRTUAL_WIKI_LIST.getCacheName())) {
+			return virtualWikis;
 		}
-		List<VirtualWiki> virtualWikis = new ArrayList<VirtualWiki>();
+		virtualWikis = new ArrayList<VirtualWiki>();
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -733,7 +731,7 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-		WikiCache.addToCache(CACHE_VIRTUAL_WIKI_LIST, CACHE_VIRTUAL_WIKI_LIST, virtualWikis);
+		CACHE_VIRTUAL_WIKI_LIST.addToCache(CACHE_VIRTUAL_WIKI_LIST.getCacheName(), virtualWikis);
 		return virtualWikis;
 	}
 
@@ -810,12 +808,11 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	public List<Interwiki> lookupInterwikis() throws DataAccessException {
 		// first check the cache
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_INTERWIKI_LIST, CACHE_INTERWIKI_LIST);
-		if (cacheElement != null) {
-			return (List<Interwiki>)cacheElement.getObjectValue();
+		List<Interwiki> interwikis = CACHE_INTERWIKI_LIST.retrieveFromCache(CACHE_INTERWIKI_LIST.getCacheName());
+		if (interwikis != null || CACHE_INTERWIKI_LIST.isKeyInCache(CACHE_INTERWIKI_LIST.getCacheName())) {
+			return interwikis;
 		}
 		// if not in the cache, go to the database
-		List<Interwiki> interwikis = null;
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -825,7 +822,7 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-		WikiCache.addToCache(CACHE_INTERWIKI_LIST, CACHE_INTERWIKI_LIST, interwikis);
+		CACHE_INTERWIKI_LIST.addToCache(CACHE_INTERWIKI_LIST.getCacheName(), interwikis);
 		return interwikis;
 	}
 
@@ -865,12 +862,11 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	public List<Namespace> lookupNamespaces() throws DataAccessException {
 		// first check the cache
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_NAMESPACE_LIST, CACHE_NAMESPACE_LIST);
-		if (cacheElement != null) {
-			return (List<Namespace>)cacheElement.getObjectValue();
+		List<Namespace> namespaces = CACHE_NAMESPACE_LIST.retrieveFromCache(CACHE_NAMESPACE_LIST.getCacheName());
+		if (namespaces != null || CACHE_NAMESPACE_LIST.isKeyInCache(CACHE_NAMESPACE_LIST.getCacheName())) {
+			return namespaces;
 		}
 		// if not in the cache, go to the database
-		List<Namespace> namespaces = null;
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -880,7 +876,7 @@ public class AnsiDataHandler implements DataHandler {
 		} finally {
 			DatabaseConnection.closeConnection(conn);
 		}
-		WikiCache.addToCache(CACHE_NAMESPACE_LIST, CACHE_NAMESPACE_LIST, namespaces);
+		CACHE_NAMESPACE_LIST.addToCache(CACHE_NAMESPACE_LIST.getCacheName(), namespaces);
 		return namespaces;
 	}
 
@@ -920,9 +916,8 @@ public class AnsiDataHandler implements DataHandler {
 			// retrieve topic from the cache only if this call is not currently a part
 			// of a transaction to avoid retrieving data that might have been updated
 			// as part of this transaction and would thus now be out of date
-			Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPICS_BY_NAME, key);
-			if (cacheElement != null) {
-				Topic cacheTopic = (Topic)cacheElement.getObjectValue();
+			Topic cacheTopic = CACHE_TOPICS_BY_NAME.retrieveFromCache(key);
+			if (cacheTopic != null || CACHE_TOPICS_BY_NAME.isKeyInCache(key)) {
 				return (cacheTopic == null || (!deleteOK && cacheTopic.getDeleteDate() != null)) ? null : new Topic(cacheTopic);
 			}
 		}
@@ -930,9 +925,8 @@ public class AnsiDataHandler implements DataHandler {
 		String sharedVirtualWiki = Environment.getValue(Environment.PROP_SHARED_UPLOAD_VIRTUAL_WIKI);
 		if (conn == null && checkSharedVirtualWiki) {
 			String sharedKey = this.cacheTopicKey(sharedVirtualWiki, namespace, pageName);
-			Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPICS_BY_NAME, sharedKey);
-			if (cacheElement != null) {
-				Topic cacheTopic = (Topic)cacheElement.getObjectValue();
+			Topic cacheTopic = CACHE_TOPICS_BY_NAME.retrieveFromCache(sharedKey);
+			if (cacheTopic != null || CACHE_TOPICS_BY_NAME.isKeyInCache(sharedKey)) {
 				return (cacheTopic == null || (!deleteOK && cacheTopic.getDeleteDate() != null)) ? null : new Topic(cacheTopic);
 			}
 		}
@@ -951,9 +945,9 @@ public class AnsiDataHandler implements DataHandler {
 				// add topic to the cache only if it is not currently a part of a transaction
 				// to avoid caching something that might need to be rolled back
 				Topic cacheTopic = (topic == null) ? null : new Topic(topic);
-				WikiCache.addToCache(CACHE_TOPICS_BY_NAME, key, cacheTopic);
+				CACHE_TOPICS_BY_NAME.addToCache(key, cacheTopic);
 				// do not cache deleted topics
-				WikiCache.addToCache(CACHE_TOPIC_NAMES_BY_NAME, key, (cacheTopic == null || cacheTopic.getDeleteDate() != null) ? null : cacheTopic.getName());
+				CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, (cacheTopic == null || cacheTopic.getDeleteDate() != null) ? null : cacheTopic.getName());
 			}
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -971,18 +965,17 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException {
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPICS_BY_ID, topicId);
-		if (cacheElement != null) {
-			return (Topic)cacheElement.getObjectValue();
+		Topic result = CACHE_TOPICS_BY_ID.retrieveFromCache(topicId);
+		if (result != null || CACHE_TOPICS_BY_ID.isKeyInCache(topicId)) {
+			return result;
 		}
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
-		Topic result = null;
 		try {
 			result = this.queryHandler().lookupTopicById(virtualWikiId, virtualWiki, topicId);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		WikiCache.addToCache(CACHE_TOPICS_BY_ID, topicId, result);
+		CACHE_TOPICS_BY_ID.addToCache(topicId, result);
 		return result;
 	}
 
@@ -1036,27 +1029,26 @@ public class AnsiDataHandler implements DataHandler {
 	private String lookupTopicName(String virtualWiki, Namespace namespace, String pageName) throws DataAccessException {
 		long start = System.currentTimeMillis();
 		String key = this.cacheTopicKey(virtualWiki, namespace, pageName);
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPIC_NAMES_BY_NAME, key);
-		if (cacheElement != null) {
-			return (String)cacheElement.getObjectValue();
+		String topicName = CACHE_TOPIC_NAMES_BY_NAME.retrieveFromCache(key);
+		if (topicName != null || CACHE_TOPIC_NAMES_BY_NAME.isKeyInCache(key)) {
+			return topicName;
 		}
 		boolean checkSharedVirtualWiki = this.useSharedVirtualWiki(virtualWiki, namespace);
 		String sharedVirtualWiki = Environment.getValue(Environment.PROP_SHARED_UPLOAD_VIRTUAL_WIKI);
 		if (checkSharedVirtualWiki) {
 			String sharedKey = this.cacheTopicKey(sharedVirtualWiki, namespace, pageName);
-			cacheElement = WikiCache.retrieveFromCache(CACHE_TOPIC_NAMES_BY_NAME, sharedKey);
-			if (cacheElement != null) {
-				return (String)cacheElement.getObjectValue();
+			topicName = CACHE_TOPIC_NAMES_BY_NAME.retrieveFromCache(sharedKey);
+			if (topicName != null || CACHE_TOPIC_NAMES_BY_NAME.isKeyInCache(sharedKey)) {
+				return topicName;
 			}
 		}
-		String topicName = null;
 		try {
 			int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 			topicName = this.queryHandler().lookupTopicName(virtualWikiId, virtualWiki, namespace, pageName);
 			if (topicName == null && checkSharedVirtualWiki) {
 				topicName = this.lookupTopicName(sharedVirtualWiki, namespace, pageName);
 			}
-			WikiCache.addToCache(CACHE_TOPIC_NAMES_BY_NAME, key, topicName);
+			CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, topicName);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
@@ -1103,17 +1095,16 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public TopicVersion lookupTopicVersion(int topicVersionId) throws DataAccessException {
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_TOPIC_VERSIONS, topicVersionId);
-		if (cacheElement != null) {
-			return (TopicVersion)cacheElement.getObjectValue();
+		TopicVersion topicVersion = CACHE_TOPIC_VERSIONS.retrieveFromCache(topicVersionId);
+		if (topicVersion != null || CACHE_TOPIC_VERSIONS.isKeyInCache(topicVersionId)) {
+			return topicVersion;
 		}
-		TopicVersion topicVersion = null;
 		try {
 			topicVersion = this.queryHandler().lookupTopicVersion(topicVersionId);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		WikiCache.addToCache(CACHE_TOPIC_VERSIONS, topicVersionId, topicVersion);
+		CACHE_TOPIC_VERSIONS.addToCache(topicVersionId, topicVersion);
 		return topicVersion;
 	}
 
@@ -1234,17 +1225,16 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public WikiUser lookupWikiUser(int userId) throws DataAccessException {
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_USER_BY_USER_ID, userId);
-		if (cacheElement != null) {
-			return (WikiUser)cacheElement.getObjectValue();
+		WikiUser user = CACHE_USER_BY_USER_ID.retrieveFromCache(userId);
+		if (user != null || CACHE_USER_BY_USER_ID.isKeyInCache(userId)) {
+			return user;
 		}
-		WikiUser user = null;
 		try {
 			user = this.queryHandler().lookupWikiUser(userId);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		WikiCache.addToCache(CACHE_USER_BY_USER_ID, userId, user);
+		CACHE_USER_BY_USER_ID.addToCache(userId, user);
 		return user;
 	}
 
@@ -1252,11 +1242,10 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public WikiUser lookupWikiUser(String username) throws DataAccessException {
-		Element cacheElement = WikiCache.retrieveFromCache(CACHE_USER_BY_USER_NAME, username);
-		if (cacheElement != null) {
-			return (WikiUser)cacheElement.getObjectValue();
+		WikiUser result = CACHE_USER_BY_USER_NAME.retrieveFromCache(username);
+		if (result != null || CACHE_USER_BY_USER_NAME.isKeyInCache(username)) {
+			return result;
 		}
-		WikiUser result = null;
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -1270,7 +1259,7 @@ public class AnsiDataHandler implements DataHandler {
 			throw new DataAccessException(e);
 		}
 		DatabaseConnection.commit(status);
-		WikiCache.addToCache(CACHE_USER_BY_USER_NAME, username, result);
+		CACHE_USER_BY_USER_NAME.addToCache(username, result);
 		return result;
 	}
 
@@ -1435,7 +1424,7 @@ public class AnsiDataHandler implements DataHandler {
 			this.addLogItem(logItem, conn);
 			RecentChange change = RecentChange.initRecentChange(logItem);
 			this.addRecentChange(change, conn);
-			WikiCache.removeFromCache(CACHE_TOPIC_VERSIONS, topicVersionId);
+			CACHE_TOPIC_VERSIONS.removeFromCache(topicVersionId);
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -1931,7 +1920,7 @@ public class AnsiDataHandler implements DataHandler {
 			throw new DataAccessException(e);
 		}
 		DatabaseConnection.commit(status);
-		WikiCache.removeAllFromCache(CACHE_INTERWIKI_LIST);
+		CACHE_INTERWIKI_LIST.removeAllFromCache();
 	}
 
 	/**
@@ -1949,7 +1938,7 @@ public class AnsiDataHandler implements DataHandler {
 			throw new DataAccessException(e);
 		}
 		DatabaseConnection.commit(status);
-		WikiCache.removeAllFromCache(CACHE_NAMESPACE_LIST);
+		CACHE_NAMESPACE_LIST.removeAllFromCache();
 	}
 
 	/**
@@ -1970,7 +1959,7 @@ public class AnsiDataHandler implements DataHandler {
 			throw new DataAccessException(e);
 		}
 		DatabaseConnection.commit(status);
-		WikiCache.removeAllFromCache(CACHE_NAMESPACE_LIST);
+		CACHE_NAMESPACE_LIST.removeAllFromCache();
 	}
 
 	/**
@@ -2012,7 +2001,7 @@ public class AnsiDataHandler implements DataHandler {
 				this.queryHandler().insertGroupAuthority(groupId, authority, conn);
 			}
 			// flush the cache
-			WikiCache.removeAllFromCache(CACHE_ROLE_MAP_GROUP);
+			CACHE_ROLE_MAP_GROUP.removeAllFromCache();
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -2198,7 +2187,7 @@ public class AnsiDataHandler implements DataHandler {
 		}
 		DatabaseConnection.commit(status);
 		// flush the cache
-		WikiCache.removeAllFromCache(CACHE_USER_BLOCKS_ACTIVE);
+		CACHE_USER_BLOCKS_ACTIVE.removeAllFromCache();
 	}
 
 	/**
@@ -2227,7 +2216,7 @@ public class AnsiDataHandler implements DataHandler {
 		}
 		DatabaseConnection.commit(status);
 		// flush the cache
-		WikiCache.removeAllFromCache(CACHE_VIRTUAL_WIKI_LIST);
+		CACHE_VIRTUAL_WIKI_LIST.removeAllFromCache();
 	}
 
 	/**
@@ -2335,7 +2324,7 @@ public class AnsiDataHandler implements DataHandler {
 		}
 		DatabaseConnection.commit(status);
 		// update the cache AFTER the commit
-		WikiCache.addToCache(CACHE_USER_BY_USER_ID, user.getUserId(), user);
-		WikiCache.addToCache(CACHE_USER_BY_USER_NAME, user.getUsername(), user);
+		CACHE_USER_BY_USER_ID.addToCache(user.getUserId(), user);
+		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 }
