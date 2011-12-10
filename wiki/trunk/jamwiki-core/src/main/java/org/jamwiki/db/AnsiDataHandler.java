@@ -1381,7 +1381,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public void purgeTopicVersion(String virtualWiki, int topicVersionId, WikiUser user, String ipAddress) throws DataAccessException, WikiException {
+	public void purgeTopicVersion(Topic topic, int topicVersionId, WikiUser user, String ipAddress) throws DataAccessException, WikiException {
 		// 1. get the topic version record.  if no such record exists
 		// throw an exception.
 		TopicVersion topicVersion = this.lookupTopicVersion(topicVersionId);
@@ -1392,7 +1392,6 @@ public class AnsiDataHandler implements DataHandler {
 		// record.  if there is no such record get the topic version
 		// with the current version as its previous_topic_version_id.
 		// if there is still no such record throw an exception.
-		Topic topic = this.lookupTopicById(topicVersion.getTopicId());
 		Integer previousTopicVersionId = topicVersion.getPreviousTopicVersionId();
 		Integer nextTopicVersionId = this.lookupTopicVersionNextId(topicVersionId);
 		if (previousTopicVersionId == null && nextTopicVersionId == null) {
@@ -1424,6 +1423,8 @@ public class AnsiDataHandler implements DataHandler {
 			RecentChange change = RecentChange.initRecentChange(logItem);
 			this.addRecentChange(change, conn);
 			CACHE_TOPIC_VERSIONS.removeFromCache(topicVersionId);
+			CACHE_TOPIC_VERSIONS.removeFromCache(nextTopicVersionId);
+			CACHE_TOPICS_BY_ID.removeFromCache(topic.getTopicId());
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);

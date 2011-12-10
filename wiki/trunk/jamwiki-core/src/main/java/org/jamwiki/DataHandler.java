@@ -739,14 +739,14 @@ public interface DataHandler {
 	 * Remove a topic version from the database.  This action deletes the record
 	 * entirely, including references in other tables, and cannot be undone.
 	 *
-	 * @param virtualWiki The virtual wiki for the version being deleted.
+	 * @param topic The topic record for which a version is being purged.
 	 * @param topicVersionId The ID of the topic version being deleted.
 	 * @param user The WikiUser who will be credited in the log record
 	 *  associated with this action.
 	 * @param ipAddress The IP address of the user deleting the topic version.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	void purgeTopicVersion(String virtualWiki, int topicVersionId, WikiUser user, String ipAddress) throws DataAccessException, WikiException;
+	void purgeTopicVersion(Topic topic, int topicVersionId, WikiUser user, String ipAddress) throws DataAccessException, WikiException;
 
 	/**
 	 * Delete all existing log entries and reload the log item table based
