@@ -970,7 +970,7 @@ public class ServletUtil {
 					Topic sharedImageTopic = topic;
 					if (!StringUtils.equals(wikiFile.getVirtualWiki(), topic.getVirtualWiki())) {
 						// look up the shared topic file
-						sharedImageTopic = WikiBase.getDataHandler().lookupTopicById(wikiFile.getVirtualWiki(), wikiFile.getTopicId());
+						sharedImageTopic = WikiBase.getDataHandler().lookupTopicById(wikiFile.getTopicId());
 					}
 					WikiLink wikiLink = new WikiLink(request.getContextPath(), sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName());
 					pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());

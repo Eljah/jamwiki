@@ -749,33 +749,27 @@ public interface QueryHandler {
 	 *
 	 * @param virtualWikiId The virtual wiki id for the virtual wiki of the topic
 	 *  being retrieved.
-	 * @param virtualWikiName The name of the virtual wiki for the virtual wiki of
-	 *  the topic being retrieved.
 	 * @param namespace The Namespace for the topic being retrieved.
 	 * @param pageName The topic pageName (topic name without the namespace) for
 	 *  the topic being retrieved.
 	 * @param conn A database connection to use when connecting to the database
-	 *  from this method.
+	 *  from this method.  My be <code>null</code>.
 	 * @return A topic containing all topic information for the given topic
 	 *  name and virtual wiki.  If no matching topic is found <code>null</code> is
 	 *  returned.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	Topic lookupTopic(int virtualWikiId, String virtualWikiName, Namespace namespace, String pageName, Connection conn) throws SQLException;
+	Topic lookupTopic(int virtualWikiId, Namespace namespace, String pageName, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a topic that matches a given topic ID and virtual wiki.
 	 *
-	 * @param virtualWikiId The virtual wiki id for the virtual wiki of the topic
-	 *  being retrieved.
-	 * @param virtualWikiName The name of the virtual wiki for the virtual wiki of
-	 *  the topic being retrieved.
 	 * @param topicId The ID of the topic being retrieved.
 	 * @return A topic containing all topic information for the given topic
 	 *  ID.  If no matching topic is found <code>null</code> is returned.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public Topic lookupTopicById(int virtualWikiId, String virtualWikiName, int topicId) throws SQLException;
+	public Topic lookupTopicById(int topicId) throws SQLException;
 
 	/**
 	 * Retrieve a list of all topic names of a given type within a virtual wiki.

@@ -933,10 +933,10 @@ public class AnsiDataHandler implements DataHandler {
 		Topic topic = null;
 		try {
 			int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
-			topic = this.queryHandler().lookupTopic(virtualWikiId, virtualWiki, namespace, pageName, conn);
+			topic = this.queryHandler().lookupTopic(virtualWikiId, namespace, pageName, conn);
 			if (topic == null && Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_CAPITALIZATION)) {
 				String alternativePageName = (StringUtils.equals(pageName, StringUtils.capitalize(pageName))) ? StringUtils.lowerCase(pageName) : StringUtils.capitalize(pageName);
-				topic = this.queryHandler().lookupTopic(virtualWikiId, virtualWiki, namespace, alternativePageName, conn);
+				topic = this.queryHandler().lookupTopic(virtualWikiId, namespace, alternativePageName, conn);
 			}
 			if (topic == null && checkSharedVirtualWiki) {
 				topic = this.lookupTopic(sharedVirtualWiki, namespace, pageName, deleteOK, conn);
@@ -964,14 +964,13 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException {
+	public Topic lookupTopicById(int topicId) throws DataAccessException {
 		Topic result = CACHE_TOPICS_BY_ID.retrieveFromCache(topicId);
 		if (result != null || CACHE_TOPICS_BY_ID.isKeyInCache(topicId)) {
 			return result;
 		}
-		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 		try {
-			result = this.queryHandler().lookupTopicById(virtualWikiId, virtualWiki, topicId);
+			result = this.queryHandler().lookupTopicById(topicId);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
@@ -1393,7 +1392,7 @@ public class AnsiDataHandler implements DataHandler {
 		// record.  if there is no such record get the topic version
 		// with the current version as its previous_topic_version_id.
 		// if there is still no such record throw an exception.
-		Topic topic = this.lookupTopicById(virtualWiki, topicVersion.getTopicId());
+		Topic topic = this.lookupTopicById(topicVersion.getTopicId());
 		Integer previousTopicVersionId = topicVersion.getPreviousTopicVersionId();
 		Integer nextTopicVersionId = this.lookupTopicVersionNextId(topicVersionId);
 		if (previousTopicVersionId == null && nextTopicVersionId == null) {

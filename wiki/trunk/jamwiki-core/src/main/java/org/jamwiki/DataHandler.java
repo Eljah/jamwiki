@@ -498,13 +498,12 @@ public interface DataHandler {
 	 * Retrieve a Topic object that matches the given topic id and virtual wiki.  Note
 	 * that this method can return deleted topics.
 	 *
-	 * @param virtualWiki The virtual wiki for the topic being queried.
 	 * @param topicId The identifier of the topic being queried.
 	 * @return A Topic object that matches the given virtual wiki and topic
 	 * id, or <code>null</code> if no matching topic exists.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	Topic lookupTopicById(String virtualWiki, int topicId) throws DataAccessException;
+	Topic lookupTopicById(int topicId) throws DataAccessException;
 
 	/**
 	 * Return a count of all topics, including redirects, comments pages and
