@@ -767,9 +767,11 @@ public interface QueryHandler {
 	 * @param topicId The ID of the topic being retrieved.
 	 * @return A topic containing all topic information for the given topic
 	 *  ID.  If no matching topic is found <code>null</code> is returned.
+	 * @param conn A database connection to use when connecting to the database
+	 *  from this method.  My be <code>null</code>.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public Topic lookupTopicById(int topicId) throws SQLException;
+	public Topic lookupTopicById(int topicId, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a list of all topic names of a given type within a virtual wiki.

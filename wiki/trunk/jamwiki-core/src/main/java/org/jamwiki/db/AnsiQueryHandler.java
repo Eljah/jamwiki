@@ -2372,18 +2372,25 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public Topic lookupTopicById(int topicId) throws SQLException {
-		Connection conn = null;
+	public Topic lookupTopicById(int topicId, Connection conn) throws SQLException {
+		boolean closeConnection = (conn == null);
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			conn = DatabaseConnection.getConnection();
+			if (conn == null) {
+				conn = DatabaseConnection.getConnection();
+			}
 			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_BY_ID);
 			stmt.setInt(1, topicId);
 			rs = stmt.executeQuery();
 			return (rs.next()) ? this.initTopic(rs) : null;
 		} finally {
-			DatabaseConnection.closeConnection(conn, stmt, rs);
+			if (closeConnection) {
+				DatabaseConnection.closeConnection(conn, stmt, rs);
+			} else {
+				// close only the statement and result set - leave the connection open for further use
+				DatabaseConnection.closeConnection(null, stmt, rs);
+			}
 		}
 	}
 

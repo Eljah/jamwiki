@@ -74,9 +74,15 @@ public class AnsiDataHandler implements DataHandler {
 	private static final WikiCache<String, List<Interwiki>> CACHE_INTERWIKI_LIST = new WikiCache<String, List<Interwiki>>("org.jamwiki.db.AnsiDataHandler.CACHE_INTERWIKI_LIST");
 	private static final WikiCache<String, List<Namespace>> CACHE_NAMESPACE_LIST = new WikiCache<String, List<Namespace>>("org.jamwiki.db.AnsiDataHandler.CACHE_NAMESPACE_LIST");
 	private static final WikiCache<String, List<RoleMap>> CACHE_ROLE_MAP_GROUP = new WikiCache<String, List<RoleMap>>("org.jamwiki.db.AnsiDataHandler.CACHE_ROLE_MAP_GROUP");
+	/**
+	 * Cache a topic name lookup to the actual topic name, useful for cases where
+	 * a topic name may vary by case.  This cache should not include deleted topics.
+	 */
 	private static final WikiCache<String, String> CACHE_TOPIC_NAMES_BY_NAME = new WikiCache<String, String>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_NAMES_BY_NAME");
+	/** Cache a topic object by its ID value.  This cache may include deleted topics. */
 	private static final WikiCache<Integer, Topic> CACHE_TOPICS_BY_ID = new WikiCache<Integer, Topic>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS_BY_ID");
-	private static final WikiCache<String, Topic> CACHE_TOPICS_BY_NAME = new WikiCache<String, Topic>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPICS_BY_NAME");
+	/** Cache topic IDs by the topic name.  This cache may include deleted topics. */
+	private static final WikiCache<String, Integer> CACHE_TOPIC_IDS_BY_NAME = new WikiCache<String, Integer>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_IDS_BY_NAME");
 	private static final WikiCache<Integer, TopicVersion> CACHE_TOPIC_VERSIONS = new WikiCache<Integer, TopicVersion>("org.jamwiki.db.AnsiDataHandler.CACHE_TOPIC_VERSIONS");
 	private static final WikiCache<String, Map<Object, UserBlock>> CACHE_USER_BLOCKS_ACTIVE = new WikiCache<String, Map<Object, UserBlock>>("org.jamwiki.db.AnsiDataHandler.CACHE_USER_BLOCKS_ACTIVE");
 	private static final WikiCache<Integer, WikiUser> CACHE_USER_BY_USER_ID = new WikiCache<Integer, WikiUser>("org.jamwiki.db.AnsiDataHandler.CACHE_USER_BY_USER_ID");
@@ -344,19 +350,45 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 * Call this method whenever a topic is updated to update all relevant caches
 	 * for the topic.
+	 *
+	 * @param topic The topic being added/updated in the cache.
+	 * @param removeExisting Set to <code>true</code> when data has been updated,
+	 *  such as when adding or updating a topic.  If a topic is simply being cached
+	 *  after a lookup then set to <code>false</code> to avoid any unnecessary
+	 *  performance overhead.
+	 * @param altKey Specifies an alternative key to use for caching, such as when
+	 *  using a shared virtual wiki.  May also be <code>null</code>.
 	 */
-	private void cacheTopicRefresh(Topic topic) {
+	private void cacheTopicRefresh(Topic topic, boolean removeExisting, String altKey) {
 		String key = this.cacheTopicKey(topic.getVirtualWiki(), topic.getNamespace(), topic.getPageName());
-		// because some topics may be cached in a case-insensitive manner remove all possible
-		// cache keys for the topic, regardless of case
-		WikiBase.CACHE_PARSED_TOPIC_CONTENT.removeFromCacheCaseInsensitive(key);
-		CACHE_TOPIC_NAMES_BY_NAME.removeFromCacheCaseInsensitive(key);
-		CACHE_TOPICS_BY_NAME.removeFromCacheCaseInsensitive(key);
-		if (topic.getDeleteDate() == null) {
-			CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, topic.getName());
+		boolean useAltKey = (altKey != null && !key.equals(altKey));
+		if (removeExisting) {
+			// because some topics may be cached in a case-insensitive manner remove
+			// all possible cache keys for the topic, regardless of case
+			WikiBase.CACHE_PARSED_TOPIC_CONTENT.removeFromCacheCaseInsensitive(key);
+			CACHE_TOPIC_NAMES_BY_NAME.removeFromCacheCaseInsensitive(key);
+			CACHE_TOPIC_IDS_BY_NAME.removeFromCacheCaseInsensitive(key);
+			if (useAltKey && !key.equalsIgnoreCase(altKey)) {
+				// if the two keys differ only by case then the previous remove
+				// will have already removed the alt version, otherwise perform
+				// a second remove
+				WikiBase.CACHE_PARSED_TOPIC_CONTENT.removeFromCacheCaseInsensitive(altKey);
+				CACHE_TOPIC_NAMES_BY_NAME.removeFromCacheCaseInsensitive(altKey);
+				CACHE_TOPIC_IDS_BY_NAME.removeFromCacheCaseInsensitive(altKey);
+			}
 		}
-		CACHE_TOPICS_BY_NAME.addToCache(key, topic);
-		CACHE_TOPICS_BY_ID.addToCache(topic.getTopicId(), topic);
+		if (topic.getDeleteDate() == null) {
+			// topic name cache does not include deleted topics
+			CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, topic.getName());
+			if (useAltKey) {
+				CACHE_TOPIC_NAMES_BY_NAME.addToCache(altKey, topic.getName());
+			}
+		}
+		CACHE_TOPIC_IDS_BY_NAME.addToCache(key, topic.getTopicId());
+		if (useAltKey) {
+			CACHE_TOPIC_IDS_BY_NAME.addToCache(altKey, topic.getTopicId());
+		}
+		CACHE_TOPICS_BY_ID.addToCache(topic.getTopicId(), new Topic(topic));
 	}
 
 	/**
@@ -916,18 +948,20 @@ public class AnsiDataHandler implements DataHandler {
 			// retrieve topic from the cache only if this call is not currently a part
 			// of a transaction to avoid retrieving data that might have been updated
 			// as part of this transaction and would thus now be out of date
-			Topic cacheTopic = CACHE_TOPICS_BY_NAME.retrieveFromCache(key);
-			if (cacheTopic != null || CACHE_TOPICS_BY_NAME.isKeyInCache(key)) {
-				return (cacheTopic == null || (!deleteOK && cacheTopic.getDeleteDate() != null)) ? null : new Topic(cacheTopic);
+			Integer cacheTopicId = CACHE_TOPIC_IDS_BY_NAME.retrieveFromCache(key);
+			if (cacheTopicId != null || CACHE_TOPIC_IDS_BY_NAME.isKeyInCache(key)) {
+				Topic cacheTopic = (cacheTopicId != null) ? this.lookupTopicById(cacheTopicId.intValue(), conn) : null;
+				return (cacheTopic == null || (!deleteOK && cacheTopic.getDeleteDate() != null)) ? null : cacheTopic;
 			}
 		}
 		boolean checkSharedVirtualWiki = this.useSharedVirtualWiki(virtualWiki, namespace);
 		String sharedVirtualWiki = Environment.getValue(Environment.PROP_SHARED_UPLOAD_VIRTUAL_WIKI);
 		if (conn == null && checkSharedVirtualWiki) {
 			String sharedKey = this.cacheTopicKey(sharedVirtualWiki, namespace, pageName);
-			Topic cacheTopic = CACHE_TOPICS_BY_NAME.retrieveFromCache(sharedKey);
-			if (cacheTopic != null || CACHE_TOPICS_BY_NAME.isKeyInCache(sharedKey)) {
-				return (cacheTopic == null || (!deleteOK && cacheTopic.getDeleteDate() != null)) ? null : new Topic(cacheTopic);
+			Integer cacheTopicId = CACHE_TOPIC_IDS_BY_NAME.retrieveFromCache(sharedKey);
+			if (cacheTopicId != null || CACHE_TOPIC_IDS_BY_NAME.isKeyInCache(sharedKey)) {
+				Topic cacheTopic = (cacheTopicId != null) ? this.lookupTopicById(cacheTopicId.intValue(), conn) : null;
+				return (cacheTopic == null || (!deleteOK && cacheTopic.getDeleteDate() != null)) ? null : cacheTopic;
 			}
 		}
 		Topic topic = null;
@@ -943,11 +977,13 @@ public class AnsiDataHandler implements DataHandler {
 			}
 			if (conn == null) {
 				// add topic to the cache only if it is not currently a part of a transaction
-				// to avoid caching something that might need to be rolled back
-				Topic cacheTopic = (topic == null) ? null : new Topic(topic);
-				CACHE_TOPICS_BY_NAME.addToCache(key, cacheTopic);
-				// do not cache deleted topics
-				CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, (cacheTopic == null || cacheTopic.getDeleteDate() != null) ? null : cacheTopic.getName());
+				// to avoid caching something that might need to be rolled back.
+				if (topic == null) {
+					CACHE_TOPIC_IDS_BY_NAME.addToCache(key, null);
+					CACHE_TOPIC_NAMES_BY_NAME.addToCache(key, null);
+				} else {
+					this.cacheTopicRefresh(topic, false, key);
+				}
 			}
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -965,16 +1001,27 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public Topic lookupTopicById(int topicId) throws DataAccessException {
+		return this.lookupTopicById(topicId, null);
+	}
+
+	/**
+	 *
+	 */
+	private Topic lookupTopicById(int topicId, Connection conn) throws DataAccessException {
 		Topic result = CACHE_TOPICS_BY_ID.retrieveFromCache(topicId);
 		if (result != null || CACHE_TOPICS_BY_ID.isKeyInCache(topicId)) {
-			return result;
+			return (result == null) ? null : new Topic(result);
 		}
 		try {
-			result = this.queryHandler().lookupTopicById(topicId);
+			result = this.queryHandler().lookupTopicById(topicId, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		CACHE_TOPICS_BY_ID.addToCache(topicId, result);
+		if (result == null) {
+			logger.info("Attempt to look up topic with non-existent ID: " + topicId + ".  This may indicate a code error");
+		} else {
+			this.cacheTopicRefresh(result, false, null);
+		}
 		return result;
 	}
 
@@ -1375,7 +1422,7 @@ public class AnsiDataHandler implements DataHandler {
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		this.cacheTopicRefresh(topic);
+		this.cacheTopicRefresh(topic, true, null);
 	}
 
 	/**
@@ -2129,7 +2176,7 @@ public class AnsiDataHandler implements DataHandler {
 		}
 		DatabaseConnection.commit(status);
 		// update the cache AFTER the commit
-		this.cacheTopicRefresh(topic);
+		this.cacheTopicRefresh(topic, true, null);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Wrote topic " + topic.getVirtualWiki() + ':' + topic.getName() + " with params [categories is null: " + (categories == null) + "] / [links is null: " + (links == null) + "] in " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
 		}
