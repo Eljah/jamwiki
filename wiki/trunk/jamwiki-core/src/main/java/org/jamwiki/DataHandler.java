@@ -549,12 +549,14 @@ public interface DataHandler {
 	 * needs to know if a topic exists, but does not need a full Topic object.
 	 *
 	 * @param virtualWiki The virtual wiki for the topic being queried.
-	 * @param topicName The name of the topic being queried.
+	 * @param namespace The Namespace for the topic being retrieved.
+	 * @param pageName The topic pageName (topic name without the namespace) for
+	 *  the topic being retrieved.
 	 * @return The name of the Topic object that matches the given virtual wiki and topic
 	 * name, or <code>null</code> if no matching topic exists.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	String lookupTopicName(String virtualWiki, String topicName) throws DataAccessException;
+	String lookupTopicName(String virtualWiki, Namespace namespace, String pageName) throws DataAccessException;
 
 	/**
 	 * Retrieve a TopicVersion object for a given topic version ID.

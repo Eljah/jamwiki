@@ -1060,19 +1060,10 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public String lookupTopicName(String virtualWiki, String topicName) throws DataAccessException {
-		if (StringUtils.isBlank(virtualWiki) || StringUtils.isBlank(topicName)) {
+	public String lookupTopicName(String virtualWiki, Namespace namespace, String pageName) throws DataAccessException {
+		if (StringUtils.isBlank(virtualWiki) || StringUtils.isBlank(pageName)) {
 			return null;
 		}
-		Namespace namespace = LinkUtil.retrieveTopicNamespace(virtualWiki, topicName);
-		String pageName = LinkUtil.retrieveTopicPageName(namespace, virtualWiki, topicName);
-		return this.lookupTopicName(virtualWiki, namespace, pageName);
-	}
-
-	/**
-	 *
-	 */
-	private String lookupTopicName(String virtualWiki, Namespace namespace, String pageName) throws DataAccessException {
 		long start = System.currentTimeMillis();
 		String key = this.cacheTopicKey(virtualWiki, namespace, pageName);
 		String topicName = CACHE_TOPIC_NAMES_BY_NAME.retrieveFromCache(key);
