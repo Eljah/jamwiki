@@ -88,8 +88,17 @@ public class WikiCache<K, V> {
 			int maxSize = Environment.getIntValue(Environment.PROP_CACHE_INDIVIDUAL_SIZE);
 			int maxAge = Environment.getIntValue(Environment.PROP_CACHE_MAX_AGE);
 			int maxIdleAge = Environment.getIntValue(Environment.PROP_CACHE_MAX_IDLE_AGE);
-			Cache cache = new Cache(this.cacheName, maxSize, true, false, maxAge, maxIdleAge);
+			CacheConfiguration cacheConfiguration = new CacheConfiguration();
+			cacheConfiguration.setName(this.cacheName);
+			cacheConfiguration.setDiskPersistent(false);
+			cacheConfiguration.setEternal(false);
+			cacheConfiguration.setMaxElementsInMemory(maxSize);
+			cacheConfiguration.setOverflowToDisk(true);
+			cacheConfiguration.setTimeToIdleSeconds(maxIdleAge);
+			cacheConfiguration.setTimeToLiveSeconds(maxAge);
+			Cache cache = new Cache(cacheConfiguration);
 			WikiCache.CACHE_MANAGER.addCache(cache);
+			logger.info("Initialized cache " + this.cacheName);
 		}
 		return WikiCache.CACHE_MANAGER.getCache(this.cacheName);
 	}
@@ -145,7 +154,7 @@ public class WikiCache<K, V> {
 			logger.error("Failure while initializing cache", e);
 			throw new RuntimeException(e);
 		}
-		logger.info("Initializing cache");
+		logger.info("Initializing cache with disk store: " + WikiCache.CACHE_MANAGER.getDiskStorePath());
 		WikiCache.INITIALIZED = true;
 	}
 

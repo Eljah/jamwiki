@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import org.jamwiki.utils.WikiLogger;
  * roles.  This class exists primarily as a helper when adding or modifying
  * roles using a form interface.
  */
-public class RoleMap {
+public class RoleMap implements Serializable {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(RoleMap.class.getName());
 	private Integer groupId = null;
