@@ -144,6 +144,18 @@ used with JMX monitors.
            diskPersistent="false"
     />
     <!--
+    Cache of user block information.  Unless a massive number of users are
+    being blocked then this should be a very small cache.
+    -->
+    <cache name="org.jamwiki.db.AnsiDataHandler.CACHE_USER_BLOCKS_ACTIVE"
+           maxBytesLocalHeap="1%"
+           overflowToDisk="false"
+           eternal="false"
+           timeToIdleSeconds="1800"
+           timeToLiveSeconds="1800"
+           diskPersistent="false"
+    />
+    <!--
     Cache of user objects by ID.  Make the cache large enough to accomodate
     a reasonable number of users.
     -->
