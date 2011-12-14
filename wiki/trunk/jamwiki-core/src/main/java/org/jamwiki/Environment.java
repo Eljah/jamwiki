@@ -51,10 +51,6 @@ public class Environment {
 	public static final String PROP_BASE_PERSISTENCE_TYPE = "persistenceType";
 	public static final String PROP_BASE_SEARCH_ENGINE = "search-engine";
 	public static final String PROP_BASE_WIKI_VERSION = "wiki-version";
-	public static final String PROP_CACHE_INDIVIDUAL_SIZE = "cache-individual-size";
-	public static final String PROP_CACHE_MAX_AGE = "cache-max-age";
-	public static final String PROP_CACHE_MAX_IDLE_AGE = "cache-max-idle-age";
-	public static final String PROP_CACHE_TOTAL_SIZE = "cache-total-size";
 	public static final String PROP_DATE_PATTERN_DATE_AND_TIME = "date-pattern-date-and-time";
 	public static final String PROP_DATE_PATTERN_DATE_ONLY = "date-pattern-date-only";
 	public static final String PROP_DATE_PATTERN_TIME_ONLY = "date-pattern-time-only";
@@ -205,10 +201,6 @@ public class Environment {
 		this.defaults.setProperty(PROP_BASE_PERSISTENCE_TYPE, WikiBase.PERSISTENCE_INTERNAL);
 		this.defaults.setProperty(PROP_BASE_SEARCH_ENGINE, SearchEngine.SEARCH_ENGINE_LUCENE);
 		this.defaults.setProperty(PROP_BASE_WIKI_VERSION, "0.0.0");
-		this.defaults.setProperty(PROP_CACHE_INDIVIDUAL_SIZE, "1500");
-		this.defaults.setProperty(PROP_CACHE_MAX_AGE, "300");
-		this.defaults.setProperty(PROP_CACHE_MAX_IDLE_AGE, "150");
-		this.defaults.setProperty(PROP_CACHE_TOTAL_SIZE, "5000");
 		this.defaults.setProperty(PROP_DATE_PATTERN_DATE_AND_TIME, "dd MMMM yyyy HH:mm");
 		this.defaults.setProperty(PROP_DATE_PATTERN_DATE_ONLY, "dd MMMM yyyy");
 		this.defaults.setProperty(PROP_DATE_PATTERN_TIME_ONLY, "HH:mm");

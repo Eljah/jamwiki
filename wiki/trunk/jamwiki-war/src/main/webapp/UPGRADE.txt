@@ -96,6 +96,9 @@ followed by 0.6.3.
   * The /WEB-INF/applicationContext-security.xml file has been modified so that
     the Special:Account page requires ROLE_REGISTER for anonymous users. If you
     have customized this file be sure to add an appropriate intercept-url.
+  * Cache settings are no longer customizable from the Special:Admin tool.
+    Advanced users who need to change cache settings can do so by creating a
+    custom ehcache-jamwiki.xml configuration.
 
   UPGRADE STEPS:
 

@@ -525,35 +525,6 @@ FIXME - Email not supported right now, comment this out
 </div>
 
 <div id="other" class="submenu-tab-item">
-<%-- BEGIN CACHE --%>
-<fieldset>
-<legend><fmt:message key="admin.header.cache" /></legend>
-<div class="rowhelp">
-	<fmt:message key="admin.cache.help.xmlconfig" />
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_CACHE_TOTAL_SIZE %>"><fmt:message key="admin.cache.caption.totalsize" /></label>
-	<c:set var="PROP_CACHE_TOTAL_SIZE"><%= Environment.PROP_CACHE_TOTAL_SIZE %></c:set>
-	<span><jamwiki:text name="${PROP_CACHE_TOTAL_SIZE}" id="${PROP_CACHE_TOTAL_SIZE}" value="${props[PROP_CACHE_TOTAL_SIZE]}" size="10" /></span>
-	<div class="formhelp"><fmt:message key="admin.cache.help.totalsize" /></div>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_CACHE_INDIVIDUAL_SIZE %>"><fmt:message key="admin.cache.caption.individualsize" /></label>
-	<c:set var="PROP_CACHE_INDIVIDUAL_SIZE"><%= Environment.PROP_CACHE_INDIVIDUAL_SIZE %></c:set>
-	<span><jamwiki:text name="${PROP_CACHE_INDIVIDUAL_SIZE}" id="${PROP_CACHE_INDIVIDUAL_SIZE}" value="${props[PROP_CACHE_INDIVIDUAL_SIZE]}" size="10" /></span>
-	<div class="formhelp"><fmt:message key="admin.cache.help.individualsize" /></div>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_CACHE_MAX_AGE %>"><fmt:message key="admin.cache.caption.maxage" /></label>
-	<c:set var="PROP_CACHE_MAX_AGE"><%= Environment.PROP_CACHE_MAX_AGE %></c:set>
-	<span><jamwiki:text name="${PROP_CACHE_MAX_AGE}" id="${PROP_CACHE_MAX_AGE}" value="${props[PROP_CACHE_MAX_AGE]}" size="10" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_CACHE_MAX_IDLE_AGE %>"><fmt:message key="admin.cache.caption.idleage" /></label>
-	<c:set var="PROP_CACHE_MAX_IDLE_AGE"><%= Environment.PROP_CACHE_MAX_IDLE_AGE %></c:set>
-	<span><jamwiki:text name="${PROP_CACHE_MAX_IDLE_AGE}" id="${PROP_CACHE_MAX_IDLE_AGE}" value="${props[PROP_CACHE_MAX_IDLE_AGE]}" size="10" /></span>
-</div>
-</fieldset>
 <%-- BEGIN RSS --%>
 <fieldset>
 <legend><fmt:message key="admin.header.rss" /></legend>
