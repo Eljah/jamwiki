@@ -434,13 +434,10 @@ public abstract class LinkUtil {
 			// not initialized yet
 			return null;
 		}
-		String topicName = WikiBase.getDataHandler().lookupTopicName(virtualWiki, articleName);
+		String topicName = WikiBase.getDataHandler().lookupTopicName(virtualWiki, wikiLink.getNamespace(), wikiLink.getArticle());
 		if (topicName == null && Environment.getBooleanValue(Environment.PROP_PARSER_ALLOW_CAPITALIZATION)) {
 			String alternativeArticleName = (StringUtils.equals(wikiLink.getArticle(), StringUtils.capitalize(wikiLink.getArticle()))) ? StringUtils.lowerCase(wikiLink.getArticle()) : StringUtils.capitalize(wikiLink.getArticle());
-			if (!wikiLink.getNamespace().getId().equals(Namespace.MAIN_ID)) {
-				alternativeArticleName = wikiLink.getNamespace().getLabel(virtualWiki) + Namespace.SEPARATOR + alternativeArticleName;
-			}
-			topicName = WikiBase.getDataHandler().lookupTopicName(virtualWiki, alternativeArticleName);
+			topicName = WikiBase.getDataHandler().lookupTopicName(virtualWiki, wikiLink.getNamespace(), alternativeArticleName);
 		}
 		return topicName;
 	}

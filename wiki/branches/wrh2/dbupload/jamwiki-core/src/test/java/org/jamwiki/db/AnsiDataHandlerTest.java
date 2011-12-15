@@ -58,7 +58,6 @@ public class AnsiDataHandlerTest extends JAMWikiUnitTest {
 	public void testPurgeTopicVersion() throws DataAccessException, IOException, WikiException {
 		// load a test topic with three versions
 		String topicName = "Purge Topic Test";
-		String virtualWiki = "en";
 		Topic topic = null;
 		for (int i = 0; i < 3; i++) {
 			String contents = "Test topic content " + i;
@@ -74,12 +73,12 @@ public class AnsiDataHandlerTest extends JAMWikiUnitTest {
 		Pagination pagination = new Pagination(1000, 0);
 		List<RecentChange> versions = WikiBase.getDataHandler().getTopicHistory(topic, pagination, true);
 		assertEquals("Incorrect number of test versions present", 3, versions.size());
-		WikiBase.getDataHandler().purgeTopicVersion(virtualWiki, versions.get(0).getTopicVersionId(), null, "127.0.0.1");
-		WikiBase.getDataHandler().purgeTopicVersion(virtualWiki, versions.get(1).getTopicVersionId(), null, "127.0.0.1");
+		WikiBase.getDataHandler().purgeTopicVersion(topic, versions.get(0).getTopicVersionId(), null, "127.0.0.1");
+		WikiBase.getDataHandler().purgeTopicVersion(topic, versions.get(1).getTopicVersionId(), null, "127.0.0.1");
 		// attempts to delete the third version should thrown an error
 		boolean exceptionThrown = false;
 		try {
-			WikiBase.getDataHandler().purgeTopicVersion(virtualWiki, versions.get(2).getTopicVersionId(), null, "127.0.0.1");
+			WikiBase.getDataHandler().purgeTopicVersion(topic, versions.get(2).getTopicVersionId(), null, "127.0.0.1");
 		} catch (WikiException e) {
 			exceptionThrown = true;
 		}

@@ -27,16 +27,23 @@ New Features:
   * Move several system configuration files (jamwiki-configuration.xml, spam
     blacklist) out of the webapp root and into the JAMWiki system directory to
     make upgrading simpler.
+  * Refactor caching.  The cache is now configured to use a percentage of heap
+    rather than a fixed size to avoid possible OOM situations, configuration is
+    now managed via the ehcache-jamwiki.xml file, and individual caches have
+    been fine-tuned to optimize performance.
   * Add a new ROLE_REGISTER to allow enabling/disabling self-registration for
     anonymous users.  By default anonymous users are allowed to self-register.
   * Be more strict with HTML-like tags: tags of the form "< tag>" or "< / tag>"
     are no longer supported and must be of the form "<tag>" or "</tag>".  This
     matches Mediawiki.
   * Add a honeypot input during registration to deter spambots.
+  * Use the cache more effectively to reduce memory usage.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to Lucene Search 3.5.
+  * Upgrade to Ehcache 2.5.
   * Upgrade to commons-lang 3.1.
   * Upgrade to commons-io-2.1.
+  * Upgrade to commons-codec 1.6.
 
 Bugfixes:
 

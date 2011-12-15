@@ -1470,10 +1470,12 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
+	 * Initialize the topic record.
 	 *
+	 * @param rs The result set being used to initialize the record.
 	 */
-	private Topic initTopic(ResultSet rs, String virtualWikiName) throws SQLException {
-		Topic topic = new Topic(virtualWikiName, Namespace.namespace(rs.getInt("namespace_id")), rs.getString("page_name"));
+	private Topic initTopic(ResultSet rs) throws SQLException {
+		Topic topic = new Topic(rs.getString("virtual_wiki_name"), Namespace.namespace(rs.getInt("namespace_id")), rs.getString("page_name"));
 		topic.setAdminOnly(rs.getInt("topic_admin_only") != 0);
 		int currentVersionId = rs.getInt("current_version_id");
 		if (currentVersionId > 0) {
@@ -1498,7 +1500,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			// this is an inefficient way to get the last result, but due to the fact that
 			// the result set may be forward only it's the safest.
 			if (rs.next()) {
-				topic = this.initTopic(rs, virtualWikiName);
+				topic = this.initTopic(rs);
 			}
 		}
 		return topic;
@@ -2344,7 +2346,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public Topic lookupTopic(int virtualWikiId, String virtualWikiName, Namespace namespace, String pageName, Connection conn) throws SQLException {
+	public Topic lookupTopic(int virtualWikiId, Namespace namespace, String pageName, Connection conn) throws SQLException {
 		if (namespace.getId().equals(Namespace.SPECIAL_ID)) {
 			// invalid namespace
 			return null;
@@ -2362,7 +2364,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt(2, virtualWikiId);
 			stmt.setInt(3, namespace.getId());
 			rs = stmt.executeQuery();
-			topic = (rs.next() ? this.initTopic(rs, virtualWikiName) : null);
+			topic = (rs.next() ? this.initTopic(rs) : null);
 		} finally {
 			DatabaseConnection.closeConnection(null, stmt, rs);
 		}
@@ -2373,7 +2375,7 @@ public class AnsiQueryHandler implements QueryHandler {
 				stmt.setInt(2, virtualWikiId);
 				stmt.setInt(3, namespace.getId());
 				rs = stmt.executeQuery();
-				topic = (rs.next() ? this.initTopic(rs, virtualWikiName) : null);
+				topic = (rs.next() ? this.initTopic(rs) : null);
 			}
 			return topic;
 		} finally {
@@ -2389,19 +2391,25 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public Topic lookupTopicById(int virtualWikiId, String virtualWikiName, int topicId) throws SQLException {
-		Connection conn = null;
+	public Topic lookupTopicById(int topicId, Connection conn) throws SQLException {
+		boolean closeConnection = (conn == null);
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			conn = DatabaseConnection.getConnection();
+			if (conn == null) {
+				conn = DatabaseConnection.getConnection();
+			}
 			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_BY_ID);
-			stmt.setInt(1, virtualWikiId);
-			stmt.setInt(2, topicId);
+			stmt.setInt(1, topicId);
 			rs = stmt.executeQuery();
-			return (rs.next()) ? this.initTopic(rs, virtualWikiName) : null;
+			return (rs.next()) ? this.initTopic(rs) : null;
 		} finally {
-			DatabaseConnection.closeConnection(conn, stmt, rs);
+			if (closeConnection) {
+				DatabaseConnection.closeConnection(conn, stmt, rs);
+			} else {
+				// close only the statement and result set - leave the connection open for further use
+				DatabaseConnection.closeConnection(null, stmt, rs);
+			}
 		}
 	}
 

@@ -341,10 +341,6 @@ public class AdminServlet extends JAMWikiServlet {
 					pageInfo.addError(new WikiMessage("admin.spam.message.invalidkeys"));
 				}
 			}
-			setNumericProperty(props, request, Environment.PROP_CACHE_INDIVIDUAL_SIZE, pageInfo.getErrors());
-			setNumericProperty(props, request, Environment.PROP_CACHE_MAX_AGE, pageInfo.getErrors());
-			setNumericProperty(props, request, Environment.PROP_CACHE_MAX_IDLE_AGE, pageInfo.getErrors());
-			setNumericProperty(props, request, Environment.PROP_CACHE_TOTAL_SIZE, pageInfo.getErrors());
 			setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
 			setProperty(props, request, Environment.PROP_RSS_TITLE);
 			pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(props));

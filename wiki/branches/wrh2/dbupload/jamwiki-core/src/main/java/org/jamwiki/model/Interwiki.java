@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiException;
@@ -25,7 +26,7 @@ import org.jamwiki.utils.Utilities;
 /**
  * Provides an object representing an interwiki link record.
  */
-public class Interwiki {
+public class Interwiki implements Serializable {
 
 	private String interwikiDisplay = null;
 	private String interwikiPattern = null;

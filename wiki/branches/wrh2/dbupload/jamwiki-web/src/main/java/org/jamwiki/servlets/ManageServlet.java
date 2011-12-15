@@ -149,7 +149,8 @@ public class ManageServlet extends JAMWikiServlet {
 			if (topicVersionId == -1) {
 				throw new WikiException(new WikiMessage("purge.error.noversion"));
 			}
-			WikiBase.getDataHandler().purgeTopicVersion(virtualWiki, topicVersionId, ServletUtil.currentWikiUser(), ServletUtil.getIpAddress(request));
+			Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, topicName, true);
+			WikiBase.getDataHandler().purgeTopicVersion(topic, topicVersionId, ServletUtil.currentWikiUser(), ServletUtil.getIpAddress(request));
 			purgeCount++;
 		}
 		pageInfo.addMessage(new WikiMessage("manage.message.purge", Integer.toString(purgeCount), topicName));

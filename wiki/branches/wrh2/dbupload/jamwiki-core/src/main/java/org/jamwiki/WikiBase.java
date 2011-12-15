@@ -46,7 +46,7 @@ public class WikiBase {
 	private static JAMWikiParser parserInstance = null;
 
 	/** Cache name for the cache of parsed topic content. */
-	public static final String CACHE_PARSED_TOPIC_CONTENT = "org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_CONTENT";
+	public static final WikiCache<String, String> CACHE_PARSED_TOPIC_CONTENT = new WikiCache<String, String>("org.jamwiki.WikiBase.CACHE_PARSED_TOPIC_CONTENT");
 	/** Default group for registered users. */
 	private static WikiGroup GROUP_REGISTERED_USER = null;
 	/** Data stored using an external database */
