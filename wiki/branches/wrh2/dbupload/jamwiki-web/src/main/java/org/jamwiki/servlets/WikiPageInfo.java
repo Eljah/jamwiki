@@ -33,6 +33,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.parser.WikiLink;
+import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -230,6 +231,27 @@ public class WikiPageInfo {
 	 */
 	public void setErrors(List<WikiMessage> errors) {
 		this.errors = errors;
+	}
+
+	/**
+	 * Return a flag indicating whether images are stored on the file
+	 * system or in the database.
+	 *
+	 * @return <code>true</code> if images are stored on the file system.
+	 */
+	public boolean isImagesOnFS() {
+		return ImageUtil.isImagesOnFS();
+	}
+
+	/**
+	 * Return the path to the servlet that serves images that are stored
+	 * in the database.
+	 *
+	 * @return The path to the servlet that serves images that are stored
+	 * in the database.
+	 */
+	public String getImageServletUrl() {
+		return ImageUtil.getImageServletUrl();
 	}
 
 	/**

@@ -17,8 +17,6 @@
 
 --%>
 
-<%@ page import="org.jamwiki.parser.image.ImageUtil" %>
-
 <c:choose>
 	<c:when test="${empty notopic}">
 		<c:if test="${!empty topicObject}">
@@ -26,14 +24,16 @@
 			<c:if test="${!empty sharedImageTopicObject}">
 				<div id="shared-image-message"><fmt:message key="topic.sharedImage"><fmt:param><jamwiki:link value="${sharedImageTopicObject.name}" virtualWiki="${sharedImageTopicObject.virtualWiki}" text="${sharedImageTopicObject.name}" style="interwikilink" /></fmt:param></fmt:message></div>
 			</c:if>
-			<c:if test="<%=  ImageUtil.isImagesOnFS() %>">
-			<c:if test="${topicImage}"><a href="<c:out value="${fileVersions[0].url}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
-			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<c:out value="${fileVersions[0].url}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
-			</c:if>
-			<c:if test="<%= !ImageUtil.isImagesOnFS() %>">
-			<c:if test="${topicImage}"><a href="<%= ImageUtil.getImageServletUrl() %>?fileVersionId=<c:out value="${fileVersions[0].fileVersionId}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
-			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<%= ImageUtil.getImageServletUrl() %>?fileVersionId=<c:out value="${fileVersions[0].fileVersionId}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
-			</c:if>
+			<c:choose>
+				<c:when test="${pageInfo.imagesOnFS}">
+					<c:if test="${topicImage}"><a href="<c:out value="${fileVersions[0].url}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
+					<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<c:out value="${fileVersions[0].url}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
+				</c:when>
+				<c:otherwise>
+					<c:if test="${topicImage}"><a href="${pageInfo.imageServletUrl}?fileVersionId=<c:out value="${fileVersions[0].fileVersionId}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
+					<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="${pageInfo.imageServletUrl}?fileVersionId=<c:out value="${fileVersions[0].fileVersionId}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
+				</c:otherwise>
+			</c:choose>
 			<c:out value="${topicObject.topicContent}" escapeXml="false" />
 			</div>
 			<div class="clear"></div>
@@ -44,11 +44,13 @@
 				<ul>
 					<c:forEach items="${fileVersions}" var="fileVersion">
 					<li>
-					<c:if test="<%=  ImageUtil.isImagesOnFS() %>">
-					<a href="<c:out value="${fileVersion.url}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>					</c:if>
-					<c:if test="<%= !ImageUtil.isImagesOnFS() %>">
-					<a href="<%= ImageUtil.getImageServletUrl() %>?fileVersionId=<c:out value="${fileVersion.fileVersionId}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>
-					</c:if>
+					<c:choose>
+						<c:when test="${pageInfo.imagesOnFS}">
+							<a href="<c:out value="${fileVersion.url}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>						</c:when>
+						<c:otherwise>
+							<a href="${pageInfo.imageServletUrl}?fileVersionId=<c:out value="${fileVersion.fileVersionId}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>
+						</c:otherwise>
+					</c:choose>
 					&#160;(<fmt:message key="topic.filesize.bytes"><fmt:param value="${fileVersion.fileSize}" /></fmt:message>)
 					&#160;.&#160;.&#160;
 					<c:choose>
