@@ -346,14 +346,6 @@ public abstract class ImageUtil {
 	 * the max width height are 200, and the increment is 400, the result is 400x200.
 	 */
 	private static Dimension calculateIncrementalDimensions(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions) throws IOException {
-		if (isImagesOnFS()) {
-			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, scaledDimensions);
-		} else {
-			return calculateIncrementalDimensionsForImageBlob(wikiImage, originalDimensions, scaledDimensions);
-		}
-	}
-
-	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions) throws IOException {
 		int increment = Environment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
 		// use width for incremental resizing
 		int incrementalWidth = calculateImageIncrement(scaledDimensions.getWidth());
@@ -362,6 +354,17 @@ public abstract class ImageUtil {
 			return originalDimensions;
 		}
 		int incrementalHeight = (int)Math.round(((double)incrementalWidth / (double)originalDimensions.getWidth()) * (double)originalDimensions.getHeight());
+		if (isImagesOnFS()) {
+			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, scaledDimensions, incrementalWidth, incrementalHeight);
+		} else {
+			return calculateIncrementalDimensionsForImageBlob(wikiImage, originalDimensions, scaledDimensions, incrementalWidth, incrementalHeight);
+		}
+	}
+
+	/**
+	 * Determine scaled dimensions for images stored on the filesystem.
+	 */
+	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		String newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), incrementalWidth);
 		File newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
@@ -377,19 +380,13 @@ public abstract class ImageUtil {
 		return new Dimension(bufferedImage.getWidth(), bufferedImage.getHeight());
 	}
 
-	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions) throws IOException {
-		int increment = Environment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
-		// use width for incremental resizing
-		int incrementalWidth = calculateImageIncrement(scaledDimensions.getWidth());
-		if (increment <= 0 || incrementalWidth >= originalDimensions.getWidth()) {
-			// let the browser scale the image
-			return originalDimensions;
-		}
-		int incrementalHeight = (int)Math.round(((double)incrementalWidth / (double)originalDimensions.getWidth()) * (double)originalDimensions.getHeight());
+	/**
+	 * Determine scaled dimensions for images stored in the database.
+	 */
+	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		Dimension d1  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), incrementalWidth);
-		if       (d1 != null)
-		{
+		if (d1 != null) {
 			return d1;
 		}
 		// otherwise generate a scaled instance
@@ -710,7 +707,7 @@ public abstract class ImageUtil {
 	 * @return <code>true</code> if images are stored on file system and <code>false</code> if in database.
 	 */
 	public static boolean isImagesOnFS() {
-		String  fileDir  = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
+		String fileDir = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
 		return !fileDir.isEmpty();
 	}
 

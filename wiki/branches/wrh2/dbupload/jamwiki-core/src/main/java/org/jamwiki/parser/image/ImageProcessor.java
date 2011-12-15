@@ -94,17 +94,14 @@ public class ImageProcessor {
 	 */
 	private static ImageData loadImage(int fileId) throws IOException {
 		ImageData imageData = null;
-
 		try {
 			imageData = WikiBase.getDataHandler().getImageData(fileId, 0);
 		} catch (DataAccessException dae) {
 			throw new IOException(dae);
 		}
-
 		if (imageData == null) {
 			throw new FileNotFoundException("Image does not exist: " + fileId);
 		}
-
 		return imageData;
 	}
 
@@ -124,27 +121,8 @@ public class ImageProcessor {
 	 */
 	public static BufferedImage resizeImage(File imageFile, int targetWidth, int targetHeight) throws IOException {
 		long start = System.currentTimeMillis();
-		BufferedImage tmp = ImageProcessor.loadImage(imageFile);
-		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-		int width = tmp.getWidth();
-		int height = tmp.getHeight();
-		BufferedImage resized = tmp;
-		do {
-			width /= 2;
-			if (width < targetWidth) {
-				width = targetWidth;
-			}
-			height /= 2;
-			if (height < targetHeight) {
-				height = targetHeight;
-			}
-			tmp = new BufferedImage(width, height, type);
-			Graphics2D g2 = tmp.createGraphics();
-			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g2.drawImage(resized, 0, 0, width, height, null);
-			g2.dispose();
-			resized = tmp;
-		} while (width != targetWidth || height != targetHeight);
+		BufferedImage resized = ImageProcessor.loadImage(imageFile);
+		resized = ImageProcessor.resizeImage(resized, targetWidth, targetHeight);
 		if (logger.isDebugEnabled()) {
 			long current = System.currentTimeMillis();
 			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for file: " + imageFile.getAbsolutePath();
@@ -174,6 +152,33 @@ public class ImageProcessor {
 		if (tmp == null) {
 			throw new IOException("JDK is unable to process image data, possibly indicating data corruption: " + fileId);
 		}
+		BufferedImage resized = ImageProcessor.resizeImage(tmp, targetWidth, targetHeight);
+		int pos = imageData.mimeType.lastIndexOf('/');
+		if (pos == -1 || (pos + 1) >= imageData.mimeType.length()) {
+			throw new IOException("Unknown image file type " + imageData.mimeType);
+		}
+		String imageType = imageData.mimeType.substring(pos + 1).toLowerCase();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		boolean result = ImageIO.write(resized, imageType, baos);		if (!result) {
+			throw new IOException("No appropriate writer found when writing image: " + imageData.fileVersionId);
+		}
+		baos.close();
+		imageData.width = resized.getWidth();
+		imageData.height = resized.getHeight();
+		imageData.data = baos.toByteArray();
+		saveImage(imageData);
+		if (logger.isDebugEnabled()) {
+			long current = System.currentTimeMillis();
+			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for fileId: " + fileId;
+			logger.debug(message);
+		}
+		return new Dimension(imageData.width, imageData.height);
+	}
+
+	/**
+	 *
+	 */
+	private static BufferedImage resizeImage(BufferedImage tmp, int targetWidth, int targetHeight) throws IOException {
 		int type = (tmp.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		int width = tmp.getWidth();
 		int height = tmp.getHeight();
@@ -194,26 +199,7 @@ public class ImageProcessor {
 			g2.dispose();
 			resized = tmp;
 		} while (width != targetWidth || height != targetHeight);
-		if (logger.isDebugEnabled()) {
-			long current = System.currentTimeMillis();
-			String message = "Image resize time (" + ((current - start) / 1000.000) + " s), dimensions: " + targetWidth + "x" + targetHeight + " for fileId: " + fileId;
-			logger.debug(message);
-		}
-		int pos = imageData.mimeType.lastIndexOf('/');
-		if (pos == -1 || (pos + 1) >= imageData.mimeType.length()) {
-			throw new IOException("Unknown image file type " + imageData.mimeType);
-		}
-		String imageType = imageData.mimeType.substring(pos + 1).toLowerCase();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		boolean result = ImageIO.write(resized, imageType, baos);		if    (!result) {
-			throw new IOException("No appropriate writer found when writing image: " + imageData.fileVersionId);
-		}
-		baos.close();
-		imageData.width  = resized.getWidth   ();
-		imageData.height = resized.getHeight  ();
-		imageData.data   = baos   .toByteArray();
-		saveImage(imageData);
-		return new Dimension(imageData.width, imageData.height);
+		return resized;
 	}
 
 	/**
@@ -266,17 +252,14 @@ public class ImageProcessor {
 	 */
 	protected static Dimension retrieveImageDimensions(int fileId, int resized) throws IOException {
 		ImageData imageData = null;
-
 		try {
 			imageData = WikiBase.getDataHandler().getImageInfo(fileId, resized);
 		} catch (DataAccessException dae) {
 			throw new IOException(dae);
 		}
-
 		if (imageData == null || imageData.width < 0) {
 			return null;
 		}
-
 		return new Dimension(imageData.width, imageData.height);
 	}
 
@@ -314,8 +297,8 @@ public class ImageProcessor {
 		try {
 			WikiBase.getDataHandler().insertImage(imageData, true);
 		} catch (DataAccessException dae) {
-		      //FIXME
-		      //throw new IOException(dae);
+			//FIXME
+			//throw new IOException(dae);
 			logger.warn(dae.toString());
 		}
 	}
