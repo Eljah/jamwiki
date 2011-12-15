@@ -2374,7 +2374,7 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#insertImage(int, int, org.jamwiki.ImageData, boolean)
+	 *
 	 */
 	public void insertImage(ImageData imageData, boolean resized) throws DataAccessException {
 		TransactionStatus status = null;
@@ -2385,40 +2385,29 @@ public class AnsiDataHandler implements DataHandler {
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
-	      //FIXME Why no finally section
-		}/* finally {
-			DatabaseConnection.closeConnection(conn);
-		}*/
+		}
 		DatabaseConnection.commit(status);
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#getImageInfo(int, int)
+	 *
 	 */
 	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException {
-		Connection conn = null;
 		try {
-			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageInfo(fileId, resized, conn);
+			return this.queryHandler().getImageInfo(fileId, resized);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
-		} finally {
-			DatabaseConnection.closeConnection(conn);
 		}
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#getImageData(int, int)
+	 *
 	 */
 	public ImageData getImageData(int fileId, int resized) throws DataAccessException {
-		Connection conn = null;
 		try {
-			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageData(fileId, resized, conn);
+			return this.queryHandler().getImageData(fileId, resized);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
-		} finally {
-			DatabaseConnection.closeConnection(conn);
 		}
 	}
 
@@ -2426,14 +2415,10 @@ public class AnsiDataHandler implements DataHandler {
 	 * @see org.jamwiki.DataHandler#getImageVersionData(int, int)
 	 */
 	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException {
-		Connection conn = null;
 		try {
-			conn = DatabaseConnection.getConnection();
-			return this.queryHandler().getImageVersionData(fileVersionId, resized, conn);
+			return this.queryHandler().getImageVersionData(fileVersionId, resized);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
-		} finally {
-			DatabaseConnection.closeConnection(conn);
 		}
 	}
 }

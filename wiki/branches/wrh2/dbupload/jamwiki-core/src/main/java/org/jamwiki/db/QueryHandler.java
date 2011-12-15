@@ -1180,37 +1180,31 @@ public interface QueryHandler {
 	/**
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
-	 * @param conn A database connection to use when connecting to the database
-	 *  from this method.
 	 * @return The image info or null if image not found. Result's width and height components must
 	 * be negative when data are not an image. Result's data and image components may be null.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public ImageData getImageInfo(int fileId, int resized, Connection conn) throws SQLException;
+	public ImageData getImageInfo(int fileId, int resized) throws SQLException;
 
 	/**
 	 * Get latest version of image.
 	 *
 	 * @param fileId File identifier.
 	 * @param resized Image width or zero for original.
-	 * @param conn A database connection to use when connecting to the database
-	 *  from this method.
 	 * @return The image data or null if image not found. Result's width and height components must
 	 * be negative when data are not an image. Result's image components may be null.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public ImageData getImageData(int fileId, int resized, Connection conn) throws SQLException;
+	public ImageData getImageData(int fileId, int resized) throws SQLException;
 
 	/**
 	 * Get desired version of image.
 	 *
 	 * @param fileVersionId File identifier.
 	 * @param resized Image width or zero for original.
-	 * @param conn A database connection to use when connecting to the database
-	 *  from this method.
 	 * @return The image data or null if image not found. Result's width and height components must
 	 * be negative when data are not an image. Result's image components may be null.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	public ImageData getImageVersionData(int fileVersionId, int resized, Connection conn) throws SQLException;
+	public ImageData getImageVersionData(int fileVersionId, int resized) throws SQLException;
 }

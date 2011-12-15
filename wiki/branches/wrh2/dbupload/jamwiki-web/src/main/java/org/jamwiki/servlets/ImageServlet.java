@@ -32,37 +32,35 @@ import org.jamwiki.WikiBase;
  * Get image requests handler.
  */
 public class ImageServlet extends JAMWikiServlet {
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
-		ImageData imageData;
 
-		try
-		{
-			String fileId        = request.getParameter("fileId");
+	/**
+	 * Handle image requests, returning the binary image data.
+	 */
+	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
+		// TODO - consider implementing caching
+		ImageData imageData;
+		try {
+			String fileId = request.getParameter("fileId");
 			String fileVersionId = request.getParameter("fileVersionId");
-			String resized       = request.getParameter("resized");
-			if    (resized      == null) {
+			String resized = request.getParameter("resized");
+			if (resized == null) {
 				resized = "0";
 			}
-
 			if (fileVersionId != null) {
 				imageData = WikiBase.getDataHandler().getImageVersionData(Integer.parseInt(fileVersionId), Integer.parseInt(resized));
 			} else {
-				imageData = WikiBase.getDataHandler().getImageData       (Integer.parseInt(fileId),        Integer.parseInt(resized));
+				imageData = WikiBase.getDataHandler().getImageData(Integer.parseInt(fileId), Integer.parseInt(resized));
 			}
-		}
-		catch (NumberFormatException nfe) {
+		} catch (NumberFormatException nfe) {
 			throw new ServletException(nfe);
-		}
-		catch (DataAccessException dae) {
+		} catch (DataAccessException dae) {
 			throw new ServletException(dae);
 		}
-
-		response.setContentType  (imageData.mimeType);
+		response.setContentType(imageData.mimeType);
 		response.setContentLength(imageData.data.length);
 		OutputStream os = response.getOutputStream();
 		os.write(imageData.data);
 		os.close();
-
 		return null;
 	} 
 }
