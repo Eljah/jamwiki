@@ -383,6 +383,17 @@ public class Environment {
 	}
 
 	/**
+	 * Return <code>true</code> if wiki properties have been initialized,
+	 * <code>false</code> otherwise.
+	 *
+	 * @return <code>true</code> if wiki properties have been initialized,
+	 * <code>false</code> otherwise.
+	 */
+	public static boolean isInitialized() {
+		return Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED);
+	}
+
+	/**
 	 * Given a property file name, load the property file and return an object
 	 * representing the property values.
 	 *

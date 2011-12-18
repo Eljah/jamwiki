@@ -693,7 +693,7 @@ public class ServletUtil {
 		// FIXME - the check here for initialized properties is due to this
 		// change being made late in a release cycle.  Revisit in a future
 		// release & clean this up.
-		if (Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
+		if (Environment.isInitialized()) {
 			try {
 				virtualWiki = WikiBase.getDataHandler().lookupVirtualWiki(virtualWikiName);
 			} catch (DataAccessException e) {}
