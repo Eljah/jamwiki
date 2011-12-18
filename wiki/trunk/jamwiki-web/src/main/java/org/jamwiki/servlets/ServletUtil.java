@@ -73,6 +73,7 @@ import org.jamwiki.utils.WikiUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -815,7 +816,8 @@ public class ServletUtil {
 		String virtualWikiName = pageInfo.getVirtualWikiName();
 		next.addObject("springSecurityTargetUrlField", JAMWikiAuthenticationConstants.SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME);
 		HttpSession session = request.getSession(false);
-		if (request.getRequestURL().indexOf(request.getRequestURI()) != -1 && (session == null || session.getAttribute(JAMWikiAuthenticationConstants.SPRING_SECURITY_SAVED_REQUEST_SESSION_KEY) == null)) {
+		HttpSessionRequestCache httpSessionRequestCache = new HttpSessionRequestCache();
+		if (request.getRequestURL().indexOf(request.getRequestURI()) != -1 && httpSessionRequestCache.getRequest(request, null) == null) {
 			// Only add a target URL if Spring Security has not saved a request in the session.  The request
 			// URL vs URI check is needed due to the fact that the first time a user is redirected by Spring
 			// Security to the login page the saved request attribute is not yet available in the session

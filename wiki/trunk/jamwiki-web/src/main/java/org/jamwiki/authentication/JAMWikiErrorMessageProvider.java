@@ -16,16 +16,10 @@
  */
 package org.jamwiki.authentication;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
-import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.RequestKey;
-import org.springframework.security.web.util.AntUrlPathMatcher;
-import org.springframework.security.web.util.UrlMatcher;
+import org.springframework.security.web.util.AntPathRequestMatcher;
+import org.springframework.security.web.util.RequestMatcher;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -36,7 +30,7 @@ import org.jamwiki.utils.WikiLogger;
 public class JAMWikiErrorMessageProvider {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiErrorMessageProvider.class.getName());
-	private DefaultFilterInvocationSecurityMetadataSource defaultFilterInvocationSecurityMetadataSource = null;
+	private LinkedHashMap<RequestMatcher, String> matcherToKeyMap;
 	private LinkedHashMap<String, String> urlPatterns;
 
 	/**
@@ -56,33 +50,17 @@ public class JAMWikiErrorMessageProvider {
 	/**
 	 *
 	 */
-	private Collection<ConfigAttribute> retrieveConfigAttribute(HttpServletRequest request) {
-		String uri = request.getRequestURI();
-		if (uri == null) {
-			return null;
-		}
-		if (this.defaultFilterInvocationSecurityMetadataSource == null) {
-			UrlMatcher matcher = new AntUrlPathMatcher();
-			LinkedHashMap<RequestKey, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<RequestKey, Collection<ConfigAttribute>>();
+	private String retrieveErrorKey(HttpServletRequest request) {
+		if (this.matcherToKeyMap == null) {
+			this.matcherToKeyMap = new LinkedHashMap<RequestMatcher, String>();
 			for (String key : this.getUrlPatterns().keySet()) {
 				String value = this.getUrlPatterns().get(key);
-				Collection<ConfigAttribute> elements = new ArrayList<ConfigAttribute>();
-				elements.add(new SecurityConfig(value));
-				requestMap.put(new RequestKey(key), elements);
+				this.matcherToKeyMap.put(new AntPathRequestMatcher(key), value);
 			}
-			this.defaultFilterInvocationSecurityMetadataSource = new DefaultFilterInvocationSecurityMetadataSource(matcher, requestMap);
 		}
-		return this.defaultFilterInvocationSecurityMetadataSource.lookupAttributes(uri, null);
-	}
-
-	/**
-	 *
-	 */
-	private String retrieveErrorKey(HttpServletRequest request) {
-		Collection<ConfigAttribute> attrs = this.retrieveConfigAttribute(request);
-		if (attrs != null) {
-			for (ConfigAttribute attr : attrs) {
-				return attr.getAttribute();
+		for (RequestMatcher matcher : this.matcherToKeyMap.keySet()) {
+			if (matcher.matches(request)) {
+				return this.matcherToKeyMap.get(matcher);
 			}
 		}
 		return null;

@@ -26,6 +26,7 @@ import org.jamwiki.model.WikiGroup;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * This class acts as a utility class for holding information used by the authentication
@@ -71,7 +72,7 @@ public class JAMWikiAuthenticationConfiguration {
 	}
 
 	/**
-	 * The DataHandler interface returns Role objects, but the AnsiDataHandler returns RoleImpl
+	 * The DataHandler interface returns Role objects, but the AnsiDataHandler returns Role
 	 * so cast the results appropriately.
 	 */
 	private static Collection<GrantedAuthority> roleToGrantedAuthority(List<Role> roles) {
@@ -80,7 +81,7 @@ public class JAMWikiAuthenticationConfiguration {
 		}
 		Collection<GrantedAuthority> results = new ArrayList<GrantedAuthority>();
 		for (Role role : roles) {
-			results.add(new RoleImpl(role));
+			results.add(new SimpleGrantedAuthority(role.getAuthority()));
 		}
 		return results;
 	}

@@ -39,6 +39,8 @@ New Features:
   * Add a honeypot input during registration to deter spambots.
   * Use the cache more effectively to reduce memory usage.
   * Remove ability to automatically upgrade from versions prior to 1.0.
+  * Upgrade to Spring Framework 3.1.0.RELEASE.
+  * Upgrade to Spring Security 3.1.0.RELEASE.
   * Upgrade to Lucene Search 3.5.
   * Upgrade to Ehcache 2.5.
   * Upgrade to commons-lang 3.1.

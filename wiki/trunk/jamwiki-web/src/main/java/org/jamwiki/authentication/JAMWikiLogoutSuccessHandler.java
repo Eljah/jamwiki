@@ -22,15 +22,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 /**
  *
  */
-public class JAMWikiLogoutSuccessHandler implements LogoutSuccessHandler {
+public class JAMWikiLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
 	/** Standard logger. */
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiLogoutSuccessHandler.class.getName());
+
+	/**
+	 *
+	 */
+	public JAMWikiLogoutSuccessHandler() {
+		this.setTargetUrlParameter(JAMWikiAuthenticationConstants.SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME);
+	}
 
 	/**
 	 *
