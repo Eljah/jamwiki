@@ -64,6 +64,12 @@
 	<label for="reason"><fmt:message key="block.caption.reason" /></label>
 	<span><input type="text" name="reason" value="<c:out value="${reason}" />" id="user" size="60" /></span>
 </div>
+<c:if test="${!empty lastLoginIpAddress}">
+<div class="row">
+	<label for="user"><fmt:message key="block.caption.lastLoginIpAddress" /></label>
+	<span>${lastLoginIpAddress}&#160;(<jamwiki:link value="Special:Contributions"><jamwiki:linkParam key="contributor" value="${lastLoginIpAddress}" /><fmt:message key="recentchanges.caption.contributions" /></jamwiki:link>&#160;|&#160;<jamwiki:link value="Special:Block"><jamwiki:linkParam key="user" value="${lastLoginIpAddress}" /><fmt:message key="recentchanges.caption.block" /></jamwiki:link>)</span>
+</div>
+</c:if>
 <div class="row">
 	<span class="form-button"><input type="submit" name="block" value="<fmt:message key="block.button.block" />" /></span>
 </div>

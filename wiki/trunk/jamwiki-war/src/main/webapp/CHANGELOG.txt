@@ -28,6 +28,8 @@ New Features:
     Example: "{{PAGENAME:Template:Main Page}}".
   * Add a new ROLE_REGISTER to allow enabling/disabling self-registration for
     anonymous users.  By default anonymous users are allowed to self-register.
+  * Display the last IP address used by a user on the Special:Block page when
+    blocking user accounts.
   * Move hard-coded HTML to template files to allow simpler customization of
     images, table of contents, and other elements.
   * Move several system configuration files (jamwiki-configuration.xml, spam
