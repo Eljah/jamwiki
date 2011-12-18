@@ -5,9 +5,18 @@ New Features:
 
   * Add support for limited wiki text in edit summaries (wiki links, interwiki
     links) to match Mediawiki behavior.
+  * Add a new JAMWiki:Header system topic that allows adding a custom message
+    to the top of all pages, just below the tab bar.
+  * Add a new JAMWiki:Custom.css stylesheet.  Starting with JAMWiki 1.2
+    System.css will be used for base CSS styles, while Custom.css should be
+    used for site-specific customizations.
+  * Move the system topics (BottomArea, LeftMenu, StyleSheet) to the
+    JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
+  * Refactor caching.  The cache is now configured to use a percentage of heap
+    rather than a fixed size to avoid possible OOM situations, configuration is
+    now managed via the ehcache-jamwiki.xml file, and individual caches have
+    been fine-tuned to optimize performance.
   * Allow the table of contents to be hidden via a "show/hide" link.
-  * Move hard-coded HTML to template files to allow simpler customization of
-    images, table of contents, and other elements.
   * Add support for the Mediawiki {{padleft:}} and {{padright:}} parser
     functions.  Usage: "{{padleft:string|amt|padString}}".
   * Enhance the #expr parser function to better match Mediawiki by supporting
@@ -17,27 +26,17 @@ New Features:
   * Allow page name and namespace magic words to specify the page to be
     operated on, instead of just the current page, to match Mediawiki behavior.
     Example: "{{PAGENAME:Template:Main Page}}".
-  * Move the system topics (BottomArea, LeftMenu, StyleSheet) to the
-    JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
-  * Add a new JAMWiki:Custom.css stylesheet.  Starting with JAMWiki 1.2
-    System.css will be used for base CSS styles, while Custom.css should be
-    used for site-specific customizations.
-  * Add a new JAMWiki:Header system topic that allows adding a custom message
-    to the top of all pages, just below the tab bar.
+  * Add a new ROLE_REGISTER to allow enabling/disabling self-registration for
+    anonymous users.  By default anonymous users are allowed to self-register.
+  * Move hard-coded HTML to template files to allow simpler customization of
+    images, table of contents, and other elements.
   * Move several system configuration files (jamwiki-configuration.xml, spam
     blacklist) out of the webapp root and into the JAMWiki system directory to
     make upgrading simpler.
-  * Refactor caching.  The cache is now configured to use a percentage of heap
-    rather than a fixed size to avoid possible OOM situations, configuration is
-    now managed via the ehcache-jamwiki.xml file, and individual caches have
-    been fine-tuned to optimize performance.
-  * Add a new ROLE_REGISTER to allow enabling/disabling self-registration for
-    anonymous users.  By default anonymous users are allowed to self-register.
+  * Add a honeypot input during registration to deter spambots.
   * Be more strict with HTML-like tags: tags of the form "< tag>" or "< / tag>"
     are no longer supported and must be of the form "<tag>" or "</tag>".  This
     matches Mediawiki.
-  * Add a honeypot input during registration to deter spambots.
-  * Use the cache more effectively to reduce memory usage.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to Spring Framework 3.1.0.RELEASE.
   * Upgrade to Spring Security 3.1.0.RELEASE.
