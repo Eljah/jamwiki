@@ -142,6 +142,7 @@ public class WikiBase {
 	 * data structures.
 	 */
 	public static void reload() throws IOException {
+		WikiConfiguration.reset();
 		WikiBase.dataHandler = WikiUtil.dataHandlerInstance();
 		if (WikiBase.searchEngine != null) {
 			WikiBase.searchEngine.shutdown();

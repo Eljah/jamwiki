@@ -294,4 +294,10 @@ public class WikiConfiguration {
 		throw new IllegalStateException("No search configuraiton available");
 	}
 
+	/**
+	 * Refresh the current configuration instance from the configuration file.
+	 */
+	public static void reset() {
+		WikiConfiguration.instance = null;
+	}
 }

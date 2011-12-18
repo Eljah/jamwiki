@@ -430,7 +430,7 @@ public abstract class LinkUtil {
 		if (wikiLink.getInterwiki() != null) {
 			return articleName;
 		}
-		if (StringUtils.isBlank(Environment.getValue(Environment.PROP_BASE_FILE_DIR)) || !Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED)) {
+		if (!Environment.isInitialized()) {
 			// not initialized yet
 			return null;
 		}

@@ -384,7 +384,7 @@ public class WikiUtil {
 	 *  <code>false</code> otherwise.
 	 */
 	public static boolean isFirstUse() {
-		return !Environment.getBooleanValue(Environment.PROP_BASE_INITIALIZED);
+		return !Environment.isInitialized();
 	}
 
 	/**
