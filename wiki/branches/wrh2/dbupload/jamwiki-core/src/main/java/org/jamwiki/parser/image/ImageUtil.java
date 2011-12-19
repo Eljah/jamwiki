@@ -107,23 +107,25 @@ public abstract class ImageUtil {
 	 *  if the file does not exist.
 	 * @throws DataAccessException Thrown if any error occurs while retrieving file info.
 	 */
-	public static String buildImageFileUrl(String virtualWiki, String topicName) throws DataAccessException {
+	public static String buildImageFileUrl(String context, String virtualWiki, String topicName) throws DataAccessException {
 		WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(virtualWiki, topicName);
 		if (wikiFile == null) {
 			return null;
 		}
-		return buildRelativeImageUrl(isImagesOnFS() ? wikiFile.getUrl() : ("?fileId=" + wikiFile.getFileId()));
+		String relativeFileUrl = isImagesOnFS() ? wikiFile.getUrl() : "?fileId=" + wikiFile.getFileId();
+		return buildRelativeImageUrl(context, virtualWiki, relativeFileUrl);
 	}
 
 	/**
 	 *
 	 */
-	private static String buildRelativeImageUrl(String filename) {
+	private static String buildRelativeImageUrl(String context, String virtualWiki, String filename) {
 		if (isImagesOnFS()) {
 			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + filename);
 			return FilenameUtils.separatorsToUnix(url);
 		} else {
-			return getImageServletUrl() + filename;
+			WikiLink imageLink = new WikiLink(context, virtualWiki, "Special:Image");
+			return imageLink.toRelativeUrl() + filename;
 		}
 	}
 
@@ -151,7 +153,7 @@ public abstract class ImageUtil {
 	 * @throws IOException Thrown if any error occurs while reading image information.
 	 */
 	public static String buildImageLinkHtml(String context, String linkVirtualWiki, String topicName, ImageMetadata imageMetadata, String style, boolean escapeHtml) throws DataAccessException, IOException {
-		String url = ImageUtil.buildImageFileUrl(linkVirtualWiki, topicName);
+		String url = ImageUtil.buildImageFileUrl(context, linkVirtualWiki, topicName);
 		if (url == null) {
 			return ImageUtil.buildUploadLink(context, linkVirtualWiki, topicName);
 		}
@@ -181,7 +183,7 @@ public abstract class ImageUtil {
 		}
 		Object[] args = (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) ? new Object[6] : new Object[5];
 		args[0] = style;
-		args[1] = buildRelativeImageUrl(wikiImage.getUrl());
+		args[1] = buildRelativeImageUrl(context, linkVirtualWiki, wikiImage.getUrl());
 		args[2] = wikiImage.getWidth();
 		args[3] = wikiImage.getHeight();
 		args[4] = StringEscapeUtils.escapeHtml4(imageMetadata.getAlt());
@@ -709,14 +711,5 @@ public abstract class ImageUtil {
 	public static boolean isImagesOnFS() {
 		String fileDir = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
 		return !fileDir.isEmpty();
-	}
-
-	/**
-	 * FIXME Works only if war file name corresponds to environment properties.
-	 *
-	 * @return ImageServlet URL.
-	 */
-	public static String getImageServletUrl() {
-		return "/" + Environment.getValue(Environment.PROP_SITE_NAME).toLowerCase() + "-" + Environment.getValue(Environment.PROP_BASE_WIKI_VERSION) + "/" + Environment.getValue(Environment.PROP_VIRTUAL_WIKI_DEFAULT) + "/Special:Image";
 	}
 }

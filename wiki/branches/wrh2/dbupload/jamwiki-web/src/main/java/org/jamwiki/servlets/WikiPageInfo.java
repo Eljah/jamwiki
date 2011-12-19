@@ -244,17 +244,6 @@ public class WikiPageInfo {
 	}
 
 	/**
-	 * Return the path to the servlet that serves images that are stored
-	 * in the database.
-	 *
-	 * @return The path to the servlet that serves images that are stored
-	 * in the database.
-	 */
-	public String getImageServletUrl() {
-		return ImageUtil.getImageServletUrl();
-	}
-
-	/**
 	 * Return a list of interwiki links that have been set for the current page.
 	 *
 	 * @return A list of all interwiki links for the current page.

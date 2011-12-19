@@ -208,7 +208,7 @@ public abstract class ParserFunctionUtil {
 	private static String parseFilePath(ParserInput parserInput, String[] parserFunctionArgumentArray) throws DataAccessException {
 		// pre-pend the image namespace to the file name
 		String filename = Namespace.namespace(Namespace.FILE_ID).getLabel(parserInput.getVirtualWiki()) + Namespace.SEPARATOR + parserFunctionArgumentArray[0];
-		String result = ImageUtil.buildImageFileUrl(parserInput.getVirtualWiki(), filename);
+		String result = ImageUtil.buildImageFileUrl(parserInput.getContext(), parserInput.getVirtualWiki(), filename);
 		if (result == null) {
 			return "";
 		}
