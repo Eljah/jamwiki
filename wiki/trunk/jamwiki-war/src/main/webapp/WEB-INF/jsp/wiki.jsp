@@ -22,7 +22,12 @@
 
 <%@ include file="page-init.jsp" %>
 
-<%@ include file="top.jsp" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<%@ include file="head.jsp" %>
+
+<body>
 
 <div id="wiki-page">
 <div id="wiki-navigation">
@@ -89,4 +94,5 @@ String contentJsp = (String)pageContext.getAttribute("contentJsp");
 </div>
 </div>
 
-<%@ include file="close-document.jsp"%>
+</body>
+</html>
