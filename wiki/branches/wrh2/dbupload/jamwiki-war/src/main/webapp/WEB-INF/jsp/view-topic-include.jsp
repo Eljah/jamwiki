@@ -49,7 +49,7 @@
 						<c:when test="${pageInfo.imagesOnFS}">
 							<a href="<c:out value="${fileVersion.url}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>						</c:when>
 						<c:otherwise>
-							<c:set var="imageLinkUrl"><jamwiki:link value="Special:Image"><jamwiki:linkParam key="fileVersionId" value="${fileVersions[0].fileVersionId}" /></jamwiki:link></c:set>
+							<c:set var="imageLinkUrl"><jamwiki:link value="Special:Image"><jamwiki:linkParam key="fileVersionId" value="${fileVersion.fileVersionId}" /></jamwiki:link></c:set>
 							<a href="${imageLinkUrl}"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a>
 						</c:otherwise>
 					</c:choose>
