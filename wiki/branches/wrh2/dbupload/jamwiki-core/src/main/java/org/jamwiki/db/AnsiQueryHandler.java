@@ -251,6 +251,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_FILE_INFO = null;
 	protected static String STATEMENT_SELECT_FILE_DATA = null;
 	protected static String STATEMENT_SELECT_FILE_VERSION_DATA = null;
+	protected static String STATEMENT_CREATE_SEQUENCES = null;
+	protected static String STATEMENT_DROP_SEQUENCES = null;
 	private Properties props = null;
 
 	/**
@@ -330,6 +332,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_CONFIGURATION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_BLOCK_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_FILE_DATA_TABLE, conn);
+		if (STATEMENT_CREATE_SEQUENCES.length() > 0) {
+			DatabaseConnection.executeUpdate(STATEMENT_CREATE_SEQUENCES, conn);
+		}
 	}
 
 	/**
@@ -484,6 +489,11 @@ public class AnsiQueryHandler implements QueryHandler {
 		// catch errors that might result from a partial failure during install.  also
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
+		if (STATEMENT_DROP_SEQUENCES.length() > 0) {
+			try {
+				DatabaseConnection.executeUpdate(STATEMENT_DROP_SEQUENCES, conn);
+			} catch (SQLException e) { logger.error(e.getMessage()); }
+		}
 		try {
 			DatabaseConnection.executeUpdate(STATEMENT_DROP_FILE_DATA_TABLE, conn);
 		} catch (SQLException e) { logger.error(e.getMessage()); }
@@ -1376,6 +1386,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_FILE_INFO               = props.getProperty("STATEMENT_SELECT_FILE_INFO");
 		STATEMENT_SELECT_FILE_DATA               = props.getProperty("STATEMENT_SELECT_FILE_DATA");
 		STATEMENT_SELECT_FILE_VERSION_DATA       = props.getProperty("STATEMENT_SELECT_FILE_VERSION_DATA");
+		STATEMENT_CREATE_SEQUENCES               = props.getProperty("STATEMENT_CREATE_SEQUENCES");
+		STATEMENT_DROP_SEQUENCES                 = props.getProperty("STATEMENT_DROP_SEQUENCES");
 	}
 
 	/**
