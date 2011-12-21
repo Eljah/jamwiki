@@ -115,6 +115,47 @@ followed by 0.6.3.
        a) Add the ROLE_REGISTER role and assign it to the anonymous group:
               insert into jam_role (role_name) values ('ROLE_REGISTER');
               insert into jam_group_authorities (group_id, authority) values (1, 'ROLE_REGISTER');
+       b) Create the jam_file_data table.
+            DB2:
+              CREATE TABLE jam_file_data (
+                file_version_id INTEGER NOT NULL,
+                resized INTEGER NOT NULL,
+                image_width INTEGER NOT NULL,
+                image_height INTEGER NOT NULL,
+                file_data BLOB(16M) NOT NULL,
+                CONSTRAINT jam_p_file_data PRIMARY KEY (file_version_id, resized),
+                CONSTRAINT jam_f_file_data_file_version FOREIGN KEY (file_version_id) REFERENCES jam_file_version(file_version_id)
+              )
+            MS SQL:
+              CREATE TABLE jam_file_data (
+                file_version_id INTEGER NOT NULL,
+                resized INTEGER NOT NULL,
+                image_width INTEGER NOT NULL,
+                image_height INTEGER NOT NULL,
+                file_data VARBINARY(MAX) NOT NULL,
+                CONSTRAINT jam_p_file_data PRIMARY KEY (file_version_id, resized),
+                CONSTRAINT jam_f_file_data_file_version FOREIGN KEY (file_version_id) REFERENCES jam_file_version(file_version_id)
+              )
+            Postgres:
+              CREATE TABLE jam_file_data (
+                file_version_id INTEGER NOT NULL,
+                resized INTEGER NOT NULL,
+                image_width INTEGER NOT NULL,
+                image_height INTEGER NOT NULL,
+                file_data BYTEA NOT NULL,
+                CONSTRAINT jam_p_file_data PRIMARY KEY (file_version_id, resized),
+                CONSTRAINT jam_f_file_data_file_version FOREIGN KEY (file_version_id) REFERENCES jam_file_version(file_version_id)
+              )
+            Other Databases:
+              CREATE TABLE jam_file_data (
+                file_version_id INTEGER NOT NULL,
+                resized INTEGER NOT NULL,
+                image_width INTEGER NOT NULL,
+                image_height INTEGER NOT NULL,
+                file_data BLOB NOT NULL,
+                CONSTRAINT jam_p_file_data PRIMARY KEY (file_version_id, resized),
+                CONSTRAINT jam_f_file_data_file_version FOREIGN KEY (file_version_id) REFERENCES jam_file_version(file_version_id)
+              )
 
 
   JAMWiki 1.1.3
