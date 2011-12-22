@@ -363,6 +363,13 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>avhohlov2</id>
+			<name>Andrei Khokhlov</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
 	</developers>
 	<contributors>
 		<contributor><name>Fernando Fernandes</name><email>leandes</email><roles><role>translator (Portugese - Brazilian)</role></roles></contributor>

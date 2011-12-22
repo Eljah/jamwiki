@@ -12,6 +12,8 @@ New Features:
     used for site-specific customizations.
   * Move the system topics (BottomArea, LeftMenu, StyleSheet) to the
     JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
+  * Support storing images directly in the database rather than on the
+    filesystem (avhohlov2).
   * Refactor caching.  The cache is now configured to use a percentage of heap
     rather than a fixed size to avoid possible OOM situations, configuration is
     now managed via the ehcache-jamwiki.xml file, and individual caches have

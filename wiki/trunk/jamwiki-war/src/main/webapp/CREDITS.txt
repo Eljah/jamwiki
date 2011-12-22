@@ -12,6 +12,7 @@ JAMWiki Contributors
                             Daniel Fisla (dfisla)
                             Michael Greifeneder (mikegr)
                             Dallas Hopewell (dallas)
+                            Andrei Khokhlov (avhohlov2)
                             Hanspeter Klapf (hanspeterklapf)
                             Axel Kramer (axelclk)
                             Robert Matyja (dlpa)
