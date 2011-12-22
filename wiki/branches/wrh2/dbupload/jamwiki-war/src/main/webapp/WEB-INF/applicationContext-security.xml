@@ -3,8 +3,10 @@
 <b:beans xmlns="http://www.springframework.org/schema/security"
     xmlns:b="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+             http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+             http://www.springframework.org/schema/security
+             http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
 	<!--
 	This section contains the basic Spring Security configuration settings.  The intercept-url elements
@@ -13,6 +15,13 @@
 	element implements Spring Security's basic anonymous user permissions - note that these will be updated
 	by the JAMWikiAnonymousProcessingFilter.
 	-->
+	<http pattern="/**/Special:RecentChangesFeed" security="none" />
+	<http pattern="/**/Special:Setup" security="none" />
+	<http pattern="/**/*.jsp*" security="none" />
+	<http pattern="/**/jamwiki.css" security="none" />
+	<http pattern="/images/**" security="none" />
+	<http pattern="/js/**" security="none" />
+	<http pattern="/upload/**" security="none" />
 	<http auto-config="false" entry-point-ref="authenticationEntryPoint">
 		<!--
 		The intercept-url element defines the roles or authentication states that are required
@@ -32,19 +41,12 @@
 		<intercept-url pattern="/**/Special:Maintenance" access="ROLE_SYSADMIN" />
 		<intercept-url pattern="/**/Special:Manage" access="ROLE_ADMIN" />
 		<intercept-url pattern="/**/Special:Move" access="ROLE_MOVE" />
-		<intercept-url pattern="/**/Special:RecentChangesFeed" filters="none" />
 		<intercept-url pattern="/**/Special:Roles" access="ROLE_SYSADMIN" />
-		<intercept-url pattern="/**/Special:Setup" filters="none" />
 		<intercept-url pattern="/**/Special:Translation" access="ROLE_TRANSLATE" />
 		<intercept-url pattern="/**/Special:Unblock" access="ROLE_ADMIN" />
 		<intercept-url pattern="/**/Special:Upload" access="ROLE_UPLOAD" />
 		<intercept-url pattern="/**/Special:Upgrade" access="ROLE_SYSADMIN" />
 		<intercept-url pattern="/**/Special:VirtualWiki" access="ROLE_SYSADMIN" />
-		<intercept-url pattern="/**/*.jsp" filters="none" />
-		<intercept-url pattern="/**/jamwiki.css" filters="none" />
-		<intercept-url pattern="/images/**" filters="none" />
-		<intercept-url pattern="/js/**" filters="none" />
-		<intercept-url pattern="/upload/**" filters="none" />
 		<intercept-url pattern="/**" access="ROLE_VIEW" />
 		<access-denied-handler ref="jamwikiAccessDeniedHandler" />
 		<remember-me key="jam35Wiki" services-alias="_rememberMeServices" />

@@ -88,8 +88,8 @@ public class JAMWikiPostAuthenticationFilter implements Filter {
 			return;
 		}
 		// get arrays of existing Spring Security roles and JAMWiki anonymous user roles
-		Collection<GrantedAuthority> springSecurityAnonymousAuthorities = auth.getAuthorities();
-		Collection<GrantedAuthority> jamwikiAnonymousAuthorities = JAMWikiAuthenticationConfiguration.getJamwikiAnonymousAuthorities();
+		Collection<? extends GrantedAuthority> springSecurityAnonymousAuthorities = auth.getAuthorities();
+		Collection<? extends GrantedAuthority> jamwikiAnonymousAuthorities = JAMWikiAuthenticationConfiguration.getJamwikiAnonymousAuthorities();
 		if (springSecurityAnonymousAuthorities == null || jamwikiAnonymousAuthorities == null) {
 			return;
 		}

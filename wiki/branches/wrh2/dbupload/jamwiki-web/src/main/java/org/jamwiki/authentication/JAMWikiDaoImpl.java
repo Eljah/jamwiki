@@ -26,6 +26,7 @@ import org.jamwiki.utils.WikiUtil;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -80,7 +81,7 @@ public class JAMWikiDaoImpl implements UserDetailsService {
 				List<Role> roles = WikiBase.getDataHandler().getRoleMapUser(username);
 				if (roles != null) {
 					for (Role role : roles) {
-						results.add(new RoleImpl(role));
+						results.add(new SimpleGrantedAuthority(role.getAuthority()));
 					}
 				}
 			} catch (org.jamwiki.DataAccessException e) {

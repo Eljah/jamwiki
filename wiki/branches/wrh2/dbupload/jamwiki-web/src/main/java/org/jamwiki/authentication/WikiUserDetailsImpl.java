@@ -18,6 +18,7 @@ package org.jamwiki.authentication;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.model.Role;
 import org.jamwiki.utils.WikiLogger;
@@ -25,6 +26,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -46,7 +48,7 @@ public class WikiUserDetailsImpl implements UserDetails {
 	 * (roles). Anonymous users are assigned ROLE_ANONYMOUS by the Spring Security
 	 * filters.
 	 */
-	private Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+	private Collection<GrantedAuthority> authorities;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
 	private boolean credentialsNonExpired = true;
@@ -74,10 +76,10 @@ public class WikiUserDetailsImpl implements UserDetails {
 	 *  if they presented the correct username and password and the user
 	 *  is enabled
 	 * @throws IllegalArgumentException if a <code>null</code> value was passed
-	 *  either as a parameter or as an element in the
-	 *  <code>GrantedAuthority[]</code> array.
+	 *  either as a parameter or as an element in the <code>authorities</code>
+	 *  collection.
 	 */
-	public WikiUserDetailsImpl(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<GrantedAuthority> authorities) {
+	public WikiUserDetailsImpl(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 		if (StringUtils.isBlank(username) || password == null) {
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
 		}
@@ -119,16 +121,17 @@ public class WikiUserDetailsImpl implements UserDetails {
 	 * Standard set method for setting an array of granted authorities (permissions) for
 	 * the user.  This method will overwrite any existing authorities.
 	 */
-	protected void setAuthorities(Collection<GrantedAuthority> authorities) {
+	private void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
 		if (authorities == null) {
-			throw new IllegalArgumentException("Cannot pass a null GrantedAuthority array");
+			throw new IllegalArgumentException("Cannot pass a null authorities array");
 		}
+		this.authorities = new ArrayList<GrantedAuthority>();
 		for (GrantedAuthority auth : authorities) {
 			if (auth == null) {
-				throw new IllegalArgumentException("Granted authorities contains null element - GrantedAuthority[] cannot contain any null elements");
+				throw new IllegalArgumentException("Granted authorities cannot contain null elements");
 			}
+			this.authorities.add(auth);
 		}
-		this.authorities = authorities;
 	}
 
 	/**
@@ -184,7 +187,7 @@ public class WikiUserDetailsImpl implements UserDetails {
 	 *  role, <code>false</code> otherwise.
 	 */
 	public boolean hasRole(Role role) {
-		return this.hasRole(new RoleImpl(role));
+		return this.hasRole(new SimpleGrantedAuthority(role.getAuthority()));
 	}
 
 	/**

@@ -73,6 +73,7 @@ import org.jamwiki.utils.WikiUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -706,6 +707,24 @@ public class ServletUtil {
 	}
 
 	/**
+	 * Generate a ParserInput object appropriate for the given topic parameters.
+	 */
+	private static ParserInput topicParserInput(HttpServletRequest request, Topic topic, boolean sectionEdit) throws WikiException {
+		WikiUserDetailsImpl userDetails = ServletUtil.currentUserDetails();
+		if (sectionEdit && !ServletUtil.isEditable(topic.getVirtualWiki(), topic.getName(), userDetails)) {
+			sectionEdit = false;
+		}
+		WikiUser user = ServletUtil.currentWikiUser();
+		ParserInput parserInput = new ParserInput(topic.getVirtualWiki(), topic.getName());
+		parserInput.setContext(request.getContextPath());
+		parserInput.setLocale(request.getLocale());
+		parserInput.setWikiUser(user);
+		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
+		parserInput.setAllowSectionEdit(sectionEdit);
+		return parserInput;
+	}
+
+	/**
 	 * Validate that vital system properties, such as database connection settings,
 	 * have been specified properly.
 	 *
@@ -815,7 +834,8 @@ public class ServletUtil {
 		String virtualWikiName = pageInfo.getVirtualWikiName();
 		next.addObject("springSecurityTargetUrlField", JAMWikiAuthenticationConstants.SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME);
 		HttpSession session = request.getSession(false);
-		if (request.getRequestURL().indexOf(request.getRequestURI()) != -1 && (session == null || session.getAttribute(JAMWikiAuthenticationConstants.SPRING_SECURITY_SAVED_REQUEST_SESSION_KEY) == null)) {
+		HttpSessionRequestCache httpSessionRequestCache = new HttpSessionRequestCache();
+		if (request.getRequestURL().indexOf(request.getRequestURI()) != -1 && httpSessionRequestCache.getRequest(request, null) == null) {
 			// Only add a target URL if Spring Security has not saved a request in the session.  The request
 			// URL vs URI check is needed due to the fact that the first time a user is redirected by Spring
 			// Security to the login page the saved request attribute is not yet available in the session
@@ -866,45 +886,9 @@ public class ServletUtil {
 		}
 		LinkUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
 		if (allowRedirect && topic.getTopicType() == TopicType.REDIRECT && (request.getParameter("redirect") == null || !request.getParameter("redirect").equalsIgnoreCase("no"))) {
-			Topic child = null;
-			try {
-				child = LinkUtil.findRedirectedTopic(topic, 0);
-			} catch (DataAccessException e) {
-				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
-			}
-			if (!child.getName().equals(topic.getName())) {
-				String redirectUrl = null;
-				WikiLink wikiLink = new WikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
-				try {
-					redirectUrl = LinkUtil.buildTopicUrl(wikiLink);
-				} catch (DataAccessException e) {
-					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
-				}
-				// FIXME - hard coding
-				redirectUrl += LinkUtil.appendQueryParam("", "redirect", "no");
-				String redirectName = topic.getName();
-				pageInfo.setRedirectInfo(redirectUrl, redirectName);
-				pageTitle.replaceParameter(0, child.getName());
-				topic = child;
-				wikiLink = new WikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
-				pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());
-				// update the page info's virtual wiki in case this redirect is to another virtual wiki
-				pageInfo.setVirtualWikiName(topic.getVirtualWiki());
-			}
+			topic = ServletUtil.viewTopicRedirect(request, pageInfo, pageTitle, topic);
 		}
-		String virtualWiki = topic.getVirtualWiki();
-		String topicName = topic.getName();
-		WikiUserDetailsImpl userDetails = ServletUtil.currentUserDetails();
-		if (sectionEdit && !ServletUtil.isEditable(virtualWiki, topicName, userDetails)) {
-			sectionEdit = false;
-		}
-		WikiUser user = ServletUtil.currentWikiUser();
-		ParserInput parserInput = new ParserInput(virtualWiki, topicName);
-		parserInput.setContext(request.getContextPath());
-		parserInput.setLocale(request.getLocale());
-		parserInput.setWikiUser(user);
-		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
-		parserInput.setAllowSectionEdit(sectionEdit);
+		ParserInput parserInput = ServletUtil.topicParserInput(request, topic, sectionEdit);
 		ParserOutput parserOutput = new ParserOutput();
 		String content = null;
 		try {
@@ -915,73 +899,22 @@ public class ServletUtil {
 		if (parserOutput.getCategories().size() > 0) {
 			LinkedHashMap<String, String> categories = new LinkedHashMap<String, String>();
 			for (String key : parserOutput.getCategories().keySet()) {
-				String value = key.substring(Namespace.namespace(Namespace.CATEGORY_ID).getLabel(virtualWiki).length() + Namespace.SEPARATOR.length());
+				String value = key.substring(Namespace.namespace(Namespace.CATEGORY_ID).getLabel(topic.getVirtualWiki()).length() + Namespace.SEPARATOR.length());
 				categories.put(key, value);
 			}
 			next.addObject("categories", categories);
 		}
 		topic.setTopicContent(content);
 		if (topic.getTopicType() == TopicType.CATEGORY) {
-			loadCategoryContent(request, next, virtualWiki, topic.getName());
+			loadCategoryContent(request, next, topic.getVirtualWiki(), topic.getName());
 		}
 		pageInfo.setInterwikiLinks(parserOutput.getInterwikiLinks());
 		pageInfo.setVirtualWikiLinks(parserOutput.getVirtualWikiLinks());
 		if (topic.getTopicType() == TopicType.IMAGE || topic.getTopicType() == TopicType.FILE) {
-			WikiFile wikiFile = null;
-			List<WikiFileVersion> fileVersions = null;
-			try {
-				wikiFile = WikiBase.getDataHandler().lookupWikiFile(topic.getVirtualWiki(), topicName);
-				fileVersions = WikiBase.getDataHandler().getAllWikiFileVersions(topic.getVirtualWiki(), topicName, true);
-			} catch (DataAccessException e) {
-				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
-			}
-			WikiUser wikiUser;
-			for (WikiFileVersion fileVersion : fileVersions) {
-				// update version urls to include web root path
-				String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + fileVersion.getUrl());
-				url = FilenameUtils.separatorsToUnix(url);
-				fileVersion.setUrl(url);
-				// make sure the authorDisplay field is equal to the login for non-anonymous uploads
-				if (fileVersion.getAuthorId() != null) {
-					try {
-						wikiUser = WikiBase.getDataHandler().lookupWikiUser(fileVersion.getAuthorId());
-					} catch (DataAccessException e) {
-						throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
-					}
-					if (wikiUser != null) {
-						// wikiUser should never be null unless the data in the database is somehow corrupt
-						fileVersion.setAuthorDisplay(wikiUser.getUsername());
-					}
-				}
-			}
-			next.addObject("fileVersions", fileVersions);
-			if (topic.getTopicType() == TopicType.IMAGE) {
-				next.addObject("topicImage", true);
-			} else {
-				next.addObject("topicFile", true);
-			}
-			// use the WikiFile virtual wiki rather than the topic to work around
-			// a corner case where there could be an image page topic created for
-			// the virtual wiki even though the actual image file is only on the
-			// shared virtual wiki.
-			boolean sharedImage = !pageInfo.getVirtualWikiName().equals(wikiFile.getVirtualWiki());
-			if (sharedImage) {
-				try {
-					Topic sharedImageTopic = topic;
-					if (!StringUtils.equals(wikiFile.getVirtualWiki(), topic.getVirtualWiki())) {
-						// look up the shared topic file
-						sharedImageTopic = WikiBase.getDataHandler().lookupTopicById(wikiFile.getTopicId());
-					}
-					WikiLink wikiLink = new WikiLink(request.getContextPath(), sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName());
-					pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());
-					next.addObject("sharedImageTopicObject", sharedImageTopic);
-				} catch (DataAccessException e) {
-					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
-				}
-			}
+			ServletUtil.viewTopicImage(request, next, pageInfo, topic);
 		}
 		pageInfo.setSpecial(false);
-		pageInfo.setTopicName(topicName);
+		pageInfo.setTopicName(topic.getName());
 		next.addObject(ServletUtil.PARAMETER_TOPIC_OBJECT, topic);
 		if (pageTitle != null) {
 			if (parserOutput.getPageTitle() != null) {
@@ -989,6 +922,97 @@ public class ServletUtil {
 			}
 			pageInfo.setPageTitle(pageTitle);
 		}
+	}
+
+	/**
+	 * If a topic is an image then set metadata appropriately.
+	 */
+	private static void viewTopicImage(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, Topic topic) throws WikiException {
+		WikiFile wikiFile = null;
+		List<WikiFileVersion> fileVersions = null;
+		try {
+			wikiFile = WikiBase.getDataHandler().lookupWikiFile(topic.getVirtualWiki(), topic.getName());
+			fileVersions = WikiBase.getDataHandler().getAllWikiFileVersions(topic.getVirtualWiki(), topic.getName(), true);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
+		WikiUser wikiUser;
+		for (WikiFileVersion fileVersion : fileVersions) {
+			// update version urls to include web root path
+			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + fileVersion.getUrl());
+			url = FilenameUtils.separatorsToUnix(url);
+			fileVersion.setUrl(url);
+			// make sure the authorDisplay field is equal to the login for non-anonymous uploads
+			if (fileVersion.getAuthorId() != null) {
+				try {
+					wikiUser = WikiBase.getDataHandler().lookupWikiUser(fileVersion.getAuthorId());
+				} catch (DataAccessException e) {
+					throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+				}
+				if (wikiUser != null) {
+					// wikiUser should never be null unless the data in the database is somehow corrupt
+					fileVersion.setAuthorDisplay(wikiUser.getUsername());
+				}
+			}
+		}
+		next.addObject("fileVersions", fileVersions);
+		if (topic.getTopicType() == TopicType.IMAGE) {
+			next.addObject("topicImage", true);
+		} else {
+			next.addObject("topicFile", true);
+		}
+		// use the WikiFile virtual wiki rather than the topic to work around
+		// a corner case where there could be an image page topic created for
+		// the virtual wiki even though the actual image file is only on the
+		// shared virtual wiki.
+		boolean sharedImage = !pageInfo.getVirtualWikiName().equals(wikiFile.getVirtualWiki());
+		if (sharedImage) {
+			try {
+				Topic sharedImageTopic = topic;
+				if (!StringUtils.equals(wikiFile.getVirtualWiki(), topic.getVirtualWiki())) {
+					// look up the shared topic file
+					sharedImageTopic = WikiBase.getDataHandler().lookupTopicById(wikiFile.getTopicId());
+				}
+				WikiLink wikiLink = new WikiLink(request.getContextPath(), sharedImageTopic.getVirtualWiki(), sharedImageTopic.getName());
+				pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());
+				next.addObject("sharedImageTopicObject", sharedImageTopic);
+			} catch (DataAccessException e) {
+				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+			}
+		}
+	}
+
+	/**
+	 * If a topic is a redirect then set metadata appropriately, and return
+	 * the topic that is the target of the redirection.
+	 */
+	private static Topic viewTopicRedirect(HttpServletRequest request, WikiPageInfo pageInfo, WikiMessage pageTitle, Topic topic) throws WikiException {
+		Topic child = null;
+		try {
+			child = LinkUtil.findRedirectedTopic(topic, 0);
+		} catch (DataAccessException e) {
+			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+		}
+		if (!child.getName().equals(topic.getName())) {
+			String redirectUrl = null;
+			WikiLink wikiLink = new WikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
+			try {
+				redirectUrl = LinkUtil.buildTopicUrl(wikiLink);
+			} catch (DataAccessException e) {
+				throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
+			}
+			// FIXME - hard coding
+			redirectUrl += LinkUtil.appendQueryParam("", "redirect", "no");
+			String redirectName = topic.getName();
+			pageInfo.setRedirectInfo(redirectUrl, redirectName);
+			pageTitle.replaceParameter(0, child.getName());
+			topic = child;
+			wikiLink = new WikiLink(request.getContextPath(), topic.getVirtualWiki(), topic.getName());
+			pageInfo.setCanonicalUrl(wikiLink.toRelativeUrl());
+			// update the page info's virtual wiki in case this redirect is to another virtual wiki
+			pageInfo.setVirtualWikiName(topic.getVirtualWiki());
+		}
+		return topic;
 	}
 
 	/**

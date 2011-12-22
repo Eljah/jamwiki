@@ -195,8 +195,12 @@ public class BlockServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	private void viewBlock(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
+	private void viewBlock(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws DataAccessException {
 		next.addObject("user", request.getParameter("user"));
+		WikiUser user = this.initializeWikiUser(request, pageInfo);
+		if (user != null) {
+			next.addObject("lastLoginIpAddress", user.getLastLoginIpAddress());
+		}
 		pageInfo.setContentJsp(JSP_ADMIN_BLOCK);
 		pageInfo.setPageTitle(new WikiMessage("block.title"));
 		pageInfo.setSpecial(true);

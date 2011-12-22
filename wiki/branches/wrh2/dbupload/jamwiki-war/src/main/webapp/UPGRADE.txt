@@ -93,6 +93,9 @@ followed by 0.6.3.
     "resources" sub-directory within the JAMWiki system folder.  If these files
     have been customized then they will need to be manually copied to the new
     folder, otherwise JAMWiki will create fresh versions automatically.
+  * Spring and Spring security have been upgraded; make sure that the
+    xsi:schemaLocation elements in the jamwiki-servlet.xml and
+    applicationContext-security.xml files point to the 3.1 versions.
   * The /WEB-INF/applicationContext-security.xml file has been modified so that
     the Special:Account page requires ROLE_REGISTER for anonymous users. If you
     have customized this file be sure to add an appropriate intercept-url.

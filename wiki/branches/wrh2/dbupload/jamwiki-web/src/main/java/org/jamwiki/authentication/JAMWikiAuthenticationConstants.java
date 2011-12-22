@@ -16,10 +16,8 @@
  */
 package org.jamwiki.authentication;
 
-import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
-import org.springframework.security.web.WebAttributes;
 
 /**
  * Constant values used with the Spring Security integration.
@@ -40,10 +38,7 @@ public interface JAMWikiAuthenticationConstants {
 	/** The default Spring Security username login form field name. */
 	public static final String SPRING_SECURITY_LOGIN_USERNAME_FIELD_NAME = UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY;
 	/** The default Spring Security target URL login form hidden field name. */
-	public static final String SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME = AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER;
-
-	/** When forcing a user to login, the previous request is saved in the session under this key. */
-	public static final String SPRING_SECURITY_SAVED_REQUEST_SESSION_KEY = WebAttributes.SAVED_REQUEST;
+	public static final String SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME = "spring-security-redirect";
 
 	/** Key used to store access denied message key in the session. */
 	public static final String JAMWIKI_ACCESS_DENIED_ERROR_KEY = "JAMWIKI_403_ERROR_KEY";

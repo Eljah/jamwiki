@@ -18,6 +18,7 @@ package org.jamwiki.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -29,6 +30,14 @@ public class JAMWikiAuthenticationProcessingFilter extends UsernamePasswordAuthe
 
 	/** Standard logger. */
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiAuthenticationProcessingFilter.class.getName());
+
+	/**
+	 *
+	 */
+	public JAMWikiAuthenticationProcessingFilter() {
+		super();
+		((SimpleUrlAuthenticationSuccessHandler)this.getSuccessHandler()).setTargetUrlParameter(JAMWikiAuthenticationConstants.SPRING_SECURITY_LOGIN_TARGET_URL_FIELD_NAME);
+	}
 
 	/**
 	 * Indicates whether this filter should attempt to process a login request
