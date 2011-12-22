@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import org.jamwiki.ImageData;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -1156,4 +1157,54 @@ public interface QueryHandler {
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
 	void updateWikiUser(WikiUser user, Connection conn) throws SQLException;
+
+	/**
+	 * Add new image or other data to database.
+	 *
+	 * @param imageData The image and it's arrtibutes to store.
+	 * @param isResized Must be true when inserting resized version of image and false otherwise.
+	 * @param conn A database connection to use when connecting to the database
+	 *  from this method.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	public void insertImage(ImageData imageData, boolean isResized, Connection conn) throws SQLException;
+
+	/**
+	 * @param fileId File identifier.
+	 * @param conn A database connection to use when connecting to the database
+	 *  from this method.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	public void deleteResizedImages(int fileId, Connection conn) throws SQLException;
+
+	/**
+	 * @param fileId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image info or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's data and image components may be null.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	public ImageData getImageInfo(int fileId, int resized) throws SQLException;
+
+	/**
+	 * Get latest version of image.
+	 *
+	 * @param fileId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image data or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's image components may be null.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	public ImageData getImageData(int fileId, int resized) throws SQLException;
+
+	/**
+	 * Get desired version of image.
+	 *
+	 * @param fileVersionId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image data or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's image components may be null.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	public ImageData getImageVersionData(int fileVersionId, int resized) throws SQLException;
 }

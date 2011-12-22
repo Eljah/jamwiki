@@ -165,6 +165,9 @@ public class DatabaseUpgrades {
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_role"));
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_120_ADD_ROLE_REGISTER_TO_ANONYMOUS", conn);
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_group_authorities"));
+			// add the jam_file_data table
+			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_FILE_DATA_TABLE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_file_data"));
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			logger.error("Database failure during upgrade", e);

@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
+import org.jamwiki.ImageData;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
@@ -106,20 +107,26 @@ public abstract class ImageUtil {
 	 *  if the file does not exist.
 	 * @throws DataAccessException Thrown if any error occurs while retrieving file info.
 	 */
-	public static String buildImageFileUrl(String virtualWiki, String topicName) throws DataAccessException {
+	public static String buildImageFileUrl(String context, String virtualWiki, String topicName) throws DataAccessException {
 		WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(virtualWiki, topicName);
 		if (wikiFile == null) {
 			return null;
 		}
-		return buildRelativeImageUrl(wikiFile.getUrl());
+		String relativeFileUrl = isImagesOnFS() ? wikiFile.getUrl() : "?fileId=" + wikiFile.getFileId();
+		return buildRelativeImageUrl(context, virtualWiki, relativeFileUrl);
 	}
 
 	/**
 	 *
 	 */
-	private static String buildRelativeImageUrl(String filename) {
-		String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + filename);
-		return FilenameUtils.separatorsToUnix(url);
+	private static String buildRelativeImageUrl(String context, String virtualWiki, String filename) {
+		if (isImagesOnFS()) {
+			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + filename);
+			return FilenameUtils.separatorsToUnix(url);
+		} else {
+			WikiLink imageLink = new WikiLink(context, virtualWiki, "Special:Image");
+			return imageLink.toRelativeUrl() + filename;
+		}
 	}
 
 	/**
@@ -146,7 +153,7 @@ public abstract class ImageUtil {
 	 * @throws IOException Thrown if any error occurs while reading image information.
 	 */
 	public static String buildImageLinkHtml(String context, String linkVirtualWiki, String topicName, ImageMetadata imageMetadata, String style, boolean escapeHtml) throws DataAccessException, IOException {
-		String url = ImageUtil.buildImageFileUrl(linkVirtualWiki, topicName);
+		String url = ImageUtil.buildImageFileUrl(context, linkVirtualWiki, topicName);
 		if (url == null) {
 			return ImageUtil.buildUploadLink(context, linkVirtualWiki, topicName);
 		}
@@ -176,7 +183,7 @@ public abstract class ImageUtil {
 		}
 		Object[] args = (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) ? new Object[6] : new Object[5];
 		args[0] = style;
-		args[1] = buildRelativeImageUrl(wikiImage.getUrl());
+		args[1] = buildRelativeImageUrl(context, linkVirtualWiki, wikiImage.getUrl());
 		args[2] = wikiImage.getWidth();
 		args[3] = wikiImage.getHeight();
 		args[4] = StringEscapeUtils.escapeHtml4(imageMetadata.getAlt());
@@ -349,6 +356,17 @@ public abstract class ImageUtil {
 			return originalDimensions;
 		}
 		int incrementalHeight = (int)Math.round(((double)incrementalWidth / (double)originalDimensions.getWidth()) * (double)originalDimensions.getHeight());
+		if (isImagesOnFS()) {
+			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, scaledDimensions, incrementalWidth, incrementalHeight);
+		} else {
+			return calculateIncrementalDimensionsForImageBlob(wikiImage, originalDimensions, scaledDimensions, incrementalWidth, incrementalHeight);
+		}
+	}
+
+	/**
+	 * Determine scaled dimensions for images stored on the filesystem.
+	 */
+	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		String newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), incrementalWidth);
 		File newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
@@ -362,6 +380,19 @@ public abstract class ImageUtil {
 		newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
 		ImageProcessor.saveImage(bufferedImage, newImageFile);
 		return new Dimension(bufferedImage.getWidth(), bufferedImage.getHeight());
+	}
+
+	/**
+	 * Determine scaled dimensions for images stored in the database.
+	 */
+	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
+		// check to see if an image with the desired dimensions already exists on the filesystem
+		Dimension d1  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), incrementalWidth);
+		if (d1 != null) {
+			return d1;
+		}
+		// otherwise generate a scaled instance
+		return ImageProcessor.resizeImage(wikiImage.getFileId(), incrementalWidth, incrementalHeight);
 	}
 
 	/**
@@ -433,9 +464,11 @@ public abstract class ImageUtil {
 		String year = Integer.toString(cal.get(Calendar.YEAR));
 		String month = Integer.toString(cal.get(Calendar.MONTH) + 1);
 		String subdirectory = "/" + virtualWiki + "/" + year + "/" + month;
-		File directory = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), subdirectory);
-		if (!directory.exists() && !directory.mkdirs()) {
-			throw new WikiException(new WikiMessage("upload.error.directorycreate", directory.getAbsolutePath()));
+		if (isImagesOnFS()) {
+			File directory = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), subdirectory);
+			if (!directory.exists() && !directory.mkdirs()) {
+				throw new WikiException(new WikiMessage("upload.error.directorycreate", directory.getAbsolutePath()));
+			}
 		}
 		return subdirectory + "/" + url;
 	}
@@ -471,8 +504,12 @@ public abstract class ImageUtil {
 		// get the size of the original (unresized) image
 		Dimension originalDimensions = ImageUtil.retrieveFromCache(wikiImage);
 		if (originalDimensions == null) {
-			File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
-			originalDimensions = ImageProcessor.retrieveImageDimensions(file);
+			if (isImagesOnFS()) {
+				File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
+				originalDimensions = ImageProcessor.retrieveImageDimensions(file);
+			} else {
+				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), 0);
+			}
 			if (originalDimensions == null) {
 				logger.info("Unable to determine dimensions for image: " + wikiImage.getUrl());
 				return null;
@@ -489,8 +526,14 @@ public abstract class ImageUtil {
 		wikiImage.setHeight((int)scaledDimensions.getHeight());
 		// return an appropriate WikiImage object with URL to the scaled image, proper width, and proper height
 		Dimension incrementalDimensions = calculateIncrementalDimensions(wikiImage, originalDimensions, scaledDimensions);
-		String url = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), (int)incrementalDimensions.getWidth());
-		wikiImage.setUrl(url);
+		if (isImagesOnFS()) {
+			String url = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), (int)incrementalDimensions.getWidth());
+			wikiImage.setUrl(url);
+		} else {
+			int resized  = incrementalDimensions.width != originalDimensions.width ? incrementalDimensions.width : 0;
+			String url = "?fileId=" + wikiImage.getFileId() + "&resized=" + resized;
+			wikiImage.setUrl(url);
+		}
 		return wikiImage;
 	}
 
@@ -535,6 +578,21 @@ public abstract class ImageUtil {
 	public static boolean isImage(File file) {
 		try {
 			return (ImageProcessor.retrieveImageDimensions(file) != null);
+		} catch (IOException x) {
+			return false;
+		}
+	}
+
+	/**
+	 * Given a object name, determine if the object is an image or if it is some
+	 * other type of data.
+	 *
+	 * @param fileId The file identifier that is being examined.
+	 * @return Returns <code>true</code> if the object is an image object.
+	 */
+	public static boolean isImage(int fileId) {
+		try {
+			return (ImageProcessor.retrieveImageDimensions(fileId, 0) != null);
 		} catch (IOException x) {
 			return false;
 		}
@@ -622,7 +680,7 @@ public abstract class ImageUtil {
 	 * @param fileSize The size of the file version record in bytes.
 	 * @return The new or updated WikiFile record.
 	 */
-	public static WikiFile writeWikiFile(Topic topic, WikiFileVersion wikiFileVersion, WikiUser user, String ipAddress, String filename, String url, String contentType, long fileSize) throws DataAccessException, WikiException {
+	public static WikiFile writeWikiFile(Topic topic, WikiFileVersion wikiFileVersion, WikiUser user, String ipAddress, String filename, String url, String contentType, long fileSize, ImageData imageData) throws DataAccessException, WikiException {
 		wikiFileVersion.setAuthorDisplay(ipAddress);
 		Integer authorId = null;
 		if (user != null && user.getUserId() > 0) {
@@ -643,7 +701,15 @@ public abstract class ImageUtil {
 		wikiFileVersion.setFileSize(fileSize);
 		wikiFile.setFileSize(fileSize);
 		wikiFile.setTopicId(topic.getTopicId());
-		WikiBase.getDataHandler().writeFile(wikiFile, wikiFileVersion);
+		WikiBase.getDataHandler().writeFile(wikiFile, wikiFileVersion, imageData);
 		return wikiFile;
+	}
+
+	/**
+	 * @return <code>true</code> if images are stored on file system and <code>false</code> if in database.
+	 */
+	public static boolean isImagesOnFS() {
+		String fileDir = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
+		return !fileDir.isEmpty();
 	}
 }

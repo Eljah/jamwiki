@@ -91,7 +91,8 @@ public class WikiDatabase {
 		{"jam_topic_links", null},
 		{"jam_interwiki", null},
 		{"jam_configuration", null},
-		{"jam_user_block", "user_block_id"}
+		{"jam_user_block", "user_block_id"},
+		{"jam_file_data", "file_version_id"}
 	};
 
 	/**
