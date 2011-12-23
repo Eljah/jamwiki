@@ -49,6 +49,7 @@ New Features:
   * Upgrade to commons-lang 3.1.
   * Upgrade to commons-io-2.1.
   * Upgrade to commons-codec 1.6.
+  * Upgrade to commons-pool 1.5.7.
 
 Bugfixes:
 
