@@ -585,12 +585,12 @@ public interface DataHandler {
 	 *
 	 * @param virtualWiki The virtual wiki for the topic.
 	 * @param topicName The name of the topic.
-	 * @return A list of topic names for all topics that link to the
-	 *  specified topic.  If no results are found then an empty list is
-	 *  returned.
+	 * @return A list of topic name and (for redirects) the redirect topic
+	 *  name for all topics that link to the specified topic.  If no results
+	 *  are found then an empty list is returned.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	List<String> lookupTopicLinks(String virtualWiki, String topicName) throws DataAccessException;
+	List<String[]> lookupTopicLinks(String virtualWiki, String topicName) throws DataAccessException;
 
 	/**
 	 * Find the names for all un-linked topics in the main namespace.

@@ -839,15 +839,14 @@ public interface QueryHandler {
 	 * Find the names for all topics that link to a specified topic.
 	 *
 	 * @param virtualWikiId The virtual wiki id for the topic being queried.
-	 * @param namespace The Namespace for the topic being queried.
-	 * @param pageName The topic pageName (topic name without the namespace) for
-	 *  the topic being queried.
-	 * @return A list of topic names for all topics that link to the
-	 *  specified topic.  If no results are found then an empty list is
-	 *  returned.
+	 * @param topic The topic that is the target of all link topics being returned
+	 *  by this method.
+	 * @return A list of topic name and (for redirects) the redirect topic
+	 *  name for all topics that link to the specified topic.  If no results
+	 *  are found then an empty list is returned.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	List<String> lookupTopicLinks(int virtualWikiId, Namespace namespace, String pageName) throws SQLException;
+	List<String[]> lookupTopicLinks(int virtualWikiId, Topic topic) throws SQLException;
 
 	/**
 	 * Find the names for all un-linked topics in the main namespace.

@@ -60,8 +60,6 @@ public class ItemsServlet extends JAMWikiServlet {
 			viewImages(request, next, pageInfo);
 		} else if (ServletUtil.isTopic(request, "Special:FileList")) {
 			viewFiles(request, next, pageInfo);
-		} else if (ServletUtil.isTopic(request, "Special:LinkTo")) {
-			viewLinkTo(request, next, pageInfo);
 		} else if (ServletUtil.isTopic(request, "Special:ListUsers")) {
 			viewUsers(request, next, pageInfo);
 		} else if (ServletUtil.isTopic(request, "Special:OrphanedPages")) {
@@ -90,35 +88,6 @@ public class ItemsServlet extends JAMWikiServlet {
 		pageInfo.setPageTitle(new WikiMessage("allfiles.title"));
 		pageInfo.setContentJsp(JSP_ITEMS);
 		pageInfo.setSpecial(true);
-	}
-
-	/**
-	 *
-	 */
-	private void viewLinkTo(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws DataAccessException, WikiException {
-		String virtualWiki = pageInfo.getVirtualWikiName();
-		String topicName = WikiUtil.getTopicFromRequest(request);
-		if (StringUtils.isBlank(topicName)) {
-			throw new WikiException(new WikiMessage("common.exception.notopic"));
-		}
-		Pagination pagination = ServletUtil.loadPagination(request, next);
-		Set<String> allItems = new TreeSet<String>();
-		// retrieve topic names for topics that link to this one
-		allItems.addAll(WikiBase.getDataHandler().lookupTopicLinks(virtualWiki, topicName));
-		List<String> items = Pagination.retrievePaginatedSubset(pagination, allItems);
-		if (!allItems.isEmpty()) {
-			pageInfo.addMessage(new WikiMessage("linkto.overview", topicName));
-		} else {
-			pageInfo.addMessage(new WikiMessage("linkto.none", topicName));
-		}
-		next.addObject("itemCount", items.size());
-		next.addObject("items", items);
-		String rootUrl = "Special:LinkTo?topic=" + Utilities.encodeAndEscapeTopicName(topicName);
-		next.addObject("rootUrl", rootUrl);
-		pageInfo.setPageTitle(new WikiMessage("linkto.title", topicName));
-		pageInfo.setContentJsp(JSP_ITEMS);
-		pageInfo.setSpecial(true);
-		pageInfo.setTopicName(topicName);
 	}
 
 	/**

@@ -2523,7 +2523,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public List<String> lookupTopicLinks(int virtualWikiId, Namespace namespace, String pageName) throws SQLException {
+	public List<String[]> lookupTopicLinks(int virtualWikiId, Topic topic) throws SQLException {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2531,12 +2531,17 @@ public class AnsiQueryHandler implements QueryHandler {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_LINKS);
 			stmt.setInt(1, virtualWikiId);
-			stmt.setInt(2, namespace.getId());
-			stmt.setString(3, pageName);
+			stmt.setInt(2, topic.getNamespace().getId());
+			stmt.setString(3, topic.getPageName());
+			stmt.setInt(4, virtualWikiId);
+			stmt.setString(5, topic.getName());
 			rs = stmt.executeQuery();
-			List<String> results = new ArrayList<String>();
+			List<String[]> results = new ArrayList<String[]>();
 			while (rs.next()) {
-				results.add(rs.getString("topic_name"));
+				String[] element = new String[2];
+				element[0] = rs.getString("topic_name");
+				element[1] = rs.getString("child_topic_name");
+				results.add(element);
 			}
 			return results;
 		} finally {

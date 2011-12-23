@@ -1102,15 +1102,16 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public List<String> lookupTopicLinks(String virtualWiki, String topicName) throws DataAccessException {
+	public List<String[]> lookupTopicLinks(String virtualWiki, String topicName) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 		Namespace namespace = LinkUtil.retrieveTopicNamespace(virtualWiki, topicName);
 		String pageName = LinkUtil.retrieveTopicPageName(namespace, virtualWiki, topicName);
 		// FIXE - link to records are always capitalized, which will cause problems for the
 		// rare case of two topics such as "eBay" and "EBay".
 		pageName = StringUtils.capitalize(pageName);
+		Topic topic = new Topic(virtualWiki, namespace, pageName);
 		try {
-			return this.queryHandler().lookupTopicLinks(virtualWikiId, namespace, pageName);
+			return this.queryHandler().lookupTopicLinks(virtualWikiId, topic);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
