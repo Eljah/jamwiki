@@ -71,6 +71,24 @@ Translation Updates:
   * Updated German translations (axelclk).
 
 
+1.1.4
+=====
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+  * Image "alt" tag on image pages should not be "null".  Reported by Samuel.
+  * The "File server URL" property was being ignored when generating image and
+    file URLs.  Reported by Samuel.
+
+Translation Updates:
+
+  * None.
+
+
 1.1.3
 =====
 

@@ -161,6 +161,13 @@ followed by 0.6.3.
               )
 
 
+  JAMWiki 1.1.4
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "1.1.4".
+
+
   JAMWiki 1.1.3
   =============
 

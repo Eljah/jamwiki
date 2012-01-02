@@ -103,25 +103,39 @@ public abstract class ImageUtil {
 	 *
 	 * @param virtualWiki The virtual wiki for the URL that is being created.
 	 * @param topicName The name of the image for which a link is being created.
+	 * @param forceAbsoluteUrl Set to <code>true</code> if the returned URL should
+	 *  always be absolute.  By default an absolute URL will only be returned if
+	 *  the PROP_FILE_SERVER_URL property is not empty and differs from the
+	 *  PROP_SERVER_URL property.
 	 * @return The URL to an image file (not the image topic) or <code>null</code>
 	 *  if the file does not exist.
 	 * @throws DataAccessException Thrown if any error occurs while retrieving file info.
 	 */
-	public static String buildImageFileUrl(String context, String virtualWiki, String topicName) throws DataAccessException {
+	public static String buildImageFileUrl(String context, String virtualWiki, String topicName, boolean forceAbsoluteUrl) throws DataAccessException {
 		WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(virtualWiki, topicName);
 		if (wikiFile == null) {
 			return null;
 		}
 		String relativeFileUrl = isImagesOnFS() ? wikiFile.getUrl() : "?fileId=" + wikiFile.getFileId();
-		return buildRelativeImageUrl(context, virtualWiki, relativeFileUrl);
+		return buildImageUrl(context, virtualWiki, relativeFileUrl, forceAbsoluteUrl);
 	}
 
 	/**
 	 *
 	 */
-	private static String buildRelativeImageUrl(String context, String virtualWiki, String filename) {
+	private static String buildImageUrl(String context, String virtualWiki, String filename, boolean forceAbsoluteUrl) {
 		if (isImagesOnFS()) {
 			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + filename);
+			String fileServerUrl = Environment.getValue(Environment.PROP_FILE_SERVER_URL);
+			String absoluteServerUrl = Environment.getValue(Environment.PROP_SERVER_URL);
+			if (!StringUtils.isBlank(fileServerUrl) && !StringUtils.equalsIgnoreCase(fileServerUrl, absoluteServerUrl)) {
+				// file server URL is not the same as server URL, so make the image URL absolute
+				url = LinkUtil.normalize(fileServerUrl + url);
+			} else if (forceAbsoluteUrl) {
+				// caller requested an absolute URL when one would not have otherwise been
+				// required, so use the server URL to generate an absolute URL
+				url = LinkUtil.normalize(absoluteServerUrl + url);
+			}
 			return FilenameUtils.separatorsToUnix(url);
 		} else {
 			WikiLink imageLink = new WikiLink(context, virtualWiki, "Special:Image");
@@ -153,7 +167,7 @@ public abstract class ImageUtil {
 	 * @throws IOException Thrown if any error occurs while reading image information.
 	 */
 	public static String buildImageLinkHtml(String context, String linkVirtualWiki, String topicName, ImageMetadata imageMetadata, String style, boolean escapeHtml) throws DataAccessException, IOException {
-		String url = ImageUtil.buildImageFileUrl(context, linkVirtualWiki, topicName);
+		String url = ImageUtil.buildImageFileUrl(context, linkVirtualWiki, topicName, false);
 		if (url == null) {
 			return ImageUtil.buildUploadLink(context, linkVirtualWiki, topicName);
 		}
@@ -183,10 +197,11 @@ public abstract class ImageUtil {
 		}
 		Object[] args = (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) ? new Object[6] : new Object[5];
 		args[0] = style;
-		args[1] = buildRelativeImageUrl(context, linkVirtualWiki, wikiImage.getUrl());
+		args[1] = buildImageUrl(context, linkVirtualWiki, wikiImage.getUrl(), false);
 		args[2] = wikiImage.getWidth();
 		args[3] = wikiImage.getHeight();
-		args[4] = StringEscapeUtils.escapeHtml4(imageMetadata.getAlt());
+		String alt = (imageMetadata.getAlt() == null) ? topicName : imageMetadata.getAlt();
+		args[4] = StringEscapeUtils.escapeHtml4(alt);
 		// TODO: combine the standard & vertical templates by adding a CSS class for
 		// vertical alignment
 		String template = TEMPLATE_IMAGE_IMG_STANDARD;
