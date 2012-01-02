@@ -152,18 +152,21 @@ public class UploadServlet extends JAMWikiServlet {
 			next.addObject("contents", contents);
 			return;
 		}
+		if (!StringUtils.isEmpty(destinationFilename)) {
+			// rename the uploaded file if a destination file name was specified
+			filename = ImageUtil.sanitizeFilename(destinationFilename);
+			url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
+			if (ImageUtil.isImagesOnFS()) {
+				File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
+				if (!uploadedFile.renameTo(renamedFile)) {
+					throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
+				}
+			}
+		}
 		ImageData imageData = null;
 		if (!ImageUtil.isImagesOnFS()) {
 			imageData = processImageData(contentType, buff);
 			isImage = (imageData.width >= 0);
-		} else if (!StringUtils.isEmpty(destinationFilename)) {
-			// rename the uploaded file if a destination file name was specified
-			filename = ImageUtil.sanitizeFilename(destinationFilename);
-			url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
-			File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
-			if (!uploadedFile.renameTo(renamedFile)) {
-				throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
-			}
 		}
 		String ipAddress = ServletUtil.getIpAddress(request);
 		WikiUser user = ServletUtil.currentWikiUser();
