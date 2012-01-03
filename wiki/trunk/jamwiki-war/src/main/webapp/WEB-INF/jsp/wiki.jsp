@@ -18,6 +18,7 @@
 --%>
 <%@ page errorPage="/WEB-INF/jsp/error.jsp"
     contentType="text/html; charset=utf-8"
+    trimDirectiveWhitespaces="true"
 %>
 
 <%@ include file="page-init.jsp" %>
