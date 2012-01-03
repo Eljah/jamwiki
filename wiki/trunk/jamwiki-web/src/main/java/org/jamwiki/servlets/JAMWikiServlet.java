@@ -29,6 +29,7 @@ import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
+import org.jamwiki.model.UserBlock;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiUser;
@@ -54,7 +55,7 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 	/** The prefix of the JSP file used to display the servlet output. */
 	protected String displayJSP = "wiki";
 	/** The name of the JSP file used to render the servlet output in case the user is blocked. */
-	protected static final String JSP_BLOCKED = "blocked.jsp";
+	private static final String JSP_BLOCKED = "blocked.jsp";
 	/** The name of the JSP file used to render the servlet output in case of errors. */
 	protected static final String JSP_ERROR = "error-display.jsp";
 	/** The name of the JSP file used to render the servlet output for logins. */
@@ -311,9 +312,18 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 		initParams();
 		ModelAndView next = new ModelAndView(this.displayJSP);
 		WikiPageInfo pageInfo = new WikiPageInfo(request);
+		ModelAndView blockedUserModelAndView = null;
 		try {
 			if (!this.handleRedirect(request, next, pageInfo)) {
-				next = this.handleJAMWikiRequest(request, response, next, pageInfo);
+				if (this instanceof BlockableController) {
+					// verify that the user is not blocked from accessing the servlet
+					blockedUserModelAndView = this.handleUserBlock(request, pageInfo);
+				}
+				if (blockedUserModelAndView != null) {
+					next = blockedUserModelAndView;
+				} else {
+					next = this.handleJAMWikiRequest(request, response, next, pageInfo);
+				}
 				if (next != null && this.layout) {
 					this.loadLayout(request, next, pageInfo);
 				}
@@ -355,6 +365,32 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 		}
 		pageInfo.addError(new WikiMessage("edit.exception.spam", result));
 		return true;
+	}
+
+	/**
+	 * Utility method used when determining if a user is blocked.  If the
+	 * user is blocked this method will return a ModelAndView object
+	 * appropriate for the blocked user page.
+	 *
+	 * @param request The servlet request object.
+	 * @param pageInfo The current WikiPageInfo object, which contains
+	 *  information needed for rendering the final JSP page.
+	 * @return Returns a ModelAndView object corresponding to the blocked
+	 *  user page display if the user is blocked, <code>null</code>
+	 *  otherwise.
+	 */
+	private ModelAndView handleUserBlock(HttpServletRequest request, WikiPageInfo pageInfo) {
+		UserBlock userBlock = ServletUtil.retrieveCurrentUserBlock(request);
+		if (userBlock == null) {
+			return null;
+		}
+		ModelAndView next = new ModelAndView("wiki");
+		pageInfo.reset();
+		pageInfo.setPageTitle(new WikiMessage("userblock.title"));
+		pageInfo.setContentJsp(JAMWikiServlet.JSP_BLOCKED);
+		pageInfo.setSpecial(true);
+		next.addObject("userBlock", userBlock);
+		return next;
 	}
 
 	/**

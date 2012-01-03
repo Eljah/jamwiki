@@ -45,7 +45,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 /**
  * Used to process new user account setup.
  */
-public class RegisterServlet extends JAMWikiServlet {
+public class RegisterServlet extends JAMWikiServlet implements BlockableController {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(RegisterServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output when searching. */
@@ -55,11 +55,6 @@ public class RegisterServlet extends JAMWikiServlet {
 	 *
 	 */
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		// verify that the user is not blocked from registering
-		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
-		if (blockedUserModelAndView != null) {
-			return blockedUserModelAndView;
-		}
 		if (request.getParameter("function") == null) {
 			view(request, next, pageInfo);
 		} else {

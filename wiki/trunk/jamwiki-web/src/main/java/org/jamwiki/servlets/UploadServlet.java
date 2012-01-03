@@ -43,7 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Used to handle file uploads.
  */
-public class UploadServlet extends JAMWikiServlet {
+public class UploadServlet extends JAMWikiServlet implements BlockableController {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(UploadServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
@@ -53,11 +53,6 @@ public class UploadServlet extends JAMWikiServlet {
 	 *
 	 */
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		// verify that the user is not blocked from uploading
-		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
-		if (blockedUserModelAndView != null) {
-			return blockedUserModelAndView;
-		}
 		String contentType = ((request.getContentType() != null) ? request.getContentType().toLowerCase() : "" );
 		if (contentType.indexOf("multipart") == -1) {
 			view(request, next, pageInfo);

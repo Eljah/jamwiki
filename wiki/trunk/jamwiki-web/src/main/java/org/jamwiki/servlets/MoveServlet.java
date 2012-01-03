@@ -36,7 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Used to handle moving a topic to a new name.
  */
-public class MoveServlet extends JAMWikiServlet {
+public class MoveServlet extends JAMWikiServlet implements BlockableController {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(MoveServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
@@ -46,11 +46,6 @@ public class MoveServlet extends JAMWikiServlet {
 	 *
 	 */
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		// verify that the user is not blocked from renaming pages
-		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
-		if (blockedUserModelAndView != null) {
-			return blockedUserModelAndView;
-		}
 		WikiUserDetailsImpl userDetails = ServletUtil.currentUserDetails();
 		if (!userDetails.hasRole(Role.ROLE_MOVE)) {
 			WikiMessage messageObject = new WikiMessage("login.message.move");

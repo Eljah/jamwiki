@@ -611,7 +611,7 @@ public class ServletUtil {
 	 * @return The active user block record if the user is blocked, or
 	 *  <code>null</code> if the current user is not blocked.
 	 */
-	private static UserBlock retrieveCurrentUserBlock(HttpServletRequest request) {
+	protected static UserBlock retrieveCurrentUserBlock(HttpServletRequest request) {
 		WikiUser wikiUser = ServletUtil.currentWikiUser();
 		Integer wikiUserId = (wikiUser.getUserId() > 0) ? wikiUser.getUserId() : null;
 		String ipAddress = request.getRemoteAddr();
@@ -786,32 +786,6 @@ public class ServletUtil {
 			errors.add(new WikiMessage("error.parserclass", parserClass));
 		}
 		return errors;
-	}
-
-	/**
-	 * Utility method used when determining if a user is blocked.  If the
-	 * user is blocked this method will return a ModelAndView object
-	 * appropriate for the blocked user page.
-	 *
-	 * @param request The servlet request object.
-	 * @param pageInfo The current WikiPageInfo object, which contains
-	 *  information needed for rendering the final JSP page.
-	 * @return Returns a ModelAndView object corresponding to the blocked
-	 *  user page display if the user is blocked, <code>null</code>
-	 *  otherwise.
-	 */
-	protected static ModelAndView viewIfBlocked(HttpServletRequest request, WikiPageInfo pageInfo) {
-		UserBlock userBlock = ServletUtil.retrieveCurrentUserBlock(request);
-		if (userBlock == null) {
-			return null;
-		}
-		ModelAndView next = new ModelAndView("wiki");
-		pageInfo.reset();
-		pageInfo.setPageTitle(new WikiMessage("userblock.title"));
-		pageInfo.setContentJsp(JAMWikiServlet.JSP_BLOCKED);
-		pageInfo.setSpecial(true);
-		next.addObject("userBlock", userBlock);
-		return next;
 	}
 
 	/**

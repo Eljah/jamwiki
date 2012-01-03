@@ -46,7 +46,7 @@ import org.springframework.web.servlet.ModelAndView;
  * Used to process topic edits including saving an edit, preview, resolving
  * conflicts and dealing with spam.
  */
-public class EditServlet extends JAMWikiServlet {
+public class EditServlet extends JAMWikiServlet implements BlockableController {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(EditServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
@@ -56,11 +56,6 @@ public class EditServlet extends JAMWikiServlet {
 	 *
 	 */
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		// verify that the user is not blocked from editing
-		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
-		if (blockedUserModelAndView != null) {
-			return blockedUserModelAndView;
-		}
 		// verify that the user is allowed to edit - since there are different permissions
 		// for editing new vs existing topics the Spring Security permissions are not
 		// sufficient for handling all checks.
