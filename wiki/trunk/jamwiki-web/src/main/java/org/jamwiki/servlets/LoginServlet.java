@@ -38,7 +38,7 @@ public class LoginServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// FIXME - hard coding
 		if (ServletUtil.isTopic(request, "Special:Logout")) {
 			// redirect to the Spring Security logout

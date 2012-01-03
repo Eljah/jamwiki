@@ -41,7 +41,7 @@ public class BlockListServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		this.view(request, next, pageInfo);
 		return next;
 	}

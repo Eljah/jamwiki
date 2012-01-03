@@ -54,7 +54,7 @@ public class RegisterServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// verify that the user is not blocked from registering
 		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
 		if (blockedUserModelAndView != null) {

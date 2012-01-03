@@ -39,7 +39,7 @@ public class ContributionsServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		this.contributions(request, next, pageInfo);
 		return next;
 	}

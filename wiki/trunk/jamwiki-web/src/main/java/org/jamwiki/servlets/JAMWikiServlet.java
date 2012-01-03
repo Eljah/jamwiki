@@ -45,7 +45,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
  * special handling is required all JAMWiki servlets should extend this
  * servlet.
  */
-public abstract class JAMWikiServlet extends AbstractController {
+public abstract class JAMWikiServlet extends AbstractController implements JAMWikiController {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiServlet.class.getName());
 
@@ -251,22 +251,6 @@ public abstract class JAMWikiServlet extends AbstractController {
 		}
 		return links;
 	}
-
-	/**
-	 * Abstract method that must be implemented by all sub-classes to handle
-	 * servlet requests.
-	 *
-	 * @param request The servlet request object.
-	 * @param response The servlet response object.
-	 * @param next A ModelAndView object that has been initialized to the view
-	 *  specified by the <code>displayJSP</code> member variable.
-	 * @param pageInfo A WikiPageInfo object that will hold output parameters
-	 *  to be passed to the output JSP.
-	 * @return A ModelAndView object corresponding to the information to be
-	 *  rendered, or <code>null</code> if the method directly handles its own
-	 *  output, for example by writing directly to the output response.
-	 */
-	protected abstract ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception;
 
 	/**
 	 * Handle redirection cases, such as case-sensitive issues or legacy support.

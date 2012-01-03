@@ -58,7 +58,7 @@ public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 	 * @param response - Standard HttpServletResponse object.
 	 * @return A <code>ModelAndView</code> object to be handled by the rest of the Spring framework.
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		String contentType = ((request.getContentType() == null) ? "" : request.getContentType().toLowerCase());
 		if (contentType.indexOf("multipart") == -1) {
 			view(request, next, pageInfo);

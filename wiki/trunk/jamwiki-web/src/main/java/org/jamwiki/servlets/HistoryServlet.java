@@ -44,7 +44,7 @@ public class HistoryServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		if (!StringUtils.isBlank(request.getParameter("topicVersionId"))) {
 			viewVersion(request, next, pageInfo);
 		} else {

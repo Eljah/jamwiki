@@ -55,7 +55,7 @@ public class EditServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// verify that the user is not blocked from editing
 		ModelAndView blockedUserModelAndView = ServletUtil.viewIfBlocked(request, pageInfo);
 		if (blockedUserModelAndView != null) {

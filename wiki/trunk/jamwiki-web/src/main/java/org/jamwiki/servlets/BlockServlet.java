@@ -47,7 +47,7 @@ public class BlockServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		if (ServletUtil.isTopic(request, "Special:Block")) {
 			if (!StringUtils.isBlank(request.getParameter("block"))) {
 				block(request, next, pageInfo);

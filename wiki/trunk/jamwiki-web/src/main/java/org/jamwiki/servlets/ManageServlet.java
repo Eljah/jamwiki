@@ -48,7 +48,7 @@ public class ManageServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		if (!StringUtils.isBlank(request.getParameter("delete"))) {
 			delete(request, next, pageInfo);
 		} else if (!StringUtils.isBlank(request.getParameter("undelete"))) {

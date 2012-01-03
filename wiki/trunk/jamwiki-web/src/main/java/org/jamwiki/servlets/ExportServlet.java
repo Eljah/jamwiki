@@ -47,7 +47,7 @@ public class ExportServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// if a file is ready to export then export it as XML, otherwise display a page
 		this.layout = true;
 		if (!StringUtils.isBlank(request.getParameter("export")) && this.exportFile(request, response, next, pageInfo)) {

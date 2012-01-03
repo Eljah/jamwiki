@@ -34,7 +34,7 @@ public class ImageServlet extends JAMWikiServlet {
 	/**
 	 * Handle image requests, returning the binary image data.
 	 */
-	protected ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
 		// TODO - consider implementing caching
 		ImageData imageData;
 		try {
