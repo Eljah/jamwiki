@@ -37,6 +37,10 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Used to import an HTML file (in TiddlyWiki format), creating or updating a
  * topic as a result.
+ *
+ * @deprecated Tiddly wiki import support has been unmaintained since JAMWiki
+ *  0.6.0 and will be removed in a future release unless a new maintainer is
+ *  found.
  */
 public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 

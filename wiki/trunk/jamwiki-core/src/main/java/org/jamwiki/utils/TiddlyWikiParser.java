@@ -38,7 +38,11 @@ import org.jamwiki.parser.WikiLink;
 
 /**
  * This class parse a TiddlyWiki file and imports it to JamWiki
+ *
  * @author Michael Greifeneder mikegr@gmx.net
+ * @deprecated Tiddly wiki import support has been unmaintained since JAMWiki
+ *  0.6.0 and will be removed in a future release unless a new maintainer is
+ *  found.
  */
 public class TiddlyWikiParser {
 

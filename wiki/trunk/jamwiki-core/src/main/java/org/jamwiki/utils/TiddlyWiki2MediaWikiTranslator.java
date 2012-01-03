@@ -24,7 +24,11 @@ import java.util.StringTokenizer;
 
 /**
  * This class translates TiddlyWiki markup to MediaWiki markup.
+ *
  * @author Michael Greifeneder mikegr@gmx.net
+ * @deprecated Tiddly wiki import support has been unmaintained since JAMWiki
+ *  0.6.0 and will be removed in a future release unless a new maintainer is
+ *  found.
  */
 public class TiddlyWiki2MediaWikiTranslator {
     

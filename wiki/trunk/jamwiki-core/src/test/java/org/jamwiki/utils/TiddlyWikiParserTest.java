@@ -34,6 +34,11 @@ import org.jamwiki.model.TopicVersion;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+/**
+ * @deprecated Tiddly wiki import support has been unmaintained since JAMWiki
+ *  0.6.0 and will be removed in a future release unless a new maintainer is
+ *  found.
+ */
 public class TiddlyWikiParserTest extends JAMWikiUnitTest {
 
 	private static final String NAME = "MyTopic";
