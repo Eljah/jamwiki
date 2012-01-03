@@ -372,16 +372,16 @@ public abstract class ImageUtil {
 		}
 		int incrementalHeight = (int)Math.round(((double)incrementalWidth / (double)originalDimensions.getWidth()) * (double)originalDimensions.getHeight());
 		if (isImagesOnFS()) {
-			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, scaledDimensions, incrementalWidth, incrementalHeight);
+			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, incrementalWidth, incrementalHeight);
 		} else {
-			return calculateIncrementalDimensionsForImageBlob(wikiImage, originalDimensions, scaledDimensions, incrementalWidth, incrementalHeight);
+			return calculateIncrementalDimensionsForImageBlob(wikiImage, incrementalWidth, incrementalHeight);
 		}
 	}
 
 	/**
 	 * Determine scaled dimensions for images stored on the filesystem.
 	 */
-	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
+	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		String newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), incrementalWidth);
 		File newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
@@ -400,7 +400,7 @@ public abstract class ImageUtil {
 	/**
 	 * Determine scaled dimensions for images stored in the database.
 	 */
-	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
+	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, int incrementalWidth, int incrementalHeight) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		Dimension d1  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), incrementalWidth);
 		if (d1 != null) {

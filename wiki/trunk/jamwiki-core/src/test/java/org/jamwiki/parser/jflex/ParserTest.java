@@ -23,18 +23,15 @@ import java.util.List;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
-import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.JAMWikiUnitTest;
 import org.jamwiki.TestFileUtil;
 import org.jamwiki.WikiBase;
-import org.jamwiki.WikiException;
 import org.jamwiki.model.Topic;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

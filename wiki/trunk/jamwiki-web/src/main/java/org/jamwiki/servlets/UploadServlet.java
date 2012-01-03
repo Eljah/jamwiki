@@ -28,7 +28,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.WikiBase;
 import org.jamwiki.ImageData;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;

@@ -17,7 +17,6 @@
 package org.jamwiki.parser;
 
 import java.util.Locale;
-import org.jamwiki.Environment;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Topic;

@@ -17,17 +17,14 @@
 package org.jamwiki.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 
 /**

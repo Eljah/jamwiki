@@ -18,7 +18,6 @@ package org.jamwiki.parser.image;
 
 import org.jamwiki.Environment;
 import org.jamwiki.JAMWikiUnitTest;
-import org.jamwiki.model.Namespace;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
