@@ -1,4 +1,7 @@
-<%@ tag body-content="empty" description="Render a WikiMessage object" %>
+<%@ tag body-content="empty"
+    description="Render a WikiMessage object"
+    trimDirectiveWhitespaces="true"
+%>
 
 <%@ taglib prefix="jamwiki" uri="http://jamwiki.org/taglib" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

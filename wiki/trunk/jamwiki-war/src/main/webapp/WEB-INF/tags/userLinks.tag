@@ -1,4 +1,7 @@
-<%@ tag body-content="empty" description="Render the standard link to a user page, talk page, and contributions" %>
+<%@ tag body-content="empty"
+    description="Render the standard link to a user page, talk page, and contributions"
+    trimDirectiveWhitespaces="true"
+%>
 
 <%@ taglib prefix="jamwiki" uri="http://jamwiki.org/taglib" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
