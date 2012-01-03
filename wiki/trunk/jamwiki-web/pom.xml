@@ -32,7 +32,7 @@
 			<artifactId>mail</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
+			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>jsp-api</artifactId>
 			<scope>provided</scope>
 		</dependency>

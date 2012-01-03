@@ -3,6 +3,8 @@
 
 New Features:
 
+  * Upgrade dependencies to Servlet 2.5 and JSP 2.1.  Java 5 has been required
+    since JAMWiki 0.8, so this change should be transparent to most users.
   * Add support for limited wiki text in edit summaries (wiki links, interwiki
     links) to match Mediawiki behavior.
   * Add a new JAMWiki:Header system topic that allows adding a custom message
