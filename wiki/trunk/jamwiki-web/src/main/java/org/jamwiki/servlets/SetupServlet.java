@@ -54,6 +54,15 @@ public class SetupServlet extends JAMWikiServlet {
 	private static final JavaVersion MINIMUM_JDK_VERSION = JavaVersion.JAVA_1_5;
 
 	/**
+	 * This servlet requires slightly different initialization parameters from most
+	 * servlets.
+	 */
+	public SetupServlet() {
+		this.layout = false;
+		this.displayJSP = "setup";
+	}
+
+	/**
 	 * This method handles the request after its parent class receives control.
 	 *
 	 * @param request - Standard HttpServletRequest object.
@@ -104,14 +113,6 @@ public class SetupServlet extends JAMWikiServlet {
 		} else {
 			next.addObject("messageObject", new WikiMessage("error.unknown", e.getMessage()));
 		}
-	}
-
-	/**
-	 *
-	 */
-	protected void initParams() {
-		this.layout = false;
-		this.displayJSP = "setup";
 	}
 
 	/**

@@ -46,11 +46,18 @@ import org.springframework.web.servlet.ModelAndView;
  * Used to process topic edits including saving an edit, preview, resolving
  * conflicts and dealing with spam.
  */
-public class EditServlet extends JAMWikiServlet implements BlockableController {
+public class EditServlet extends JAMWikiServlet {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(EditServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_EDIT = "edit.jsp";
+
+	/**
+	 * Override defaults to enable user blocking.
+	 */
+	public EditServlet() {
+		this.blockable = true;
+	}
 
 	/**
 	 *

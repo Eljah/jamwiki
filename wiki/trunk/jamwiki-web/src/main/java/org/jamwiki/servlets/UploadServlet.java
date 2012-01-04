@@ -43,11 +43,18 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Used to handle file uploads.
  */
-public class UploadServlet extends JAMWikiServlet implements BlockableController {
+public class UploadServlet extends JAMWikiServlet {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(UploadServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_UPLOAD = "upload.jsp";
+
+	/**
+	 * Override defaults to enable user blocking.
+	 */
+	public UploadServlet() {
+		this.blockable = true;
+	}
 
 	/**
 	 *

@@ -54,6 +54,15 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private static final int MAX_TOPICS_FOR_AUTOMATIC_UPDATE = 1000;
 
 	/**
+	 * This servlet requires slightly different initialization parameters from most
+	 * servlets.
+	 */
+	public UpgradeServlet() {
+		this.layout = false;
+		this.displayJSP = "upgrade";
+	}
+
+	/**
 	 * This method handles the request after its parent class receives control.
 	 *
 	 * @param request - Standard HttpServletRequest object.
@@ -72,14 +81,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 			view(request, next, pageInfo);
 		}
 		return next;
-	}
-
-	/**
-	 *
-	 */
-	protected void initParams() {
-		this.layout = false;
-		this.displayJSP = "upgrade";
 	}
 
 	/**

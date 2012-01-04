@@ -31,6 +31,14 @@ public class StylesheetServlet extends JAMWikiServlet {
 	private static final WikiLogger logger = WikiLogger.getLogger(StylesheetServlet.class.getName());
 
 	/**
+	 * This servlet requires slightly different initialization parameters from most
+	 * servlets.
+	 */
+	public StylesheetServlet() {
+		this.layout = false;
+	}
+
+	/**
 	 *
 	 */
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
@@ -47,12 +55,5 @@ public class StylesheetServlet extends JAMWikiServlet {
 		out.close();
 		// do not load defaults or redirect - return as raw CSS
 		return null;
-	}
-
-	/**
-	 *
-	 */
-	protected void initParams() {
-		this.layout = false;
 	}
 }

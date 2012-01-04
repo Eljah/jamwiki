@@ -50,6 +50,8 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiServlet.class.getName());
 
+	/** Flag indicating whether or not a blocked user should be able to access the servlet. */
+	protected boolean blockable = false;
 	/** Flag to indicate whether or not the servlet should load the nav bar and other layout elements. */
 	protected boolean layout = true;
 	/** The prefix of the JSP file used to display the servlet output. */
@@ -309,13 +311,12 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 	 */
 	public ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
 		long start = System.currentTimeMillis();
-		initParams();
 		ModelAndView next = new ModelAndView(this.displayJSP);
 		WikiPageInfo pageInfo = new WikiPageInfo(request);
 		ModelAndView blockedUserModelAndView = null;
 		try {
 			if (!this.handleRedirect(request, next, pageInfo)) {
-				if (this instanceof BlockableController) {
+				if (this.blockable) {
 					// verify that the user is not blocked from accessing the servlet
 					blockedUserModelAndView = this.handleUserBlock(request, pageInfo);
 				}
@@ -391,17 +392,6 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 		pageInfo.setSpecial(true);
 		next.addObject("userBlock", userBlock);
 		return next;
-	}
-
-	/**
-	 * If any special servlet initialization needs to be performed it can be done
-	 * by overriding this method.  In particular, this method can be used to
-	 * override the defaults for the <code>layout</code> member variable, which
-	 * determines whether or not the output JSP should include the left navigation
-	 * and other layout values, and the <code>displayJSP</code> member variable,
-	 * which determine the JSP file used to render output.
-	 */
-	protected void initParams() {
 	}
 
 	/**

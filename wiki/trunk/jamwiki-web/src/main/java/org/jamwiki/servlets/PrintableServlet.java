@@ -35,18 +35,19 @@ public class PrintableServlet extends JAMWikiServlet {
 	private static final WikiLogger logger = WikiLogger.getLogger(PrintableServlet.class.getName());
 
 	/**
-	 *
+	 * This servlet requires slightly different initialization parameters from most
+	 * servlets.
 	 */
-	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		this.print(request, next, pageInfo);
-		return next;
+	public PrintableServlet() {
+		this.displayJSP = "printable";
 	}
 
 	/**
 	 *
 	 */
-	protected void initParams() {
-		this.displayJSP = "printable";
+	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+		this.print(request, next, pageInfo);
+		return next;
 	}
 
 	/**
