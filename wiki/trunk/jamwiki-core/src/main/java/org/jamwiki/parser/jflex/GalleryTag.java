@@ -41,6 +41,7 @@ public class GalleryTag implements JFlexCustomTagItem {
 	private static Pattern IMAGE_DIMENSION_PATTERN = Pattern.compile("([0-9]+)[ ]*(?:px)?", Pattern.CASE_INSENSITIVE);
 	private static final int DEFAULT_IMAGES_PER_ROW = 4;
 	private static final int DEFAULT_THUMBNAIL_MAX_DIMENSION = 120;
+	private String tagName = "gallery";
 
 	/**
 	 * Given a list of image links to display in the gallery, generate the
@@ -116,7 +117,14 @@ public class GalleryTag implements JFlexCustomTagItem {
 	 * Return the tag name.  If the tag is "<custom>" then the tag name is "custom".
 	 */
 	public String getTagName() {
-		return "gallery";
+		return this.tagName;
+	}
+
+	/**
+	 * Set the tag name.  If the tag is "<custom>" then the tag name is "custom".
+	 */
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
 	}
 
 	/**

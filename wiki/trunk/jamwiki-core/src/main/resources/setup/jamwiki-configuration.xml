@@ -40,12 +40,18 @@
    API stabilizes.
 
    class - The fully qualified class name for the custom tag class.
+   key   - (Optional) The tag name.  If the tag is "<custom>" then the
+           tag name is "custom".  If not specified then the default
+           value specified in the tag class will be used.
 
    ======================================================================
 -->
-<parser-custom-tags>
-	<parser-custom-tag>org.jamwiki.parser.jflex.GalleryTag</parser-custom-tag>
-</parser-custom-tags>
+<jflex-parser-custom-tags>
+	<custom-tag>
+		<class>org.jamwiki.parser.jflex.GalleryTag</class>
+		<key>gallery</key>
+	</custom-tag>
+</jflex-parser-custom-tags>
 
 <!--
    ====================================================================

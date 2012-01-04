@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiConfiguration;
+import org.jamwiki.model.WikiConfigurationObject;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiLogger;
@@ -63,21 +65,30 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 	 * Initialize the mapping of custom tag name to tag instance.
 	 */
 	private static void initializeCustomTagRegistry() {
-		List<String> parserCustomTags = WikiConfiguration.getInstance().getParserCustomTags();
-		for (String parserCustomTag : parserCustomTags) {
+		List<WikiConfigurationObject> parserCustomTags = WikiConfiguration.getInstance().getJflexParserCustomTags();
+		for (WikiConfigurationObject wikiConfigurationObject : parserCustomTags) {
+			String parserCustomTagClass = wikiConfigurationObject.getClazz();
 			Object object = null;
 			try {
-				object = ResourceUtil.instantiateClass(parserCustomTag);
+				object = ResourceUtil.instantiateClass(parserCustomTagClass);
 			} catch (IllegalStateException e) {
-				logger.warn("Could not instantiate configured custom parser tag: " + parserCustomTag);
+				logger.warn("Could not instantiate configured custom parser tag: " + parserCustomTagClass);
 				continue;
 			}
 			if (!(object instanceof JFlexCustomTagItem)) {
-				logger.warn("Custom tag does not implement interface JFlexCustomTagItem: " + parserCustomTag);
+				logger.warn("Custom tag does not implement interface JFlexCustomTagItem: " + parserCustomTagClass);
 				continue;
 			}
-			logger.info("Initializing custom parser tag: " + parserCustomTag);
-			CUSTOM_TAG_REGISTRY.put(((JFlexCustomTagItem)object).getTagName(), ((JFlexCustomTagItem)object));
+			logger.info("Initializing custom parser tag: " + parserCustomTagClass);
+			JFlexCustomTagItem jflexCustomTagItem = (JFlexCustomTagItem)object;
+			if (!StringUtils.isBlank(wikiConfigurationObject.getKey())) {
+				jflexCustomTagItem.setTagName(wikiConfigurationObject.getKey());
+			}
+			if (StringUtils.isBlank(jflexCustomTagItem.getTagName())) {
+				logger.warn("No tag name specified for custom tag: " + parserCustomTagClass);
+				continue;
+			}
+			CUSTOM_TAG_REGISTRY.put(jflexCustomTagItem.getTagName(), jflexCustomTagItem);
 		}
 	}
 
