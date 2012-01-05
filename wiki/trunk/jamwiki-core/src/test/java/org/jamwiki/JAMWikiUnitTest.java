@@ -32,6 +32,7 @@ import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.parser.image.ImageUtil;
+import org.jamwiki.utils.WikiLogger;
 import org.junit.Before;
 
 /**
@@ -40,6 +41,8 @@ import org.junit.Before;
  * virtual wikis, and a default user account.
  */
 public abstract class JAMWikiUnitTest {
+
+	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiUnitTest.class.getName());
 
 	/**
 	 * If a test JAMWiki instance does not yet exist, create one to allow running
@@ -51,18 +54,22 @@ public abstract class JAMWikiUnitTest {
 	public void setup() throws Exception {
 		File rootDirectory = new File("target", "data");
 		if (!rootDirectory.exists()) {
+			logger.info("Setting up test data installation in directory " + rootDirectory.getAbsolutePath());
 			rootDirectory.mkdir();
-			Environment.setValue(Environment.PROP_BASE_FILE_DIR, rootDirectory.getAbsolutePath());
-			File databaseDirectory = new File(rootDirectory, "database");
-			if (!databaseDirectory.exists()) {
-				this.setupDatabase();
-			}
-			File filesDirectory = new File(rootDirectory, "files");
-			File testFilesDirectory = new File("src/test/resources/data/files");
-			if (!filesDirectory.exists() && testFilesDirectory.exists()) {
-				// copy everything from src/test/resources/data/files to this directory
-				FileUtils.copyDirectory(testFilesDirectory, filesDirectory);
-			}
+		}
+		Environment.setValue(Environment.PROP_BASE_FILE_DIR, rootDirectory.getAbsolutePath());
+		File filesDirectory = new File(rootDirectory, "files");
+		File testFilesDirectory = new File("src/test/resources/data/files");
+		if (!filesDirectory.exists() && testFilesDirectory.exists()) {
+			// copy everything from src/test/resources/data/files to this directory
+			logger.info("Copying test files from directory " + filesDirectory.getAbsolutePath() + " to directory " + testFilesDirectory.getAbsolutePath());
+			FileUtils.copyDirectory(testFilesDirectory, filesDirectory);
+		}
+		File databaseDirectory = new File(rootDirectory, "database");
+		if (!databaseDirectory.exists()) {
+			logger.info("Setting up test database in directory " + databaseDirectory.getAbsolutePath());
+			this.setupDatabase();
+			logger.info("Setting up test topic data");
 			this.setupTopics();
 		}
 	}
