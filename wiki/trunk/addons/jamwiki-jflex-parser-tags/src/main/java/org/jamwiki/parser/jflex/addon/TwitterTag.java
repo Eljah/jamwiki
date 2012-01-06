@@ -37,13 +37,24 @@ import org.jamwiki.utils.WikiUtil;
  * <dl>
  * <dt>data-href</dt>
  * <dd>The full URL of the page being Tweeted.  Defaults to the current page URL.</dd>
+ * <dt>data-count</dt>
+ * <dd>The "count" layout for the button.  One of "horizontal", "vertical" or "none",
+       with "horizontal" being the default.</dd>
  * </dl>
  */
 public class TwitterTag implements JFlexCustomTagItem {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(TwitterTag.class.getName());
+	/** Tag attribute name for the "count" layout.  If not specifies defaults to "horizontal". */
+	private static final String ATTRIBUTE_COUNT_TYPE = "data-count";
 	/** Tag attribute name for the page URL.  If not specifies defaults to the current page URL. */
 	private static final String ATTRIBUTE_HREF = "data-href";
+	/** Twitter attribute value for the horizontal "count" layout. */
+	private static final String COUNT_HORIZONTAL = "horizontal";
+	/** Twitter attribute value for no "count" layout. */
+	private static final String COUNT_NONE = "none";
+	/** Twitter attribute value for the vertical "count" layout. */
+	private static final String COUNT_VERTICAL = "vertical";
 	/** Parameter used to hold a flag in the ParserInput object indicating whether shared code has been loaded. */
 	private static final String TWITTER_SHARED_PARAM = TwitterTag.class.getName() + "-shared";
 	/** Path to the template used to format the Twitter button code, relative to the classpath. */
@@ -89,12 +100,19 @@ public class TwitterTag implements JFlexCustomTagItem {
 	 * Parse the "Tweet" button.
 	 */
 	private String parseButtonCode(JFlexLexer lexer, Map<String, String> attributes) throws IOException {
-		String[] args = new String[1];
+		String[] args = new String[2];
 		if (StringUtils.isBlank(attributes.get(ATTRIBUTE_HREF))) {
 			WikiLink wikiLink = new WikiLink(lexer.getParserInput().getContext(), lexer.getParserInput().getVirtualWiki(), lexer.getParserInput().getTopicName());
 			args[0] = LinkUtil.normalize(Environment.getValue(Environment.PROP_SERVER_URL) + wikiLink.toRelativeUrl());
 		} else {
 			args[0] = attributes.get(ATTRIBUTE_HREF);
+		}
+		if (StringUtils.equalsIgnoreCase(attributes.get(ATTRIBUTE_COUNT_TYPE), COUNT_VERTICAL)) {
+			args[1] = COUNT_VERTICAL;
+		} else if (StringUtils.equalsIgnoreCase(attributes.get(ATTRIBUTE_COUNT_TYPE), COUNT_NONE)) {
+			args[1] = COUNT_NONE;
+		} else {
+			args[1] = COUNT_HORIZONTAL;
 		}
 		return WikiUtil.formatFromTemplate(TEMPLATE_TWITTER_BUTTON, args);
 	}

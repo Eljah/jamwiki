@@ -1,4 +1,4 @@
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://example.com/wiki/en/TwitterTag">Tweet</a>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://example.com/wiki/en/TwitterTag" data-count="horizontal">Tweet</a>
 <script>!function(d,s,id){
   var js,fjs=d.getElementsByTagName(s)[0];
   if(!d.getElementById(id)){
@@ -8,5 +8,5 @@
     fjs.parentNode.insertBefore(js,fjs);
   }
 }(document,"script","twitter-wjs");</script>
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.example.com">Tweet</a>
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://example.com/wiki/en/Example">Tweet</a>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.example.com" data-count="vertical">Tweet</a>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://example.com/wiki/en/Example" data-count="horizontal">Tweet</a>
