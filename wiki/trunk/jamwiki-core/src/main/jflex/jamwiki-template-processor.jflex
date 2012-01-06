@@ -24,6 +24,9 @@ whitespace         = {newline} | [ \t\f]
 /* nowiki */
 nowiki             = "<nowiki>" ~"</nowiki>"
 
+/* parser directives */
+noparsedirective   = "<__NOPARSE>" | "</__NOPARSE>"
+
 /* pre */
 htmlpreattributes  = class|dir|id|lang|style|title
 htmlpreattribute   = ([ \t]+) {htmlpreattributes} ([ \t]*=[^>\n]+[ \t]*)*
@@ -169,6 +172,15 @@ wikisignature      = ([~]{3,5})
     {whitespace} | . {
         // no need to log this
         return yytext();
+    }
+}
+
+/* ----- parser directives ----- */
+
+<YYINITIAL, TEMPLATE> {
+    {noparsedirective} {
+        if (logger.isTraceEnabled()) logger.trace("noparsedirective: " + yytext() + " (" + yystate() + ")");
+        return this.parse(TAG_TYPE_NO_PARSE, yytext());
     }
 }
 

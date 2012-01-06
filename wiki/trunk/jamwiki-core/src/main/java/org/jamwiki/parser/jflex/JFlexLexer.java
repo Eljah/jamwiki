@@ -46,6 +46,7 @@ public abstract class JFlexLexer {
 	protected static final int TAG_TYPE_INCLUDE_ONLY = 20;
 	protected static final int TAG_TYPE_JAVASCRIPT = 25;
 	protected static final int TAG_TYPE_NO_INCLUDE = 30;
+	protected static final int TAG_TYPE_NO_PARSE = 31;
 	protected static final int TAG_TYPE_ONLY_INCLUDE = 32;
 	protected static final int TAG_TYPE_PARAGRAPH = 33;
 	protected static final int TAG_TYPE_REDIRECT = 34;
@@ -63,6 +64,7 @@ public abstract class JFlexLexer {
 	private static final IncludeOnlyTag TAG_INCLUDE_ONLY = new IncludeOnlyTag();
 	private static final JavascriptTag TAG_JAVASCRIPT = new JavascriptTag();
 	private static final NoIncludeTag TAG_NO_INCLUDE = new NoIncludeTag();
+	private static final NoParseDirectiveTag TAG_NO_PARSE = new NoParseDirectiveTag();
 	private static final OnlyIncludeTag TAG_ONLY_INCLUDE = new OnlyIncludeTag();
 	private static final ParagraphTag TAG_PARAGRAPH = new ParagraphTag();
 	private static final RedirectTag TAG_REDIRECT = new RedirectTag();
@@ -202,6 +204,9 @@ public abstract class JFlexLexer {
 				break;
 			case TAG_TYPE_NO_INCLUDE:
 				jflexParserTag = TAG_NO_INCLUDE;
+				break;
+			case TAG_TYPE_NO_PARSE:
+				jflexParserTag = TAG_NO_PARSE;
 				break;
 			case TAG_TYPE_ONLY_INCLUDE:
 				jflexParserTag = TAG_ONLY_INCLUDE;

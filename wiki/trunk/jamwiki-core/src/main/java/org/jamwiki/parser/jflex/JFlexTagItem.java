@@ -37,7 +37,7 @@ class JFlexTagItem {
 	private static final Map<String, String> LIST_TAGS = Utilities.initializeLookupMap("dd", "dl", "dt", "li", "ol", "ul");
 	private static final Map<String, String> NON_NESTING_TAGS = Utilities.initializeLookupMap("col", "colgroup", "dd", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
 	private static final Map<String, String> NON_TEXT_BODY_TAGS = Utilities.initializeLookupMap("col", "colgroup", "dl", "ol", "table", "tbody", "tfoot", "thead", "tr", "ul");
-	private static final Map<String, String> NON_INLINE_TAGS = Utilities.initializeLookupMap("blockquote", "caption", "center", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul");
+	private static final Map<String, String> NON_INLINE_TAGS = Utilities.initializeLookupMap("blockquote", "caption", "center", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul", NoParseDirectiveTag.NOPARSE_DIRECTIVE);
 	private static final Map<String, String> TABLE_TAGS = Utilities.initializeLookupMap("caption", "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr");
 	private static final String nonInlineTagPattern = "(?:blockquote|caption|center|col|colgroup|dd|div|dl|dt|h1|h2|h3|h4|h5|h6|hr|li|ol|p|pre|table|tbody|td|tfoot|th|thead|tr|ul)";
 	private static final String nonInlineTagStartPattern = "<" + nonInlineTagPattern + "[ >]";

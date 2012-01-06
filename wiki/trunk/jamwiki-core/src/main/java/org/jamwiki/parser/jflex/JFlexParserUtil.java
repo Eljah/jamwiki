@@ -45,6 +45,22 @@ public class JFlexParserUtil {
 	}
 
 	/**
+	 * Utility method for returning the submitted content enclosed by NOPARSE
+	 * directives.  This method should be used only be internal parser code
+	 * when parsing to indicate that content should not be further modified
+	 * by the parser, such as when using a custom tag to add HTML that would
+	 * otherwise be escaped by the parser.
+	 *
+	 * @see NoParseDirectiveTag
+	 */
+	public static String formatAsNoParse(String content) {
+		if (StringUtils.isBlank(content)) {
+			return content;
+		}
+		return NoParseDirectiveTag.NOPARSE_DIRECTIVE_OPEN + content + NoParseDirectiveTag.NOPARSE_DIRECTIVE_CLOSE;
+	}
+
+	/**
 	 * Provide a way to run the pre-processor against a fragment of text, such
 	 * as an image caption.  This method should be used sparingly since it is
 	 * not very efficient.

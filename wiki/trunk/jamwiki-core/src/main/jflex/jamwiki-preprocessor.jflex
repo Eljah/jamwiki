@@ -20,6 +20,9 @@ whitespace         = {newline} | [ \t\f]
 /* nowiki */
 nowiki             = "<nowiki>" ~"</nowiki>"
 
+/* parser directives */
+noparse            = "<__NOPARSE>" ~"</__NOPARSE>"
+
 /* pre */
 htmlpreattributes  = class|dir|id|lang|style|title
 htmlpreattribute   = ([ \t]+) {htmlpreattributes} ([ \t]*=[^>\n]+[ \t]*)*
@@ -48,12 +51,20 @@ redirect           = "#REDIRECT" [ \t]* {wikilink}
 
 %%
 
-/* ----- nowiki ----- */
-
 <YYINITIAL, WIKIPRE> {
+
+    /* ----- nowiki ----- */
+
     {nowiki} {
         if (logger.isTraceEnabled()) logger.trace("nowiki: " + yytext() + " (" + yystate() + ")");
         return yytext();
+    }
+
+    /* ----- parser directives ----- */
+
+    {noparse} {
+        if (logger.isTraceEnabled()) logger.trace("noparse: " + yytext() + " (" + yystate() + ")");
+        return this.parse(TAG_TYPE_NO_PARSE, yytext());
     }
 }
 

@@ -43,6 +43,9 @@ listdt             = ":"
 /* nowiki */
 nowiki             = "<nowiki>" ~"</nowiki>"
 
+/* parser directives */
+noparse            = "<__NOPARSE>" ~"</__NOPARSE>"
+
 /* pre */
 attributeValueInQuotes = "\"" ~"\""
 attributeValueInSingleQuotes = "'" ~"'"
@@ -114,13 +117,21 @@ endparagraph       = {newline} (({whitespace})*{newline})*
     }
 }
 
-/* ----- nowiki ----- */
-
 <YYINITIAL, WIKIPRE, PRE, LIST, TABLE> {
+
+    /* ----- nowiki ----- */
+
     {nowiki} {
         if (logger.isTraceEnabled()) logger.trace("nowiki: " + yytext() + " (" + yystate() + ")");
         String content = JFlexParserUtil.tagContent(yytext());
         return "<nowiki>" + StringEscapeUtils.escapeHtml4(content) + "</nowiki>";
+    }
+
+    /* ----- parser directives ----- */
+
+    {noparse} {
+        if (logger.isTraceEnabled()) logger.trace("noparse: " + yytext() + " (" + yystate() + ")");
+        return this.parse(TAG_TYPE_NO_PARSE, yytext());
     }
 }
 
