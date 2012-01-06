@@ -16,6 +16,8 @@ New Features:
     JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
   * Support storing images directly in the database rather than on the
     filesystem (avhohlov2).
+  * Support extensions to the JFlex parser for iframes, Facebook and Twitter.
+    See http://jamwiki.org/wiki/en/Help:Tag_extensions for details.
   * Refactor caching.  The cache is now configured to use a percentage of heap
     rather than a fixed size to avoid possible OOM situations, configuration is
     now managed via the ehcache-jamwiki.xml file, and individual caches have
@@ -46,6 +48,7 @@ New Features:
     matches Mediawiki.
   * Use the JSP trimDirectiveWhitespaces directive to reduce whitespace in the
     generated HTML.
+  * Deprecate TiddlyWiki import support.
   * Remove ability to automatically upgrade from versions prior to 1.0.
   * Upgrade to Spring Framework 3.1.0.RELEASE.
   * Upgrade to Spring Security 3.1.0.RELEASE.

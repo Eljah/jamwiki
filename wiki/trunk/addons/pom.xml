@@ -11,5 +11,6 @@
 	<name>JAMWiki Addons</name>
 	<modules>
 		<module>bliki-parser</module>
+		<module>jamwiki-jflex-parser-tags</module>
 	</modules>
 </project>
