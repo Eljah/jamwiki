@@ -72,6 +72,8 @@ Bugfixes:
   * Allow whitespace in front of wiki table syntax (" {|") to match Mediawiki.
   * Allow thumbnail images to be specified using "thumnbail" in addition to
     "thumb" to match Mediawiki.
+  * When a topic contains only whitespace it should be parsed to empty text and
+    not display empty paragraph tags.
 
 Translation Updates:
 

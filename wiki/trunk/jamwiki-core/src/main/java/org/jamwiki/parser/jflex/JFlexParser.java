@@ -297,6 +297,9 @@ public class JFlexParser implements JAMWikiParser {
 		if (mode < JFlexParser.MODE_PROCESS) {
 			return raw;
 		}
+		if (StringUtils.isBlank(raw)) {
+			return "";
+		}
 		StringReader reader = toStringReader(raw, false);
 		JAMWikiLexer lexer = new JAMWikiLexer(reader);
 		return this.lex(lexer, raw, parserInput, parserOutput, mode);
