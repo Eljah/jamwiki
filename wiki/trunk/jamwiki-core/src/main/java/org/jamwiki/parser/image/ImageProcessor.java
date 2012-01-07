@@ -35,8 +35,8 @@ import javax.imageio.stream.ImageInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.jamwiki.WikiBase;
-import org.jamwiki.ImageData;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.model.ImageData;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 

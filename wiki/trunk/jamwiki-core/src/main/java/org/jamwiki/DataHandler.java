@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
 import org.jamwiki.model.Namespace;

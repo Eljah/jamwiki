@@ -14,22 +14,22 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki;
+package org.jamwiki.model;
 
 /**
  * Class for image and other data storing and loading.
  */
 public class ImageData {
-	public int      fileVersionId;
 
-	public String	mimeType;
+	public int fileVersionId;
+	public String mimeType;
+	public int width;
+	public int height;
+	public byte data[];
 
-	public int	width;
-
-	public int	height;
-
-	public byte	data[];
-
+	/**
+	 *
+	 */
 	public ImageData(int fileVersionId, String mimeType, int width, int height, byte data[]) {
 		this.fileVersionId = fileVersionId;
 		this.mimeType      = mimeType;
@@ -38,6 +38,9 @@ public class ImageData {
 		this.data          = data;
 	}
 
+	/**
+	 *
+	 */
 	public ImageData(String mimeType, int width, int height, byte data[]) {
 		this(-1, mimeType, width, height, data);
 	}

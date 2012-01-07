@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.ImageData;
 import org.jamwiki.WikiBase;
+import org.jamwiki.model.ImageData;
 
 /**
  * Get image requests handler.
