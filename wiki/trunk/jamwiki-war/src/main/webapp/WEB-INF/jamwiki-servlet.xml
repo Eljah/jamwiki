@@ -4,7 +4,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                 http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
+	<!-- map everything but the default topic mapping -->
 	<bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="1" />
+		<!-- this property is required for the "/uploads" pattern -->
+		<property name="alwaysUseFullPath" value="true" />
 		<property name="interceptors">
 			<list>
 				<bean class="org.jamwiki.servlets.JAMWikiLocaleInterceptor" />
@@ -54,8 +58,22 @@
 				<prop key="/**/Special:VirtualWiki">VirtualWiki</prop>
 				<prop key="/**/Special:Watchlist">Watchlist</prop>
 				<prop key="/**/jamwiki.css">Stylesheet</prop>
-				<prop key="/**/*">Topic</prop>
-				<prop key="/**/">Topic</prop>
+				<prop key="/uploads/**/*">Image</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- if this mapping triggers then nothing above matched, default to topic -->
+	<bean id="urlMappingDefault" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<bean class="org.jamwiki.servlets.JAMWikiLocaleInterceptor" />
+			</list>
+		</property>
+		<property name="order" value="2" />
+		<property name="mappings">
+			<props>
+				<prop key="/*">Topic</prop>
 			</props>
 		</property>
 	</bean>

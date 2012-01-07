@@ -414,8 +414,16 @@ FIXME - Email not supported right now, comment this out
 <fieldset>
 <legend><fmt:message key="admin.header.upload" /></legend>
 <div class="row">
-	<label for="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>"><fmt:message key="admin.upload.caption.maxfilesize" /></label>
-	<span><input type="text" name="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>" value="<c:out value="${maximumFileSize}" />" size="10" id="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>" /></span>
+	<label for="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"><fmt:message key="admin.upload.caption.storage" /></label>
+	<span>
+		<select name="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" id="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" onchange="onUploadStorage()">
+		<c:set var="PROP_FILE_UPLOAD_STORAGE"><%= Environment.PROP_FILE_UPLOAD_STORAGE %></c:set>
+		<c:forEach items="<%= WikiBase.UPLOAD_STORAGE.values() %>" var="uploadStorageType">
+			<option value="${uploadStorageType}"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == uploadStorageType}"> selected="selected"</c:if>>${uploadStorageType}</option>
+		</c:forEach>
+		</select>
+	</span>
+	<div class="formhelp"><fmt:message key="admin.upload.help.storage" /> <fmt:message key="admin.upload.help.storage.note" /></div>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_FILE_DIR_FULL_PATH %>"><fmt:message key="admin.upload.caption.uploaddir" /></label>
@@ -434,6 +442,10 @@ FIXME - Email not supported right now, comment this out
 	<c:set var="PROP_FILE_SERVER_URL"><%= Environment.PROP_FILE_SERVER_URL %></c:set>
 	<span><jamwiki:text name="${PROP_FILE_SERVER_URL}" value="${props[PROP_FILE_SERVER_URL]}" size="50" id="${PROP_FILE_SERVER_URL}" /></span>
 	<div class="formhelp"><fmt:message key="admin.upload.help.serverurl" /></div>
+</div>
+<div class="row">
+	<label for="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>"><fmt:message key="admin.upload.caption.maxfilesize" /></label>
+	<span><input type="text" name="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>" value="<c:out value="${maximumFileSize}" />" size="10" id="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>" /></span>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_SHARED_UPLOAD_VIRTUAL_WIKI %>"><fmt:message key="admin.upload.caption.sharedrepository" /></label>
@@ -583,5 +595,6 @@ function onRSS() {
 onUploadType();
 onRSS();
 onPersistenceType();
+onUploadStorage();
 // ]]>
 </script>

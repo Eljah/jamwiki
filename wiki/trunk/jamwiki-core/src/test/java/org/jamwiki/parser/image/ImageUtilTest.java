@@ -16,8 +16,10 @@
  */
 package org.jamwiki.parser.image;
 
+import java.io.File;
 import org.jamwiki.Environment;
 import org.jamwiki.JAMWikiUnitTest;
+import org.jamwiki.WikiBase;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -42,7 +44,7 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 	 *
 	 */
 	@Test
-	public void testBuildImageFileUrl() throws Throwable {
+	public void testBuildImageFileDocrootUrl() throws Throwable {
 		String actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "Image:Test Image.jpg", false);
 		String expectedResult = "/files/test_image.jpg";
 		assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
@@ -63,6 +65,42 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 			assertEquals("Alternate image link URL (no protocol) incorrect", expectedResult, actualResult);
 		} finally {
 			Environment.setValue(Environment.PROP_FILE_SERVER_URL, originalFileServerUrl);
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testBuildImageDefaultUrl() throws Throwable {
+		String originalFileUploadStorage = Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE);
+		String FILE_NAME = "/2010/10/example.jpg";
+		try {
+			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DEFAULT.toString());
+			String actualResult = ImageUtil.buildImageUrl("/wiki", "en", FILE_NAME, false);
+			String expectedResult = "/wiki/uploads" + FILE_NAME;
+			assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
+		} finally {
+			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, originalFileUploadStorage);
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testBuildImageDatabaseUrl() throws Throwable {
+		String originalFileUploadStorage = Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE);
+		String FILE_NAME = "/2010/10/example.jpg";
+		try {
+			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DATABASE.toString());
+			String actualResult = ImageUtil.buildImageUrl("/wiki", "en", FILE_NAME, false);
+			String expectedResult = "/wiki/en/Special:Image" + FILE_NAME;
+			assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
+			File resultFile = ImageUtil.buildAbsoluteFile(FILE_NAME);
+			assertNull("Absolute image link URL incorrect", resultFile);
+		} finally {
+			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, originalFileUploadStorage);
 		}
 	}
 }

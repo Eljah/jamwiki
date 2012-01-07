@@ -311,6 +311,7 @@ public class AdminServlet extends JAMWikiServlet {
 			setNumericProperty(props, request, Environment.PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, pageInfo.getErrors());
 			setNumericProperty(props, request, Environment.PROP_DBCP_NUM_TESTS_PER_EVICTION_RUN, pageInfo.getErrors());
 			setProperty(props, request, Environment.PROP_DBCP_WHEN_EXHAUSTED_ACTION);
+			setProperty(props, request, Environment.PROP_FILE_UPLOAD_STORAGE);
 			String maxFileSizeString = request.getParameter(Environment.PROP_FILE_MAX_FILE_SIZE);
 			if (StringUtils.isBlank(maxFileSizeString) || !StringUtils.isNumeric(maxFileSizeString)) {
 				pageInfo.addError(new WikiMessage("admin.message.nonnumeric", Environment.PROP_FILE_MAX_FILE_SIZE, maxFileSizeString));

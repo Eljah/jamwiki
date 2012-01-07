@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.Environment;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.ImageData;
@@ -88,13 +87,6 @@ public class UploadServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void upload(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
-		// FIXME - this method is a mess and needs to be split up.
-		if (ImageUtil.isImagesOnFS()) {
-			File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH));
-			if (!file.exists()) {
-				throw new WikiException(new WikiMessage("upload.error.nodirectory"));
-			}
-		}
 		String virtualWiki = pageInfo.getVirtualWikiName();
 		List<FileItem> fileItems = ServletUtil.processMultipartRequest(request);
 		String filename = null;
@@ -131,7 +123,7 @@ public class UploadServlet extends JAMWikiServlet {
 			fileSize = fileItem.getSize();
 			contentType = fileItem.getContentType();
 			if (ImageUtil.isImagesOnFS()) {
-				uploadedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
+				uploadedFile = ImageUtil.buildAbsoluteFile(url);
 				fileItem.write(uploadedFile);
 				isImage = ImageUtil.isImage(uploadedFile);
 			} else {
@@ -157,7 +149,7 @@ public class UploadServlet extends JAMWikiServlet {
 			filename = ImageUtil.sanitizeFilename(destinationFilename);
 			url = ImageUtil.generateFileUrl(virtualWiki, filename, null);
 			if (ImageUtil.isImagesOnFS()) {
-				File renamedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
+				File renamedFile = ImageUtil.buildAbsoluteFile(url);
 				if (!uploadedFile.renameTo(renamedFile)) {
 					throw new WikiException(new WikiMessage("upload.error.filerename", destinationFilename));
 				}

@@ -83,6 +83,12 @@
 		<url-pattern>/en/*</url-pattern>
 	</servlet-mapping>
 
+	<!-- file serving servlet -->
+	<servlet-mapping>
+		<servlet-name>jamwiki</servlet-name>
+		<url-pattern>/uploads/*</url-pattern>
+	</servlet-mapping>
+
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

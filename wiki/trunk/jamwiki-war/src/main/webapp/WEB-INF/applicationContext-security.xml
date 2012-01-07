@@ -21,7 +21,7 @@
 	<http pattern="/**/jamwiki.css" security="none" />
 	<http pattern="/images/**" security="none" />
 	<http pattern="/js/**" security="none" />
-	<http pattern="/upload/**" security="none" />
+	<http pattern="/uploads/**" security="none" />
 	<http auto-config="false" entry-point-ref="authenticationEntryPoint">
 		<!--
 		The intercept-url element defines the roles or authentication states that are required

@@ -22,10 +22,7 @@ To upgrade using this automated process follow these steps:
       installation directory:
         1.  /WEB-INF/classes/jamwiki.properties
         2.  /WEB-INF/classes/logback.xml (new in JAMWiki 1.0.0)
-        3.  (Optional) The content found in the /upload/ directory. This step
-            is necessary only if the default file upload directory is being
-            used.
-        4.  (Optional) Any other files in the /WEB-INF/ directory that have
+        3.  (Optional) Any other files in the /WEB-INF/ directory that have
             custom modifications.
   3.  Back up all database data prior to upgrading. If you skip this step you
       do so at your own risk - major upgrades (such as from 0.7.x 0.8.x) will
@@ -95,6 +92,12 @@ followed by 0.6.3.
     "resources" sub-directory within the JAMWiki system folder.  If these files
     have been customized then they will need to be manually copied to the new
     folder, otherwise JAMWiki will create fresh versions automatically.
+  * Sites that previously managed file uploads from the webapp /upload
+    directory are encouraged to move those files to a new "uploads" folder in
+    the JAMWiki system directory.  The "Uploaded file location" property of the
+    "File Upload Settings" tab on the Special:Admin page should then be changed
+    from "DOCROOT" to "default".
+  * The "/uploads/*" url-pattern needs to be added to the web.xml file.
   * Spring and Spring security have been upgraded; make sure that the
     xsi:schemaLocation elements in the jamwiki-servlet.xml and
     applicationContext-security.xml files point to the 3.1 versions.

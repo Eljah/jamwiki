@@ -82,6 +82,7 @@ public class Environment {
 	public static final String PROP_FILE_DIR_RELATIVE_PATH = "file-dir-relative-path";
 	public static final String PROP_FILE_MAX_FILE_SIZE = "max-file-size";
 	public static final String PROP_FILE_SERVER_URL = "file-server-url";
+	public static final String PROP_FILE_UPLOAD_STORAGE = "file-upload-storage";
 	public static final String PROP_FILE_WHITELIST = "file-whitelist";
 	public static final String PROP_IMAGE_RESIZE_INCREMENT = "image-resize-increment";
 	public static final String PROP_MAX_RECENT_CHANGES = "max-recent-changes";
@@ -228,9 +229,12 @@ public class Environment {
 		this.defaults.setProperty(PROP_EXTERNAL_LINK_NEW_WINDOW, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_FILE_BLACKLIST, "bat,bin,exe,htm,html,js,jsp,php,sh");
 		this.defaults.setProperty(PROP_FILE_BLACKLIST_TYPE, String.valueOf(WikiBase.UPLOAD_BLACKLIST));
+		this.defaults.setProperty(PROP_FILE_DIR_FULL_PATH, "");
+		this.defaults.setProperty(PROP_FILE_DIR_RELATIVE_PATH, "");
 		// size is in bytes
 		this.defaults.setProperty(PROP_FILE_MAX_FILE_SIZE, "5000000");
 		this.defaults.setProperty(PROP_FILE_SERVER_URL, "");
+		this.defaults.setProperty(PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DEFAULT.toString());
 		this.defaults.setProperty(PROP_FILE_WHITELIST, "bmp,gif,jpeg,jpg,pdf,png,properties,svg,txt,zip");
 		this.defaults.setProperty(PROP_IMAGE_RESIZE_INCREMENT, "100");
 		this.defaults.setProperty(PROP_MAX_RECENT_CHANGES, "10000");
@@ -274,7 +278,6 @@ public class Environment {
 		this.defaults.setProperty(PROP_TOPIC_USE_PREVIEW, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_TOPIC_USE_SHOW_CHANGES, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_VIRTUAL_WIKI_DEFAULT, "en");
-		this.processDefaultUploadDirectories();
 	}
 
 	/**
@@ -447,36 +450,6 @@ public class Environment {
 			map.put(key.toString(), properties.get(key).toString());
 		}
 		return map;
-	}
-
-	/**
-	 * Set values related to file uploads.  The file upload directory is the default
-	 * folder into which uploads are stored, such as /home/user/wiki/upload.  The
-	 * relative upload directory is a prefix that will be added to upload URLs that
-	 * corresponds to the file upload directory, so in the previous example if files
-	 * are being uploaded to /home/user/wiki/upload then the relative uploaded
-	 * directory would be /wiki/upload/.
-	 */
-	private void processDefaultUploadDirectories() {
-		String defaultUploadDirectory = "";
-		String defaultRelativeUploadDirectory = "";
-		try {
-			File webAppRoot = ResourceUtil.getClassLoaderRoot();
-			// the class loader root should be /WEB-INF/classes, but if deployed as anything
-			// other than a WAR then it might just be the temp directory.
-			if (webAppRoot.getParentFile() != null && webAppRoot.getName().equalsIgnoreCase("classes")) {
-				webAppRoot = webAppRoot.getParentFile();
-				if (webAppRoot.getParentFile() != null && webAppRoot.getName().equalsIgnoreCase("web-inf")) {
-					webAppRoot = webAppRoot.getParentFile();
-				}
-			}
-			defaultRelativeUploadDirectory = "/" + webAppRoot.getName() + "/upload/";
-			defaultUploadDirectory = new File(webAppRoot, "upload").getPath();
-		} catch (Throwable t) {
-			logger.error("Failure while setting file upload defaults", t);
-		}
-		this.defaults.setProperty(PROP_FILE_DIR_FULL_PATH, defaultUploadDirectory);
-		this.defaults.setProperty(PROP_FILE_DIR_RELATIVE_PATH, defaultRelativeUploadDirectory);
 	}
 
 	/**

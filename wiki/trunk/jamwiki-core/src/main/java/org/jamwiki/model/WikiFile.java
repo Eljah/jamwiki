@@ -34,6 +34,7 @@ public class WikiFile {
 	private long fileSize = -1;
 	private String mimeType = UNKNOWN_MIME_TYPE;
 	private boolean readOnly = false;
+	/** The URL is the image file path relative to the file upload directory. */
 	private String url = null;
 	private int topicId = -1;
 	private String virtualWiki = null;
@@ -176,14 +177,20 @@ public class WikiFile {
 	}
 
 	/**
-	 *
+	 * Return the image file path relative to the file upload directory. For example,
+	 * if the file upload directory is <code>/home/wiki/files</code> and the file
+	 * is <code>/home/wiki/files/en/2011/10/image-06222500.png</code> then the URL
+	 * would be <code>/en/2011/10/image-06222500.png</code>.
 	 */
 	public String getUrl() {
 		return this.url;
 	}
 
 	/**
-	 *
+	 * Set the image file path relative to the file upload directory. For example,
+	 * if the file upload directory is <code>/home/wiki/files</code> and the file
+	 * is <code>/home/wiki/files/en/2011/10/image-06222500.png</code> then the URL
+	 * would be <code>/en/2011/10/image-06222500.png</code>.
 	 */
 	public void setUrl(String url) {
 		this.url = url;

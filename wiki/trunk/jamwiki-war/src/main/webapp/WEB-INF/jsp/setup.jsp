@@ -129,6 +129,19 @@ td.formhelp {
 </tr>
 <tr><td colspan="2">&#160;</td></tr>
 <tr>
+	<td class="formcaption"><label for="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"><fmt:message key="admin.upload.caption.storage" /></label></td>
+	<td class="formelement">
+		<select name="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" id="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" onchange="onUploadStorage()">
+		<c:set var="PROP_FILE_UPLOAD_STORAGE"><%= Environment.PROP_FILE_UPLOAD_STORAGE %></c:set>
+		<c:set var="selectedStorageType"><%= Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE) %></c:set>
+		<c:forEach items="<%= WikiBase.UPLOAD_STORAGE.values() %>" var="uploadStorageType">
+			<option value="${uploadStorageType}"<c:if test="${selectedStorageType == uploadStorageType}"> selected="selected"</c:if>>${uploadStorageType}</option>
+		</c:forEach>
+		</select>
+	</td>
+</tr>
+<tr><td colspan="2" class="formhelp"><fmt:message key="admin.upload.help.storage" /> <fmt:message key="admin.upload.help.storage.note" /></td></tr>
+<tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_FILE_DIR_FULL_PATH %>"><fmt:message key="admin.upload.caption.uploaddir" /></label>:</td>
 	<td class="formelement"><input type="text" name="<%= Environment.PROP_FILE_DIR_FULL_PATH %>" value="<%= Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH) %>" size="50" id="<%= Environment.PROP_FILE_DIR_FULL_PATH %>" /></td>
 </tr>
@@ -172,6 +185,7 @@ td.formhelp {
 
 <script type="text/javascript">
 onPersistenceType();
+onUploadStorage();
 </script>
 
 </div>

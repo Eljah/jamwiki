@@ -66,5 +66,11 @@ function onDatabaseType() {
 	document.getElementById("<%= Environment.PROP_DB_DRIVER %>").value = sampleDriver;
 	document.getElementById("<%= Environment.PROP_DB_URL %>").value = sampleUrl;
 }
+function onUploadStorage() {
+	var disabled = (document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>").options[document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>").selectedIndex].value != "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>");
+	document.getElementById("<%= Environment.PROP_FILE_DIR_FULL_PATH %>").disabled = disabled;
+	document.getElementById("<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>").disabled = disabled;
+	document.getElementById("<%= Environment.PROP_FILE_SERVER_URL %>").disabled = disabled;
+}
 // ]]>
 </script>

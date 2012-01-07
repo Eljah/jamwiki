@@ -16,6 +16,8 @@ New Features:
     JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
   * Support storing images directly in the database rather than on the
     filesystem (avhohlov2).
+  * Store images by default in the JAMWiki file system directory, rather than
+    the webapp root, to allow simpler setup and upgrades.
   * Support extensions to the JFlex parser for iframes, Facebook and Twitter.
     See http://jamwiki.org/wiki/en/Help:Tag_extensions for details.
   * Refactor caching.  The cache is now configured to use a percentage of heap

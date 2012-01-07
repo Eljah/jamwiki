@@ -185,6 +185,7 @@ public class SetupServlet extends JAMWikiServlet {
 	 */
 	private void setProperties(HttpServletRequest request, ModelAndView next) throws Exception {
 		Environment.setValue(Environment.PROP_BASE_FILE_DIR, request.getParameter(Environment.PROP_BASE_FILE_DIR));
+		Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, request.getParameter(Environment.PROP_FILE_UPLOAD_STORAGE));
 		Environment.setValue(Environment.PROP_FILE_DIR_FULL_PATH, request.getParameter(Environment.PROP_FILE_DIR_FULL_PATH));
 		Environment.setValue(Environment.PROP_FILE_DIR_RELATIVE_PATH, request.getParameter(Environment.PROP_FILE_DIR_RELATIVE_PATH));
 		Environment.setValue(Environment.PROP_BASE_PERSISTENCE_TYPE, request.getParameter(Environment.PROP_BASE_PERSISTENCE_TYPE));

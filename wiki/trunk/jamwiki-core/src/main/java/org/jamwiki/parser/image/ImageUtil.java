@@ -61,7 +61,9 @@ public abstract class ImageUtil {
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageUtil.class.getName());
 	/** Cache name for the cache of image dimensions. */
 	private static final WikiCache<String, Dimension> CACHE_IMAGE_DIMENSIONS = new WikiCache<String, Dimension>("org.jamwiki.parser.image.ImageUtil.CACHE_IMAGE_DIMENSIONS");
-	/** Sub-folder of the "files" directory into which to place resized images. */
+	/** Default sub-directory into which image files are stored. */
+	private static final String DEFAULT_RELATIVE_FILE_DIRECTORY = "/uploads";
+	/** Sub-folder of the upload file directory into which to place resized images. */
 	private static final String RESIZED_IMAGE_SUBFOLDER = "resized";
 	/** Path to the template used to format a center-aligned image. */
 	private static final String TEMPLATE_IMAGE_ALIGN_CENTER = "templates/image-align-center.template";
@@ -97,18 +99,41 @@ public abstract class ImageUtil {
 	}
 
 	/**
-	 * Utility method for building the URL to an image file (NOT the image topic
-	 * page).  If the file does not exist then this method will return
+	 * Given a relative upload file name, return a File object representing the
+	 * absolute file path for the upload file.  Note that the file may not yet
+	 * exist.  If files are stored in the database rather than on the file
+	 * system then this method will return <code>null</code>.
+	 *
+	 * @param relativeFile The file name and path relative to the file root.
+	 * @return A File object representing the absolute file path for the upload
+	 * file, or <code>null</code> if files are stored in the database rather
+	 * than on the file system.
+	 */
+	public static File buildAbsoluteFile(String relativeFile) {
+		if (!ImageUtil.isImagesOnFS()) {
+			return null;
+		}
+		File fileDirectory = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), DEFAULT_RELATIVE_FILE_DIRECTORY);
+		if (Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DOCROOT.toString())) {
+			fileDirectory = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH));
+		}
+		return new File(fileDirectory, relativeFile);
+	}
+
+	/**
+	 * Utility method for building the URL to an uploaded file (NOT the file's
+	 * topic page).  If the file does not exist then this method will return
 	 * <code>null</code>.
 	 *
+	 * @param context The servlet context root.
 	 * @param virtualWiki The virtual wiki for the URL that is being created.
-	 * @param topicName The name of the image for which a link is being created.
+	 * @param topicName The name of the file for which a link is being created.
 	 * @param forceAbsoluteUrl Set to <code>true</code> if the returned URL should
 	 *  always be absolute.  By default an absolute URL will only be returned if
 	 *  the PROP_FILE_SERVER_URL property is not empty and differs from the
 	 *  PROP_SERVER_URL property.
-	 * @return The URL to an image file (not the image topic) or <code>null</code>
-	 *  if the file does not exist.
+	 * @return The URL to an uploaded file (not the file's topic page) or
+	 *  <code>null</code> if the file does not exist.
 	 * @throws DataAccessException Thrown if any error occurs while retrieving file info.
 	 */
 	public static String buildImageFileUrl(String context, String virtualWiki, String topicName, boolean forceAbsoluteUrl) throws DataAccessException {
@@ -121,11 +146,28 @@ public abstract class ImageUtil {
 	}
 
 	/**
+	 * Utility method for building the URL to an uploaded file (NOT the file's
+	 * topic page).  If the file does not exist then this method will return
+	 * <code>null</code>.
 	 *
+	 * @param context The servlet context root.
+	 * @param virtualWiki The virtual wiki for the URL that is being created.
+	 * @param filename The relative path of the file.  See
+	 *  {@link org.jamwiki.model.WikiFile#getUrl}.
+	 * @param forceAbsoluteUrl Set to <code>true</code> if the returned URL should
+	 *  always be absolute.  By default an absolute URL will only be returned if
+	 *  the PROP_FILE_SERVER_URL property is not empty and differs from the
+	 *  PROP_SERVER_URL property.
+	 * @return The URL to an uploaded file (not the file's topic page) or
+	 *  <code>null</code> if the file does not exist.
 	 */
-	private static String buildImageUrl(String context, String virtualWiki, String filename, boolean forceAbsoluteUrl) {
+	public static String buildImageUrl(String context, String virtualWiki, String filename, boolean forceAbsoluteUrl) {
 		if (isImagesOnFS()) {
-			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + filename);
+			String relativeFileRoot = FilenameUtils.normalize(context + "/" + DEFAULT_RELATIVE_FILE_DIRECTORY);
+			if (Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DOCROOT.toString())) {
+				relativeFileRoot = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
+			}
+			String url = FilenameUtils.normalize(relativeFileRoot + "/" + filename);
 			String fileServerUrl = Environment.getValue(Environment.PROP_FILE_SERVER_URL);
 			String absoluteServerUrl = Environment.getValue(Environment.PROP_SERVER_URL);
 			if (!StringUtils.isBlank(fileServerUrl) && !StringUtils.equalsIgnoreCase(fileServerUrl, absoluteServerUrl)) {
@@ -384,15 +426,15 @@ public abstract class ImageUtil {
 	private static Dimension calculateIncrementalDimensionsForImageFile(WikiImage wikiImage, Dimension originalDimensions, int incrementalWidth, int incrementalHeight) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
 		String newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), incrementalWidth);
-		File newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
+		File newImageFile = ImageUtil.buildAbsoluteFile(newUrl);
 		if (newImageFile.exists()) {
 			return new Dimension(incrementalWidth, incrementalHeight);
 		}
 		// otherwise generate a scaled instance
-		File imageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
+		File imageFile = ImageUtil.buildAbsoluteFile(wikiImage.getUrl());
 		BufferedImage bufferedImage = ImageProcessor.resizeImage(imageFile, incrementalWidth, incrementalHeight);
 		newUrl = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), bufferedImage.getWidth());
-		newImageFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), newUrl);
+		newImageFile = ImageUtil.buildAbsoluteFile(newUrl);
 		ImageProcessor.saveImage(bufferedImage, newImageFile);
 		return new Dimension(bufferedImage.getWidth(), bufferedImage.getHeight());
 	}
@@ -480,7 +522,7 @@ public abstract class ImageUtil {
 		String month = Integer.toString(cal.get(Calendar.MONTH) + 1);
 		String subdirectory = "/" + virtualWiki + "/" + year + "/" + month;
 		if (isImagesOnFS()) {
-			File directory = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), subdirectory);
+			File directory = ImageUtil.buildAbsoluteFile(subdirectory);
 			if (!directory.exists() && !directory.mkdirs()) {
 				throw new WikiException(new WikiMessage("upload.error.directorycreate", directory.getAbsolutePath()));
 			}
@@ -520,7 +562,7 @@ public abstract class ImageUtil {
 		Dimension originalDimensions = ImageUtil.retrieveFromCache(wikiImage);
 		if (originalDimensions == null) {
 			if (isImagesOnFS()) {
-				File file = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), wikiImage.getUrl());
+				File file = ImageUtil.buildAbsoluteFile(wikiImage.getUrl());
 				originalDimensions = ImageProcessor.retrieveImageDimensions(file);
 			} else {
 				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), 0);
@@ -724,7 +766,6 @@ public abstract class ImageUtil {
 	 * @return <code>true</code> if images are stored on file system and <code>false</code> if in database.
 	 */
 	public static boolean isImagesOnFS() {
-		String fileDir = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
-		return !StringUtils.isBlank(fileDir);
+		return (!Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DATABASE.toString()));
 	}
 }

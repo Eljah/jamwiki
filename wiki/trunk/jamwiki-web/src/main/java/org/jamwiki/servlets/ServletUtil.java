@@ -32,7 +32,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +61,7 @@ import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.parser.WikiLink;
+import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.ResourceUtil;
@@ -562,11 +562,14 @@ public class ServletUtil {
 	 * @throws WikiException Thrown if any problems occur while processing the request.
 	 */
 	public static List<FileItem> processMultipartRequest(HttpServletRequest request) throws WikiException {
-		String uploadDirectory = Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH);
+		File uploadDirectory = WikiUtil.getTempDirectory();
+		if (!uploadDirectory.exists()) {
+			throw new WikiException(new WikiMessage("upload.error.directorycreate", uploadDirectory.getAbsolutePath()));
+		}
 		long maxFileSize = Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE);
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setRepository(new File(uploadDirectory));
+		factory.setRepository(uploadDirectory);
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setHeaderEncoding("UTF-8");
 		upload.setSizeMax(maxFileSize);
@@ -739,9 +742,11 @@ public class ServletUtil {
 		if (baseDirError != null) {
 			errors.add(baseDirError);
 		}
-		WikiMessage fullDirError = WikiUtil.validateDirectory(props.getProperty(Environment.PROP_FILE_DIR_FULL_PATH));
-		if (fullDirError != null) {
-			errors.add(fullDirError);
+		if (props.getProperty(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DOCROOT.toString())) {
+			WikiMessage fullDirError = WikiUtil.validateDirectory(props.getProperty(Environment.PROP_FILE_DIR_FULL_PATH));
+			if (fullDirError != null) {
+				errors.add(fullDirError);
+			}
 		}
 		String classesDir = null;
 		try {
@@ -913,8 +918,7 @@ public class ServletUtil {
 		WikiUser wikiUser;
 		for (WikiFileVersion fileVersion : fileVersions) {
 			// update version urls to include web root path
-			String url = FilenameUtils.normalize(Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) + "/" + fileVersion.getUrl());
-			url = FilenameUtils.separatorsToUnix(url);
+			String url = ImageUtil.buildImageUrl(request.getContextPath(), pageInfo.getVirtualWikiName(), fileVersion.getUrl(), false);
 			fileVersion.setUrl(url);
 			// make sure the authorDisplay field is equal to the login for non-anonymous uploads
 			if (fileVersion.getAuthorId() != null) {
