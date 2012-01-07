@@ -17,7 +17,6 @@
 package org.jamwiki.servlets;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
@@ -64,13 +63,12 @@ public class ImportServlet extends JAMWikiServlet {
 	 */
 	private void importFile(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) {
 		try {
-			Iterator iterator = ServletUtil.processMultipartRequest(request, Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE));
-			while (iterator.hasNext()) {
-				FileItem item = (FileItem)iterator.next();
-				if (item.isFormField()) {
+			List<FileItem> fileItems = ServletUtil.processMultipartRequest(request);
+			for (FileItem fileItem : fileItems) {
+				if (fileItem.isFormField()) {
 					continue;
 				}
-				File file = saveFileItem(item);
+				File file = saveFileItem(fileItem);
 				WikiUser user = ServletUtil.currentWikiUser();
 				String virtualWiki = pageInfo.getVirtualWikiName();
 				String ipAddress = ServletUtil.getIpAddress(request);

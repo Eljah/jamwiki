@@ -18,7 +18,7 @@ package org.jamwiki.servlets;
  */
 
 import java.io.File;
-import java.util.Iterator;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
@@ -73,7 +73,7 @@ public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 	 */
 	private void importFile(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		String virtualWiki = pageInfo.getVirtualWikiName();
-		Iterator iterator = ServletUtil.processMultipartRequest(request, Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE));
+		List<FileItem> fileItems = ServletUtil.processMultipartRequest(request);
 		WikiUserDetailsImpl userDetails = ServletUtil.currentUserDetails();
 		WikiUser user = ServletUtil.currentWikiUser();
 		if (userDetails.hasRole(Role.ROLE_ANONYMOUS)) {
@@ -84,12 +84,11 @@ public class ImportTiddlyWikiServlet extends JAMWikiServlet {
 		}
 		TiddlyWikiParser parser = new TiddlyWikiParser(virtualWiki, user, ServletUtil.getIpAddress(request));
 		String topicName = null;
-		while (iterator.hasNext()) {
-			FileItem item = (FileItem)iterator.next();
-			if (item.isFormField()) {
+		for (FileItem fileItem : fileItems) {
+			if (fileItem.isFormField()) {
 				continue;
 			}
-			File xmlFile = saveFileItem(item);
+			File xmlFile = saveFileItem(fileItem);
 			topicName = parser.parse(xmlFile);
 			xmlFile.delete();
 		}

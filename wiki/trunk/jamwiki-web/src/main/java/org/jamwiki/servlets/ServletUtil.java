@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +28,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -555,15 +555,15 @@ public class ServletUtil {
 
 	/**
 	 * Utility method for parsing a multipart servlet request.  This method returns
-	 * an iterator of FileItem objects that corresponds to the request.
+	 * a list of FileItem objects that corresponds to the request.
 	 *
 	 * @param request The servlet request containing the multipart request.
-	 * @param uploadDirectory The directory into which files will be uploaded.
-	 * @param maxFileSize The maximum allowed file size in bytes.
-	 * @return Returns an iterator of FileItem objects the corresponds to the request.
+	 * @return Returns a list of FileItem objects the corresponds to the request.
 	 * @throws WikiException Thrown if any problems occur while processing the request.
 	 */
-	public static Iterator processMultipartRequest(HttpServletRequest request, String uploadDirectory, long maxFileSize) throws WikiException {
+	public static List<FileItem> processMultipartRequest(HttpServletRequest request) throws WikiException {
+		String uploadDirectory = Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH);
+		long maxFileSize = Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE);
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setRepository(new File(uploadDirectory));
@@ -571,7 +571,7 @@ public class ServletUtil {
 		upload.setHeaderEncoding("UTF-8");
 		upload.setSizeMax(maxFileSize);
 		try {
-			return upload.parseRequest(request).iterator();
+			return (List<FileItem>)upload.parseRequest(request);
 		} catch (FileUploadException e) {
 			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()), e);
 		}

@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
@@ -96,7 +96,7 @@ public class UploadServlet extends JAMWikiServlet {
 			}
 		}
 		String virtualWiki = pageInfo.getVirtualWikiName();
-		Iterator iterator = ServletUtil.processMultipartRequest(request, Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), Environment.getLongValue(Environment.PROP_FILE_MAX_FILE_SIZE));
+		List<FileItem> fileItems = ServletUtil.processMultipartRequest(request);
 		String filename = null;
 		String destinationFilename = null;
 		String contentType = null;
@@ -106,20 +106,19 @@ public class UploadServlet extends JAMWikiServlet {
 		File uploadedFile = null;
 		String url = null;
 		byte buff[] = null;
-		while (iterator.hasNext()) {
-			FileItem item = (FileItem)iterator.next();
-			String fieldName = item.getFieldName();
-			if (item.isFormField()) {
+		for (FileItem fileItem : fileItems) {
+			String fieldName = fileItem.getFieldName();
+			if (fileItem.isFormField()) {
 				if (fieldName.equals("description")) {
 					// FIXME - these should be parsed
-					contents = item.getString("UTF-8");
+					contents = fileItem.getString("UTF-8");
 				} else if (fieldName.equals("destination")) {
-					destinationFilename = item.getString("UTF-8");
+					destinationFilename = fileItem.getString("UTF-8");
 				}
 				continue;
 			}
 			// file name can have encoding issues, so manually convert
-			filename = item.getName();
+			filename = fileItem.getName();
 			if (filename == null) {
 				throw new WikiException(new WikiMessage("upload.error.filename"));
 			}
@@ -129,14 +128,14 @@ public class UploadServlet extends JAMWikiServlet {
 				String extension = FilenameUtils.getExtension(filename);
 				throw new WikiException(new WikiMessage("upload.error.filetype", extension));
 			}
-			fileSize = item.getSize();
-			contentType = item.getContentType();
+			fileSize = fileItem.getSize();
+			contentType = fileItem.getContentType();
 			if (ImageUtil.isImagesOnFS()) {
 				uploadedFile = new File(Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH), url);
-				item.write(uploadedFile);
+				fileItem.write(uploadedFile);
 				isImage = ImageUtil.isImage(uploadedFile);
 			} else {
-				buff = item.get();
+				buff = fileItem.get();
 			}
 		}
 		if (ImageUtil.isImagesOnFS() && uploadedFile == null) {
