@@ -725,6 +725,6 @@ public abstract class ImageUtil {
 	 */
 	public static boolean isImagesOnFS() {
 		String fileDir = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
-		return !fileDir.isEmpty();
+		return !StringUtils.isBlank(fileDir);
 	}
 }

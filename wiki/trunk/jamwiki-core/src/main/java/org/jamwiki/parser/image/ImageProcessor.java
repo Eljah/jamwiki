@@ -96,7 +96,7 @@ public class ImageProcessor {
 		try {
 			imageData = WikiBase.getDataHandler().getImageData(fileId, 0);
 		} catch (DataAccessException dae) {
-			throw new IOException(dae);
+			throw new IOException("Failure while retrieving image data for file " + fileId + ": " + dae.toString());
 		}
 		if (imageData == null) {
 			throw new FileNotFoundException("Image does not exist: " + fileId);
@@ -254,7 +254,7 @@ public class ImageProcessor {
 		try {
 			imageData = WikiBase.getDataHandler().getImageInfo(fileId, resized);
 		} catch (DataAccessException dae) {
-			throw new IOException(dae);
+			throw new IOException("Failure while retrieving image info for file " + fileId + ": " + dae.toString());
 		}
 		if (imageData == null || imageData.width < 0) {
 			return null;
