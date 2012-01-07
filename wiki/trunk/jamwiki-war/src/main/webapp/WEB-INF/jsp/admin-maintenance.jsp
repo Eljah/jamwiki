@@ -321,21 +321,3 @@
 </div>
 
 </div>
-
-<script type="text/javascript">
-function onPersistenceType() {
-	if (document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>").options[document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>").selectedIndex].value == "<%= WikiBase.PERSISTENCE_INTERNAL %>") {
-		document.getElementById("<%= Environment.PROP_DB_DRIVER %>").disabled=true
-		document.getElementById("<%= Environment.PROP_DB_TYPE %>").disabled=true
-		document.getElementById("<%= Environment.PROP_DB_URL %>").disabled=true
-		document.getElementById("<%= Environment.PROP_DB_USERNAME %>").disabled=true
-		document.getElementById("<%= Environment.PROP_DB_PASSWORD %>").disabled=true
-	} else {
-		document.getElementById("<%= Environment.PROP_DB_DRIVER %>").disabled=false
-		document.getElementById("<%= Environment.PROP_DB_TYPE %>").disabled=false
-		document.getElementById("<%= Environment.PROP_DB_URL %>").disabled=false
-		document.getElementById("<%= Environment.PROP_DB_USERNAME %>").disabled=false
-		document.getElementById("<%= Environment.PROP_DB_PASSWORD %>").disabled=false
-	}
-}
-</script>
