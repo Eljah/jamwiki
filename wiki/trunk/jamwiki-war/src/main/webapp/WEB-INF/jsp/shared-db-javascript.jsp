@@ -25,15 +25,12 @@
 <script type="text/javascript">
 // <![CDATA[
 var DATABASE_ELEMENT_IDS = [
-	"<%= Environment.PROP_DB_TYPE %>", "<%= Environment.PROP_DB_DRIVER %>", "<%= Environment.PROP_DB_URL %>",
-	"<%= Environment.PROP_DB_USERNAME %>", "<%= Environment.PROP_DB_PASSWORD %>"
+	"<%= Environment.PROP_DB_TYPE %>",
+	"<%= Environment.PROP_DB_DRIVER %>",
+	"<%= Environment.PROP_DB_URL %>",
+	"<%= Environment.PROP_DB_USERNAME %>",
+	"<%= Environment.PROP_DB_PASSWORD %>"
 ];
-function onPersistenceType() {
-	var disabled = (document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>").options[document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>").selectedIndex].value == "<%= WikiBase.PERSISTENCE_INTERNAL %>");
-	for (var i = 0; i < DATABASE_ELEMENT_IDS.length; i++) {
-		document.getElementById(DATABASE_ELEMENT_IDS[i]).disabled = disabled;
-	}
-}
 var DATABASE_SAMPLE_VALUES = new Array();
 DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_DB2 %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "com.ibm.db2.jdbc.app.DB2Driver", <%= Environment.PROP_DB_URL %>: "jdbc:db2j:net://localhost:1527/database"
@@ -59,18 +56,10 @@ DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_POSTGRES %>"] = {
 DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_ASA %>"] = {
 	<%= Environment.PROP_DB_DRIVER %>: "com.sybase.jdbc2.jdbc.SybDriver", <%= Environment.PROP_DB_URL %>: "jdbc:sybase:Tds:localhost:2048/database"
 };
-function onDatabaseType() {
-	var databaseType = (document.getElementById("<%= Environment.PROP_DB_TYPE %>").options[document.getElementById("<%= Environment.PROP_DB_TYPE %>").selectedIndex].value);
-	var sampleDriver = ((DATABASE_SAMPLE_VALUES[databaseType]) ? DATABASE_SAMPLE_VALUES[databaseType]["<%= Environment.PROP_DB_DRIVER %>"] : "");
-	var sampleUrl = ((DATABASE_SAMPLE_VALUES[databaseType]) ? DATABASE_SAMPLE_VALUES[databaseType]["<%= Environment.PROP_DB_URL %>"] : "");
-	document.getElementById("<%= Environment.PROP_DB_DRIVER %>").value = sampleDriver;
-	document.getElementById("<%= Environment.PROP_DB_URL %>").value = sampleUrl;
-}
-function onUploadStorage() {
-	var disabled = (document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>").options[document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>").selectedIndex].value != "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>");
-	document.getElementById("<%= Environment.PROP_FILE_DIR_FULL_PATH %>").disabled = disabled;
-	document.getElementById("<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>").disabled = disabled;
-	document.getElementById("<%= Environment.PROP_FILE_SERVER_URL %>").disabled = disabled;
-}
+var UPLOAD_ELEMENT_IDS = [
+	"<%= Environment.PROP_FILE_DIR_FULL_PATH %>",
+	"<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>",
+	"<%= Environment.PROP_FILE_SERVER_URL %>"
+];
 // ]]>
 </script>

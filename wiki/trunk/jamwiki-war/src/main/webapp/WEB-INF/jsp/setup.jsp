@@ -58,7 +58,7 @@ td.formhelp {
 	text-align: center;
 }
 </style>
-
+	<script type="text/javascript" src="<c:url value="/js/jamwiki.js?setup" />"></script>
 </head>
 <body>
 <div id="setup-container">
@@ -90,7 +90,7 @@ td.formhelp {
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>"><fmt:message key="admin.persistence.caption" /></label>:</td>
 	<td class="formelement">
-		<select name="<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>" id="<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>" onchange="onPersistenceType()">
+		<select name="<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>" id="<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>">
 		<c:set var="persistenceType"><%= Environment.getValue(Environment.PROP_BASE_PERSISTENCE_TYPE) %></c:set>
 		<c:set var="persistenceTypeInternal"><%= WikiBase.PERSISTENCE_INTERNAL %></c:set>
 		<c:set var="persistenceTypeExternal"><%= WikiBase.PERSISTENCE_EXTERNAL %></c:set>
@@ -102,7 +102,7 @@ td.formhelp {
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_DB_TYPE %>"><fmt:message key="admin.persistence.caption.type" /></label>:</td>
 	<td class="formelement">
-		<select name="<%= Environment.PROP_DB_TYPE %>" id="<%= Environment.PROP_DB_TYPE %>" onchange="onDatabaseType()">
+		<select name="<%= Environment.PROP_DB_TYPE %>" id="<%= Environment.PROP_DB_TYPE %>">
 		<option value=""></option>
 		<c:set var="selectedDataHandler"><%= Environment.getValue(Environment.PROP_DB_TYPE) %></c:set>
 		<c:forEach items="${dataHandlers}" var="dataHandler">
@@ -131,7 +131,7 @@ td.formhelp {
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"><fmt:message key="admin.upload.caption.storage" /></label></td>
 	<td class="formelement">
-		<select name="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" id="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" onchange="onUploadStorage()">
+		<select name="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" id="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>">
 		<c:set var="PROP_FILE_UPLOAD_STORAGE"><%= Environment.PROP_FILE_UPLOAD_STORAGE %></c:set>
 		<c:set var="selectedStorageType"><%= Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE) %></c:set>
 		<c:forEach items="<%= WikiBase.UPLOAD_STORAGE.values() %>" var="uploadStorageType">
@@ -184,8 +184,9 @@ td.formhelp {
 <%@ include file="shared-db-javascript.jsp" %>
 
 <script type="text/javascript">
-onPersistenceType();
-onUploadStorage();
+JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>"), "<%= WikiBase.PERSISTENCE_EXTERNAL %>", DATABASE_ELEMENT_IDS);
+JAMWiki.Admin.sampleDatabaseValues(document.getElementById("<%= Environment.PROP_DB_TYPE %>"), "<%= Environment.PROP_DB_DRIVER %>", "<%= Environment.PROP_DB_URL %>", DATABASE_SAMPLE_VALUES);
+JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"), "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>", UPLOAD_ELEMENT_IDS);
 </script>
 
 </div>

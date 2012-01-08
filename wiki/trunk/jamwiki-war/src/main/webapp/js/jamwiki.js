@@ -285,6 +285,22 @@ JAMWiki.Admin = function() {
 			input.value = checkbox.value;
 		}
 	}
+	function toggleDisable(selectElement, enableValue, idElements) {
+		var disabled = (selectElement.options[selectElement.selectedIndex].value != enableValue);
+		for (var i = 0; i < idElements.length; i++) {
+			var disableElement = document.getElementById(idElements[i]);
+			if (disableElement) {
+				disableElement.disabled = disabled;
+			}
+		}
+	}
+	function sampleValuesUpdate(selectElement, driverElementId, urlElementId, sampleValues) {
+		var databaseType = selectElement.options[selectElement.selectedIndex].value;
+		var sampleDriver = ((sampleValues[databaseType]) ? sampleValues[databaseType][driverElementId] : "");
+		var sampleUrl = ((sampleValues[databaseType]) ? sampleValues[databaseType][urlElementId] : "");
+		document.getElementById(driverElementId).value = sampleDriver;
+		document.getElementById(urlElementId).value = sampleUrl;
+	}
 	return {
 		initializeVirtualWikiCheckboxes: function() {
 			for (var i = 0; i < virtualWikiCheckboxArray.length; i++) {
@@ -297,6 +313,15 @@ JAMWiki.Admin = function() {
 				checkbox.onclick = toggleInputState.bind(JAMWiki.Admin, checkbox, input);
 				toggleInputState(checkbox, input);
 			}
+		},
+		// toggle the disabled state of additional fields when a select element is changed
+		toggleDisableOnSelect: function(selectElement, enableValue, idElements) {
+			toggleDisable(selectElement, enableValue, idElements);
+			selectElement.onchange = toggleDisable.bind(this, selectElement, enableValue, idElements);
+		},
+		// populate database fields with appropriate sample values
+		sampleDatabaseValues: function(selectElement, driverElementId, urlElementId, sampleValues) {
+			selectElement.onchange = sampleValuesUpdate.bind(this, selectElement, driverElementId, urlElementId, sampleValues);
 		}
 	};
 }();
