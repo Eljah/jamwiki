@@ -6,7 +6,7 @@
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=";
+  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=123456789";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 <div class="fb-like" data-href="http://example.com/wiki/en/FacebookTag" data-send="false" data-layout="standard" data-width="450" data-show-faces="false" data-action="like"></div>

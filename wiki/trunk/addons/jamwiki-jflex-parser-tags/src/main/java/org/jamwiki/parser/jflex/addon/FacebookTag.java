@@ -55,6 +55,10 @@ import org.jamwiki.utils.WikiUtil;
  *     Defaults to "like".</dd>
  * <dt>app-id</dt>
  * <dd>The Facebook application ID to tie the like/recommend to.  Defaults empty.</dd>
+ * <dt>locale</dt>
+ * <dd>Locale used by the Facebook button, useful for localizing button text.  Only
+ *     locales that are supported by Facebook are valid.  Example "en_GB".  Defaults
+ *     to "en_US".</dd>
  * </dl>
  */
 public class FacebookTag implements JFlexCustomTagItem {
@@ -72,6 +76,11 @@ public class FacebookTag implements JFlexCustomTagItem {
 	private static final String ATTRIBUTE_HREF = "data-href";
 	/** Tag attribute name for the "layout" attribute - one of "button_count", "standard" or "box_count", defaults to "standard". */
 	private static final String ATTRIBUTE_LAYOUT_TYPE = "data-layout";
+	/**
+	 * Tag attribute name for the optional locale.  Only locales supported by Facebook
+	 * are valid. Defaults to "en_US".
+	 */
+	private static final String ATTRIBUTE_LOCALE = "locale";
 	/** Tag attribute name for the "send" attribute.  If not specified defaults to <code>false</code>. */
 	private static final String ATTRIBUTE_SEND = "data-send";
 	/** Tag attribute name for the "show faces" attribute.  Defaults to <code>false</code>. */
@@ -162,8 +171,9 @@ public class FacebookTag implements JFlexCustomTagItem {
 			return "";
 		}
 		lexer.getParserInput().getTempParams().put(FACEBOOK_SHARED_PARAM, true);
-		String[] args = new String[1];
-		args[0] = (attributes.get(ATTRIBUTE_APP_ID) != null) ? attributes.get(ATTRIBUTE_APP_ID) : "";
+		String[] args = new String[2];
+		args[0] = (attributes.get(ATTRIBUTE_LOCALE) != null) ? attributes.get(ATTRIBUTE_LOCALE) : "en_US";
+		args[1] = (attributes.get(ATTRIBUTE_APP_ID) != null) ? attributes.get(ATTRIBUTE_APP_ID) : "";
 		return WikiUtil.formatFromTemplate(TEMPLATE_FACEBOOK_SHARED, args);
 	}
 }
