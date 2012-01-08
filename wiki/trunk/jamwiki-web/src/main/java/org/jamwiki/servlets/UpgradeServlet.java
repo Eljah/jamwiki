@@ -96,7 +96,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			this.upgradeDatabase(true, pageInfo.getMessages());
 			if (oldVersion.before(1, 2, 0)) {
 				// old installs used the DOCROOT storage type rather than the new DEFAULT
-				Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DEFAULT.toString());
+				Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.JAMWIKI.toString());
 				Environment.saveConfiguration();
 				// move system topics
 				this.updateSystemTopics(request, pageInfo.getMessages());

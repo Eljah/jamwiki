@@ -234,7 +234,7 @@ public class Environment {
 		// size is in bytes
 		this.defaults.setProperty(PROP_FILE_MAX_FILE_SIZE, "5000000");
 		this.defaults.setProperty(PROP_FILE_SERVER_URL, "");
-		this.defaults.setProperty(PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DEFAULT.toString());
+		this.defaults.setProperty(PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.JAMWIKI.toString());
 		this.defaults.setProperty(PROP_FILE_WHITELIST, "bmp,gif,jpeg,jpg,pdf,png,properties,svg,txt,zip");
 		this.defaults.setProperty(PROP_IMAGE_RESIZE_INCREMENT, "100");
 		this.defaults.setProperty(PROP_MAX_RECENT_CHANGES, "10000");

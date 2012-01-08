@@ -74,7 +74,7 @@ public class WikiBase {
 	/** Use a whitelist to determine what file types can be uploaded. */
 	public static final int UPLOAD_WHITELIST = 3;
 	/** Enum indicating where uploaded files are stored. */
-	public static enum UPLOAD_STORAGE { DEFAULT, DOCROOT, DATABASE }
+	public static enum UPLOAD_STORAGE { JAMWIKI, DOCROOT, DATABASE }
 
 	static {
 		try {

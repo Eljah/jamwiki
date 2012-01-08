@@ -92,11 +92,12 @@ followed by 0.6.3.
     "resources" sub-directory within the JAMWiki system folder.  If these files
     have been customized then they will need to be manually copied to the new
     folder, otherwise JAMWiki will create fresh versions automatically.
-  * Sites that previously managed file uploads from the webapp /upload
-    directory are encouraged to move those files to a new "uploads" folder in
-    the JAMWiki system directory.  The "Uploaded file location" property of the
-    "File Upload Settings" tab on the Special:Admin page should then be changed
-    from "DOCROOT" to "default".
+  * The "Uploaded file location" property of the "File Upload Settings" tab on
+    the Special:Admin page needs to be set appropriately.  Sites that store
+    file uploads in the webapp /upload directory are encouraged to move those
+    files to a new "uploads" folder in the JAMWiki file system directory.  If
+    files are kept in the webapp folder then the "Uploaded file location"
+    property must be changed from "JAMWIKI" to "DOCROOT".
   * The "/uploads/*" url-pattern needs to be added to the web.xml file.
   * Spring and Spring security have been upgraded; make sure that the
     xsi:schemaLocation elements in the jamwiki-servlet.xml and

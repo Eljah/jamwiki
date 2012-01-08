@@ -76,7 +76,7 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 		String originalFileUploadStorage = Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE);
 		String FILE_NAME = "/2010/10/example.jpg";
 		try {
-			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DEFAULT.toString());
+			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.JAMWIKI.toString());
 			String actualResult = ImageUtil.buildImageUrl("/wiki", "en", FILE_NAME, false);
 			String expectedResult = "/wiki/uploads" + FILE_NAME;
 			assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
