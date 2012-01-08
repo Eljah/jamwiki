@@ -823,26 +823,32 @@ div.callout input {
 	margin-right: 20px;
 }
 .expander {
-	padding: 5px;
+	display: none;
 }
 .expander-open {
+	display: block !important;
+}
+.manage-expander {
+	padding: 5px;
+}
+.manage-expander-open {
 	height: auto !important;
 }
-.expander > label {
+.manage-expander > label {
 	cursor: pointer;
 	font-weight: bold;
 }
-.expander > label:before {
+.manage-expander > label:before {
 	content:url("../images/arrow-right.png");
 }
-.expander-open > label:before {
+.manage-expander-open > label:before {
 	content:url("../images/arrow-down.png");
 }
-.expander > ul {
+.manage-expander > ul {
 	display: none;
 	margin-top: 10px;
 }
-.expander-open > ul {
+.manage-expander-open > ul {
 	display: block !important;
 }
 .captcha {

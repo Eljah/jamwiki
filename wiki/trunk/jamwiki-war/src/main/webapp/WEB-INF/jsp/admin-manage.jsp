@@ -48,7 +48,7 @@
 		</div>
 		</c:if>
 		<%-- revisions div should be open by default for non-Javascript browsers --%>
-		<div class="expander expander-open" id="undelete_revisions">
+		<div class="manage-expander manage-expander-open" id="undelete_revisions">
 			<label id="undelete_revisions_toggle"><fmt:message key="manage.caption.undeleterevisions" /></label>
 			<ul>
 			<c:forEach items="${versions}" var="version" varStatus="status">
@@ -75,7 +75,7 @@
 		</fieldset>
 		</form>
 		<script type="text/javascript">
-		JAMWiki.UI.initializeToggle(document.getElementById('undelete_revisions'), document.getElementById('undelete_revisions_toggle'), 'expander-open');
+		JAMWiki.UI.initializeToggle(document.getElementById('undelete_revisions'), document.getElementById('undelete_revisions_toggle'), 'manage-expander-open');
 		</script>
 	</c:when>
 	<c:otherwise>

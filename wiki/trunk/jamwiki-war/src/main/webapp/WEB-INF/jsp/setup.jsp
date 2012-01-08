@@ -42,10 +42,10 @@ body, input, select {
 }
 #setup-container {
 	padding: 10px 5px;
+	border: 2px solid #333333;
 }
 td.formcaption {
-}
-td.formelement {
+	width: 300px;
 }
 td.formhelp {
 	font-size: 85%;
@@ -56,6 +56,12 @@ td.formhelp {
 	font-size: 110%;
 	color: #ff0000;
 	text-align: center;
+}
+.expander {
+	display: none;
+}
+.expander-open {
+	display: block !important;
 }
 </style>
 	<script type="text/javascript" src="<c:url value="/js/jamwiki.js?setup" />"></script>
@@ -71,7 +77,7 @@ td.formhelp {
 
 <form name="setup" method="post">
 <input type="hidden" value="<c:out value="${upgrade}" />" />
-<table style="border:2px solid #333333;padding=1em;">
+<table>
 <c:if test="${!empty pageInfo.errors}">
 <tr><td class="red" colspan="2"><c:forEach items="${pageInfo.errors}" var="message"><jamwiki_t:wikiMessage message="${message}" /><br /></c:forEach></td></tr>
 </c:if>
@@ -99,6 +105,9 @@ td.formhelp {
 		</select>
 	</td>
 </tr>
+<tr><td colspan="2" class="formhelp"><fmt:message key="admin.persistence.help" /></td></tr>
+</table>
+<table id="db-details" class="expander expander-open">
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_DB_TYPE %>"><fmt:message key="admin.persistence.caption.type" /></label>:</td>
 	<td class="formelement">
@@ -127,6 +136,8 @@ td.formhelp {
 	<td class="formcaption"><label for="<%= Environment.PROP_DB_PASSWORD %>"><fmt:message key="admin.persistence.caption.pass" /></label>:</td>
 	<td class="formelement"><input type="password" name="<%= Environment.PROP_DB_PASSWORD %>" id="<%= Environment.PROP_DB_PASSWORD %>" value="<c:out value="${dbPassword}" />" size="15"></td>
 </tr>
+</table>
+<table>
 <tr><td colspan="2">&#160;</td></tr>
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"><fmt:message key="admin.upload.caption.storage" /></label></td>
@@ -134,13 +145,15 @@ td.formhelp {
 		<select name="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" id="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>">
 		<c:set var="PROP_FILE_UPLOAD_STORAGE"><%= Environment.PROP_FILE_UPLOAD_STORAGE %></c:set>
 		<c:set var="selectedStorageType"><%= Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE) %></c:set>
-		<option value="JAMWIKI"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'JAMWIKI'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.default" /> (<fmt:message key="common.default" />)</option>
+		<option value="JAMWIKI"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'JAMWIKI'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.default" /> (<fmt:message key="common.caption.default" />)</option>
 		<option value="DOCROOT"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'DOCROOT'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.docroot" /></option>
 		<option value="DATABASE"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'DATABASE'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.database" /> (<fmt:message key="common.caption.experimental" />)</option>
 		</select>
 	</td>
 </tr>
 <tr><td colspan="2" class="formhelp"><fmt:message key="admin.upload.help.storage" /> <fmt:message key="admin.upload.help.storage.note" /></td></tr>
+</table>
+<table id="upload-details" class="expander expander-open">
 <tr>
 	<td class="formcaption"><label for="<%= Environment.PROP_FILE_DIR_FULL_PATH %>"><fmt:message key="admin.upload.caption.uploaddir" /></label>:</td>
 	<td class="formelement"><input type="text" name="<%= Environment.PROP_FILE_DIR_FULL_PATH %>" value="<%= Environment.getValue(Environment.PROP_FILE_DIR_FULL_PATH) %>" size="50" id="<%= Environment.PROP_FILE_DIR_FULL_PATH %>" /></td>
@@ -151,6 +164,8 @@ td.formhelp {
 	<td class="formelement"><input type="text" name="<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>" value="<%= Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH) %>" size="50" id="<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>" /></td>
 </tr>
 <tr><td colspan="2" class="formhelp"><fmt:message key="admin.upload.help.uploaddirrel" /></td></tr>
+</table>
+<table>
 <tr><td colspan="2">&#160;</td></tr>
 <tr>
 	<td class="formcaption"><label for="setupLogin"><fmt:message key="setup.caption.adminlogin"/></label>:</td>
@@ -184,9 +199,9 @@ td.formhelp {
 <%@ include file="shared-db-javascript.jsp" %>
 
 <script type="text/javascript">
-JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>"), "<%= WikiBase.PERSISTENCE_EXTERNAL %>", DATABASE_ELEMENT_IDS);
+JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>"), "<%= WikiBase.PERSISTENCE_EXTERNAL %>", DATABASE_ELEMENT_IDS, document.getElementById("db-details"), "expander-open");
 JAMWiki.Admin.sampleDatabaseValues(document.getElementById("<%= Environment.PROP_DB_TYPE %>"), "<%= Environment.PROP_DB_DRIVER %>", "<%= Environment.PROP_DB_URL %>", DATABASE_SAMPLE_VALUES);
-JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"), "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>", UPLOAD_ELEMENT_IDS);
+JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"), "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>", UPLOAD_ELEMENT_IDS, document.getElementById("upload-details"), "expander-open");
 </script>
 
 </div>

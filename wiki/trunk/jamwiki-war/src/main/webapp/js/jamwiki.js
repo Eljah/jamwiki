@@ -285,13 +285,18 @@ JAMWiki.Admin = function() {
 			input.value = checkbox.value;
 		}
 	}
-	function toggleDisable(selectElement, enableValue, idElements) {
+	function toggleDisableOnChange(selectElement, enableValue, idElements, containerElement, expandedClass) {
 		var disabled = (selectElement.options[selectElement.selectedIndex].value != enableValue);
 		for (var i = 0; i < idElements.length; i++) {
 			var disableElement = document.getElementById(idElements[i]);
 			if (disableElement) {
 				disableElement.disabled = disabled;
 			}
+		}
+		if (disabled) {
+			JAMWiki.UI.removeClass(containerElement, expandedClass);
+		} else {
+			JAMWiki.UI.addClass(containerElement, expandedClass);
 		}
 	}
 	function sampleValuesUpdate(selectElement, driverElementId, urlElementId, sampleValues) {
@@ -315,9 +320,9 @@ JAMWiki.Admin = function() {
 			}
 		},
 		// toggle the disabled state of additional fields when a select element is changed
-		toggleDisableOnSelect: function(selectElement, enableValue, idElements) {
-			toggleDisable(selectElement, enableValue, idElements);
-			selectElement.onchange = toggleDisable.bind(this, selectElement, enableValue, idElements);
+		toggleDisableOnSelect: function(selectElement, enableValue, idElements, containerElement, expandedClass) {
+			toggleDisableOnChange(selectElement, enableValue, idElements, containerElement, expandedClass);
+			selectElement.onchange = toggleDisableOnChange.bind(this, selectElement, enableValue, idElements, containerElement, expandedClass);
 		},
 		// populate database fields with appropriate sample values
 		sampleDatabaseValues: function(selectElement, driverElementId, urlElementId, sampleValues) {

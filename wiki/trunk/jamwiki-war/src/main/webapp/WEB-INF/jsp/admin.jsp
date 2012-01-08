@@ -311,37 +311,40 @@ FIXME - Email not supported right now, comment this out
 		<option value="<%= WikiBase.PERSISTENCE_EXTERNAL %>"<c:if test="${props[PROP_BASE_PERSISTENCE_TYPE] == persistenceTypeExternal}"> selected="selected"</c:if>><fmt:message key="admin.persistencetype.database" /></option>
 		</select>
 	</span>
+	<div class="formhelp"><fmt:message key="admin.persistence.help" /></div>
 </div>
-<div class="row">
-	<label for="<%= Environment.PROP_DB_TYPE %>"><fmt:message key="admin.persistence.caption.type" /></label>
-	<span>
-		<select name="<%= Environment.PROP_DB_TYPE %>" id="<%= Environment.PROP_DB_TYPE %>">
-		<option value=""></option>
-		<c:set var="PROP_DB_TYPE"><%= Environment.PROP_DB_TYPE %></c:set>
-		<c:forEach items="${dataHandlers}" var="dataHandler">
-		<option value="<c:out value="${dataHandler.clazz}" />"<c:if test="${props[PROP_DB_TYPE] == dataHandler.clazz}"> selected="selected"</c:if>><c:if test="${!empty dataHandler.key}"><fmt:message key="${dataHandler.key}" /></c:if><c:if test="${empty dataHandler.key}"><c:out value="${dataHandler.name}" /></c:if><c:if test="${dataHandler.experimental}"> (<fmt:message key="common.caption.experimental" />)</c:if></option>
-		</c:forEach>
-		</select>
-	</span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_DB_DRIVER %>"><fmt:message key="admin.persistence.caption.driver" /></label>
-	<c:set var="PROP_DB_DRIVER"><%= Environment.PROP_DB_DRIVER %></c:set>
-	<span><jamwiki:text name="${PROP_DB_DRIVER}" id="${PROP_DB_DRIVER}" value="${props[PROP_DB_DRIVER]}" size="50" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_DB_URL %>"><fmt:message key="admin.persistence.caption.url" /></label>
-	<c:set var="PROP_DB_URL"><%= Environment.PROP_DB_URL %></c:set>
-	<span><jamwiki:text name="${PROP_DB_URL}" id="${PROP_DB_URL}" value="${props[PROP_DB_URL]}" size="50" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_DB_USERNAME %>"><fmt:message key="admin.persistence.caption.user" /></label>
-	<c:set var="PROP_DB_USERNAME"><%= Environment.PROP_DB_USERNAME %></c:set>
-	<span><jamwiki:text name="${PROP_DB_USERNAME}" id="${PROP_DB_USERNAME}" value="${props[PROP_DB_USERNAME]}" size="30" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_DB_PASSWORD %>"><fmt:message key="admin.persistence.caption.pass" /></label>
-	<span><input type="password" name="<%= Environment.PROP_DB_PASSWORD %>" id="<%= Environment.PROP_DB_PASSWORD %>" value="<c:out value="${dbPassword}" />" size="30" /></span>
+<div id="db-details" class="expander expander-open">
+	<div class="row">
+		<label for="<%= Environment.PROP_DB_TYPE %>"><fmt:message key="admin.persistence.caption.type" /></label>
+		<span>
+			<select name="<%= Environment.PROP_DB_TYPE %>" id="<%= Environment.PROP_DB_TYPE %>">
+			<option value=""></option>
+			<c:set var="PROP_DB_TYPE"><%= Environment.PROP_DB_TYPE %></c:set>
+			<c:forEach items="${dataHandlers}" var="dataHandler">
+			<option value="<c:out value="${dataHandler.clazz}" />"<c:if test="${props[PROP_DB_TYPE] == dataHandler.clazz}"> selected="selected"</c:if>><c:if test="${!empty dataHandler.key}"><fmt:message key="${dataHandler.key}" /></c:if><c:if test="${empty dataHandler.key}"><c:out value="${dataHandler.name}" /></c:if><c:if test="${dataHandler.experimental}"> (<fmt:message key="common.caption.experimental" />)</c:if></option>
+			</c:forEach>
+			</select>
+		</span>
+	</div>
+	<div class="row">
+		<label for="<%= Environment.PROP_DB_DRIVER %>"><fmt:message key="admin.persistence.caption.driver" /></label>
+		<c:set var="PROP_DB_DRIVER"><%= Environment.PROP_DB_DRIVER %></c:set>
+		<span><jamwiki:text name="${PROP_DB_DRIVER}" id="${PROP_DB_DRIVER}" value="${props[PROP_DB_DRIVER]}" size="50" /></span>
+	</div>
+	<div class="row">
+		<label for="<%= Environment.PROP_DB_URL %>"><fmt:message key="admin.persistence.caption.url" /></label>
+		<c:set var="PROP_DB_URL"><%= Environment.PROP_DB_URL %></c:set>
+		<span><jamwiki:text name="${PROP_DB_URL}" id="${PROP_DB_URL}" value="${props[PROP_DB_URL]}" size="50" /></span>
+	</div>
+	<div class="row">
+		<label for="<%= Environment.PROP_DB_USERNAME %>"><fmt:message key="admin.persistence.caption.user" /></label>
+		<c:set var="PROP_DB_USERNAME"><%= Environment.PROP_DB_USERNAME %></c:set>
+		<span><jamwiki:text name="${PROP_DB_USERNAME}" id="${PROP_DB_USERNAME}" value="${props[PROP_DB_USERNAME]}" size="30" /></span>
+	</div>
+	<div class="row">
+		<label for="<%= Environment.PROP_DB_PASSWORD %>"><fmt:message key="admin.persistence.caption.pass" /></label>
+		<span><input type="password" name="<%= Environment.PROP_DB_PASSWORD %>" id="<%= Environment.PROP_DB_PASSWORD %>" value="<c:out value="${dbPassword}" />" size="30" /></span>
+	</div>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_DBCP_MAX_ACTIVE %>"><fmt:message key="admin.persistence.caption.maxactive" /></label>
@@ -418,30 +421,32 @@ FIXME - Email not supported right now, comment this out
 	<span>
 		<select name="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>" id="<%= Environment.PROP_FILE_UPLOAD_STORAGE %>">
 		<c:set var="PROP_FILE_UPLOAD_STORAGE"><%= Environment.PROP_FILE_UPLOAD_STORAGE %></c:set>
-		<option value="JAMWIKI"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'JAMWIKI'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.default" /> (<fmt:message key="common.default" />)</option>
+		<option value="JAMWIKI"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'JAMWIKI'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.default" /> (<fmt:message key="common.caption.default" />)</option>
 		<option value="DOCROOT"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'DOCROOT'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.docroot" /></option>
 		<option value="DATABASE"<c:if test="${props[PROP_FILE_UPLOAD_STORAGE] == 'DATABASE'}"> selected="selected"</c:if>><fmt:message key="admin.upload.storage.database" /> (<fmt:message key="common.caption.experimental" />)</option>
 		</select>
 	</span>
 	<div class="formhelp"><fmt:message key="admin.upload.help.storage" /> <fmt:message key="admin.upload.help.storage.note" /></div>
 </div>
-<div class="row">
-	<label for="<%= Environment.PROP_FILE_DIR_FULL_PATH %>"><fmt:message key="admin.upload.caption.uploaddir" /></label>
-	<c:set var="PROP_FILE_DIR_FULL_PATH"><%= Environment.PROP_FILE_DIR_FULL_PATH %></c:set>
-	<span><jamwiki:text name="${PROP_FILE_DIR_FULL_PATH}" value="${props[PROP_FILE_DIR_FULL_PATH]}" size="50" id="${PROP_FILE_DIR_FULL_PATH}" /></span>
-	<div class="formhelp"><fmt:message key="admin.upload.help.uploaddir" /></div>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>"><fmt:message key="admin.upload.caption.uploaddirrel" /></label>
-	<c:set var="PROP_FILE_DIR_RELATIVE_PATH"><%= Environment.PROP_FILE_DIR_RELATIVE_PATH %></c:set>
-	<span><jamwiki:text name="${PROP_FILE_DIR_RELATIVE_PATH}" value="${props[PROP_FILE_DIR_RELATIVE_PATH]}" size="50" id="${PROP_FILE_DIR_RELATIVE_PATH}" /></span>
-	<div class="formhelp"><fmt:message key="admin.upload.help.uploaddirrel" /></div>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_FILE_SERVER_URL %>"><fmt:message key="admin.upload.caption.serverurl" /></label>
-	<c:set var="PROP_FILE_SERVER_URL"><%= Environment.PROP_FILE_SERVER_URL %></c:set>
-	<span><jamwiki:text name="${PROP_FILE_SERVER_URL}" value="${props[PROP_FILE_SERVER_URL]}" size="50" id="${PROP_FILE_SERVER_URL}" /></span>
-	<div class="formhelp"><fmt:message key="admin.upload.help.serverurl" /></div>
+<div id="upload-details" class="expander expander-open">
+	<div class="row">
+		<label for="<%= Environment.PROP_FILE_DIR_FULL_PATH %>"><fmt:message key="admin.upload.caption.uploaddir" /></label>
+		<c:set var="PROP_FILE_DIR_FULL_PATH"><%= Environment.PROP_FILE_DIR_FULL_PATH %></c:set>
+		<span><jamwiki:text name="${PROP_FILE_DIR_FULL_PATH}" value="${props[PROP_FILE_DIR_FULL_PATH]}" size="50" id="${PROP_FILE_DIR_FULL_PATH}" /></span>
+		<div class="formhelp"><fmt:message key="admin.upload.help.uploaddir" /></div>
+	</div>
+	<div class="row">
+		<label for="<%= Environment.PROP_FILE_DIR_RELATIVE_PATH %>"><fmt:message key="admin.upload.caption.uploaddirrel" /></label>
+		<c:set var="PROP_FILE_DIR_RELATIVE_PATH"><%= Environment.PROP_FILE_DIR_RELATIVE_PATH %></c:set>
+		<span><jamwiki:text name="${PROP_FILE_DIR_RELATIVE_PATH}" value="${props[PROP_FILE_DIR_RELATIVE_PATH]}" size="50" id="${PROP_FILE_DIR_RELATIVE_PATH}" /></span>
+		<div class="formhelp"><fmt:message key="admin.upload.help.uploaddirrel" /></div>
+	</div>
+	<div class="row">
+		<label for="<%= Environment.PROP_FILE_SERVER_URL %>"><fmt:message key="admin.upload.caption.serverurl" /></label>
+		<c:set var="PROP_FILE_SERVER_URL"><%= Environment.PROP_FILE_SERVER_URL %></c:set>
+		<span><jamwiki:text name="${PROP_FILE_SERVER_URL}" value="${props[PROP_FILE_SERVER_URL]}" size="50" id="${PROP_FILE_SERVER_URL}" /></span>
+		<div class="formhelp"><fmt:message key="admin.upload.help.serverurl" /></div>
+	</div>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_FILE_MAX_FILE_SIZE %>"><fmt:message key="admin.upload.caption.maxfilesize" /></label>
@@ -594,8 +599,8 @@ function onRSS() {
 // initialize
 onUploadType();
 onRSS();
-JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>"), "<%= WikiBase.PERSISTENCE_EXTERNAL %>", DATABASE_ELEMENT_IDS);
+JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_BASE_PERSISTENCE_TYPE %>"), "<%= WikiBase.PERSISTENCE_EXTERNAL %>", DATABASE_ELEMENT_IDS, document.getElementById("db-details"), "expander-open");
 JAMWiki.Admin.sampleDatabaseValues(document.getElementById("<%= Environment.PROP_DB_TYPE %>"), "<%= Environment.PROP_DB_DRIVER %>", "<%= Environment.PROP_DB_URL %>", DATABASE_SAMPLE_VALUES);
-JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"), "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>", UPLOAD_ELEMENT_IDS);
+JAMWiki.Admin.toggleDisableOnSelect(document.getElementById("<%= Environment.PROP_FILE_UPLOAD_STORAGE %>"), "<%= WikiBase.UPLOAD_STORAGE.DOCROOT %>", UPLOAD_ELEMENT_IDS, document.getElementById("upload-details"), "expander-open");
 // ]]>
 </script>
