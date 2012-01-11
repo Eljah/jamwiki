@@ -54,6 +54,8 @@ public class WikiConfiguration {
 
 	/** Name of the configuration file. */
 	private static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration.xml";
+	/** XSD for the configuration file. */
+	private static final String JAMWIKI_CONFIGURATION_XSD = "jamwiki-configuration-1.2.xsd";
 	private static final String XML_CONFIGURATION_ROOT = "configuration";
 	private static final String XML_DATA_HANDLER = "data-handler";
 	private static final String XML_DATA_HANDLER_ROOT = "data-handlers";
@@ -145,6 +147,8 @@ public class WikiConfiguration {
 		File file = null;
 		Document document = null;
 		try {
+			// "get resource file" for the XSD to ensure it is copied to the setup directory
+			ResourceUtil.getJAMWikiResourceFile(JAMWIKI_CONFIGURATION_XSD);
 			file = ResourceUtil.getJAMWikiResourceFile(JAMWIKI_CONFIGURATION_FILE);
 			document = XMLUtil.parseXML(file, false);
 		} catch (ParseException e) {
