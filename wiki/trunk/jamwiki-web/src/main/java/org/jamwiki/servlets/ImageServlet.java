@@ -90,6 +90,11 @@ public class ImageServlet extends JAMWikiServlet {
 		} catch (DataAccessException dae) {
 			throw new ServletException(dae);
 		}
+		if (imageData == null) {
+			logger.info("Data does not exist: " + (fileVersionId != null ? ("file_version_id=" + fileVersionId) : ("file_id=" + fileId)));
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
 		response.setContentType(imageData.mimeType);
 		response.setContentLength(imageData.data.length);
 		OutputStream os = null;
