@@ -38,9 +38,9 @@ To upgrade using this automated process follow these steps:
       documentation for instructions. Note that WAR files should be deployed as
       exploded WAR files as some application servers will lose configuration
       information otherwise.
-  6.  Restore the files that were backed up in steps two and three to their
-      previous locations under the /upload/, /WEB-INF/ and /WEB-INF/classes/
-      directories, overwriting any new files.
+  6.  Restore the files that were backed up in step two to their previous
+      locations under the /WEB-INF/ and /WEB-INF/classes/ directories,
+      overwriting any new files.
   7.  If using an external database, make sure that the JDBC driver is
       available in the web application server's classpath.
   8.  Verify that the web application server process has permisson to read and
@@ -54,7 +54,8 @@ To upgrade using this automated process follow these steps:
       viewing the "History" tab for the JAMWiki:System.css topic (for example: 
       http://jamwiki.org/wiki/en/Special:History?topic=JAMWiki:System.css),
       selecting the pre-upgrade version, and then editing and saving that
-      version.
+      version.  Note, however, that starting with JAMWiki 1.2 all custom CSS
+      should be done using the JAMWiki:Custom.css topic.
   11. If you have created any virtual wikis, be sure to restore the
       configuration for each virtual wiki to the /WEB-INF/web-xml file.
 
@@ -73,9 +74,9 @@ MANUAL UPGRADES
 Manual upgrades should only be performed if an error occurs while upgrading
 JAMWiki automatically.  When upgrading manually, you should perform all
 upgrade steps sequentially for each version that is being upgraded,  unless
-otherwise noted.  For example, if upgrading from version 0.6.0 to version
-0.6.3, you should apply the upgrade steps for 0.6.1, followed by 0.6.2,
-followed by 0.6.3.
+otherwise noted.  For example, if upgrading from version 0.9.4 to version
+1.0.1, you should apply the upgrade steps for 0.9.5, followed by 1.0.0,
+followed by 1.0.1.
 
 
   JAMWiki 1.2
@@ -120,7 +121,12 @@ followed by 0.6.3.
   3. Two new topics should be created for all virtual wikis:
      - JAMWiki:Custom.css
      - JAMWiki:Header
-  4. Update the database schema by executing the following SQL statements:
+  4. CSS styles have changed during this release.  An up-to-date version of
+     the JAMWiki:System.css topic can be found in the
+     /WEB-INF/classes/pages/JAMWiki%3ASystem.css.txt file.  Note that the
+     JAMWiki:System.css topic should only be edited AFTER all other upgrade
+     steps have been completed.
+  5. Update the database schema by executing the following SQL statements:
        a) Add the ROLE_REGISTER role and assign it to the anonymous group:
               insert into jam_role (role_name) values ('ROLE_REGISTER');
               insert into jam_group_authorities (group_id, authority) values (1, 'ROLE_REGISTER');
