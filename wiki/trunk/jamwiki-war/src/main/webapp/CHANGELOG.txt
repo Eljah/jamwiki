@@ -76,6 +76,8 @@ Bugfixes:
     "thumb" to match Mediawiki.
   * When a topic contains only whitespace it should be parsed to empty text and
     not display empty paragraph tags.
+  * A warning should be displayed during the setup flow if an existing JAMWiki
+    install is found, but was not executing properly.
 
 Translation Updates:
 

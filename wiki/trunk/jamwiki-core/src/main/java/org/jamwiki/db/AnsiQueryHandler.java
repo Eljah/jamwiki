@@ -604,12 +604,15 @@ public class AnsiQueryHandler implements QueryHandler {
 
 	/**
 	 * Return a simple query, that if successfully run indicates that JAMWiki
-	 * tables have been initialized in the database.
+	 * tables have been initialized in the database.  This method should not
+	 * be overridden as it is directly invoked by the
+	 * {@link DatabaseConnection#testDatabase} method and should thus be used
+	 * in its base class form for all databases.
 	 *
 	 * @return Returns a simple query that, if successfully run, indicates
 	 *  that JAMWiki tables have been set up in the database.
 	 */
-	public String existenceValidationQuery() {
+	public final String existenceValidationQuery() {
 		return STATEMENT_SELECT_VIRTUAL_WIKIS;
 	}
 

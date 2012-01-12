@@ -282,7 +282,8 @@ public class DatabaseConnection {
 			if (existence) {
 				stmt = conn.createStatement();
 				// test to see if database exists
-				stmt.executeQuery(WikiDatabase.getExistenceValidationQuery());
+				AnsiQueryHandler queryHandler = new AnsiQueryHandler();
+				stmt.executeQuery(queryHandler.existenceValidationQuery());
 			}
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt);

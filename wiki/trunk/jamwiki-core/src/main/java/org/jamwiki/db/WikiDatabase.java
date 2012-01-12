@@ -62,7 +62,6 @@ import org.springframework.transaction.TransactionStatus;
 public class WikiDatabase {
 
 	private static String CONNECTION_VALIDATION_QUERY = null;
-	private static String EXISTENCE_VALIDATION_QUERY = null;
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiDatabase.class.getName());
 	/** Root directory within the WAR distribution that contains the default topic pages. */
 	public static final String SPECIAL_PAGE_DIR = "pages";
@@ -331,17 +330,9 @@ public class WikiDatabase {
 	/**
 	 *
 	 */
-	protected static String getExistenceValidationQuery() {
-		return (!StringUtils.isBlank(EXISTENCE_VALIDATION_QUERY)) ? EXISTENCE_VALIDATION_QUERY : null;
-	}
-
-	/**
-	 *
-	 */
 	public synchronized static void initialize() {
 		try {
 			WikiDatabase.CONNECTION_VALIDATION_QUERY = WikiDatabase.queryHandler().connectionValidationQuery();
-			WikiDatabase.EXISTENCE_VALIDATION_QUERY = WikiDatabase.queryHandler().existenceValidationQuery();
 			// initialize connection pool in its own try-catch to avoid an error
 			// causing property values not to be saved.
 			// this clears out any existing connection pool, so that a new one will be created on first access

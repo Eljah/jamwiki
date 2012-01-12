@@ -1526,7 +1526,7 @@ public class AnsiDataHandler implements DataHandler {
 		try {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.createStatement();
-			stmt.executeQuery(WikiDatabase.getExistenceValidationQuery());
+			stmt.executeQuery(this.queryHandler().existenceValidationQuery());
 			return;
 		} catch (SQLException e) {
 			// database not yet set up
