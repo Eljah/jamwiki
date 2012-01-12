@@ -42,7 +42,17 @@ body, input, select {
 }
 #setup-container {
 	padding: 10px 5px;
-	border: 2px solid #333333;
+	border: 2px solid #333;
+}
+#install-exists {
+	color: red;
+	padding: 10px 20px;
+	border: 2px solid #333;
+	margin: 10px 10px 20px 10px;
+}
+#continue {
+	margin-top: 10px;
+	text-align: center;
 }
 td.formcaption {
 	width: 300px;
@@ -76,15 +86,19 @@ td.formhelp {
 </c:if>
 
 <form name="setup" method="post">
-<input type="hidden" value="<c:out value="${upgrade}" />" />
+<input type="hidden" value="<c:out value="${installExists}" />" />
 <table>
 <c:if test="${!empty pageInfo.errors}">
 <tr><td class="red" colspan="2"><c:forEach items="${pageInfo.errors}" var="message"><jamwiki_t:wikiMessage message="${message}" /><br /></c:forEach></td></tr>
 </c:if>
-<c:if test="${!empty upgrade}">
-<tr><td colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><font color="red"><fmt:message key="setup.error.upgrade" /></font></td></tr>
-<tr><td colspan="2" align="center"><input type="submit" name="override" value="<fmt:message key="common.button.continue" />" /></td></tr>
+<c:if test="${!empty installExists}">
+<tr><td colspan="2">
+	<div id="install-exists">
+		<fmt:message key="setup.error.installexists" />
+		<br />
+		<div id="continue"><input type="submit" name="override" value="<fmt:message key="common.button.continue" />" /></div>
+	</div>
+</td></tr>
 </c:if>
 <tr><td colspan="2">&#160;</td></tr>
 <tr>

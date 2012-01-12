@@ -24,6 +24,9 @@ New Features:
     rather than a fixed size to avoid possible OOM situations, configuration is
     now managed via the ehcache-jamwiki.xml file, and individual caches have
     been fine-tuned to optimize performance.
+  * If setup finds an existing JAMWiki installation it will now prompt the user
+    to restore the old configuration, and will then begin the automatic upgrade
+    process if necessary.
   * Allow the table of contents to be hidden via a "show/hide" link.
   * Add support for the Mediawiki {{padleft:}} and {{padright:}} parser
     functions.  Usage: "{{padleft:string|amt|padString}}".

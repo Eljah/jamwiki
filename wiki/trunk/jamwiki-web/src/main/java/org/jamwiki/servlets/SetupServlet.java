@@ -16,13 +16,15 @@
  */
 package org.jamwiki.servlets;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiConfiguration;
@@ -38,6 +40,7 @@ import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -73,16 +76,14 @@ public class SetupServlet extends JAMWikiServlet {
 		if (!WikiUtil.isFirstUse()) {
 			throw new WikiException(new WikiMessage("setup.error.notrequired"));
 		}
-		String function = (request.getParameter("function") == null) ? request.getParameter("override") : request.getParameter("function");
-		if (function == null) {
-			function = "";
-		}
 		try {
 			if (!SystemUtils.isJavaVersionAtLeast(MINIMUM_JDK_VERSION)) {
 				throw new WikiException(new WikiMessage("setup.error.jdk", MINIMUM_JDK_VERSION.toString(), System.getProperty("java.version")));
 			}
-			if (!StringUtils.isBlank(function) && initialize(request, next, pageInfo)) {
-				VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
+			VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
+			if (!StringUtils.isBlank(request.getParameter("override")) && this.restoreProperties(pageInfo)) {
+				ServletUtil.redirect(next, virtualWiki.getName(), virtualWiki.getRootTopicName());
+			} else if (!StringUtils.isBlank(request.getParameter("function")) && initialize(request, next, pageInfo)) {
 				ServletUtil.redirect(next, virtualWiki.getName(), virtualWiki.getRootTopicName());
 			} else {
 				view(request, next, pageInfo);
@@ -123,15 +124,14 @@ public class SetupServlet extends JAMWikiServlet {
 		WikiUser user = setAdminUser(request);
 		this.validate(request, pageInfo, user);
 		if (!pageInfo.getErrors().isEmpty()) {
-			this.view(request, next, pageInfo);
 			next.addObject("username", user.getUsername());
 			next.addObject("newPassword", request.getParameter("newPassword"));
 			next.addObject("confirmPassword", request.getParameter("confirmPassword"));
 			return false;
 		}
-		if (previousInstall() && request.getParameter("override") == null) {
+		if (previousInstall()) {
 			// user is trying to do a new install when a previous installation exists
-			next.addObject("upgrade", "true");
+			next.addObject("installExists", "true");
 			next.addObject("username", user.getUsername());
 			next.addObject("newPassword", request.getParameter("newPassword"));
 			next.addObject("confirmPassword", request.getParameter("confirmPassword"));
@@ -167,6 +167,31 @@ public class SetupServlet extends JAMWikiServlet {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Call this method only when an existing JAMWiki database is found and
+	 * 
+	 */
+	private boolean restoreProperties(WikiPageInfo pageInfo) {
+		// read the old configuration from the database
+		boolean result = false;
+		try {
+			// do not use WikiBase.getDataHandler() since the instance is not initialized
+			Map<String, String> configuration = WikiUtil.dataHandlerInstance().lookupConfiguration();
+			for (String key : configuration.keySet()) {
+				Environment.setValue(key, configuration.get(key));
+			}
+			Environment.saveConfiguration();
+			result = true;
+		} catch (IOException e) {
+			pageInfo.addError(new WikiMessage("error.unknown", e.getMessage()));
+		} catch (DataAccessException e) {
+			pageInfo.addError(new WikiMessage("error.unknown", e.getMessage()));
+		} catch (WikiException e) {
+			pageInfo.addError(e.getWikiMessage());
+		}
+		return result;
 	}
 
 	/**
