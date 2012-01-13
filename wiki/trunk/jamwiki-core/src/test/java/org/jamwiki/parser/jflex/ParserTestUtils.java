@@ -91,6 +91,15 @@ public class ParserTestUtils {
 	}
 
 	/**
+	 *
+	 */
+	public ParserOutput parseForParserOutput(String topicName) throws Throwable {
+		ParserOutput parserOutput = new ParserOutput();
+		this.parserResult(parserOutput, topicName);
+		return parserOutput;
+	}
+
+	/**
 	 * Given a topic file name (located within the TEST_TOPICS_DIR), parse the
 	 * topic and return the parsed output.
 	 */

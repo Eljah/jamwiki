@@ -193,6 +193,9 @@ public abstract class LinkUtil {
 		String topic = wikiLink.getDestination();
 		if (StringUtils.isBlank(text)) {
 			text = topic;
+			if (!StringUtils.isBlank(wikiLink.getSection())) {
+				text += "#" + wikiLink.getSection();
+			}
 		}
 		if (!wikiLink.getNamespace().getId().equals(Namespace.MEDIA_ID) && !StringUtils.isBlank(topic) && StringUtils.isBlank(style)) {
 			String virtualWiki = ((wikiLink.getAltVirtualWiki() != null) ? wikiLink.getAltVirtualWiki().getName() : wikiLink.getVirtualWiki());

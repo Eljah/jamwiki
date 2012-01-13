@@ -57,7 +57,7 @@ public class ParserTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testCategory() throws Throwable {
-		ParserOutput parserOutput = this.executeCategoryTest("WikiCategory");
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("WikiCategory");
 		assertEquals("Expected two categories", 2, parserOutput.getCategories().size());
 		assertTrue("Category:Test expected in categories", parserOutput.getCategories().containsKey("Category:Test"));
 		assertNull("Category:Test should not have a sort key", parserOutput.getCategories().get("Category:Test"));
@@ -70,7 +70,7 @@ public class ParserTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testCategoryNested() throws Throwable {
-		ParserOutput parserOutput = this.executeCategoryTest("TemplateIncludeCategory");
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("TemplateIncludeCategory");
 		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
 		assertNotNull("Category:Test expected", parserOutput.getCategories().containsKey("Category:Test"));
 	}
@@ -80,7 +80,7 @@ public class ParserTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testCategoryTemplate1() throws Throwable {
-		ParserOutput parserOutput = this.executeCategoryTest("TemplateCategory1");
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("TemplateCategory1");
 		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
 		assertNotNull("Category:Test Example1 expected", parserOutput.getCategories().containsKey("Category:Test Example1"));
 	}
@@ -90,19 +90,10 @@ public class ParserTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testCategoryTemplate2() throws Throwable {
-		ParserOutput parserOutput = this.executeCategoryTest("TemplateCategory2");
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("TemplateCategory2");
 		assertEquals("Expected two categories", 2, parserOutput.getCategories().size());
 		assertNotNull("Category:Test Example1 expected", parserOutput.getCategories().containsKey("Category:Test Example1"));
 		assertNotNull("Category:Test Example2 expected", parserOutput.getCategories().containsKey("Category:Test Example2"));
-	}
-
-	/**
-	 *
-	 */
-	private ParserOutput executeCategoryTest(String topicName) throws Throwable {
-		ParserOutput parserOutput = new ParserOutput();
-		String parserResult = this.parserTestUtils.parserResult(parserOutput, topicName);
-		return parserOutput;
 	}
 
 	/**
@@ -236,7 +227,7 @@ public class ParserTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testRedirectCategory1() throws Throwable {
-		ParserOutput parserOutput = this.executeCategoryTest("Redirect4");
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("Redirect4");
 		assertEquals("Expected redirect target to be Example1", "Example1", parserOutput.getRedirect());
 		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
 		assertEquals("Expected two links", 2, parserOutput.getLinks().size());
@@ -247,9 +238,18 @@ public class ParserTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testRedirectCategory2() throws Throwable {
-		ParserOutput parserOutput = this.executeCategoryTest("Category:Redirected");
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("Category:Redirected");
 		assertEquals("Expected redirect target to be Category:Test", "Category:Test", parserOutput.getRedirect());
 		assertEquals("Expected one category", 1, parserOutput.getCategories().size());
 		assertEquals("Expected two links", 2, parserOutput.getLinks().size());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testRedirectWithSection() throws Throwable {
+		ParserOutput parserOutput = this.parserTestUtils.parseForParserOutput("Redirect5");
+		assertEquals("Expected redirect target to be Example1#Section 2", "Example1#Section 2", parserOutput.getRedirect());
 	}
 }
