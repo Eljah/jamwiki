@@ -143,8 +143,9 @@ public class MediaWikiXmlExporter implements TopicExporter {
 		TopicVersion topicVersion;
 		Topic topic;
 		WikiUser user;
-		// choose 100,000 as an arbitrary max
-		Pagination pagination = new Pagination(100000, 0);
+		// choose 100,000 as an arbitrary default
+		int maxRevisions = (Environment.getIntValue(Environment.PROP_MAX_TOPIC_VERSION_EXPORT) > 0) ? Environment.getIntValue(Environment.PROP_MAX_TOPIC_VERSION_EXPORT) : 100000;
+		int revisionsRetrieved = 0;
 		List<Integer> topicVersionIds;
 		Map<String, String> textAttributes = new HashMap<String, String>();
 		textAttributes.put("xml:space", "preserve");
@@ -159,12 +160,14 @@ public class MediaWikiXmlExporter implements TopicExporter {
 			XMLUtil.buildTag(writer, "title", topic.getName(), true);
 			writer.append('\n');
 			XMLUtil.buildTag(writer, "id", topic.getTopicId());
-			if (excludeHistory) {
+			if (excludeHistory || (maxRevisions - revisionsRetrieved) <= 1) {
 				// only include the most recent version
 				topicVersionIds.add(topic.getCurrentVersionId());
 			} else {
 				// FIXME - changes sorted newest-to-oldest, should be reverse
+				Pagination pagination = new Pagination(maxRevisions - revisionsRetrieved, 0);
 				List<RecentChange> changes = WikiBase.getDataHandler().getTopicHistory(topic, pagination, true);
+				revisionsRetrieved += changes.size();
 				for (int i = (changes.size() - 1); i >= 0; i--) {
 					topicVersionIds.add(changes.get(i).getTopicVersionId());
 				}
