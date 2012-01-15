@@ -79,6 +79,12 @@ public class TwitterTag implements JFlexCustomTagItem {
 	}
 
 	/**
+	 * Initialize the tag with any key-value params passed in from the configuration.
+	 */
+	public void initParams(Map<String, String> initParams) {
+	}
+
+	/**
 	 * Parse a Twitter integration tag of the form <twitter /> and return the
 	 * resulting wiki text output.
 	 */

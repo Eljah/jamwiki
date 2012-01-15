@@ -16,6 +16,8 @@
  */
 package org.jamwiki.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -32,6 +34,7 @@ public class WikiConfigurationObject {
 	private String key2;
 	private String name;
 	private String state;
+	private Map<String, String> initParams = new HashMap<String, String>();
 
 	/**
 	 *
@@ -108,5 +111,21 @@ public class WikiConfigurationObject {
 	 */
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	/**
+	 * Return a mapping of of key-value pairs representing initialization parameters.
+	 * This method will never return <code>null</code>.
+	 */
+	public Map<String, String> getInitParams() {
+		return this.initParams;
+	}
+
+	/**
+	 * Add a key-value pair to the mapping of of key-value pairs representing
+	 * initialization parameters.
+	 */
+	public void addInitParam(String key, String value) {
+		this.initParams.put(key, value);
 	}
 }

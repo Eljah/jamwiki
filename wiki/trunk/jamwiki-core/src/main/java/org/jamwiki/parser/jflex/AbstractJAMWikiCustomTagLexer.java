@@ -88,6 +88,7 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 				logger.warn("No tag name specified for custom tag: " + parserCustomTagClass);
 				continue;
 			}
+			jflexCustomTagItem.initParams(wikiConfigurationObject.getInitParams());
 			CUSTOM_TAG_REGISTRY.put(jflexCustomTagItem.getTagName(), jflexCustomTagItem);
 		}
 	}

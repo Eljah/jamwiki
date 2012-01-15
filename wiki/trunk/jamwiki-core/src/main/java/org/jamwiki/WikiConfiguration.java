@@ -61,6 +61,9 @@ public class WikiConfiguration {
 	private static final String XML_DATA_HANDLER_ROOT = "data-handlers";
 	private static final String XML_EDITOR = "editor";
 	private static final String XML_EDITOR_ROOT = "editors";
+	private static final String XML_INIT_PARAM = "init-param";
+	private static final String XML_INIT_PARAM_NAME = "param-name";
+	private static final String XML_INIT_PARAM_VALUE = "param-value";
 	private static final String XML_PARAM_CLASS = "class";
 	private static final String XML_PARAM_KEY = "key";
 	private static final String XML_PARAM_KEY2 = "key2";
@@ -200,6 +203,21 @@ public class WikiConfiguration {
 				configurationObject.setName(XMLUtil.getTextContent(child));
 			} else if (child.getNodeName().equals(XML_PARAM_STATE)) {
 				configurationObject.setState(XMLUtil.getTextContent(child));
+			} else if (child.getNodeName().equals(XML_INIT_PARAM)) {
+				NodeList initParamNodes = child.getChildNodes();
+				String key = null;
+				String value = null;
+				for (int k = 0; k < initParamNodes.getLength(); k++) {
+					Node initParamNode = initParamNodes.item(k);
+					if (initParamNode.getNodeName().equals(XML_INIT_PARAM_NAME)) {
+						key = XMLUtil.getTextContent(initParamNode);
+					} else if (initParamNode.getNodeName().equals(XML_INIT_PARAM_VALUE)) {
+						value = XMLUtil.getTextContent(initParamNode);
+					}
+				}
+				if (!StringUtils.isBlank(key) && !StringUtils.isBlank(value)) {
+					configurationObject.addInitParam(key, value);
+				}
 			} else {
 				logUnknownChild(node, child);
 			}

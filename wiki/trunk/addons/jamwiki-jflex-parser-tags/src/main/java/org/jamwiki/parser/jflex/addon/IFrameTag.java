@@ -74,6 +74,12 @@ public class IFrameTag implements JFlexCustomTagItem {
 	}
 
 	/**
+	 * Initialize the tag with any key-value params passed in from the configuration.
+	 */
+	public void initParams(Map<String, String> initParams) {
+	}
+
+	/**
 	 * Convert the attribute map to a string of key-value pairs.
 	 */
 	private String formatAttributes(Map<String, String> attributes) {

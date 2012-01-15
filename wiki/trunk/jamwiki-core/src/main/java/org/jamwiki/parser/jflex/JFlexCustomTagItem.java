@@ -31,6 +31,12 @@ import org.jamwiki.parser.ParserException;
 public interface JFlexCustomTagItem {
 
 	/**
+	 * Initialize the tag with any key-value params passed in from the configuration.
+	 * This method will be called immediately after the tag is instantiated.
+	 */
+	public void initParams(Map<String, String> initParams);
+
+	/**
 	 * Return the tag name.  If the tag is "<custom>" then the tag name is "custom".
 	 */
 	public String getTagName();

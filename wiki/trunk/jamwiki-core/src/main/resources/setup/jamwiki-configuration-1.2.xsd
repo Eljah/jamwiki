@@ -38,6 +38,7 @@
 	<xs:element name="custom-tag">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element ref="init-param" maxOccurs="unbounded" minOccurs="0" />
 				<xs:element name="class" type="xs:string" maxOccurs="1" minOccurs="1" />
 				<xs:element name="key" type="xs:string" maxOccurs="1" minOccurs="0" />
 			</xs:sequence>
@@ -105,6 +106,14 @@
 			<xs:sequence>
 				<xs:element name="name" type="xs:string" maxOccurs="1" minOccurs="1" />
 				<xs:element name="key" type="xs:string" maxOccurs="1" minOccurs="1" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="init-param">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="param-name" type="xs:string" maxOccurs="1" minOccurs="1" />
+				<xs:element name="param-value" type="xs:string" maxOccurs="1" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
