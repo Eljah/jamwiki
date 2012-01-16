@@ -86,6 +86,12 @@
 	<div class="formhelp"><fmt:message key="admin.help.logoimage" /></div>
 </div>
 <div class="row">
+	<label for="<%= Environment.PROP_BASE_DEFAULT_TOPIC %>"><fmt:message key="admin.caption.defaulttopic" /></label>
+	<c:set var="PROP_BASE_DEFAULT_TOPIC"><%= Environment.PROP_BASE_DEFAULT_TOPIC %></c:set>
+	<span><jamwiki:text name="${PROP_BASE_DEFAULT_TOPIC}" value="${props[PROP_BASE_DEFAULT_TOPIC]}" size="30" id="${PROP_BASE_DEFAULT_TOPIC}" /></span>
+	<div class="formhelp"><fmt:message key="admin.help.defaulttopic" /></div>
+</div>
+<div class="row">
 	<label for="<%= Environment.PROP_RECENT_CHANGES_NUM %>"><fmt:message key="admin.caption.recentchangesdefault" /></label>
 	<c:set var="PROP_RECENT_CHANGES_NUM"><%= Environment.PROP_RECENT_CHANGES_NUM %></c:set>
 	<span><jamwiki:text name="${PROP_RECENT_CHANGES_NUM}" size="5" maxlength="4" value="${props[PROP_RECENT_CHANGES_NUM]}" id="${PROP_RECENT_CHANGES_NUM}" /></span>
@@ -99,19 +105,6 @@
 	<label for="<%= Environment.PROP_TOPIC_USE_SHOW_CHANGES %>"><fmt:message key="admin.caption.useshowchanges" /></label>
 	<c:set var="PROP_TOPIC_USE_SHOW_CHANGES"><%= Environment.PROP_TOPIC_USE_SHOW_CHANGES %></c:set>
 	<span><jamwiki:checkbox name="${PROP_TOPIC_USE_SHOW_CHANGES}" value="true" checked="${props[PROP_TOPIC_USE_SHOW_CHANGES]}" id="${PROP_TOPIC_USE_SHOW_CHANGES}" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_TOPIC_EDITOR %>"><fmt:message key="admin.caption.editor" /></label>
-	<c:set var="PROP_TOPIC_EDITOR"><%= Environment.PROP_TOPIC_EDITOR %></c:set>
-	<span>
-		<select name="<%= Environment.PROP_TOPIC_EDITOR %>" id="<%= Environment.PROP_TOPIC_EDITOR %>">
-		<c:set var="PROP_TOPIC_EDITOR"><%= Environment.PROP_TOPIC_EDITOR %></c:set>
-		<c:forEach items="${editors}" var="editor">
-		<option value="<c:out value="${editor.key}" />"<c:if test="${props[PROP_TOPIC_EDITOR] == editor.key}"> selected="selected"</c:if>><c:out value="${editor.value}" /></option>
-		</c:forEach>
-		</select>
-	</span>
-	<div class="formhelp"><fmt:message key="admin.help.editor" /></div>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_BASE_META_DESCRIPTION %>"><fmt:message key="admin.caption.metadescription" /></label>
@@ -132,10 +125,17 @@
 	</span>
 </div>
 <div class="row">
-	<label for="<%= Environment.PROP_BASE_DEFAULT_TOPIC %>"><fmt:message key="admin.caption.defaulttopic" /></label>
-	<c:set var="PROP_BASE_DEFAULT_TOPIC"><%= Environment.PROP_BASE_DEFAULT_TOPIC %></c:set>
-	<span><jamwiki:text name="${PROP_BASE_DEFAULT_TOPIC}" value="${props[PROP_BASE_DEFAULT_TOPIC]}" size="30" id="${PROP_BASE_DEFAULT_TOPIC}" /></span>
-	<div class="formhelp"><fmt:message key="admin.help.defaulttopic" /></div>
+	<label for="<%= Environment.PROP_TOPIC_EDITOR %>"><fmt:message key="admin.caption.editor" /></label>
+	<c:set var="PROP_TOPIC_EDITOR"><%= Environment.PROP_TOPIC_EDITOR %></c:set>
+	<span>
+		<select name="<%= Environment.PROP_TOPIC_EDITOR %>" id="<%= Environment.PROP_TOPIC_EDITOR %>">
+		<c:set var="PROP_TOPIC_EDITOR"><%= Environment.PROP_TOPIC_EDITOR %></c:set>
+		<c:forEach items="${editors}" var="editor">
+		<option value="<c:out value="${editor.key}" />"<c:if test="${props[PROP_TOPIC_EDITOR] == editor.key}"> selected="selected"</c:if>><c:out value="${editor.value}" /></option>
+		</c:forEach>
+		</select>
+	</span>
+	<div class="formhelp"><fmt:message key="admin.help.editor" /></div>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_MAX_TOPIC_VERSION_EXPORT %>"><fmt:message key="admin.caption.maxversionexport" /></label>
