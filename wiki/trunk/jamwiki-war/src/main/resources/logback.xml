@@ -48,6 +48,7 @@
 	-->
 
 	<logger name="org.jamwiki" level="WARN" />
+	<logger name="net.sf.ehcache.pool.sizeof" level="ERROR" />
 
 	<root level="WARN">
 		<!-- By default all logging goes to standard out -->
