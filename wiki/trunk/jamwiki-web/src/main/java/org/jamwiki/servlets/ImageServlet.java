@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.WikiFile;
+import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -57,12 +59,23 @@ public class ImageServlet extends JAMWikiServlet {
 	 * filesystem.
 	 */
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws ServletException, IOException {
-		if (ServletUtil.isTopic(request, "Special:Image")) {
+		File file = this.retrieveFile(request);
+		if (file == null) {
 			this.streamFileFromDatabase(request, response);
 		} else {
-			this.streamFileFromFileSystem(request, response);
+			this.streamFileFromFileSystem(file, response);
 		}
 		return null;
+	}
+
+	/**
+	 * If a file corresponding to the request is on the filesystem return it,
+	 * otherwise return <code>null</code>.
+	 */
+	private File retrieveFile(HttpServletRequest request) {
+		String filename = request.getRequestURI().substring(request.getContextPath().length());
+		File file = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), filename);
+		return (file.exists()) ? file : null;
 	}
 
 	/**
@@ -71,27 +84,30 @@ public class ImageServlet extends JAMWikiServlet {
 	 * those files.
 	 */
 	private void streamFileFromDatabase(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String fileId = request.getParameter("fileId");
-		String fileVersionId = request.getParameter("fileVersionId");
-		String resized = request.getParameter("resized");
-		if (resized == null) {
-			resized = "0";
+		String filename = request.getRequestURI().substring(request.getContextPath().length() + 1);
+		Object[] args;
+		try {
+			args = ImageUtil.DB_FILE_URL_FORMAT.parse(filename);
+		} catch (ParseException e) {
+			logger.debug("Invalid database file request: " + filename);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
-		// TODO - consider implementing caching
+		int fileId = Integer.parseInt(args[1].toString());
+		int fileVersionId = Integer.parseInt(args[2].toString());
+		int resized = Integer.parseInt(args[3].toString());
 		ImageData imageData;
 		try {
-			if (fileVersionId != null) {
-				imageData = WikiBase.getDataHandler().getImageVersionData(Integer.parseInt(fileVersionId), Integer.parseInt(resized));
+			if (fileVersionId != 0) {
+				imageData = WikiBase.getDataHandler().getImageVersionData(fileVersionId, resized);
 			} else {
-				imageData = WikiBase.getDataHandler().getImageData(Integer.parseInt(fileId), Integer.parseInt(resized));
+				imageData = WikiBase.getDataHandler().getImageData(fileId, resized);
 			}
-		} catch (NumberFormatException nfe) {
-			throw new ServletException(nfe);
 		} catch (DataAccessException dae) {
 			throw new ServletException(dae);
 		}
 		if (imageData == null) {
-			logger.info("Data does not exist: " + (fileVersionId != null ? ("file_version_id=" + fileVersionId) : ("file_id=" + fileId)));
+			logger.debug("Database file does not exist: fileId=" + fileId + " / fileVersionId=" + fileVersionId + " / resized=" + resized + " / request=" + request.getRequestURI());
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
@@ -111,13 +127,11 @@ public class ImageServlet extends JAMWikiServlet {
 	 * directly via Tomcat or Apache, but allows files to be stored outside of the
 	 * webapp and thus keeps wiki data (files) separate from application code.
 	 */
-	private void streamFileFromFileSystem(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void streamFileFromFileSystem(File file, HttpServletResponse response) throws ServletException, IOException {
 		ServletOutputStream out = null;
 		InputStream in = null;
-		String filename = request.getRequestURI().substring(request.getContextPath().length());
-		File file = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), filename);
-		if (!file.exists() || file.isDirectory() || !file.canRead()) {
-			logger.info("File does not exist: " + file.getAbsolutePath());
+		if (file.isDirectory() || !file.canRead()) {
+			logger.debug("File does not exist: " + file.getAbsolutePath());
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}

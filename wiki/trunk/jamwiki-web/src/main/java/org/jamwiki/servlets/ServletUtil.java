@@ -917,8 +917,12 @@ public class ServletUtil {
 		}
 		WikiUser wikiUser;
 		for (WikiFileVersion fileVersion : fileVersions) {
+			String relativeFileUrl = fileVersion.getUrl();
+			if (!ImageUtil.isImagesOnFS()) {
+				relativeFileUrl = ImageUtil.buildDatabaseRelativeUrl(wikiFile.getFileId(), fileVersion.getFileVersionId(), null, fileVersion.getUrl());
+			}
 			// update version urls to include web root path
-			String url = ImageUtil.buildImageUrl(request.getContextPath(), pageInfo.getVirtualWikiName(), fileVersion.getUrl(), false);
+			String url = ImageUtil.buildImageUrl(request.getContextPath(), relativeFileUrl, false);
 			fileVersion.setUrl(url);
 			// make sure the authorDisplay field is equal to the login for non-anonymous uploads
 			if (fileVersion.getAuthorId() != null) {

@@ -77,7 +77,7 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 		String FILE_NAME = "/2010/10/example.jpg";
 		try {
 			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.JAMWIKI.toString());
-			String actualResult = ImageUtil.buildImageUrl("/wiki", "en", FILE_NAME, false);
+			String actualResult = ImageUtil.buildImageUrl("/wiki", FILE_NAME, false);
 			String expectedResult = "/wiki/uploads" + FILE_NAME;
 			assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
 		} finally {
@@ -91,11 +91,11 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 	@Test
 	public void testBuildImageDatabaseUrl() throws Throwable {
 		String originalFileUploadStorage = Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE);
-		String FILE_NAME = "/2010/10/example.jpg";
+		String FILE_NAME = "/this-should-be-updated";
 		try {
 			Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DATABASE.toString());
-			String actualResult = ImageUtil.buildImageUrl("/wiki", "en", FILE_NAME, false);
-			String expectedResult = "/wiki/en/Special:Image" + FILE_NAME;
+			String actualResult = ImageUtil.buildImageUrl("/wiki", FILE_NAME, false);
+			String expectedResult = "/wiki/uploads" + FILE_NAME;
 			assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
 			File resultFile = ImageUtil.buildAbsoluteFile(FILE_NAME);
 			assertNull("Absolute image link URL incorrect", resultFile);

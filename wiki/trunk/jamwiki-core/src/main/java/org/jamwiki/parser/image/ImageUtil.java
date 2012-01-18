@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -61,6 +62,11 @@ public abstract class ImageUtil {
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageUtil.class.getName());
 	/** Cache name for the cache of image dimensions. */
 	private static final WikiCache<String, Dimension> CACHE_IMAGE_DIMENSIONS = new WikiCache<String, Dimension>("org.jamwiki.parser.image.ImageUtil.CACHE_IMAGE_DIMENSIONS");
+	/**
+	 * Pattern used in URLs for files uploaded to the database.  Pattern is URL root,
+	 * file ID, version ID, resize increment, and file name.
+	 */
+	public static final MessageFormat DB_FILE_URL_FORMAT = new MessageFormat("{0}/{1,number,integer}/{2,number,integer}/{3,number,integer}/{4}");
 	/** Default sub-directory into which image files are stored. */
 	private static final String DEFAULT_RELATIVE_FILE_DIRECTORY = "/uploads";
 	/** Sub-folder of the upload file directory into which to place resized images. */
@@ -121,6 +127,30 @@ public abstract class ImageUtil {
 	}
 
 	/**
+	 * Given a filename, generate the relative URL for files stored in the database.
+	 *
+	 * @param fileId The WikiFile ID.
+	 * @param fileVersionId The file version ID, or <code>null</code> if building a link
+	 *  to the current version.
+	 * @param resized The resize dimension, or <code>null</code> if a non-resized image
+	 *  is being rendered.
+	 * @param filename The file name ("my_image.png");
+	 */
+	public static String buildDatabaseRelativeUrl(int fileId, Integer fileVersionId, Integer resized, String filename) {
+		Object[] args = new Object[5];
+		args[0] = "";
+		args[1] = fileId;
+		args[2] = (fileVersionId == null) ? 0 : fileVersionId.intValue();
+		args[3] = (resized == null) ? 0 : resized.intValue();
+		int pos = filename.lastIndexOf("/");
+		if (pos != -1 && pos < (filename.length() - 1)) {
+			filename = filename.substring(pos + 1);
+		}
+		args[4] = filename;
+		return DB_FILE_URL_FORMAT.format(args);
+	}
+
+	/**
 	 * Utility method for building the URL to an uploaded file (NOT the file's
 	 * topic page).  If the file does not exist then this method will return
 	 * <code>null</code>.
@@ -141,8 +171,11 @@ public abstract class ImageUtil {
 		if (wikiFile == null) {
 			return null;
 		}
-		String relativeFileUrl = isImagesOnFS() ? wikiFile.getUrl() : "?fileId=" + wikiFile.getFileId();
-		return buildImageUrl(context, virtualWiki, relativeFileUrl, forceAbsoluteUrl);
+		String relativeFileUrl = wikiFile.getUrl();
+		if (!isImagesOnFS()) {
+			relativeFileUrl = buildDatabaseRelativeUrl(wikiFile.getFileId(), null, null, wikiFile.getUrl());
+		}
+		return buildImageUrl(context, relativeFileUrl, forceAbsoluteUrl);
 	}
 
 	/**
@@ -151,7 +184,6 @@ public abstract class ImageUtil {
 	 * <code>null</code>.
 	 *
 	 * @param context The servlet context root.
-	 * @param virtualWiki The virtual wiki for the URL that is being created.
 	 * @param filename The relative path of the file.  See
 	 *  {@link org.jamwiki.model.WikiFile#getUrl}.
 	 * @param forceAbsoluteUrl Set to <code>true</code> if the returned URL should
@@ -161,13 +193,13 @@ public abstract class ImageUtil {
 	 * @return The URL to an uploaded file (not the file's topic page) or
 	 *  <code>null</code> if the file does not exist.
 	 */
-	public static String buildImageUrl(String context, String virtualWiki, String filename, boolean forceAbsoluteUrl) {
+	public static String buildImageUrl(String context, String filename, boolean forceAbsoluteUrl) {
+		String relativeFileRoot = FilenameUtils.normalize(context + "/" + DEFAULT_RELATIVE_FILE_DIRECTORY);
+		if (Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DOCROOT.toString())) {
+			relativeFileRoot = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
+		}
+		String url = FilenameUtils.normalize(relativeFileRoot + "/" + filename);
 		if (isImagesOnFS()) {
-			String relativeFileRoot = FilenameUtils.normalize(context + "/" + DEFAULT_RELATIVE_FILE_DIRECTORY);
-			if (Environment.getValue(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DOCROOT.toString())) {
-				relativeFileRoot = Environment.getValue(Environment.PROP_FILE_DIR_RELATIVE_PATH);
-			}
-			String url = FilenameUtils.normalize(relativeFileRoot + "/" + filename);
 			String fileServerUrl = Environment.getValue(Environment.PROP_FILE_SERVER_URL);
 			String absoluteServerUrl = Environment.getValue(Environment.PROP_SERVER_URL);
 			if (!StringUtils.isBlank(fileServerUrl) && !StringUtils.equalsIgnoreCase(fileServerUrl, absoluteServerUrl)) {
@@ -178,11 +210,8 @@ public abstract class ImageUtil {
 				// required, so use the server URL to generate an absolute URL
 				url = LinkUtil.normalize(absoluteServerUrl + url);
 			}
-			return FilenameUtils.separatorsToUnix(url);
-		} else {
-			WikiLink imageLink = new WikiLink(context, virtualWiki, "Special:Image");
-			return imageLink.toRelativeUrl() + filename;
 		}
+		return FilenameUtils.separatorsToUnix(url);
 	}
 
 	/**
@@ -239,7 +268,7 @@ public abstract class ImageUtil {
 		}
 		Object[] args = (imageMetadata.getVerticalAlignment() != ImageVerticalAlignmentEnum.NOT_SPECIFIED) ? new Object[6] : new Object[5];
 		args[0] = style;
-		args[1] = buildImageUrl(context, linkVirtualWiki, wikiImage.getUrl(), false);
+		args[1] = buildImageUrl(context, wikiImage.getUrl(), false);
 		args[2] = wikiImage.getWidth();
 		args[3] = wikiImage.getHeight();
 		String alt = (imageMetadata.getAlt() == null) ? topicName : imageMetadata.getAlt();
@@ -587,8 +616,8 @@ public abstract class ImageUtil {
 			String url = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), (int)incrementalDimensions.getWidth());
 			wikiImage.setUrl(url);
 		} else {
-			int resized  = incrementalDimensions.width != originalDimensions.width ? incrementalDimensions.width : 0;
-			String url = "?fileId=" + wikiImage.getFileId() + "&resized=" + resized;
+			Integer resized  = incrementalDimensions.width != originalDimensions.width ? incrementalDimensions.width : null;
+			String url = buildDatabaseRelativeUrl(wikiImage.getFileId(), null, resized, wikiImage.getUrl());
 			wikiImage.setUrl(url);
 		}
 		return wikiImage;

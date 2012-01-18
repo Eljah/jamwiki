@@ -28,7 +28,6 @@
 				<prop key="/**/Special:Export">Export</prop>
 				<prop key="/**/Special:FileList">Items</prop>
 				<prop key="/**/Special:History">History</prop>
-				<prop key="/**/Special:Image">Image</prop>
 				<prop key="/**/Special:Import">Import</prop>
 				<prop key="/**/Special:ImportTiddly">ImportTiddly</prop>
 				<prop key="/**/Special:ImageList">Items</prop>
