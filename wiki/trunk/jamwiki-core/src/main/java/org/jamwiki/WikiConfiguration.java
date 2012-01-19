@@ -243,23 +243,6 @@ public class WikiConfiguration {
 	}
 
 	/**
-	 * Utility method for parsing nodes that are single value items.
-	 */
-	private List<String> parseListNodes(Node node, String name) {
-		List<String> results = new ArrayList<String>();
-		NodeList children = node.getChildNodes();
-		for (int j = 0; j < children.getLength(); j++) {
-			Node child = children.item(j);
-			if (child.getNodeName().equals(name)) {
-				results.add(XMLUtil.getTextContent(child));
-			} else {
-				logUnknownChild(node, child);
-			}
-		}
-		return results;
-	}
-
-	/**
 	 * Utility method for parsing a key-value node.
 	 */
 	private void parseMapNode(Node node, Map<String, String> resultMap) {
