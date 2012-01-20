@@ -74,7 +74,7 @@ td.formhelp {
 	display: block !important;
 }
 </style>
-	<script type="text/javascript" src="<c:url value="/js/jamwiki.js?setup" />"></script>
+	<script type="text/javascript" src="../js/jamwiki.js?setup"></script>
 </head>
 <body>
 <div id="setup-container">
