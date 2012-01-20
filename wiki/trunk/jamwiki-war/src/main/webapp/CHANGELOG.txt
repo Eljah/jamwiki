@@ -75,6 +75,8 @@ Bugfixes:
   * Newlines in table cells will now start a paragraph, matching Mediawiki
     behavior.
   * Allow whitespace in front of wiki table syntax (" {|") to match Mediawiki.
+  * Parser directives such as "__TOC__" that are on their own lines should not
+    cause paragraph insertion when parsed.
   * Allow thumbnail images to be specified using "thumnbail" in addition to
     "thumb" to match Mediawiki.
   * When a topic contains only whitespace it should be parsed to empty text and

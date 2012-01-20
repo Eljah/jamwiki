@@ -33,7 +33,7 @@ wikipre            = (" ") ([^\n])
 wikipreend         = [^ ] | {newline}
 
 /* processing commands */
-noeditsection      = ({newline})? "__NOEDITSECTION__"
+noeditsection      = "__NOEDITSECTION__"
 
 /* wiki links */
 protocol           = "http://" | "https://" | "mailto:" | "mailto://" | "ftp://" | "file://"
@@ -113,6 +113,11 @@ redirect           = "#REDIRECT" [ \t]* {wikilink}
 
     /* ----- processing commands ----- */
 
+    ^{noeditsection} [ \t]* {newline} {
+        if (logger.isTraceEnabled()) logger.trace("noeditsection: " + yytext() + " (" + yystate() + ")");
+        this.parserInput.setAllowSectionEdit(false);
+        return (this.mode < JFlexParser.MODE_PREPROCESS) ? yytext() : "";
+    }
     {noeditsection} {
         if (logger.isTraceEnabled()) logger.trace("noeditsection: " + yytext() + " (" + yystate() + ")");
         this.parserInput.setAllowSectionEdit(false);

@@ -188,13 +188,29 @@ endparagraph       = {newline} (({whitespace})*{newline})*
         this.parserInput.getTableOfContents().setStatus(TableOfContents.STATUS_NO_TOC);
         return "";
     }
+    ^{notoc} [ \t]* {newline} {
+        if (logger.isTraceEnabled()) logger.trace("notoc: " + yytext() + " (" + yystate() + ")");
+        this.parserInput.getTableOfContents().setStatus(TableOfContents.STATUS_NO_TOC);
+        return "";
+    }
     {toc} {
         if (logger.isTraceEnabled()) logger.trace("toc: " + yytext() + " (" + yystate() + ")");
         this.parserInput.getTableOfContents().setStatus(TableOfContents.STATUS_TOC_INITIALIZED);
         this.parserInput.getTableOfContents().setForceTOC(true);
         return yytext();
     }
+    ^{toc} [ \t]* {newline} {
+        if (logger.isTraceEnabled()) logger.trace("toc: " + yytext() + " (" + yystate() + ")");
+        this.parserInput.getTableOfContents().setStatus(TableOfContents.STATUS_TOC_INITIALIZED);
+        this.parserInput.getTableOfContents().setForceTOC(true);
+        return yytext();
+    }
     {forcetoc} {
+        if (logger.isTraceEnabled()) logger.trace("forcetoc: " + yytext() + " (" + yystate() + ")");
+        this.parserInput.getTableOfContents().setForceTOC(true);
+        return "";
+    }
+    ^{forcetoc} [ \t]* {newline} {
         if (logger.isTraceEnabled()) logger.trace("forcetoc: " + yytext() + " (" + yystate() + ")");
         this.parserInput.getTableOfContents().setForceTOC(true);
         return "";
