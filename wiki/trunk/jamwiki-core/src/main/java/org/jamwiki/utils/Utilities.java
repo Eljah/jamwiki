@@ -385,7 +385,12 @@ public abstract class Utilities {
 			return false;
 		}
 		// see if it was successfully converted, in which case it is an entity
-		return (!text.equals(StringEscapeUtils.unescapeHtml4(text)));
+		try {
+			return (!text.equals(StringEscapeUtils.unescapeHtml4(text)));
+		} catch (IllegalArgumentException e) {
+			// "&#xffffff;" seems to be throwing errors
+			return false;
+		}
 	}
 
 	/**

@@ -21,7 +21,7 @@ import org.jamwiki.utils.Utilities;
 /* character expressions */
 newline            = "\n"
 whitespace         = [ \n\t\f]
-entity             = (&#([0-9]{2,4});) | (&[A-Za-z]{2,6};)
+entity             = (&#[Xx]([0-9a-fA-F]{2,5});) | (&#([0-9]{2,4});) | (&[A-Za-z]{2,6};)
 
 /* non-container expressions */
 hr                 = "---" "-"+
@@ -526,7 +526,7 @@ endparagraph       = {newline} (({whitespace})*{newline})*
 <YYINITIAL, WIKIPRE, PRE, LIST, TABLE> {
     {entity} {
         if (logger.isTraceEnabled()) logger.trace("entity: " + yytext() + " (" + yystate() + ")");
-        String raw = yytext();
+        String raw = yytext().toLowerCase();
         return (Utilities.isHtmlEntity(raw)) ? raw : StringEscapeUtils.escapeHtml4(raw);
     }
     {whitespace} | . {
