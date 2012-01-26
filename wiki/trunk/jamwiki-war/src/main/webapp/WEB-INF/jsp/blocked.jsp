@@ -26,6 +26,10 @@
 
 <div class="message"><fmt:message key="userblock.caption.overview" /></div>
 
+<c:if test="${!empty pageInfo.messages}">
+<p><c:forEach items="${pageInfo.messages}" var="message"><jamwiki_t:wikiMessage message="${message}" /><br /></c:forEach></p>
+</c:if>
+<c:if test="${!empty userBlock}">
 <p>
 	<fmt:message key="userblock.caption.blockedby"><fmt:param><jamwiki:link value="${pageInfo.namespaces[pageInfo.virtualWikiName]['User']}:${userBlock.blockedByUsername}">${userBlock.blockedByUsername}</jamwiki:link></fmt:param></fmt:message>
 	<c:if test="${!empty userBlock.blockReason}"><fmt:message key="userblock.caption.reason"><fmt:param value="${userBlock.blockReason}" /></fmt:message></c:if>
@@ -44,5 +48,6 @@
 </li>
 <li><fmt:message key="userblock.caption.target"><fmt:param value="${userBlock.blockedUsernameOrIpAddress}" /></fmt:message></li>
 </ul>
+</c:if>
 
 </div>

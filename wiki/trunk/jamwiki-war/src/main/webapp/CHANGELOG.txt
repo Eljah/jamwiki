@@ -14,6 +14,8 @@ New Features:
     used for site-specific customizations.
   * Move the system topics (BottomArea, LeftMenu, StyleSheet) to the
     JAMWiki: namespace (JAMWiki:Footer, JAMWiki:Sidebar, JAMWiki:System.css).
+  * Add an option to block malicious IP addresses that are on the Project
+    Honeypot blacklist from creating accounts, editing and uploading files.
   * Support storing images directly in the database rather than on the
     filesystem (avhohlov2).
   * Store images by default in the JAMWiki file system directory, rather than

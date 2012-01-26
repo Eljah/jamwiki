@@ -84,6 +84,8 @@ public class Environment {
 	public static final String PROP_FILE_SERVER_URL = "file-server-url";
 	public static final String PROP_FILE_UPLOAD_STORAGE = "file-upload-storage";
 	public static final String PROP_FILE_WHITELIST = "file-whitelist";
+	public static final String PROP_HONEYPOT_ACCESS_KEY = "honeypot-access-key";
+	public static final String PROP_HONEYPOT_FILTER_ENABLED = "honeypot-enabled";
 	public static final String PROP_IMAGE_RESIZE_INCREMENT = "image-resize-increment";
 	public static final String PROP_MAX_RECENT_CHANGES = "max-recent-changes";
 	public static final String PROP_MAX_TOPIC_VERSION_EXPORT = "max-topic-version-export";
@@ -236,6 +238,8 @@ public class Environment {
 		this.defaults.setProperty(PROP_FILE_SERVER_URL, "");
 		this.defaults.setProperty(PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.JAMWIKI.toString());
 		this.defaults.setProperty(PROP_FILE_WHITELIST, "bmp,gif,jpeg,jpg,pdf,png,properties,svg,txt,zip");
+		this.defaults.setProperty(PROP_HONEYPOT_ACCESS_KEY, "");
+		this.defaults.setProperty(PROP_HONEYPOT_FILTER_ENABLED, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_IMAGE_RESIZE_INCREMENT, "100");
 		this.defaults.setProperty(PROP_MAX_RECENT_CHANGES, "10000");
 		this.defaults.setProperty(PROP_MAX_TOPIC_VERSION_EXPORT, "1000");

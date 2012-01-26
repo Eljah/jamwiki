@@ -342,6 +342,11 @@ public class AdminServlet extends JAMWikiServlet {
 					pageInfo.addError(new WikiMessage("admin.spam.message.invalidkeys"));
 				}
 			}
+			setBooleanProperty(props, request, Environment.PROP_HONEYPOT_FILTER_ENABLED);
+			setProperty(props, request, Environment.PROP_HONEYPOT_ACCESS_KEY);
+			if (Boolean.parseBoolean(props.getProperty(Environment.PROP_HONEYPOT_FILTER_ENABLED)) && StringUtils.isBlank(props.getProperty(Environment.PROP_HONEYPOT_ACCESS_KEY))) {
+				pageInfo.addError(new WikiMessage("admin.spam.message.invalidhoneypotkey"));
+			}
 			setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
 			setProperty(props, request, Environment.PROP_RSS_TITLE);
 			pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(props));

@@ -22,9 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.authentication.HoneypotValidator;
 import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
@@ -49,6 +51,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 public abstract class JAMWikiServlet extends AbstractController implements JAMWikiController {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiServlet.class.getName());
+	private static final HoneypotValidator HONEYPOT_VALIDATOR = new HoneypotValidator();
 
 	/** Flag indicating whether or not a blocked user should be able to access the servlet. */
 	protected boolean blockable = false;
@@ -382,7 +385,8 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 	 */
 	private ModelAndView handleUserBlock(HttpServletRequest request, WikiPageInfo pageInfo) {
 		UserBlock userBlock = ServletUtil.retrieveCurrentUserBlock(request);
-		if (userBlock == null) {
+		if (userBlock == null && (!Environment.getBooleanValue(Environment.PROP_HONEYPOT_FILTER_ENABLED) || HONEYPOT_VALIDATOR.isValid(request))) {
+			// user is not blocked via block list or honeypot validation failure
 			return null;
 		}
 		ModelAndView next = new ModelAndView("wiki");
@@ -390,7 +394,12 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 		pageInfo.setPageTitle(new WikiMessage("userblock.title"));
 		pageInfo.setContentJsp(JAMWikiServlet.JSP_BLOCKED);
 		pageInfo.setSpecial(true);
-		next.addObject("userBlock", userBlock);
+		if (userBlock != null) {
+			next.addObject("userBlock", userBlock);
+		} else {
+			WikiMessage honeypotMessage = new WikiMessage("userblock.caption.honeypot", ServletUtil.getIpAddress(request));
+			pageInfo.addMessage(honeypotMessage);
+		}
 		return next;
 	}
 
