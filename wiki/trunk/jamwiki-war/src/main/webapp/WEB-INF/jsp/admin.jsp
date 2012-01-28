@@ -502,6 +502,18 @@ FIXME - Email not supported right now, comment this out
 	<div class="formhelp"><fmt:message key="admin.spam.help.usespamfilter" /></div>
 </div>
 <div class="row">
+	<label for="<%= Environment.PROP_HONEYPOT_FILTER_ENABLED %>"><fmt:message key="admin.spam.caption.usehoneypotfilter" /> (<fmt:message key="common.caption.experimental" />)</label>
+	<c:set var="PROP_HONEYPOT_FILTER_ENABLED"><%= Environment.PROP_HONEYPOT_FILTER_ENABLED %></c:set>
+	<span><jamwiki:checkbox name="${PROP_HONEYPOT_FILTER_ENABLED}" value="true" checked="${props[PROP_HONEYPOT_FILTER_ENABLED]}" id="${PROP_HONEYPOT_FILTER_ENABLED}" /></span>
+	<div class="formhelp"><fmt:message key="admin.spam.help.usehoneypotfilter" /></div>
+</div>
+<div class="row">
+	<label for="<%= Environment.PROP_HONEYPOT_ACCESS_KEY %>"><fmt:message key="admin.spam.caption.honeypotkey" /></label>
+	<c:set var="PROP_HONEYPOT_ACCESS_KEY"><%= Environment.PROP_HONEYPOT_ACCESS_KEY %></c:set>
+	<span><jamwiki:text name="${PROP_HONEYPOT_ACCESS_KEY}" value="${props[PROP_HONEYPOT_ACCESS_KEY]}" size="60" id="${PROP_HONEYPOT_ACCESS_KEY}" /></span>
+	<div class="formhelp"><fmt:message key="admin.spam.help.honeypotkey" /></div>
+</div>
+<div class="row">
 	<label for="<%= Environment.PROP_RECAPTCHA_EDIT %>"><fmt:message key="admin.spam.caption.recaptchaedit" /></label>
 	<c:set var="PROP_RECAPTCHA_EDIT"><%= Environment.PROP_RECAPTCHA_EDIT %></c:set>
 	<span>
@@ -537,18 +549,6 @@ FIXME - Email not supported right now, comment this out
 	<c:set var="PROP_RECAPTCHA_PRIVATE_KEY"><%= Environment.PROP_RECAPTCHA_PRIVATE_KEY %></c:set>
 	<span><jamwiki:text name="${PROP_RECAPTCHA_PRIVATE_KEY}" value="${props[PROP_RECAPTCHA_PRIVATE_KEY]}" size="60" id="${PROP_RECAPTCHA_PRIVATE_KEY}" /></span>
 	<div class="formhelp"><fmt:message key="admin.spam.help.recaptchakey" /></div>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_HONEYPOT_FILTER_ENABLED %>"><fmt:message key="admin.spam.caption.usehoneypotfilter" /> (<fmt:message key="common.caption.experimental" />)</label>
-	<c:set var="PROP_HONEYPOT_FILTER_ENABLED"><%= Environment.PROP_HONEYPOT_FILTER_ENABLED %></c:set>
-	<span><jamwiki:checkbox name="${PROP_HONEYPOT_FILTER_ENABLED}" value="true" checked="${props[PROP_HONEYPOT_FILTER_ENABLED]}" id="${PROP_HONEYPOT_FILTER_ENABLED}" /></span>
-	<div class="formhelp"><fmt:message key="admin.spam.help.usehoneypotfilter" /></div>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_HONEYPOT_ACCESS_KEY %>"><fmt:message key="admin.spam.caption.honeypotkey" /></label>
-	<c:set var="PROP_HONEYPOT_ACCESS_KEY"><%= Environment.PROP_HONEYPOT_ACCESS_KEY %></c:set>
-	<span><jamwiki:text name="${PROP_HONEYPOT_ACCESS_KEY}" value="${props[PROP_HONEYPOT_ACCESS_KEY]}" size="60" id="${PROP_HONEYPOT_ACCESS_KEY}" /></span>
-	<div class="formhelp"><fmt:message key="admin.spam.help.honeypotkey" /></div>
 </div>
 </fieldset>
 </div>

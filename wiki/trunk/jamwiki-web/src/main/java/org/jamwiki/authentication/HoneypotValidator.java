@@ -46,7 +46,7 @@ public class HoneypotValidator {
 	private static final int HONEYPOT_OCTET_COMMENT_SPAMMER = 4;
 	/** Minimum number of days since malicious activity was detected in order for the block to be imposed. */
 	// TODO: make this configurable
-	private static final int MAX_DAYS_SINCE_LAST_ACTIVE_FOR_BLOCK = 28;
+	private static final int MAX_DAYS_SINCE_LAST_ACTIVE_FOR_BLOCK = 60;
 
 	/**
 	 * Generate the DNS lookup address for the current user request.
@@ -81,7 +81,9 @@ public class HoneypotValidator {
 		String dnsLookupAddress = this.buildDnsLookupAddress(ipAddress);
 		HoneypotResult honeypotResult = this.retrieveHoneypotResult(dnsLookupAddress);
 		boolean result = this.isValidHoneypotResult(honeypotResult, ipAddress);
-		logger.debug("Honeypot filter execution time for " + ipAddress + ": " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Honeypot filter execution time for " + ipAddress + " (score: " + ((honeypotResult != null) ? honeypotResult.ipAddress : "null") + "): " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
+		}
 		return result;
 	}
 
@@ -94,7 +96,7 @@ public class HoneypotValidator {
 			return true;
 		}
 		if (honeypotResult.threatTypeOctet >= HONEYPOT_OCTET_COMMENT_SPAMMER && honeypotResult.lastActivityOctet <= MAX_DAYS_SINCE_LAST_ACTIVE_FOR_BLOCK) {
-			logger.info("Blocking malicious user identified by Project Honeypot blacklist.  IP address: " + ipAddress + ".  Honeypot blacklist score: " + honeypotResult.ipAddress + ".");
+			logger.info("Blocking malicious IP address identified by Project Honeypot blacklist: " + ipAddress + " (score: " + honeypotResult.ipAddress + ").");
 			return false;
 		}
 		return true;
