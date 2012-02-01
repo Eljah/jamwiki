@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.authentication.ReCaptchaUtil;
 import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
@@ -40,6 +39,7 @@ import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.DiffUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
+import org.jamwiki.validator.ReCaptchaUtil;
 import org.springframework.web.servlet.ModelAndView;
 
 /**

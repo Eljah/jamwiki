@@ -49,7 +49,6 @@ import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicType;
-import org.jamwiki.model.UserBlock;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiFile;
@@ -605,26 +604,6 @@ public class ServletUtil {
 		String view = ServletUtil.SPRING_REDIRECT_PREFIX + target;
 		next.clear();
 		next.setViewName(view);
-	}
-
-	/**
-	 * Utility method for determining if the current user is blocked or not.
-	 *
-	 * @param request The servlet request object.
-	 * @return The active user block record if the user is blocked, or
-	 *  <code>null</code> if the current user is not blocked.
-	 */
-	protected static UserBlock retrieveCurrentUserBlock(HttpServletRequest request) {
-		WikiUser wikiUser = ServletUtil.currentWikiUser();
-		Integer wikiUserId = (wikiUser.getUserId() > 0) ? wikiUser.getUserId() : null;
-		String ipAddress = request.getRemoteAddr();
-		UserBlock userBlock = null;
-		try {
-			userBlock = WikiBase.getDataHandler().lookupUserBlock(wikiUserId, ipAddress);
-		} catch (DataAccessException e) {
-			logger.error("Data access exception while retrieving user block status, e");
-		}
-		return userBlock;
 	}
 
 	/**

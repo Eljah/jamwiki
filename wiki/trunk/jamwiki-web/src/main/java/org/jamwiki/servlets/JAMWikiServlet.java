@@ -26,12 +26,10 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.authentication.HoneypotValidator;
 import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.Topic;
-import org.jamwiki.model.UserBlock;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.Watchlist;
 import org.jamwiki.model.WikiUser;
@@ -40,6 +38,9 @@ import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
+import org.jamwiki.validator.HoneypotValidator;
+import org.jamwiki.validator.UserBlockValidator;
+import org.jamwiki.validator.UserBlockValidatorInfo;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -52,6 +53,7 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 
 	private static final WikiLogger logger = WikiLogger.getLogger(JAMWikiServlet.class.getName());
 	private static final HoneypotValidator HONEYPOT_VALIDATOR = new HoneypotValidator();
+	private static final UserBlockValidator USER_BLOCK_VALIDATOR = new UserBlockValidator();
 
 	/** Flag indicating whether or not a blocked user should be able to access the servlet. */
 	protected boolean blockable = false;
@@ -384,8 +386,8 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 	 *  otherwise.
 	 */
 	private ModelAndView handleUserBlock(HttpServletRequest request, WikiPageInfo pageInfo) {
-		UserBlock userBlock = ServletUtil.retrieveCurrentUserBlock(request);
-		if (userBlock == null && (!Environment.getBooleanValue(Environment.PROP_HONEYPOT_FILTER_ENABLED) || HONEYPOT_VALIDATOR.isValid(request))) {
+		UserBlockValidatorInfo userBlockValidatorInfo = USER_BLOCK_VALIDATOR.validate(request);
+		if (userBlockValidatorInfo.isValid() && (!Environment.getBooleanValue(Environment.PROP_HONEYPOT_FILTER_ENABLED) || HONEYPOT_VALIDATOR.validate(request).isValid())) {
 			// user is not blocked via block list or honeypot validation failure
 			return null;
 		}
@@ -394,8 +396,8 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 		pageInfo.setPageTitle(new WikiMessage("userblock.title"));
 		pageInfo.setContentJsp(JAMWikiServlet.JSP_BLOCKED);
 		pageInfo.setSpecial(true);
-		if (userBlock != null) {
-			next.addObject("userBlock", userBlock);
+		if (!userBlockValidatorInfo.isValid()) {
+			next.addObject("userBlock", userBlockValidatorInfo.getUserBlock());
 		} else {
 			WikiMessage honeypotMessage = new WikiMessage("userblock.caption.honeypot", ServletUtil.getIpAddress(request));
 			pageInfo.addMessage(honeypotMessage);

@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.authentication;
+package org.jamwiki.validator;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +29,7 @@ import org.springframework.security.remoting.dns.JndiDnsResolver;
  * Utility methods for working with the Project Honeypot API.  See
  * http://www.projecthoneypot.org/httpbl_api.php.
  */
-public class HoneypotValidator {
+public class HoneypotValidator implements RequestValidator {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(HoneypotValidator.class.getName());
 	/** DNS lookup address for Honeypot lookups.  IP and access key will be prepended to this value. */
@@ -68,13 +68,13 @@ public class HoneypotValidator {
 	 * has registered successfully has already passed Honeypot validation.
 	 *
 	 * @param request The current user request.
-	 * @return Returns <code>true</code> if the user is not from a blacklisted address,
-	 *  <code>false</code> otherwise.
+	 * @return Returns a non-null {@link RequestValidatorInfo} object that
+	 * encapsulates the validation result.
 	 */
-	public boolean isValid(HttpServletRequest request) {
+	public RequestValidatorInfo validate(HttpServletRequest request) {
 		if (!ServletUtil.currentUserDetails().hasRole(Role.ROLE_ANONYMOUS)) {
 			// do not validate logged-in users
-			return true;
+			return new RequestValidatorInfo(true);
 		}
 		long start = System.currentTimeMillis();
 		String ipAddress = ServletUtil.getIpAddress(request);
@@ -84,7 +84,7 @@ public class HoneypotValidator {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Honeypot filter execution time for " + ipAddress + " (score: " + ((honeypotResult != null) ? honeypotResult.ipAddress : "null") + "): " + ((System.currentTimeMillis() - start) / 1000.000) + " s.");
 		}
-		return result;
+		return new RequestValidatorInfo(result);
 	}
 
 	/**

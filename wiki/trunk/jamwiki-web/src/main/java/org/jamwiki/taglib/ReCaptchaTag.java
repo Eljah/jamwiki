@@ -21,8 +21,8 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
-import org.jamwiki.authentication.ReCaptchaUtil;
 import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.validator.ReCaptchaUtil;
 
 /**
  * Utility tag for displaying reCAPTCHA input fields.  See
