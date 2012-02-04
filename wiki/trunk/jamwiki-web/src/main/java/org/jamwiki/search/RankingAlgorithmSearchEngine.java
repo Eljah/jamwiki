@@ -87,12 +87,9 @@ public class RankingAlgorithmSearchEngine extends LuceneSearchEngine {
 					int docId = ((Integer)docobject).intValue();
 					Document doc = searcher.doc(docId);
 					String summary = retrieveResultSummary(doc, highlighter, analyzer);
-					SearchResultEntry result = new SearchResultEntry();
 					Object scoreobject = methodRH_score.invoke(hitsobject, args);
 					float score = ((Float)scoreobject).floatValue();
-					result.setRanking(score);
-					result.setTopic(doc.get(FIELD_TOPIC_NAME));
-					result.setSummary(summary);
+					SearchResultEntry result = new SearchResultEntry(doc.get(FIELD_TOPIC_NAME), score, summary);
 					results.add(result);
 				}
 			} catch (Throwable t) {

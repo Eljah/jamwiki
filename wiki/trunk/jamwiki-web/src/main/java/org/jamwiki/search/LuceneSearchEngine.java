@@ -275,10 +275,7 @@ public class LuceneSearchEngine implements SearchEngine {
 				int docId = hits[i].doc;
 				Document doc = searcher.doc(docId);
 				String summary = retrieveResultSummary(doc, highlighter, analyzer);
-				SearchResultEntry result = new SearchResultEntry();
-				result.setRanking(hits[i].score);
-				result.setTopic(doc.get(FIELD_TOPIC_NAME));
-				result.setSummary(summary);
+				SearchResultEntry result = new SearchResultEntry(doc.get(FIELD_TOPIC_NAME), hits[i].score, summary);
 				results.add(result);
 			}
 		} catch (Exception e) {

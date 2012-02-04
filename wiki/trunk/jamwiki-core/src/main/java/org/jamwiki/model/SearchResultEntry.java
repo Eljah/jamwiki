@@ -16,26 +16,25 @@
  */
 package org.jamwiki.model;
 
-import org.jamwiki.utils.WikiLogger;
-
 /**
  * Provides an object that can be used to store search result information.
  */
 public class SearchResultEntry {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(SearchResultEntry.class.getName());
-
 	/** The topic of this entry */
-	private String topic = null;
+	private final String topic;
 	/** the hit ranking */
-	private float ranking = 0.0f;
+	private final float ranking;
 	/** Result summary */
-	private String summary = null;
+	private final String summary;
 
 	/**
 	 *
 	 */
-	public SearchResultEntry() {
+	public SearchResultEntry(String topic, float ranking, String summary) {
+		this.topic = topic;
+		this.ranking = ranking;
+		this.summary = summary;
 	}
 
 	/**
@@ -57,26 +56,5 @@ public class SearchResultEntry {
 	 */
 	public String getTopic() {
 		return this.topic;
-	}
-
-	/**
-	 *
-	 */
-	public void setRanking(float ranking) {
-		this.ranking = ranking;
-	}
-
-	/**
-	 *
-	 */
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
-
-	/**
-	 *
-	 */
-	public void setTopic(String topic) {
-		this.topic = topic;
 	}
 }
