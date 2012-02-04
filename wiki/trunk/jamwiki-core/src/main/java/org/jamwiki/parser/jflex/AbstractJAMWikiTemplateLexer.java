@@ -26,7 +26,7 @@ public abstract class AbstractJAMWikiTemplateLexer extends JFlexLexer {
 
 	protected static final WikiLogger logger = WikiLogger.getLogger(AbstractJAMWikiTemplateLexer.class.getName());
 	/** String used to build up current template tag content. */
-	protected String templateString = "";
+	protected StringBuilder templateString = new StringBuilder();
 
 	/**
 	 * Utility method used to indicate whether templates are allowed in wiki syntax

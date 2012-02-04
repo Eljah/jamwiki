@@ -86,7 +86,7 @@ wikisignature      = ([~]{3,5})
         if (!allowTemplates()) {
             return yytext();
         }
-        this.templateString += yytext().substring(0, 2);
+        this.templateString.append(yytext().substring(0, 2));
         if (yystate() != TEMPLATE) {
             beginState(TEMPLATE);
         }
@@ -98,7 +98,7 @@ wikisignature      = ([~]{3,5})
         if (yystate() == YYINITIAL) {
             return yytext().substring(0, 1);
         } else {
-            this.templateString += yytext().substring(0, 1);
+            this.templateString.append(yytext().substring(0, 1));
             return "";
         }
     }
@@ -106,7 +106,7 @@ wikisignature      = ([~]{3,5})
         if (logger.isTraceEnabled()) logger.trace("includeonly: " + yytext() + " (" + yystate() + ")");
         String parsed = this.parse(TAG_TYPE_INCLUDE_ONLY, yytext());
         if (yystate() == TEMPLATE) {
-            this.templateString += parsed;
+            this.templateString.append(parsed);
         }
         return (yystate() == YYINITIAL) ? parsed : "";
     }
@@ -128,18 +128,18 @@ wikisignature      = ([~]{3,5})
 <TEMPLATE> {
     {templateendchar} {
         if (logger.isTraceEnabled()) logger.trace("templateendchar: " + yytext() + " (" + yystate() + ")");
-        this.templateString += yytext();
-        if (Utilities.findMatchingEndTag(this.templateString, 0, "{", "}") != -1) {
+        this.templateString.append(yytext());
+        if (Utilities.findMatchingEndTag(this.templateString.toString(), 0, "{", "}") != -1) {
             endState();
-            String result = this.parse(TAG_TYPE_TEMPLATE, this.templateString);
-            this.templateString = "";
+            String result = this.parse(TAG_TYPE_TEMPLATE, this.templateString.toString());
+            this.templateString = new StringBuilder();
             return result;
         }
         return "";
     }
     {whitespace} | . {
         // no need to log this
-        this.templateString += yytext();
+        this.templateString.append(yytext());
         return "";
     }
 }
@@ -186,10 +186,11 @@ wikisignature      = ([~]{3,5})
 
 <<EOF>> {
     if (logger.isTraceEnabled()) logger.trace("EOF (" + yystate() + ")");
-    String output = this.templateString;
-    if (!StringUtils.isBlank(this.templateString)) {
-        // FIXME - this leaves unparsed text
-        this.templateString = "";
+    if (StringUtils.isBlank(this.templateString)) {
+        return null;
     }
-    return (StringUtils.isBlank(output)) ? null : output;
+    // FIXME - this leaves unparsed text
+    String output = this.templateString.toString();
+    this.templateString = new StringBuilder();
+    return output;
 }
