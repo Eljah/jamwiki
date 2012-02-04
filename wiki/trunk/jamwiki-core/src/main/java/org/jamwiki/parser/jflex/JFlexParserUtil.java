@@ -198,10 +198,10 @@ public class JFlexParserUtil {
 	 *  is being parsed.
 	 */
 	protected static List<WikiReference> retrieveReferences(ParserInput parserInput) {
-		List<WikiReference> references = (List<WikiReference>)parserInput.getTempParams().get(WikiReferenceTag.REFERENCES_PARAM);
+		List<WikiReference> references = (List<WikiReference>)parserInput.getTempParam(WikiReferenceTag.REFERENCES_PARAM);
 		if (references == null) {
 			references = new ArrayList<WikiReference>();
-			parserInput.getTempParams().put(WikiReferenceTag.REFERENCES_PARAM, references);
+			parserInput.addTempParam(WikiReferenceTag.REFERENCES_PARAM, references);
 		}
 		return references;
 	}

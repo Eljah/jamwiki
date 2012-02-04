@@ -16,8 +16,9 @@
  */
 package org.jamwiki.parser;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import org.jamwiki.Environment;
 import org.jamwiki.model.WikiUser;
 
@@ -41,8 +42,8 @@ public class ParserInput {
 	private TableOfContents tableOfContents;
 	/** Template inclusion tracks whether or not template code is being parsed.  A counter is used to deal with nested templates. */
 	private int templateDepth = 0;
-	/** Hashtable of generic temporary objects used during parsing. */
-	private Hashtable<String, Object> tempParams;
+	/** Map of generic temporary objects used during parsing. */
+	private Map<String, Object> tempParams;
 	private final String topicName;
 	/** Display value for the current user, typically the IP address. */
 	private String userDisplay;
@@ -231,19 +232,46 @@ public class ParserInput {
 	}
 
 	/**
-	 * Get the Hashtable of arbitrary temporary parameters associated with
-	 * the current parser input instance.  This hashtable provides a method
-	 * for the parser to keep track of arbitrary data during the parsing
-	 * process.
+	 * If the map of arbitrary temporary parameters contains the specified
+	 * key then return its value, otherwise return <code>null</code>.
 	 *
-	 * @return The Hashtable of arbitrary temporary parameters associated with
-	 *  the current parser input instance.
+	 * @return The value of the specified key in the temporary parameters
+	 *  map, or <code>null</code> if no such value exists.
 	 */
-	public Hashtable<String, Object> getTempParams() {
+	public Object getTempParam(String key) {
 		if (this.tempParams == null) {
-			this.tempParams = new Hashtable<String, Object>();
+			return null;
 		}
-		return this.tempParams;
+		return this.tempParams.get(key);
+	}
+
+	/**
+	 * Add an item to the map of arbitrary temporary parameters.  If an
+	 * item with the same key is already in the map then it will be
+	 * overwritten.
+	 *
+	 * @param key The key to use for the map entry.
+	 * @param value The value to store in the map for the specified key.
+	 */
+	public void addTempParam(String key, Object value) {
+		if (this.tempParams == null) {
+			this.tempParams = new HashMap<String, Object>();
+		}
+		this.tempParams.put(key, value);
+	}
+
+	/**
+	 * Remove an item to the map of arbitrary temporary parameters.  If
+	 * no item with the specified key is in the map then this function
+	 * has no effect.
+	 *
+	 * @param key The key for the map entry being removed.
+	 */
+	public void removeTempParam(String key) {
+		if (this.tempParams == null) {
+			return;
+		}
+		this.tempParams.remove(key);
 	}
 
 	/**

@@ -44,7 +44,7 @@ public class OnlyIncludeTag implements JFlexParserTag {
 		// TemplateTag.parseTemplateBody method.  this is necessary because onlyinclude
 		// supersedes anything that might have been parsed before or after the onlyinclude
 		// tag.
-		lexer.getParserInput().getTempParams().put(TemplateTag.TEMPLATE_ONLYINCLUDE, content);
+		lexer.getParserInput().addTempParam(TemplateTag.TEMPLATE_ONLYINCLUDE, content);
 		return content;
 	}
 }

@@ -394,14 +394,14 @@ public class TemplateTag implements JFlexParserTag {
 		Map<String, String> parameterValues = this.parseTemplateParameterValues(templateContent);
 		// parse the template content for noinclude, onlyinclude and includeonly tags
 		String templateBody = JFlexParserUtil.parseFragment(parserInput, parserOutput, templateTopic.getTopicContent().trim(), JFlexParser.MODE_TEMPLATE_BODY);
-		if (parserInput.getTempParams().get(TEMPLATE_ONLYINCLUDE) != null) {
+		if (parserInput.getTempParam(TEMPLATE_ONLYINCLUDE) != null) {
 			// HACK! If an onlyinclude tag is encountered in the previous fragment parse
 			// then that tag's parsed output is stored in the TEMPLATE_ONLYINCLUDE param.
 			// This hack is necessary because onlyinclude indicates that ONLY the
 			// onlyinclude content is relevant, and anything parsed before or after that
 			// tag must be ignored.
-			templateBody = (String)parserInput.getTempParams().get(TEMPLATE_ONLYINCLUDE);
-			parserInput.getTempParams().remove(TEMPLATE_ONLYINCLUDE);
+			templateBody = (String)parserInput.getTempParam(TEMPLATE_ONLYINCLUDE);
+			parserInput.removeTempParam(TEMPLATE_ONLYINCLUDE);
 		}
 		return this.parseTemplateBody(parserInput, parserOutput, templateBody, parameterValues);
 	}
@@ -415,11 +415,11 @@ public class TemplateTag implements JFlexParserTag {
 			return "[[" + name + "]]";
 		}
 		// FIXME - disable section editing
-		int inclusion = (parserInput.getTempParams().get(TEMPLATE_INCLUSION) == null) ? 1 : (Integer)parserInput.getTempParams().get(TEMPLATE_INCLUSION) + 1;
+		int inclusion = (parserInput.getTempParam(TEMPLATE_INCLUSION) == null) ? 1 : (Integer)parserInput.getTempParam(TEMPLATE_INCLUSION) + 1;
 		if (inclusion > Environment.getIntValue(Environment.PROP_PARSER_MAX_INCLUSIONS)) {
 			throw new ExcessiveNestingException("Potentially infinite inclusions - over " + inclusion + " template inclusions while parsing topic " + parserInput.getVirtualWiki() + ':' + parserInput.getTopicName());
 		}
-		parserInput.getTempParams().put(TEMPLATE_INCLUSION, inclusion);
+		parserInput.addTempParam(TEMPLATE_INCLUSION, inclusion);
 		return this.processTemplateContent(parserInput, parserOutput, templateTopic, templateContent);
 	}
 

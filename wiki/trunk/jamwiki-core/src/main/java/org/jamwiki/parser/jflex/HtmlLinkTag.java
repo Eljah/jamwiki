@@ -119,16 +119,16 @@ public class HtmlLinkTag implements JFlexParserTag {
 		String caption = link;
 		if (!StringUtils.isBlank(text)) {
 			// pass a parameter via the parserInput to prevent nested links from being generated
-			parserInput.getTempParams().put(HTML_LINK_CAPTION, true);
+			parserInput.addTempParam(HTML_LINK_CAPTION, true);
 			caption = JFlexParserUtil.parseFragment(parserInput, parserOutput, text, mode);
-			parserInput.getTempParams().remove(HTML_LINK_CAPTION);
+			parserInput.removeTempParam(HTML_LINK_CAPTION);
 		} else if (numberedCaption) {
 			// set the caption of the form "[1]"
 			int counter = 1;
-			if (parserInput.getTempParams().get(HTML_LINK_CAPTION_COUNTER) != null) {
-				counter = (Integer)parserInput.getTempParams().get(HTML_LINK_CAPTION_COUNTER);
+			if (parserInput.getTempParam(HTML_LINK_CAPTION_COUNTER) != null) {
+				counter = (Integer)parserInput.getTempParam(HTML_LINK_CAPTION_COUNTER);
 			}
-			parserInput.getTempParams().put(HTML_LINK_CAPTION_COUNTER, counter + 1);
+			parserInput.addTempParam(HTML_LINK_CAPTION_COUNTER, counter + 1);
 			caption = "[" + counter + "]";
 		}
 		return LinkUtil.buildExternalLinkHtml(link, "externallink", caption) + punctuation;
@@ -147,8 +147,8 @@ public class HtmlLinkTag implements JFlexParserTag {
 			return raw;
 		}
 		boolean numberedCaption = (Environment.getBooleanValue(Environment.PROP_PARSER_USE_NUMBERED_HTML_LINKS) && args != null && args.length >= 1 && ((Boolean)args[0]).booleanValue());
-		Boolean linkCaption = (Boolean)lexer.getParserInput().getTempParams().get(WikiLinkTag.LINK_CAPTION);
-		Boolean htmlLinkCaption = (Boolean)lexer.getParserInput().getTempParams().get(HTML_LINK_CAPTION);
+		Boolean linkCaption = (Boolean)lexer.getParserInput().getTempParam(WikiLinkTag.LINK_CAPTION);
+		Boolean htmlLinkCaption = (Boolean)lexer.getParserInput().getTempParam(HTML_LINK_CAPTION);
 		if ((linkCaption != null && linkCaption.booleanValue()) || (htmlLinkCaption != null && htmlLinkCaption.booleanValue())) {
 			// do not parse HTML tags in link captions as that would result in HTML of the form
 			// "<a href="">this is the <a href="">link caption</a></a>"

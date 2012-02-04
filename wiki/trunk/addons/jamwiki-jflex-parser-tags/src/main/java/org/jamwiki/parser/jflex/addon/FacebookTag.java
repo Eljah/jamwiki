@@ -173,10 +173,10 @@ public class FacebookTag implements JFlexCustomTagItem {
 	 * include the required shared code.
 	 */
 	private String parseSharedCode(JFlexLexer lexer, Map<String, String> attributes) throws IOException {
-		if (lexer.getParserInput().getTempParams().get(FACEBOOK_SHARED_PARAM) != null) {
+		if (lexer.getParserInput().getTempParam(FACEBOOK_SHARED_PARAM) != null) {
 			return "";
 		}
-		lexer.getParserInput().getTempParams().put(FACEBOOK_SHARED_PARAM, true);
+		lexer.getParserInput().addTempParam(FACEBOOK_SHARED_PARAM, true);
 		String[] args = new String[2];
 		args[0] = (attributes.get(ATTRIBUTE_LOCALE) != null) ? attributes.get(ATTRIBUTE_LOCALE) : "en_US";
 		args[1] = (attributes.get(ATTRIBUTE_APP_ID) != null) ? attributes.get(ATTRIBUTE_APP_ID) : "";

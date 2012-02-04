@@ -49,7 +49,7 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 			return "";
 		}
 		// FIXME - template inclusion causes section edits to break, so disable for now
-		Integer inclusion = (Integer)parserInput.getTempParams().get(TemplateTag.TEMPLATE_INCLUSION);
+		Integer inclusion = (Integer)parserInput.getTempParam(TemplateTag.TEMPLATE_INCLUSION);
 		boolean disallowInclusion = (inclusion != null && inclusion > 0);
 		if (disallowInclusion) {
 			return "";

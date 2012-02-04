@@ -128,10 +128,10 @@ public class TwitterTag implements JFlexCustomTagItem {
 	 * include the required shared code.
 	 */
 	private String parseSharedCode(JFlexLexer lexer, Map<String, String> attributes) throws IOException {
-		if (lexer.getParserInput().getTempParams().get(TWITTER_SHARED_PARAM) != null) {
+		if (lexer.getParserInput().getTempParam(TWITTER_SHARED_PARAM) != null) {
 			return "";
 		}
-		lexer.getParserInput().getTempParams().put(TWITTER_SHARED_PARAM, true);
+		lexer.getParserInput().addTempParam(TWITTER_SHARED_PARAM, true);
 		return WikiUtil.formatFromTemplate(TEMPLATE_TWITTER_SHARED);
 	}
 }
