@@ -16,14 +16,11 @@
  */
 package org.jamwiki.model;
 
-import org.jamwiki.utils.WikiLogger;
-
 /**
  * Provides an object representing a Wiki group.
  */
 public class WikiGroup {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiGroup.class.getName());
 	private String description;
 	private int groupId = -1;
 	private final String name;

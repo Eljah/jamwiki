@@ -17,7 +17,6 @@
 package org.jamwiki;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Utility class that holds the current Wiki version constant and provides
@@ -25,7 +24,6 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class WikiVersion {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiVersion.class.getName());
 	private final int major;
 	private final int minor;
 	private final int patch;

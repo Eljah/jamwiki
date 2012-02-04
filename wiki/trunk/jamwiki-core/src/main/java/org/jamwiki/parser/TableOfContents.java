@@ -23,7 +23,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -32,7 +31,6 @@ import org.jamwiki.utils.WikiUtil;
  */
 public class TableOfContents {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(TableOfContents.class.getName());
 	/**
 	 * Status indicating that this TOC object has not yet been initialized.  For the JFlex parser
 	 * this will mean no __TOC__ tag has been added to the document being parsed.

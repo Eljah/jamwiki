@@ -21,14 +21,12 @@ import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Utility method used in processing Wiki links.
  */
 public class WikiLink {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiLink.class.getName());
 	/**
 	 * Virtual wiki link prefix, used when this link is to a virtual wiki other than the
 	 * current virtual wiki.

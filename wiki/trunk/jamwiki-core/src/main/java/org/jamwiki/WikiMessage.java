@@ -17,7 +17,6 @@
 package org.jamwiki;
 
 import java.util.List;
-import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiMessageParam;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class WikiMessage {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiMessage.class.getName());
 	private final String key;
 	private WikiMessageParam[] params = null;
 

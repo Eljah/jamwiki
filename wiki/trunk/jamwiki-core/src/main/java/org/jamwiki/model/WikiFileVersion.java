@@ -19,7 +19,6 @@ package org.jamwiki.model;
 import java.sql.Timestamp;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a version of a file uploaded to the Wiki.
@@ -35,7 +34,6 @@ public class WikiFileVersion {
 	private String uploadComment;
 	private Timestamp uploadDate = new Timestamp(System.currentTimeMillis());
 	private String url;
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiFileVersion.class.getName());
 
 	/**
 	 *

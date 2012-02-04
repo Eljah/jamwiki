@@ -18,7 +18,6 @@ package org.jamwiki.model;
 
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a file uploaded to the Wiki.
@@ -38,7 +37,6 @@ public class WikiFile {
 	private String url;
 	private int topicId = -1;
 	private String virtualWiki;
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiFile.class.getName());
 
 	/**
 	 *

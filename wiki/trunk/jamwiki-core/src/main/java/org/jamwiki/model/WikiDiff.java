@@ -19,7 +19,6 @@ package org.jamwiki.model;
 import java.io.Serializable;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing the difference between two objects as created
@@ -27,7 +26,6 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class WikiDiff implements Serializable {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiDiff.class.getName());
 	/** The newly modified text, or <code>null</code> if text was deleted. */
 	private String newText;
 	/** The old text that was changed, or <code>null</code> if new text was added. */

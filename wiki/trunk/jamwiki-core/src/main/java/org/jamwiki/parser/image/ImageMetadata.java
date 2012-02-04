@@ -16,14 +16,11 @@
  */
 package org.jamwiki.parser.image;
 
-import org.jamwiki.utils.WikiLogger;
-
 /**
  * Utility method used to model image metadata including alignment, max dimension, etc.
  */
 public class ImageMetadata {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(ImageMetadata.class.getName());
 	/** Flag indicating whether the image can be resized larger than its current size. */
 	private boolean allowEnlarge = true;
 	private String alt = null;
