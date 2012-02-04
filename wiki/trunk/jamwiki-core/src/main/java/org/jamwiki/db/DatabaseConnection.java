@@ -106,50 +106,6 @@ public class DatabaseConnection {
 	}
 
 	/**
-	 * Release a connection that was fetched with the getConnectionNoTransaction
-	 * method.  This method should never be called if the connection in question
-	 * was not retrieved without transaction support.
-	 *
-	 * @see getConnectionNoTransaction
-	 */
-	protected static void closeConnectionNoTransaction(Connection conn, Statement stmt, ResultSet rs) {
-		DatabaseConnection.closeResultSet(rs);
-		DatabaseConnection.closeStatement(stmt);
-		DatabaseConnection.closeConnectionNoTransaction(conn);
-	}
-
-	/**
-	 * Release a connection that was fetched with the getConnectionNoTransaction
-	 * method.  This method should never be called if the connection in question
-	 * was not retrieved without transaction support.
-	 *
-	 * @see getConnectionNoTransaction
-	 */
-	protected static void closeConnectionNoTransaction(Connection conn, Statement stmt) {
-		DatabaseConnection.closeStatement(stmt);
-		DatabaseConnection.closeConnectionNoTransaction(conn);
-	}
-
-	/**
-	 * Release a connection that was fetched with the getConnectionNoTransaction
-	 * method.  This method should never be called if the connection in question
-	 * was not retrieved without transaction support.
-	 *
-	 * @see getConnectionNoTransaction
-	 */
-	protected static void closeConnectionNoTransaction(Connection conn) {
-		if (conn != null) {
-			try {
-				conn.close();
-			} catch (SQLException e) {}
-			// explicitly null the variable to improve garbage collection.
-			// with very large loops this can help avoid OOM "GC overhead
-			// limit exceeded" errors.
-			conn = null;
-		}
-	}
-
-	/**
 	 * Close the connection pool, to be called for example during Servlet shutdown.
 	 * <p>
 	 * Note that this only applies if the DataSource was created by JAMWiki;
@@ -284,23 +240,6 @@ public class DatabaseConnection {
 			configDataSource();
 		}
 		return DataSourceUtils.getConnection(dataSource);
-	}
-
-	/**
-	 * Return a connection that does not inherit the overhead of Spring transaction
-	 * support.  In general this should not be needed, but it may be useful in
-	 * cases such as when loading thousands of records from a loader program or
-	 * another instance where transactions are not required and performance is
-	 * at a premium.
-	 *
-	 * @see closeConnectionNoTransaction
-	 */
-	protected static Connection getConnectionNoTransaction() throws SQLException {
-		if (dataSource == null) {
-			// DataSource has not yet been created, obtain it now
-			configDataSource();
-		}
-		return dataSource.getConnection();
 	}
 
 	/**
