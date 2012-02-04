@@ -44,13 +44,18 @@ public class HtmlTagItem {
 	protected HtmlTagItem(String tagType, int tagPattern, LinkedHashMap<String, String> attributes) {
 		this.tagType = tagType;
 		this.tagPattern = tagPattern;
-		this.attributes = new LinkedHashMap<String, String>(attributes);
+		if (attributes != null) {
+			this.attributes = new LinkedHashMap<String, String>(attributes);
+		}
 	}
 
 	/**
 	 * Return a mapping of key-value pairs for all attributes of this tag.
 	 */
 	protected LinkedHashMap<String, String> getAttributes() {
+		if (this.attributes == null) {
+			this.attributes = new LinkedHashMap<String, String>();
+		}
 		return this.attributes;
 	}
 
@@ -86,11 +91,13 @@ public class HtmlTagItem {
 		}
 		result.append(this.tagType);
 		String value;
-		for (String key : this.attributes.keySet()) {
-			result.append(' ').append(key);
-			value = this.attributes.get(key);
-			if (value != null) {
-				result.append('=').append("\"").append(value.trim()).append("\"");
+		if (this.attributes != null) {
+			for (String key : this.attributes.keySet()) {
+				result.append(' ').append(key);
+				value = this.attributes.get(key);
+				if (value != null) {
+					result.append('=').append("\"").append(value.trim()).append("\"");
+				}
 			}
 		}
 		if (this.isTagEmptyBody()) {

@@ -30,7 +30,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	protected String html;
 	protected int tagPattern;
 	protected String tagType;
-	protected LinkedHashMap<String, String> attributes = new LinkedHashMap<String, String>();
+	protected LinkedHashMap<String, String> attributes;
 
 	/**
 	 *
@@ -39,6 +39,15 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 		return new HtmlTagItem(this.tagType, this.tagPattern, this.attributes).toHtml();
 	}
 
+	/**
+	 *
+	 */
+	protected LinkedHashMap<String, String> getAttributes() {
+		if (this.attributes == null) {
+			this.attributes = new LinkedHashMap<String, String>();
+		}
+		return this.attributes;
+	}
 	/**
 	 * Return the HTML tag item that this processor generates.  Note that the tag
 	 * item is only created when the tag parser processes the last character of the
@@ -52,7 +61,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	 *
 	 */
 	protected void initialize(int tagPattern) {
-		this.attributes.clear();
+		this.attributes = null;
 		this.currentAttributeKey = null;
 		this.tagPattern = tagPattern;
 		this.html = yytext();
@@ -64,6 +73,6 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	 */
 	protected void initializeCurrentAttribute(String key) {
 		this.currentAttributeKey = key.toLowerCase();
-		this.attributes.put(this.currentAttributeKey, null);
+		this.getAttributes().put(this.currentAttributeKey, null);
 	}
 }

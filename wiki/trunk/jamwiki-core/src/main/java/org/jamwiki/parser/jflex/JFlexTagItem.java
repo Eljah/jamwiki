@@ -45,10 +45,10 @@ class JFlexTagItem {
 	private static final Pattern NON_INLINE_TAG_START_PATTERN = Pattern.compile(nonInlineTagStartPattern);
 	private static final Pattern NON_INLINE_TAG_END_PATTERN = Pattern.compile(nonInlineTagEndPattern);
 	protected static final String ROOT_TAG = "jflex-root";
-	private String closeTagOverride = null;
-	private HtmlTagItem htmlTagItem = null;
+	private String closeTagOverride;
+	private HtmlTagItem htmlTagItem;
 	private final StringBuilder tagContent = new StringBuilder();
-	private String tagType = null;
+	private String tagType;
 
 	/**
 	 *

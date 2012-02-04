@@ -60,7 +60,7 @@ public class TableOfContents {
 	 * example, if the TOC contains only h3 and h4 entries, this value would be 3.
 	 */
 	private int minLevel = 4;
-	private final Map<String, TableOfContentsEntry> entries = new LinkedHashMap<String, TableOfContentsEntry>();
+	private Map<String, TableOfContentsEntry> entries;
 	private int status = STATUS_TOC_UNINITIALIZED;
 	/** The minimum number of headings that must be present for a TOC to appear, unless forceTOC is set to true. */
 	private static final int MINIMUM_HEADINGS = 4;
@@ -68,7 +68,7 @@ public class TableOfContents {
 	 * Keep track of the TOC prefix to display.  This array is initialized with all ones, and each element
 	 * is then incremented as the TOC is displayed.
 	 */
-	private int[] tocPrefixes = null;
+	private int[] tocPrefixes;
 
 	/**
 	 * Add a new table of contents entry to the table of contents object.
@@ -88,7 +88,7 @@ public class TableOfContents {
 		}
 		name = this.buildUniqueName(name);
 		TableOfContentsEntry entry = new TableOfContentsEntry(name, text, level);
-		this.entries.put(name, entry);
+		this.getEntries().put(name, entry);
 		if (level < minLevel) {
 			minLevel = level;
 		}
@@ -150,7 +150,7 @@ public class TableOfContents {
 		String escapedName = LinkUtil.buildAnchorText(name);
 		String candidate = escapedName;
 		while (count < 1000) {
-			if (this.entries.get(candidate) == null) {
+			if (this.getEntries().get(candidate) == null) {
 				break;
 			}
 			count++;
@@ -167,6 +167,16 @@ public class TableOfContents {
 			// close lists to current level
 			text.append("</li>\n</ul>");
 		}
+	}
+
+	/**
+	 * Return the mapping of TOC name to entry, never <code>null</code>.
+	 */
+	private Map<String, TableOfContentsEntry> getEntries() {
+		if (this.entries == null) {
+			this.entries = new LinkedHashMap<String, TableOfContentsEntry>();
+		}
+		return this.entries;
 	}
 
 	/**
@@ -251,7 +261,7 @@ public class TableOfContents {
 	 * @return The number of entries in this table of contents object.
 	 */
 	public int size() {
-		return this.entries.size();
+		return this.getEntries().size();
 	}
 
 	/**
@@ -266,7 +276,7 @@ public class TableOfContents {
 		int adjustedLevel = 0;
 		int previousLevel = 0;
 		Object[] args = new Object[3];
-		for (TableOfContentsEntry entry : this.entries.values()) {
+		for (TableOfContentsEntry entry : this.getEntries().values()) {
 			// adjusted level determines how far to indent the list
 			adjustedLevel = ((entry.level - minLevel) + 1);
 			// cannot increase TOC indent level more than one level at a time
@@ -300,9 +310,9 @@ public class TableOfContents {
 	 */
 	class TableOfContentsEntry {
 
-		int level;
-		String name;
-		String text;
+		final int level;
+		final String name;
+		final String text;
 
 		/**
 		 *

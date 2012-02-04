@@ -29,7 +29,7 @@ public class ParserInput {
 
 	private boolean allowSectionEdit = true;
 	private boolean allowTableOfContents = true;
-	private String context = null;
+	private String context;
 	/** Depth is used to prevent infinite nesting of templates and other objects. */
 	private int depth = 0;
 	/**
@@ -37,18 +37,18 @@ public class ParserInput {
 	 * halt parsing for infinite loop attacks.
 	 */
 	private int infiniteLoopCount = 0;
-	private Locale locale = null;
-	private TableOfContents tableOfContents = new TableOfContents();
+	private Locale locale;
+	private TableOfContents tableOfContents;
 	/** Template inclusion tracks whether or not template code is being parsed.  A counter is used to deal with nested templates. */
 	private int templateDepth = 0;
 	/** Hashtable of generic temporary objects used during parsing. */
-	private final Hashtable<String, Object> tempParams = new Hashtable<String, Object>();
-	private String topicName = null;
+	private Hashtable<String, Object> tempParams;
+	private final String topicName;
 	/** Display value for the current user, typically the IP address. */
-	private String userDisplay = null;
-	private String virtualWiki = null;
+	private String userDisplay;
+	private final String virtualWiki;
 	/** Current WikiUser (if any). */
-	private WikiUser wikiUser = null;
+	private WikiUser wikiUser;
 
 	/**
 	 *
@@ -224,19 +224,10 @@ public class ParserInput {
 	 *  input instance.
 	 */
 	public TableOfContents getTableOfContents() {
+		if (this.tableOfContents == null) {
+			this.tableOfContents = new TableOfContents();
+		}
 		return this.tableOfContents;
-	}
-
-	/**
-	 * Set the table of contents object associated with the current parser
-	 * input instance.  The table of contents is used for building an internal
-	 * set of links to headings in the current document.
-	 *
-	 * @param tableOfContents The table of contents object associated with the
-	 *  current parser input instance.
-	 */
-	public void setTableOfContents(TableOfContents tableOfContents) {
-		this.tableOfContents = tableOfContents;
 	}
 
 	/**
@@ -249,6 +240,9 @@ public class ParserInput {
 	 *  the current parser input instance.
 	 */
 	public Hashtable<String, Object> getTempParams() {
+		if (this.tempParams == null) {
+			this.tempParams = new Hashtable<String, Object>();
+		}
 		return this.tempParams;
 	}
 

@@ -33,27 +33,27 @@ public class WikiLink {
 	 * Virtual wiki link prefix, used when this link is to a virtual wiki other than the
 	 * current virtual wiki.
 	 */
-	private VirtualWiki altVirtualWiki = null;
+	private VirtualWiki altVirtualWiki;
 	/** Indicator that the link requires special handling, such as links starting with a colon. */
 	private boolean colon = false;
 	/** The servlet context path. */
-	private String contextPath = null;
+	private final String contextPath;
 	/** Article name, not including namespace. */
-	private String article = null;
+	private String article;
 	/** Link destination, including namespace. */
-	private String destination = null;
+	private String destination;
 	/** Interwiki link prefix. */
-	private Interwiki interwiki = null;
+	private Interwiki interwiki;
 	/** Namespace prefix for the link. */
-	private Namespace namespace = Namespace.namespace(Namespace.MAIN_ID);
+	private Namespace namespace;
 	/** Link query paramters. */
-	private String query = null;
+	private String query;
 	/** Link section (ie #section). */
-	private String section = null;
+	private String section;
 	/** Link text. */
-	private String text = null;
+	private String text;
 	/** The current link virtual wiki. */
-	private String virtualWiki = null;
+	private final String virtualWiki;
 
 	/**
 	 * Standard constructor which initializes the destination field of
@@ -233,6 +233,9 @@ public class WikiLink {
 	 * <code>null</code> if there is no target topic.
 	 */
 	public Namespace getNamespace() {
+		if (this.namespace == null) {
+			this.namespace = Namespace.namespace(Namespace.MAIN_ID);
+		}
 		return this.namespace;
 	}
 

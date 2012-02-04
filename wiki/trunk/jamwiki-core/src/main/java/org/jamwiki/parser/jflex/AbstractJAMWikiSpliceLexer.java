@@ -27,7 +27,7 @@ public abstract class AbstractJAMWikiSpliceLexer extends JFlexLexer {
 	protected int section = 0;
 	protected int sectionDepth = 0;
 	protected int targetSection = 0;
-	protected String replacementText = null;
+	protected String replacementText;
 	protected boolean inTargetSection = false;
 
 	/**

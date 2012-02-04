@@ -40,7 +40,7 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 		initializeCustomTagRegistry();
 	}
 	/** Stack of currently parsed tag content. */
-	private List<CustomTagItem> customTagStack = new ArrayList<CustomTagItem>();
+	private List<CustomTagItem> customTagStack;
 
 	/**
 	 * This method should be called after all content has been parsed in order
@@ -50,7 +50,7 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 	 *  otherwise the parsed content will be returned if the stack was not empty.
 	 */
 	protected String flushCustomTagStack() {
-		if (this.customTagStack.isEmpty()) {
+		if (this.customTagStack == null || this.getCustomTagStack().isEmpty()) {
 			return null;
 		}
 		StringBuilder result = new StringBuilder();
@@ -59,6 +59,16 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 			result.append(this.processText(customTagItem.getRawContent()));
 		}
 		return result.toString();
+	}
+
+	/**
+	 *
+	 */
+	private List<CustomTagItem> getCustomTagStack() {
+		if (this.customTagStack == null) {
+			this.customTagStack = new ArrayList<CustomTagItem>();
+		}
+		return this.customTagStack;
 	}
 
 	/**
@@ -126,9 +136,9 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 		} catch (ParserException e) {
 			return this.processText(closeTag);
 		}
-		for (int i = (this.customTagStack.size() - 1); i >= 0; i--) {
+		for (int i = (this.getCustomTagStack().size() - 1); i >= 0; i--) {
 			// see if the tag is open
-			if (this.customTagStack.get(i).getHtmlTagItem().getTagType().equals(htmlTagItem.getTagType())) {
+			if (this.getCustomTagStack().get(i).getHtmlTagItem().getTagType().equals(htmlTagItem.getTagType())) {
 				// tag is open, pop it and everything after it
 				return this.popCustomTagAtPosition(i);
 			}
@@ -161,7 +171,7 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 			// custom tag of the form <custom />
 			return this.parseCustomTag(new CustomTagItem(htmlTagItem, openTag));
 		}
-		this.customTagStack.add(new CustomTagItem(htmlTagItem, openTag));
+		this.getCustomTagStack().add(new CustomTagItem(htmlTagItem, openTag));
 		return "";
 	}
 
@@ -170,7 +180,7 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 	 * returning it.  If the stack is empty return <code>null</code>.
 	 */
 	private CustomTagItem popCustomTag() {
-		return (this.customTagStack.isEmpty()) ? null : this.customTagStack.remove(this.customTagStack.size() - 1);
+		return (this.customTagStack == null || this.getCustomTagStack().isEmpty()) ? null : this.getCustomTagStack().remove(this.getCustomTagStack().size() - 1);
 	}
 
 	/**
@@ -184,12 +194,12 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 	 *  third item will be popped.
 	 */
 	private String popCustomTagAtPosition(int pos) {
-		if (pos < 0 || pos >= this.customTagStack.size()) {
+		if (pos < 0 || pos >= this.getCustomTagStack().size()) {
 			logger.warn("popCustomTagAtPosition called with invalid index " + pos);
 			return "";
 		}
 		CustomTagItem customTagItem;
-		for (int i = (this.customTagStack.size() - 1); i > pos; i--) {
+		for (int i = (this.getCustomTagStack().size() - 1); i > pos; i--) {
 			// pop every tag as text that is after pos in the stack
 			customTagItem = this.popCustomTag();
 			this.processText(customTagItem.getRawContent());
@@ -209,10 +219,10 @@ public abstract class AbstractJAMWikiCustomTagLexer extends JFlexLexer {
 	 *  stack is empty, otherwise returns an empty string.
 	 */
 	protected String processText(String text) {
-		if (this.customTagStack.isEmpty()) {
+		if (this.customTagStack == null || this.getCustomTagStack().isEmpty()) {
 			return text;
 		}
-		this.customTagStack.get(this.customTagStack.size() - 1).getTagContent().append(text);
+		this.getCustomTagStack().get(this.getCustomTagStack().size() - 1).getTagContent().append(text);
 		return "";
 	}
 

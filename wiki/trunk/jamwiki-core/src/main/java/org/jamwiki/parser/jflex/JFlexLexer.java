@@ -33,9 +33,9 @@ public abstract class JFlexLexer {
 	/** Member variable used to keep track of the state history for the lexer. */
 	protected Stack<Integer> states = new Stack<Integer>();
 	/** Parser configuration information. */
-	protected ParserInput parserInput = null;
+	protected ParserInput parserInput;
 	/** Parser parsing results. */
-	protected ParserOutput parserOutput = null;
+	protected ParserOutput parserOutput;
 	/** Parser mode, which provides input to the parser about what steps to take. */
 	protected int mode = JFlexParser.MODE_POSTPROCESS;
 

@@ -28,14 +28,14 @@ import java.util.List;
 public class ParserOutput implements Serializable {
 
 	private boolean cacheable = true;
-	private final LinkedHashMap<String, String> categories = new LinkedHashMap<String, String>();
-	private final List<String> interwikiLinks = new ArrayList<String>();
-	private final List<String> links = new ArrayList<String>();
-	private final List<String> virtualWikiLinks = new ArrayList<String>();
-	private String pageTitle = null;
-	private String redirect = null;
-	private String sectionName = null;
-	private final List<String> templates = new ArrayList<String>();
+	private LinkedHashMap<String, String> categories;
+	private List<String> interwikiLinks;
+	private List<String> links;
+	private List<String> virtualWikiLinks;
+	private String pageTitle;
+	private String redirect;
+	private String sectionName;
+	private List<String> templates;
 
 	/**
 	 *
@@ -48,14 +48,14 @@ public class ParserOutput implements Serializable {
 	 */
 	public void reset() {
 		this.cacheable = true;
-		this.categories.clear();
-		this.interwikiLinks.clear();
-		this.links.clear();
-		this.virtualWikiLinks.clear();
+		this.categories = null;
+		this.interwikiLinks = null;
+		this.links = null;
+		this.virtualWikiLinks = null;
 		this.pageTitle = null;
 		this.redirect = null;
 		this.sectionName = null;
-		this.templates.clear();
+		this.templates = null;
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class ParserOutput implements Serializable {
 	 *  "John Doe" might be given a sort key of "Doe, John".
 	 */
 	public void addCategory(String categoryName, String sortKey) {
-		this.categories.put(categoryName, sortKey);
+		this.getCategories().put(categoryName, sortKey);
 	}
 
 	/**
@@ -83,8 +83,8 @@ public class ParserOutput implements Serializable {
 	 * @param interwikiLink The fully-formatted HTML interwiki link.
 	 */
 	public void addInterwikiLink(String interwikiLink) {
-		if (!this.interwikiLinks.contains(interwikiLink)) {
-			this.interwikiLinks.add(interwikiLink);
+		if (!this.getInterwikiLinks().contains(interwikiLink)) {
+			this.getInterwikiLinks().add(interwikiLink);
 		}
 	}
 
@@ -96,7 +96,7 @@ public class ParserOutput implements Serializable {
 	 * @param topicName The name of the topic that is linked to.
 	 */
 	public void addLink(String topicName) {
-		this.links.add(topicName);
+		this.getLinks().add(topicName);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class ParserOutput implements Serializable {
 	 * @param template The name of the template that is being included.
 	 */
 	public void addTemplate(String template) {
-		this.templates.add(template);
+		this.getTemplates().add(template);
 	}
 
 	/**
@@ -119,8 +119,8 @@ public class ParserOutput implements Serializable {
 	 * @param virtualWikiLink The fully-formatted HTML interwiki link.
 	 */
 	public void addVirtualWikiLink(String virtualWikiLink) {
-		if (!this.virtualWikiLinks.contains(virtualWikiLink)) {
-			this.virtualWikiLinks.add(virtualWikiLink);
+		if (!this.getVirtualWikiLinks().contains(virtualWikiLink)) {
+			this.getVirtualWikiLinks().add(virtualWikiLink);
 		}
 	}
 
@@ -160,6 +160,9 @@ public class ParserOutput implements Serializable {
 	 *  for all categories that are associated with the document being parsed.
 	 */
 	public LinkedHashMap<String, String> getCategories() {
+		if (this.categories == null) {
+			this.categories = new LinkedHashMap<String, String>();
+		}
 		return this.categories;
 	}
 
@@ -171,6 +174,9 @@ public class ParserOutput implements Serializable {
 	 *  specified for the current document.
 	 */
 	public List<String> getInterwikiLinks() {
+		if (this.interwikiLinks == null) {
+			this.interwikiLinks = new ArrayList<String>();
+		}
 		return this.interwikiLinks;
 	}
 
@@ -182,6 +188,9 @@ public class ParserOutput implements Serializable {
 	 *  current document.
 	 */
 	public List<String> getLinks() {
+		if (this.links == null) {
+			this.links = new ArrayList<String>();
+		}
 		return this.links;
 	}
 
@@ -244,6 +253,9 @@ public class ParserOutput implements Serializable {
 	 *  current document.
 	 */
 	public List<String> getTemplates() {
+		if (this.templates == null) {
+			this.templates = new ArrayList<String>();
+		}
 		return this.templates;
 	}
 
@@ -277,6 +289,9 @@ public class ParserOutput implements Serializable {
 	 *  specified for the current document.
 	 */
 	public List<String> getVirtualWikiLinks() {
+		if (this.virtualWikiLinks == null) {
+			this.virtualWikiLinks = new ArrayList<String>();
+		}
 		return this.virtualWikiLinks;
 	}
 }
