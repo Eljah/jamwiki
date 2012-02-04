@@ -58,6 +58,7 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	private static final WikiLogger logger = WikiLogger.getLogger(MediaWikiXmlImporter.class.getName());
 	/** Maximum number of topic versions that can be stored before being flushed to the database. */
 	private static final int MAX_TOPIC_VERSION_BUFFER = 50;
+	private static final SAXParserFactory SAX_PARSER_FACTORY;
 
 	/** This map holds the current tag's attribute names and values.  It is cleared after an end-element is called and thus fails for nested elements. */
 	private Map<String, String> currentAttributeMap = new HashMap<String, String>();
@@ -75,6 +76,12 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	private List<TopicVersion> topicVersionBuffer = new ArrayList<TopicVersion>();
 	private String virtualWiki;
 
+	static {
+		// For big file parsing
+		System.setProperty("entityExpansionLimit", "1000000");
+		SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
+	}
+
 	/**
 	 *
 	 */
@@ -88,16 +95,13 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	 *
 	 */
 	private void importWikiXml(File file) throws MigrationException {
-		// For big file parsing
-		System.setProperty("entityExpansionLimit", "1000000");
-		SAXParserFactory factory = SAXParserFactory.newInstance();
 		FileInputStream fis = null;
 		try {
 			// at least in 1.5, the SaxParser has a bug where files with names like "%25s"
 			// will be read as "%s", generating FileNotFound exceptions.  To work around this
 			// issue use a FileInputStream rather than just SAXParser.parse(file, handler)
 			fis = new FileInputStream(file);
-			SAXParser saxParser = factory.newSAXParser();
+			SAXParser saxParser = SAX_PARSER_FACTORY.newSAXParser();
 			saxParser.parse(fis, this);
 		} catch (ParserConfigurationException e) {
 			throw new MigrationException(e);
