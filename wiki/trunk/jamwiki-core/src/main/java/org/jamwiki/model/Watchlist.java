@@ -18,7 +18,6 @@ package org.jamwiki.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a watchlist object consisting of a virtual
@@ -26,9 +25,8 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class Watchlist {
 
-	private String virtualWiki = null;
-	private List<String> topics = new ArrayList<String>();
-	private static final WikiLogger logger = WikiLogger.getLogger(Watchlist.class.getName());
+	private String virtualWiki;
+	private List<String> topics;
 
 	/**
 	 *
@@ -49,7 +47,7 @@ public class Watchlist {
 	 */
 	public void add(String topicName) {
 		if (topicName != null) {
-			this.topics.add(topicName);
+			this.getTopics().add(topicName);
 		}
 	}
 
@@ -57,13 +55,16 @@ public class Watchlist {
 	 *
 	 */
 	public boolean containsTopic(String topicName) {
-		return (topicName == null) ? false : this.topics.contains(topicName);
+		return (topicName == null || this.topics == null) ? false : this.getTopics().contains(topicName);
 	}
 
 	/**
 	 *
 	 */
 	public List<String> getTopics() {
+		if (this.topics == null) {
+			this.topics = new ArrayList<String>();
+		}
 		return this.topics;
 	}
 
@@ -86,7 +87,7 @@ public class Watchlist {
 	 */
 	public void remove(String topicName) {
 		if (topicName != null) {
-			this.topics.remove(topicName);
+			this.getTopics().remove(topicName);
 		}
 	}
 

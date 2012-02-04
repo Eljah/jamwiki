@@ -18,7 +18,6 @@ package org.jamwiki.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a configuration value as used by
@@ -26,15 +25,12 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class WikiConfigurationObject {
 
-	/** Standard logger. */
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiConfigurationObject.class.getName());
-
 	private String clazz;
 	private String key;
 	private String key2;
 	private String name;
 	private String state;
-	private Map<String, String> initParams = new HashMap<String, String>();
+	private Map<String, String> initParams;
 
 	/**
 	 *
@@ -118,6 +114,9 @@ public class WikiConfigurationObject {
 	 * This method will never return <code>null</code>.
 	 */
 	public Map<String, String> getInitParams() {
+		if (this.initParams == null) {
+			this.initParams = new HashMap<String, String>();
+		}
 		return this.initParams;
 	}
 
@@ -126,6 +125,6 @@ public class WikiConfigurationObject {
 	 * initialization parameters.
 	 */
 	public void addInitParam(String key, String value) {
-		this.initParams.put(key, value);
+		this.getInitParams().put(key, value);
 	}
 }

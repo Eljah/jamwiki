@@ -30,7 +30,7 @@ public class Topic implements Serializable {
 	private boolean adminOnly = false;
 	private Integer currentVersionId;
 	private Timestamp deleteDate;
-	private Namespace namespace = Namespace.namespace(Namespace.MAIN_ID);
+	private Namespace namespace;
 	/** Page name is the topic name without the namespace.  For example, if the topic name is "Help:Help Page" the page name is "Help Page". */
 	private String pageName;
 	private boolean readOnly = false;

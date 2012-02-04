@@ -78,7 +78,7 @@ public class Namespace implements Serializable {
 	private Integer id;
 	private String label;
 	private Namespace mainNamespace;
-	private Map<String, String> namespaceTranslations = new HashMap<String, String>();
+	private Map<String, String> namespaceTranslations;
 
 	static {
 		DEFAULT_NAMESPACES.put(Namespace.MEDIA.getId(), Namespace.MEDIA);
@@ -152,7 +152,7 @@ public class Namespace implements Serializable {
 	 * return the default namespace label
 	 */
 	public String getLabel(String virtualWiki) {
-		return (virtualWiki != null && this.namespaceTranslations.get(virtualWiki) != null) ? this.namespaceTranslations.get(virtualWiki) : this.label;
+		return (virtualWiki != null && this.getNamespaceTranslations().get(virtualWiki) != null) ? this.getNamespaceTranslations().get(virtualWiki) : this.label;
 	}
 
 	/**
@@ -173,6 +173,9 @@ public class Namespace implements Serializable {
 	 *
 	 */
 	public Map<String, String> getNamespaceTranslations() {
+		if (this.namespaceTranslations == null) {
+			this.namespaceTranslations = new HashMap<String, String>();
+		}
 		return this.namespaceTranslations;
 	}
 
