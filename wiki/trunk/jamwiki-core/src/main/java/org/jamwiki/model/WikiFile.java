@@ -28,16 +28,16 @@ public class WikiFile {
 	public static final String UNKNOWN_MIME_TYPE = "application/unknown";
 	// FIXME - consider making this an ACL (more flexible)
 	private boolean adminOnly = false;
-	private Timestamp deleteDate = null;
+	private Timestamp deleteDate;
 	private int fileId = -1;
-	private String fileName = null;
+	private String fileName;
 	private long fileSize = -1;
 	private String mimeType = UNKNOWN_MIME_TYPE;
 	private boolean readOnly = false;
 	/** The URL is the image file path relative to the file upload directory. */
-	private String url = null;
+	private String url;
 	private int topicId = -1;
-	private String virtualWiki = null;
+	private String virtualWiki;
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiFile.class.getName());
 
 	/**

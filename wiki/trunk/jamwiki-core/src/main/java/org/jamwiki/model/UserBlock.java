@@ -34,21 +34,21 @@ public class UserBlock implements Serializable {
 	/** The ID of the user who applied the block. */
 	private int blockedByUserId = -1;
 	/** The end date for the block. */
-	private Timestamp blockEndDate = null;
+	private Timestamp blockEndDate;
 	/** The internal primary key ID for the block record. */
 	private int blockId = -1;
 	/** The reason the block was applied. */
-	private String blockReason = null;
+	private String blockReason;
 	/** The IP address to block.  Either IP or user ID are required. */
-	private String ipAddress = null;
+	private String ipAddress;
 	/** The date the block was lifted. */
-	private Timestamp unblockDate = null;
+	private Timestamp unblockDate;
 	/** The ID of the user who lifted the block. */
-	private Integer unblockedByUserId = null;
+	private Integer unblockedByUserId;
 	/** The reason the block was lifted. */
-	private String unblockReason = null;
+	private String unblockReason;
 	/** The ID of the user being blocked.  Either ID or IP address are required. */
-	private Integer wikiUserId = null;
+	private Integer wikiUserId;
 
 	/**
 	 * Initialize a user block record with all required parameters.

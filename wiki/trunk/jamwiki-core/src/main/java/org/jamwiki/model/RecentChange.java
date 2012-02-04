@@ -21,29 +21,27 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a Wiki recent change.
  */
 public class RecentChange {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(RecentChange.class.getName());
-	private Integer authorId = null;
-	private String authorName = null;
-	private Integer charactersChanged = null;
-	private String changeComment = null;
-	private Timestamp changeDate = null;
-	private transient WikiMessage changeWikiMessage = null;
-	private Integer editType = null;
-	private Integer logSubType = null;
-	private Integer logType = null;
-	private List<String> params = null;
-	private Integer previousTopicVersionId = null;
-	private Integer topicId = null;
-	private String topicName = null;
-	private Integer topicVersionId = null;
-	private String virtualWiki = null;
+	private Integer authorId;
+	private String authorName;
+	private Integer charactersChanged;
+	private String changeComment;
+	private Timestamp changeDate;
+	private transient WikiMessage changeWikiMessage;
+	private Integer editType;
+	private Integer logSubType;
+	private Integer logType;
+	private List<String> params;
+	private Integer previousTopicVersionId;
+	private Integer topicId;
+	private String topicName;
+	private Integer topicVersionId;
+	private String virtualWiki;
 
 	/**
 	 *

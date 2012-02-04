@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.parser.WikiLink;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a Wiki topic.
@@ -29,18 +28,17 @@ public class Topic implements Serializable {
 
 	// FIXME - consider making this an ACL (more flexible)
 	private boolean adminOnly = false;
-	private Integer currentVersionId = null;
-	private Timestamp deleteDate = null;
+	private Integer currentVersionId;
+	private Timestamp deleteDate;
 	private Namespace namespace = Namespace.namespace(Namespace.MAIN_ID);
 	/** Page name is the topic name without the namespace.  For example, if the topic name is "Help:Help Page" the page name is "Help Page". */
-	private String pageName = null;
+	private String pageName;
 	private boolean readOnly = false;
-	private String redirectTo = null;
-	private String topicContent = null;
+	private String redirectTo;
+	private String topicContent;
 	private int topicId = -1;
 	private TopicType topicType = TopicType.ARTICLE;
-	private String virtualWiki = null;
-	private static final WikiLogger logger = WikiLogger.getLogger(Topic.class.getName());
+	private String virtualWiki;
 
 	/**
 	 * Initialize a topic, passing in the virtual wiki, namespace and page name.  Note

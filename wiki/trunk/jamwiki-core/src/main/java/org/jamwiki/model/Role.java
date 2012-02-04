@@ -65,7 +65,7 @@ public class Role {
 	public static final Role ROLE_UPLOAD = new Role("ROLE_UPLOAD");
 	public static final Role ROLE_VIEW = new Role("ROLE_VIEW");
 
-	private String authority;
+	private final String authority;
 	private String description;
 
 	/**

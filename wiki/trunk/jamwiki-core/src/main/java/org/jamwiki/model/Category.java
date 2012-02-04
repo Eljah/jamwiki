@@ -16,19 +16,16 @@
  */
 package org.jamwiki.model;
 
-import org.jamwiki.utils.WikiLogger;
-
 /**
  * Provides an object representing a Wiki category.
  */
 public class Category {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(Category.class.getName());
-	private String childTopicName = null;
-	private String name = null;
-	private String sortKey = null;
-	private TopicType topicType = null;
-	private String virtualWiki = null;
+	private String childTopicName;
+	private String name;
+	private String sortKey;
+	private TopicType topicType;
+	private String virtualWiki;
 
 	/**
 	 *

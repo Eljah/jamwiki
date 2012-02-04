@@ -24,14 +24,12 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a Wiki log entry.
  */
 public class LogItem {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(LogItem.class.getName());
 	public static final int LOG_TYPE_ALL = -1;
 	public static final int LOG_TYPE_BLOCK = 13;
 	public static final int LOG_TYPE_DELETE = 1;
@@ -57,16 +55,16 @@ public class LogItem {
 		LOG_TYPES.put(LOG_TYPE_USER_CREATION, "log.caption.log.user");
 	}
 
-	private String logComment = null;
-	private Timestamp logDate = null;
-	private List<String> logParams = null;
-	private Integer logSubType = null;
+	private String logComment;
+	private Timestamp logDate;
+	private List<String> logParams;
+	private Integer logSubType;
 	private int logType = -1;
-	private Integer topicId = null;
-	private Integer topicVersionId = null;
-	private String userDisplayName = null;
-	private Integer userId = null;
-	private String virtualWiki = null;
+	private Integer topicId;
+	private Integer topicVersionId;
+	private String userDisplayName;
+	private Integer userId;
+	private String virtualWiki;
 
 	/**
 	 *

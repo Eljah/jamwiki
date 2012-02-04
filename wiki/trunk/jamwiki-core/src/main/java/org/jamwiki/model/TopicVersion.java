@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a version of a Wiki topic.
@@ -38,22 +37,21 @@ public class TopicVersion implements Serializable {
 	public static final int EDIT_UNDELETE = 7;
 	public static final int EDIT_IMPORT = 8;
 	public static final int EDIT_UPLOAD = 9;
-	private Integer authorId = null;
-	private String authorDisplay = null;
+	private Integer authorId;
+	private String authorDisplay;
 	private int charactersChanged = 0;
-	private String editComment = null;
+	private String editComment;
 	private Timestamp editDate = new Timestamp(System.currentTimeMillis());
 	private int editType = EDIT_NORMAL;
 	/** This field is not persisted and is simply used when writing versions to indicate whether the version can be logged. */
 	private boolean loggable = true;
-	private Integer previousTopicVersionId = null;
+	private Integer previousTopicVersionId;
 	/** Some versions should be created without creating a recent change entry.  This field is not persisted. */
 	private boolean recentChangeAllowed = true;
 	private int topicId = -1;
 	private int topicVersionId = -1;
-	private String versionContent = null;
-	private List<String> versionParams = null;
-	private static final WikiLogger logger = WikiLogger.getLogger(TopicVersion.class.getName());
+	private String versionContent;
+	private List<String> versionParams;
 
 	/**
 	 *

@@ -26,15 +26,15 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class WikiFileVersion {
 
-	private Integer authorId = null;
-	private String authorDisplay = null;
+	private Integer authorId;
+	private String authorDisplay;
 	private int fileId = -1;
 	private long fileSize = -1;
 	private int fileVersionId = -1;
 	private String mimeType = WikiFile.UNKNOWN_MIME_TYPE;
-	private String uploadComment = null;
+	private String uploadComment;
 	private Timestamp uploadDate = new Timestamp(System.currentTimeMillis());
-	private String url = null;
+	private String url;
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiFileVersion.class.getName());
 
 	/**

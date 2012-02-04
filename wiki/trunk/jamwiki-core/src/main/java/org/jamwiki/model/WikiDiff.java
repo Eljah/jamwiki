@@ -29,13 +29,13 @@ public class WikiDiff implements Serializable {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiDiff.class.getName());
 	/** The newly modified text, or <code>null</code> if text was deleted. */
-	private String newText = null;
+	private String newText;
 	/** The old text that was changed, or <code>null</code> if new text was added. */
-	private String oldText = null;
+	private String oldText;
 	/** The zero-based position of the text that was changed. */
 	private int position = -1;
 	/** The diff may (optionally) contain a list of sub-diffs, such as when diffing two topics and then further showing what changed on a line. */
-	private List<WikiDiff> subDiffs = null;
+	private List<WikiDiff> subDiffs;
 
 	/**
 	 *

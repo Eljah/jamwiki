@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing a mapping of a user or group to a set of
@@ -29,12 +28,11 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class RoleMap implements Serializable {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(RoleMap.class.getName());
-	private Integer groupId = null;
-	private String groupName = null;
-	private List<String> roleNames = null;
-	private Integer userId = null;
-	private String userLogin = null;
+	private Integer groupId;
+	private String groupName;
+	private List<String> roleNames;
+	private Integer userId;
+	private String userLogin;
 
 	/**
 	 *

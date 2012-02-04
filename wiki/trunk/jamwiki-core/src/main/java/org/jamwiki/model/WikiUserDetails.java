@@ -21,8 +21,8 @@ package org.jamwiki.model;
  */
 public class WikiUserDetails {
 
-	private String username = null;
-	private String password = null;
+	private final String username;
+	private final String password;
 
 	/**
 	 *
