@@ -239,7 +239,7 @@ public class ServletUtil {
 	 */
 	public static WikiUser currentWikiUser() throws AuthenticationCredentialsNotFoundException {
 		WikiUserDetailsImpl userDetails = ServletUtil.currentUserDetails();
-		WikiUser user = new WikiUser();
+		WikiUser user = new WikiUser(null);
 		String username = userDetails.getUsername();
 		if (username.equals(WikiUserDetailsImpl.ANONYMOUS_USER_USERNAME)) {
 			return user;

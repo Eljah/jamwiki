@@ -727,8 +727,7 @@ public class WikiDatabase {
 	 */
 	protected static void setupGroups() throws DataAccessException, WikiException {
 		logger.info("Creating default wiki groups");
-		WikiGroup group = new WikiGroup();
-		group.setName(WikiGroup.GROUP_ANONYMOUS);
+		WikiGroup group = new WikiGroup(WikiGroup.GROUP_ANONYMOUS);
 		// FIXME - use message key
 		group.setDescription("All non-logged in users are automatically assigned to the anonymous group.");
 		WikiBase.getDataHandler().writeWikiGroup(group);
@@ -739,8 +738,7 @@ public class WikiDatabase {
 		anonymousRoles.add(Role.ROLE_UPLOAD.getAuthority());
 		anonymousRoles.add(Role.ROLE_VIEW.getAuthority());
 		WikiBase.getDataHandler().writeRoleMapGroup(group.getGroupId(), anonymousRoles);
-		group = new WikiGroup();
-		group.setName(WikiGroup.GROUP_REGISTERED_USER);
+		group = new WikiGroup(WikiGroup.GROUP_REGISTERED_USER);
 		// FIXME - use message key
 		group.setDescription("All logged in users are automatically assigned to the registered user group.");
 		WikiBase.getDataHandler().writeWikiGroup(group);

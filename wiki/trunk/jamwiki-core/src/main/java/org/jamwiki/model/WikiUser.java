@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing Wiki-specific information about a user of
@@ -28,26 +27,19 @@ import org.jamwiki.utils.WikiLogger;
  */
 public class WikiUser implements Serializable {
 
-	private static final WikiLogger logger = WikiLogger.getLogger(WikiUser.class.getName());
 	private Timestamp createDate = new Timestamp(System.currentTimeMillis());
 	private String createIpAddress = "0.0.0.0";
-	private String defaultLocale = null;
-	private String displayName = null;
+	private String defaultLocale;
+	private String displayName;
 	/** The user's preferred editor (if any). */
 	private String editor = Environment.getValue(Environment.PROP_TOPIC_EDITOR);
-	private String email = null;
+	private String email;
 	private Timestamp lastLoginDate = new Timestamp(System.currentTimeMillis());
 	private String lastLoginIpAddress = "0.0.0.0";
 	/** The user's custom signature (if any). */
-	private String signature = null;
-	private String username = null;
+	private String signature;
+	private final String username;
 	private int userId = -1;
-
-	/**
-	 *
-	 */
-	public WikiUser() {
-	}
 
 	/**
 	 *

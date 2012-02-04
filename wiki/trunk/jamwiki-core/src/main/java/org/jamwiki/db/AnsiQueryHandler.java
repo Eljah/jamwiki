@@ -1614,9 +1614,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	 *
 	 */
 	private WikiGroup initWikiGroup(ResultSet rs) throws SQLException {
-		WikiGroup wikiGroup = new WikiGroup();
+		WikiGroup wikiGroup = new WikiGroup(rs.getString("group_name"));
 		wikiGroup.setGroupId(rs.getInt("group_id"));
-		wikiGroup.setName(rs.getString("group_name"));
 		wikiGroup.setDescription(rs.getString("group_description"));
 		return wikiGroup;
 	}

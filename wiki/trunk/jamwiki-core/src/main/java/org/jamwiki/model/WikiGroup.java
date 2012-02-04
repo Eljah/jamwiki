@@ -24,17 +24,18 @@ import org.jamwiki.utils.WikiLogger;
 public class WikiGroup {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(WikiGroup.class.getName());
-	private String description = null;
+	private String description;
 	private int groupId = -1;
-	private String name = null;
+	private final String name;
 
 	public static final String GROUP_ANONYMOUS = "GROUP_ANONYMOUS";
 	public static final String GROUP_REGISTERED_USER = "GROUP_REGISTERED_USER";
 
 	/**
-	 *
+	 * @param name The group name.  Group names will be forced to uppercase.
 	 */
-	public WikiGroup() {
+	public WikiGroup(String name) {
+		this.name = ((name == null) ? null : name.toUpperCase());
 	}
 
 	/**
@@ -70,12 +71,5 @@ public class WikiGroup {
 	 */
 	public String getName() {
 		return (this.name == null) ? null : this.name.toUpperCase();
-	}
-
-	/**
-	 * Set the group name.  Group names will be forced to uppercase.
-	 */
-	public void setName(String name) {
-		this.name = ((name == null) ? null : name.toUpperCase());
 	}
 }
