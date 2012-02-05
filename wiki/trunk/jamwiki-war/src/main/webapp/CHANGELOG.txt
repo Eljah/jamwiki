@@ -89,6 +89,7 @@ Bugfixes:
 Translation Updates:
 
   * Updated German translations (axelclk).
+  * Updated Russian translations (shar).
 
 
 1.1.6
