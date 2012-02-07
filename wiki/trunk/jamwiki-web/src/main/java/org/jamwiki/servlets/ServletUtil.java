@@ -135,9 +135,9 @@ public class ServletUtil {
 	 *  parameter) topic content.
 	 */
 	protected static String cachedContent(String context, Locale locale, String virtualWiki, String topicName, boolean cook) throws DataAccessException {
-		String key = WikiCache.key(virtualWiki, topicName);
-		String content = WikiBase.CACHE_PARSED_TOPIC_CONTENT.retrieveFromCache(key);
-		if (content != null || WikiBase.CACHE_PARSED_TOPIC_CONTENT.isKeyInCache(key)) {
+		String cacheKey = virtualWiki + '/' + topicName;
+		String content = WikiBase.CACHE_PARSED_TOPIC_CONTENT.retrieveFromCache(cacheKey);
+		if (content != null || WikiBase.CACHE_PARSED_TOPIC_CONTENT.isKeyInCache(cacheKey)) {
 			return content;
 		}
 		try {
@@ -155,7 +155,7 @@ public class ServletUtil {
 				parserInput.setLocale(locale);
 				content = ParserUtil.parse(parserInput, null, content);
 			}
-			WikiBase.CACHE_PARSED_TOPIC_CONTENT.addToCache(key, content);
+			WikiBase.CACHE_PARSED_TOPIC_CONTENT.addToCache(cacheKey, content);
 		} catch (Exception e) {
 			logger.warn("error getting cached page " + virtualWiki + " / " + topicName, e);
 			return null;

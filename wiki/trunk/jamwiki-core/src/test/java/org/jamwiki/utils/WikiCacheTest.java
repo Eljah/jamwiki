@@ -26,14 +26,5 @@ import static org.junit.Assert.*;
  *
  */
 public class WikiCacheTest extends JAMWikiUnitTest {
-
-	/**
-	 *
-	 */
-	@Test
-	public void testKey() throws Throwable {
-		String result = WikiCache.key("testWikiCacheVirtualWiki", "testWikiCacheTopicName");
-		assertEquals("result", "testWikiCacheVirtualWiki/testWikiCacheTopicName", result);
-	}
 }
 

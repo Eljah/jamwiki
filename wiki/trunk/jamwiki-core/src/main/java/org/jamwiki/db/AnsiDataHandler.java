@@ -340,12 +340,14 @@ public class AnsiDataHandler implements DataHandler {
 	 * the corresponding topic information.
 	 */
 	private String cacheTopicKey(String virtualWiki, Namespace namespace, String pageName) {
-		String topicName = namespace.getLabel(virtualWiki);
-		if (topicName.length() != 0) {
-			topicName += Namespace.SEPARATOR;
+		StringBuilder cacheKey = new StringBuilder(virtualWiki);
+		cacheKey.append('/');
+		if (namespace.getLabel(virtualWiki).length() != 0) {
+			cacheKey.append(namespace.getLabel(virtualWiki));
+			cacheKey.append(Namespace.SEPARATOR);
 		}
-		topicName += pageName;
-		return WikiCache.key(virtualWiki, topicName);
+		cacheKey.append(pageName);
+		return cacheKey.toString();
 	}
 
 	/**

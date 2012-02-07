@@ -17,7 +17,6 @@
 package org.jamwiki.utils;
 
 import java.io.File;
-import java.util.List;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
@@ -141,27 +140,6 @@ public class WikiCache<K, V> {
 	}
 
 	/**
-	 * Given two string values, generate a unique key value that can be used to
-	 * store and retrieve cache objects.
-	 *
-	 * @param value1 The first value to use in the key name.
-	 * @param value2 The second value to use in the key name.
-	 * @return The generated key value.
-	 */
-	public static String key(String value1, String value2) {
-		if (value1 == null && value2 == null) {
-			throw new IllegalArgumentException("WikiCache.key cannot be called with two null values");
-		}
-		if (value1 == null) {
-			value1 = "";
-		}
-		if (value2 == null) {
-			value2 = "";
-		}
-		return value1 + "/" + value2;
-	}
-
-	/**
 	 * Remove all values from the cache.
 	 */
 	public void removeAllFromCache() {
@@ -183,8 +161,7 @@ public class WikiCache<K, V> {
 	 * the key values may not be exactly known.
 	 */
 	public void removeFromCacheCaseInsensitive(String key) {
-		List cacheKeys = this.getCache().getKeys();
-		for (Object cacheKey : cacheKeys) {
+		for (Object cacheKey : this.getCache().getKeys()) {
 			// with the upgrade to ehcache 2.4.2 it seems that null cache keys are possible...
 			if (cacheKey != null && cacheKey.toString().equalsIgnoreCase(key)) {
 				this.getCache().remove(cacheKey);
