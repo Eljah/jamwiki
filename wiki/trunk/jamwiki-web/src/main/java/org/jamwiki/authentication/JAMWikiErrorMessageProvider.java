@@ -17,6 +17,7 @@
 package org.jamwiki.authentication;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.security.web.util.AntPathRequestMatcher;
 import org.springframework.security.web.util.RequestMatcher;
@@ -53,14 +54,13 @@ public class JAMWikiErrorMessageProvider {
 	private String retrieveErrorKey(HttpServletRequest request) {
 		if (this.matcherToKeyMap == null) {
 			this.matcherToKeyMap = new LinkedHashMap<RequestMatcher, String>();
-			for (String key : this.getUrlPatterns().keySet()) {
-				String value = this.getUrlPatterns().get(key);
-				this.matcherToKeyMap.put(new AntPathRequestMatcher(key), value);
+			for (Map.Entry<String, String> entry : this.getUrlPatterns().entrySet()) {
+				this.matcherToKeyMap.put(new AntPathRequestMatcher(entry.getKey()), entry.getValue());
 			}
 		}
-		for (RequestMatcher matcher : this.matcherToKeyMap.keySet()) {
-			if (matcher.matches(request)) {
-				return this.matcherToKeyMap.get(matcher);
+		for (Map.Entry<RequestMatcher, String> entry : this.matcherToKeyMap.entrySet()) {
+			if (entry.getKey().matches(request)) {
+				return entry.getValue();
 			}
 		}
 		return null;

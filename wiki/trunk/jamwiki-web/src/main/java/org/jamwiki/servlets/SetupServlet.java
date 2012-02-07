@@ -179,8 +179,8 @@ public class SetupServlet extends JAMWikiServlet {
 		try {
 			// do not use WikiBase.getDataHandler() since the instance is not initialized
 			Map<String, String> configuration = WikiUtil.dataHandlerInstance().lookupConfiguration();
-			for (String key : configuration.keySet()) {
-				Environment.setValue(key, configuration.get(key));
+			for (Map.Entry<String, String> entry : configuration.entrySet()) {
+				Environment.setValue(entry.getKey(), entry.getValue());
 			}
 			Environment.saveConfiguration();
 			result = true;

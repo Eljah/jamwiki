@@ -128,14 +128,14 @@ public class XMLUtil {
 			return;
 		}
 		writer.append('<').append(tagName);
-		for (String key : attributes.keySet()) {
+		for (Map.Entry<String, String> entry : attributes.entrySet()) {
 			writer.append(' ');
 			if (escape) {
-				StringEscapeUtils.ESCAPE_XML.translate(key, writer);
+				StringEscapeUtils.ESCAPE_XML.translate(entry.getKey(), writer);
 				writer.append("=\"");
-				StringEscapeUtils.ESCAPE_XML.translate(attributes.get(key), writer);
+				StringEscapeUtils.ESCAPE_XML.translate(entry.getValue(), writer);
 			} else {
-				writer.append(' ').append(key).append("=\"").append(attributes.get(key));
+				writer.append(' ').append(entry.getKey()).append("=\"").append(entry.getValue());
 			}
 			writer.append('\"');
 		}

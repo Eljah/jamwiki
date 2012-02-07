@@ -1748,9 +1748,9 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	protected void validateConfiguration(Map<String, String> configuration) throws WikiException {
-		for (String key : configuration.keySet()) {
-			checkLength(key, 50);
-			checkLength(configuration.get(key), 500);
+		for (Map.Entry<String, String> entry : configuration.entrySet()) {
+			checkLength(entry.getKey(), 50);
+			checkLength(entry.getValue(), 500);
 		}
 	}
 
@@ -2141,10 +2141,10 @@ public class AnsiDataHandler implements DataHandler {
 				this.deleteTopicCategories(topic, conn);
 				if (topic.getDeleteDate() == null && !categories.isEmpty()) {
 					List<Category> categoryList = new ArrayList<Category>();
-					for (String categoryName : categories.keySet()) {
+					for (Map.Entry<String, String> entry : categories.entrySet()) {
 						Category category = new Category();
-						category.setName(categoryName);
-						category.setSortKey(categories.get(categoryName));
+						category.setName(entry.getKey());
+						category.setSortKey(entry.getValue());
 						category.setVirtualWiki(topic.getVirtualWiki());
 						category.setChildTopicName(topic.getName());
 						categoryList.add(category);

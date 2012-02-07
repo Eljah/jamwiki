@@ -17,7 +17,6 @@
 package org.jamwiki.servlets;
 
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -398,11 +397,8 @@ public class AdminServlet extends JAMWikiServlet {
 			return false;
 		}
 		// all is well, save the properties
-		Iterator iterator = props.keySet().iterator();
-		while (iterator.hasNext()) {
-			String key = (String)iterator.next();
-			String value = props.getProperty(key);
-			Environment.setValue(key, value);
+		for (Map.Entry<Object, Object> entry : props.entrySet()) {
+			Environment.setValue(entry.getKey().toString(), entry.getValue().toString());
 		}
 		Environment.saveConfiguration();
 		// re-initialize to reset database settings (if needed)

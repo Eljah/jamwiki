@@ -303,9 +303,9 @@ public abstract class Utilities {
 		if (map.containsKey(key)) {
 			return map.get(key);
 		}
-		for (String mapKey : map.keySet()) {
-			if (StringUtils.equalsIgnoreCase(mapKey, key)) {
-				return map.get(mapKey);
+		for (Map.Entry<String, V> entry : map.entrySet()) {
+			if (StringUtils.equalsIgnoreCase(entry.getKey(), key)) {
+				return entry.getValue();
 			}
 		}
 		return null;
@@ -365,9 +365,9 @@ public abstract class Utilities {
 			throw new IllegalArgumentException("Utilities.intersection() requires non-null arguments");
 		}
 		Map<K, V> result = new HashMap<K, V>();
-		for (K key : map1.keySet()) {
-			if (ObjectUtils.equals(map1.get(key), map2.get(key))) {
-				result.put(key, map1.get(key));
+		for (Map.Entry<K, V> entry : map1.entrySet()) {
+			if (ObjectUtils.equals(entry.getValue(), map2.get(entry.getKey()))) {
+				result.put(entry.getKey(), entry.getValue());
 			}
 		}
 		return result;

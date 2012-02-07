@@ -87,15 +87,14 @@ public class IFrameTag implements JFlexCustomTagItem {
 			return "";
 		}
 		StringBuilder result = new StringBuilder();
-		for (String key : attributes.keySet()) {
-			if (!ALLOWED_ATTRIBUTES.contains(key.toLowerCase())) {
+		for (Map.Entry<String, String> entry : attributes.entrySet()) {
+			if (!ALLOWED_ATTRIBUTES.contains(entry.getKey().toLowerCase())) {
 				if (logger.isDebugEnabled()) {
-					logger.debug("iframe tag called with invalid attribute: " + key);
+					logger.debug("iframe tag called with invalid attribute: " + entry.getKey());
 				}
 				continue;
 			}
-			String value = attributes.get(key);
-			result.append(' ').append(key).append("=\"").append(value).append("\"");
+			result.append(' ').append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
 		}
 		return result.toString();
 	}

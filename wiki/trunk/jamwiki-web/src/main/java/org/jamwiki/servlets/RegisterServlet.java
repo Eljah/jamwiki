@@ -79,9 +79,9 @@ public class RegisterServlet extends JAMWikiServlet {
 		}
 		TreeMap<String, String> locales = new TreeMap<String, String>();
 		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
-		for (String key : translations.keySet()) {
-			String value = key + " - " + translations.get(key);
-			locales.put(value, key);
+		for (Map.Entry<String, String> entry : translations.entrySet()) {
+			String value = entry.getKey() + " - " + entry.getValue();
+			locales.put(value, entry.getKey());
 		}
 		Locale[] localeArray = Locale.getAvailableLocales();
 		for (int i = 0; i < localeArray.length; i++) {

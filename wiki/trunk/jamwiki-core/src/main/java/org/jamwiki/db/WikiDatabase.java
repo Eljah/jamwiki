@@ -135,10 +135,10 @@ public class WikiDatabase {
 					continue;
 				}
 				topics = new ArrayList<Topic>();
-				for (int topicId : topicNames.keySet()) {
-					wikiLink = new WikiLink(null, virtualWiki.getName(), topicNames.get(topicId));
+				for (Map.Entry<Integer, String> entry : topicNames.entrySet()) {
+					wikiLink = new WikiLink(null, virtualWiki.getName(), entry.getValue());
 					Topic topic = new Topic(virtualWiki.getName(), wikiLink.getNamespace(), wikiLink.getArticle());
-					topic.setTopicId(topicId);
+					topic.setTopicId(entry.getKey());
 					topics.add(topic);
 				}
 				WikiDatabase.queryHandler().updateTopicNamespaces(topics, conn);

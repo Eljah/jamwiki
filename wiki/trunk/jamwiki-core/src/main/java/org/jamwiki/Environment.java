@@ -450,8 +450,8 @@ public class Environment {
 	 */
 	private static Map<String, String> propertiesToMap(Properties properties) {
 		Map<String, String> map = new HashMap<String, String>();
-		for (Object key : properties.keySet()) {
-			map.put(key.toString(), properties.get(key).toString());
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+			map.put(entry.getKey().toString(), entry.getValue().toString());
 		}
 		return map;
 	}

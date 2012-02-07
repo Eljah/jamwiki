@@ -17,6 +17,7 @@
 package org.jamwiki.parser.jflex;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Wrapper for an HTML or HTML-like tag of the form
@@ -90,13 +91,11 @@ public class HtmlTagItem {
 			result.append("/");
 		}
 		result.append(this.tagType);
-		String value;
 		if (this.attributes != null) {
-			for (String key : this.attributes.keySet()) {
-				result.append(' ').append(key);
-				value = this.attributes.get(key);
-				if (value != null) {
-					result.append('=').append("\"").append(value.trim()).append("\"");
+			for (Map.Entry<String, String> entry : this.attributes.entrySet()) {
+				result.append(' ').append(entry.getKey());
+				if (entry.getValue() != null) {
+					result.append('=').append("\"").append(entry.getValue().trim()).append("\"");
 				}
 			}
 		}

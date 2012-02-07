@@ -143,23 +143,21 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 	 */
 	private String convertToJAMWikiNamespaces(String topicContent) {
 		// convert all namespaces names from MediaWiki to JAMWiki local representation
-		String jamwikiNamespace;
 		Pattern pattern;
-		for (String mediawikiNamespace : mediawikiNamespaceMap.keySet()) {
-			jamwikiNamespace = mediawikiNamespaceMap.get(mediawikiNamespace);
-			if (jamwikiNamespace == null || StringUtils.equalsIgnoreCase(jamwikiNamespace, mediawikiNamespace)) {
+		for (Map.Entry<String, String> entry : mediawikiNamespaceMap.entrySet()) {
+			if (entry.getValue() == null || StringUtils.equalsIgnoreCase(entry.getValue(), entry.getKey())) {
 				continue;
 			}
-			pattern = this.convertNamespaceMap.get(mediawikiNamespace);
+			pattern = this.convertNamespaceMap.get(entry.getKey());
 			if (pattern == null) {
 				// convert from Mediawiki to JAMWiki namespaces.  handle "[[", "[[:", "{{", "{{:".
 				// note that "?:" is a regex non-capturing group.
-				String patternString = "((?:(?:\\[\\[)|(?:\\{\\{))[ ]*(?::)?)" + mediawikiNamespace + Namespace.SEPARATOR;
+				String patternString = "((?:(?:\\[\\[)|(?:\\{\\{))[ ]*(?::)?)" + entry.getKey() + Namespace.SEPARATOR;
 				Pattern mediawikiPattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 				pattern = mediawikiPattern;
-				this.convertNamespaceMap.put(mediawikiNamespace, mediawikiPattern);
+				this.convertNamespaceMap.put(entry.getKey(), mediawikiPattern);
 			}
-			topicContent = pattern.matcher(topicContent).replaceAll("$1" + jamwikiNamespace + Namespace.SEPARATOR);
+			topicContent = pattern.matcher(topicContent).replaceAll("$1" + entry.getValue() + Namespace.SEPARATOR);
 		}
 		return topicContent;
 	}

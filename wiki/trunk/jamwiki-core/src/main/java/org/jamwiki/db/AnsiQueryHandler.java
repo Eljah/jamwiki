@@ -2342,12 +2342,12 @@ public class AnsiQueryHandler implements QueryHandler {
 					talkNamespaces.put(mainNamespaceId, namespace);
 				}
 			}
-			for (int mainNamespaceId : talkNamespaces.keySet()) {
-				Namespace mainNamespace = namespaces.get(mainNamespaceId);
+			for (Map.Entry<Integer, Namespace> entry : talkNamespaces.entrySet()) {
+				Namespace mainNamespace = namespaces.get(entry.getKey());
 				if (mainNamespace == null) {
-					logger.warn("Invalid namespace reference - bad database data.  Namespace references invalid main namespace with ID " + mainNamespaceId);
+					logger.warn("Invalid namespace reference - bad database data.  Namespace references invalid main namespace with ID " + entry.getKey());
 				}
-				Namespace talkNamespace = talkNamespaces.get(mainNamespaceId);
+				Namespace talkNamespace = entry.getValue();
 				talkNamespace.setMainNamespace(mainNamespace);
 				namespaces.put(talkNamespace.getId(), talkNamespace);
 			}
@@ -3130,11 +3130,11 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt = conn.createStatement();
 			stmt.executeUpdate(STATEMENT_DELETE_CONFIGURATION);
 			pstmt = conn.prepareStatement(STATEMENT_INSERT_CONFIGURATION);
-			for (String key : configuration.keySet()) {
-				pstmt.setString(1, key);
+			for (Map.Entry<String, String> entry : configuration.entrySet()) {
+				pstmt.setString(1, entry.getKey());
 				// FIXME - Oracle cannot store an empty string - it converts them
 				// to null - so add a hack to work around the problem.
-				String value = configuration.get(key);
+				String value = entry.getValue();
 				if (StringUtils.isBlank(value)) {
 					value = " ";
 				}
