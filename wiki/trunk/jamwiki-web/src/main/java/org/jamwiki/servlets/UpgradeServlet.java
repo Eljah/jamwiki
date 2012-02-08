@@ -96,7 +96,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			this.upgradeDatabase(true, pageInfo.getMessages());
 			if (oldVersion.before(1, 2, 0)) {
 				// old installs used the DOCROOT storage type rather than the new DEFAULT
-				Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.JAMWIKI.toString());
+				Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DOCROOT.toString());
 				Environment.saveConfiguration();
 				// move system topics
 				this.updateSystemTopics(request, pageInfo.getMessages());
@@ -126,7 +126,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 			if (this.upgradeStyleSheetRequired()) {
 				this.upgradeStyleSheet(request, pageInfo.getMessages());
 			}
-			pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(Environment.getInstance()));
+			pageInfo.getMessages().addAll(ServletUtil.validateSystemSettings(Environment.getInstance()));
 			try {
 				Environment.setValue(Environment.PROP_BASE_WIKI_VERSION, WikiVersion.CURRENT_WIKI_VERSION);
 				Environment.saveConfiguration();
