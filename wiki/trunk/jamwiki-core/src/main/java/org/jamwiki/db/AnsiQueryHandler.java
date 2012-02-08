@@ -489,7 +489,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		// catch errors that might result from a partial failure during install.  also
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
-		if (STATEMENT_DROP_SEQUENCES.length() > 0) {
+		if (!StringUtils.isBlank(STATEMENT_DROP_SEQUENCES)) {
 			try {
 				DatabaseConnection.executeUpdate(STATEMENT_DROP_SEQUENCES, conn);
 			} catch (SQLException e) { logger.error(e.getMessage()); }
@@ -588,14 +588,14 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public void executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
+	public boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
 		String sql = this.props.getProperty(prop);
 		if (sql == null) {
 			throw new SQLException("No property found for " + prop);
 		}
 		if (StringUtils.isBlank(sql)) {
 			// some queries such as validation queries are not defined on all databases
-			return;
+			return false;
 		}
 		PreparedStatement stmt = null;
 		try {
@@ -604,6 +604,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}
+		return true;
 	}
 
 	/**

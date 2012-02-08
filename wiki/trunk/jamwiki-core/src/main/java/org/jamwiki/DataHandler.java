@@ -143,8 +143,10 @@ public interface DataHandler {
 	 * @param prop The name of the SQL property file value to execute.
 	 * @param conn The SQL connection to use when executing the SQL.
 	 * @throws SQLException Thrown if any error occurs during execution.
+	 *
+	 * @return true if action actually performed and false otherwise.
 	 */
-	void executeUpgradeUpdate(String prop, Connection conn) throws SQLException;
+	boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException;
 
 	/**
 	 * Return a List of all Category objects for a given virtual wiki.

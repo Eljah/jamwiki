@@ -161,7 +161,9 @@ public class DatabaseUpgrades {
 			status = DatabaseConnection.startTransaction(getTransactionDefinition());
 			Connection conn = DatabaseConnection.getConnection();
 			// initialize sequences
-			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_SEQUENCES", conn);
+			if (WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_SEQUENCES", conn)) {
+				messages.add(new WikiMessage("upgrade.message.db.object.added", "sequences"));
+			}
 			// create ROLE_REGISTER
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_120_ADD_ROLE_REGISTER", conn);
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_role"));

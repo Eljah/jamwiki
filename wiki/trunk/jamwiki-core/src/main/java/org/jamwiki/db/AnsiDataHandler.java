@@ -523,8 +523,8 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public void executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
-		this.queryHandler().executeUpgradeUpdate(prop, conn);
+	public boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
+		return this.queryHandler().executeUpgradeUpdate(prop, conn);
 	}
 
 	/**
