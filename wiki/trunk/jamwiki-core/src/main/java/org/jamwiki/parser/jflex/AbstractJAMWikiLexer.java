@@ -43,7 +43,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 */
 	private static final Map<String, String> PARAGRAPH_OPEN_LOCATION_LIST = Utilities.initializeLookupMap("blockquote", "center", "div", "dl", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "ol", "pre", "table", "ul");
 	/** Stack of currently parsed tag content. */
-	private Stack<JFlexTagItem> tagStack = new Stack<JFlexTagItem>();
+	private final Stack<JFlexTagItem> tagStack = new Stack<JFlexTagItem>();
 
 	/**
 	 * Append content to the current tag in the tag stack.
@@ -92,28 +92,20 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 */
 	private int currentListDepth() {
 		int depth = 0;
-		int currentPos = this.tagStack.size() - 1;
-		while (currentPos > 0) {
-			JFlexTagItem tag = this.tagStack.get(currentPos);
-			currentPos--;
-			if (tag.isEmptyParagraphTag()) {
+		int i = 0;
+		// traverse backwards through the tag stack looking for list tags
+		while (this.peekTag(++i) != null) {
+			if (this.peekTag(i).isEmptyParagraphTag()) {
 				// ignore paragraphs
 				continue;
 			}
-			if (!tag.isListTag()) {
+			if (!this.peekTag(i).isListTag()) {
 				break;
 			}
 			depth++;
 		}
 		// divide by two since lists always have a list and a list item tag
 		return (depth / 2);
-	}
-
-	/**
-	 * Return the current stack of parser tags.
-	 */
-	protected Stack<JFlexTagItem> getTagStack() {
-		return this.tagStack;
 	}
 
 	/**
@@ -129,13 +121,12 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 * contains list tags followed by a tag of a specific type.
 	 */
 	private boolean isNextAfterListTags(String tagType) {
-		JFlexTagItem nextTag;
-		for (int i = (this.tagStack.size() - 1); i > 0; i--) {
-			nextTag = this.tagStack.get(i);
-			if (nextTag.getTagType().equals(tagType)) {
+		int i = 0;
+		while (this.peekTag(++i) != null) {
+			if (this.peekTag(i).getTagType().equals(tagType)) {
 				return true;
 			}
-			if (!nextTag.isListTag()) {
+			if (!this.peekTag(i).isListTag()) {
 				return false;
 			}
 		}
@@ -154,7 +145,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 			// if this is the root tag and it's empty, this is the start of the file
 			return true;
 		}
-		if (this.tagStack.size() == 2 && this.getTagStack().get(0).getTagContent().length() == 0 && this.peekTag().isEmptyParagraphTag()) {
+		if (this.tagStack.size() == 2 && this.tagStack.get(0).getTagContent().length() == 0 && this.peekTag().isEmptyParagraphTag()) {
 			// if this is the paragraph tag that is pre-pended prior to parsing
 			// and the root tag is empty, this is the start of the file
 			return true;
@@ -189,12 +180,13 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 * Utility method to determine if a paragraph is currently open.
 	 */
 	protected boolean paragraphIsOpen() {
-		// walk the stack looking for a paragraph tag
-		for (int i = (this.tagStack.size() - 1); i > 0; i--) {
-			if (this.tagStack.get(i).getTagType().equals("p")) {
+		// traverse backwards through the tag stack looking for an open paragraph tag
+		int i = 0;
+		while (this.peekTag(++i) != null) {
+			if (this.peekTag(i).getTagType().equals("p")) {
 				return true;
 			}
-			if (!this.tagStack.get(i).isInlineTag()) {
+			if (!this.peekTag(i).isInlineTag()) {
 				// if a block tag is encountered there should be no
 				// need to check further
 				break;
@@ -235,6 +227,25 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 	 */
 	protected JFlexTagItem peekTag() {
 		return this.tagStack.peek();
+	}
+
+	/**
+	 * Peek at the current tag from the lexer stack and see if it matches
+	 * the given tag type.
+	 *
+	 * @param pos Depth of the tag stack to peek.  If looking at the last tag
+	 *  then specify one, the second-to-last-tag specify two, etc.
+	 * @return The tag as the specified position in the stack, or <code>null</code>
+	 *  if the stack is smaller than the specified index.
+	 */
+	protected JFlexTagItem peekTag(int pos) {
+		if (pos < 1) {
+			throw new IllegalArgumentException("Cannot call peekTag with an index less than one");
+		}
+		if (pos > this.tagStack.size()) {
+			return null;
+		}
+		return this.tagStack.get(this.tagStack.size() - pos);
 	}
 
 	/**
@@ -312,10 +323,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 		// check to see if the parent tag matches the current close tag.  if so then
 		// this is unbalanced HTML of the form "<u><strong>text</u></strong>" and
 		// it should be parsed as "<u><strong>text</strong></u>".
-		JFlexTagItem parent = null;
-		if (this.tagStack.size() > 2) {
-			parent = this.tagStack.get(this.tagStack.size() - 2);
-		}
+		JFlexTagItem parent = this.peekTag(2);
 		if (parent != null && parent.getTagType().equals(tagType)) {
 			parent.setCloseTagOverride(tagType);
 			this.popTag(this.peekTag().getTagType());
@@ -399,17 +407,21 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 		// the previous list was "::;" and the current list is "###" then there are
 		// three lists that must be closed.  first, walk back the current stack
 		// to find the list open tags.
-		List<String> listTagTypes = new ArrayList<String>();
-		for (int i = (this.tagStack.size() - 1); i > 0; i--) {
-			if (this.tagStack.get(i).isListTag() && !this.tagStack.get(i).isListItemTag()) {
-				listTagTypes.add(this.tagStack.get(i).getTagType());
+		List<String> listTagTypes = null;
+		int j = 0;
+		while (this.peekTag(++j) != null) {
+			if (this.peekTag(j).isListTag() && !this.peekTag(j).isListItemTag()) {
+				if (listTagTypes == null) {
+					listTagTypes = new ArrayList<String>();
+				}
+				listTagTypes.add(this.peekTag(j).getTagType());
 			}
 		}
 		// now verify whether the list open tags match the current syntax, ie
 		// whether "::;" matches whatever tags are already open
 		String tagType;
 		for (int i = 1; i <= previousDepth; i++) {
-			if ((listTagTypes.size() - i) < 0) {
+			if (listTagTypes != null && (listTagTypes.size() - i) < 0) {
 				logger.warn("processListStack has encountered an invalid list stack.  Please report this error on jamwiki.org, and provide the wiki syntax for the topic being parsed.");
 				break;
 			}
@@ -445,7 +457,7 @@ public abstract class AbstractJAMWikiLexer extends JFlexLexer {
 			previousTagType = this.peekTag().getTagType();
 			if (previousTagType.equals("p") && this.tagStack.size() > 2) {
 				// ignore paragraph tags
-				previousTagType = this.tagStack.get(this.tagStack.size() - 2).getTagType();
+				previousTagType = this.peekTag(2).getTagType();
 			}
 			if (previousTagType.equals("dt")) {
 				this.popTag("dt");

@@ -78,16 +78,13 @@ public class WikiBoldItalicTag implements JFlexParserTag {
 			// for bold and italic ('' and '''), see if the syntax is of the form
 			// '''''bold''' then italic'', in which case the current stack contains
 			// "b" followed by "i" when it should be the reverse.
-			int stackLength = ((JAMWikiLexer)lexer).getTagStack().size();
-			if (stackLength > 2) {
-				JFlexTagItem grandparent = ((JAMWikiLexer)lexer).getTagStack().get(stackLength - 2);
-				if (grandparent.getTagType().equals("b")) {
-					// swap the tag types and close the current tag
-					grandparent.changeTagType("i");
-					((JAMWikiLexer)lexer).peekTag().changeTagType("b");
-					((JAMWikiLexer)lexer).popTag(tagType);
-					return;
-				}
+			JFlexTagItem grandparent = ((JAMWikiLexer)lexer).peekTag(2);
+			if (grandparent != null && grandparent.getTagType().equals("b")) {
+				// swap the tag types and close the current tag
+				grandparent.changeTagType("i");
+				((JAMWikiLexer)lexer).peekTag().changeTagType("b");
+				((JAMWikiLexer)lexer).popTag(tagType);
+				return;
 			}
 		}
 		// push the new tag onto the stack
