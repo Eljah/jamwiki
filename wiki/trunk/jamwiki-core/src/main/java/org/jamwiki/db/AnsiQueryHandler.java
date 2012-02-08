@@ -332,7 +332,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_CONFIGURATION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_BLOCK_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_FILE_DATA_TABLE, conn);
-		if (STATEMENT_CREATE_SEQUENCES.length() > 0) {
+		if (!StringUtils.isBlank(STATEMENT_CREATE_SEQUENCES)) {
 			DatabaseConnection.executeUpdate(STATEMENT_CREATE_SEQUENCES, conn);
 		}
 	}
@@ -592,6 +592,10 @@ public class AnsiQueryHandler implements QueryHandler {
 		String sql = this.props.getProperty(prop);
 		if (sql == null) {
 			throw new SQLException("No property found for " + prop);
+		}
+		if (StringUtils.isBlank(sql)) {
+			// some queries such as validation queries are not defined on all databases
+			return;
 		}
 		PreparedStatement stmt = null;
 		try {
