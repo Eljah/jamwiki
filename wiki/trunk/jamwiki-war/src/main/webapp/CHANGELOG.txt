@@ -101,7 +101,8 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Remove semi-colons in the SQL upgrade script that caused problems with
+    Oracle (avhohlov2).
 
 Translation Updates:
 
