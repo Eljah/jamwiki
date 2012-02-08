@@ -31,6 +31,7 @@
 <body>
 
 <div id="wiki-page">
+<c:if test="${!upgradeInProgress}">
 <div id="wiki-navigation">
 	<div id="logo">
 	<%-- FIXME - need image width and height --%>
@@ -71,6 +72,7 @@
 	</div>
 	</c:if>
 </div>
+</c:if>
 <div id="wiki-content">
 	<%@ include file="user-menu.jsp"%>
 	<%@ include file="top-menu.jsp"%>

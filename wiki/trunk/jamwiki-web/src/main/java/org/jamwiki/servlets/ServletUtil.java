@@ -817,6 +817,9 @@ public class ServletUtil {
 		if (messageObject != null) {
 			next.addObject("messageObject", messageObject);
 		}
+		if (WikiUtil.isUpgrade()) {
+			next.addObject("upgradeInProgress", true);
+		}
 		return next;
 	}
 

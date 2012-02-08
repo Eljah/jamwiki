@@ -82,7 +82,11 @@ public class SetupServlet extends JAMWikiServlet {
 			}
 			VirtualWiki virtualWiki = VirtualWiki.defaultVirtualWiki();
 			if (!StringUtils.isBlank(request.getParameter("override")) && this.restoreProperties(pageInfo)) {
-				ServletUtil.redirect(next, virtualWiki.getName(), virtualWiki.getRootTopicName());
+				if (WikiUtil.isUpgrade()) {
+					ServletUtil.redirect(next, virtualWiki.getName(), "Special:Upgrade");
+				} else {
+					ServletUtil.redirect(next, virtualWiki.getName(), virtualWiki.getRootTopicName());
+				}
 			} else if (!StringUtils.isBlank(request.getParameter("function")) && initialize(request, next, pageInfo)) {
 				ServletUtil.redirect(next, virtualWiki.getName(), virtualWiki.getRootTopicName());
 			} else {
