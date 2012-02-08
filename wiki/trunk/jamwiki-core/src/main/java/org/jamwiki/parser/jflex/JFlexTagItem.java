@@ -17,8 +17,6 @@
 package org.jamwiki.parser.jflex;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.utils.Utilities;
@@ -39,14 +37,9 @@ class JFlexTagItem {
 	private static final Map<String, String> NON_TEXT_BODY_TAGS = Utilities.initializeLookupMap("col", "colgroup", "dl", "ol", "table", "tbody", "tfoot", "thead", "tr", "ul");
 	private static final Map<String, String> NON_INLINE_TAGS = Utilities.initializeLookupMap("blockquote", "caption", "center", "col", "colgroup", "dd", "div", "dl", "dt", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul", NoParseDirectiveTag.NOPARSE_DIRECTIVE);
 	private static final Map<String, String> TABLE_TAGS = Utilities.initializeLookupMap("caption", "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr");
-	private static final String nonInlineTagPattern = "(?:blockquote|caption|center|col|colgroup|dd|div|dl|dt|h1|h2|h3|h4|h5|h6|hr|li|ol|p|pre|table|tbody|td|tfoot|th|thead|tr|ul)";
-	private static final String nonInlineTagStartPattern = "<" + nonInlineTagPattern + "[ >]";
-	private static final String nonInlineTagEndPattern = "</" + nonInlineTagPattern + ">";
-	private static final Pattern NON_INLINE_TAG_START_PATTERN = Pattern.compile(nonInlineTagStartPattern);
-	private static final Pattern NON_INLINE_TAG_END_PATTERN = Pattern.compile(nonInlineTagEndPattern);
 	protected static final String ROOT_TAG = "jflex-root";
 	private String closeTagOverride;
-	private HtmlTagItem htmlTagItem;
+	private final HtmlTagItem htmlTagItem;
 	private final StringBuilder tagContent = new StringBuilder();
 	private String tagType;
 
@@ -57,6 +50,7 @@ class JFlexTagItem {
 		if (tagType == null) {
 			throw new IllegalArgumentException("tagType must not be null");
 		}
+		this.htmlTagItem = null;
 		this.tagType = tagType;
 	}
 
@@ -208,30 +202,45 @@ class JFlexTagItem {
 	 *
 	 */
 	private boolean isNonInlineTagEnd(String tagText) {
-		// this method is frequently invoked by the parser, so do a few inexpensive
-		// checks prior to invoking the regular expression to optimize performance.
-		if (!tagText.endsWith(">")) {
+		// this method is frequently invoked by the parser, so minimize the performance
+		// overhead as much as possible.
+		if (tagText.length() < 4) {
+			// minimum length string is four characters ("</a>")
+			return false;
+		}
+		if (tagText.charAt(tagText.length() - 1) != '>') {
+			// must end with ">"
 			return false;
 		}
 		int pos = tagText.lastIndexOf("</");
 		if (pos == -1) {
+			// must also contain "</"
 			return false;
 		}
-		Matcher matcher = NON_INLINE_TAG_END_PATTERN.matcher(tagText.substring(pos));
-		return (matcher.matches());
+		// test the portion of the string that contains the tag type ("</type>")
+		return NON_INLINE_TAGS.containsKey(tagText.substring(pos + 2, tagText.length() - 1));
 	}
 
 	/**
 	 *
 	 */
 	private boolean isNonInlineTagStart(String tagText) {
-		// this method is frequently invoked by the parser, so do a simple check
-		// prior to invoking the regular expression to optimize performance.
-		if (!tagText.startsWith("<")) {
+		// this method is frequently invoked by the parser, so minimize the performance
+		// overhead as much as possible.
+		if (tagText.length() < 3) {
+			// minimum length string is three characters ("<a>")
 			return false;
 		}
-		Matcher matcher = NON_INLINE_TAG_START_PATTERN.matcher(tagText);
-		return (matcher.find() && matcher.start() == 0);
+		if (tagText.charAt(0) != '<') {
+			// must start with "<"
+			return false;
+		}
+		int pos = StringUtils.indexOfAny(tagText, ' ', '>');
+		if (pos <= 1) {
+			return false;
+		}
+		// test the portion of the string that contains the tag type ("<type>" or "<type key=value>")
+		return NON_INLINE_TAGS.containsKey(tagText.substring(1, pos));
 	}
 
 	/**
