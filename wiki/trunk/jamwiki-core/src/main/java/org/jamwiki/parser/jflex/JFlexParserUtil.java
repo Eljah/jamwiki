@@ -241,14 +241,17 @@ public class JFlexParserUtil {
 		List<String> tokens = new ArrayList<String>();
 		int pos = 0;
 		int endPos = -1;
+		int closeTagSize = 0;
 		String substring = "";
 		String value = "";
 		while (pos < content.length()) {
 			substring = content.substring(pos);
 			endPos = -1;
+			closeTagSize = 2;
 			if (substring.startsWith("{{{")) {
 				// template parameter
 				endPos = Utilities.findMatchingEndTag(content, pos, "{{{", "}}}");
+				closeTagSize = 3;
 			} else if (substring.startsWith("{{")) {
 				// template
 				endPos = Utilities.findMatchingEndTag(content, pos, "{{", "}}");
@@ -266,8 +269,8 @@ public class JFlexParserUtil {
 				continue;
 			}
 			if (endPos != -1) {
-				value += content.substring(pos, endPos);
-				pos = endPos;
+				value += content.substring(pos, endPos + closeTagSize);
+				pos = endPos + closeTagSize;
 			} else {
 				value += content.charAt(pos);
 				pos++;

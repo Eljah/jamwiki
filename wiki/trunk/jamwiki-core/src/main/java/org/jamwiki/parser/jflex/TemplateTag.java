@@ -247,12 +247,13 @@ public class TemplateTag implements JFlexParserTag {
 				output.append(current);
 				continue;
 			}
+			endPos += "}}}".length();
 			// there are several sub-patterns that need to be analyzed:
 			// 1. {{{1|{{PAGENAME}}}}}
 			// 2. {{{{{1}}}}}
 			// 3. {{{template}} x {{template}}}
 			// 4. {{{1|{{{2}}}}}}
-			case1EndPos = Utilities.findMatchingEndTag(content, pos, "{", "}");
+			case1EndPos = Utilities.findMatchingEndTag(content, pos, "{", "}") + "}".length();
 			if (endPos < case1EndPos && content.substring(case1EndPos - 3, case1EndPos).equals("}}}")) {
 				// case #1
 				endPos = case1EndPos;
@@ -263,7 +264,7 @@ public class TemplateTag implements JFlexParserTag {
 				pos++;
 				continue;
 			}
-			case3EndPos = Utilities.findMatchingEndTag(content, pos + 1, "{{", "}}");
+			case3EndPos = Utilities.findMatchingEndTag(content, pos + 1, "{{", "}}") + "}}".length();
 			if (case3EndPos != (endPos - 1)) {
 				// either case #3 or case #4
 				case4Char = content.charAt(case3EndPos + 1);

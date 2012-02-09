@@ -92,7 +92,7 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingEndTag() throws Throwable {
 		int result = Utilities.findMatchingEndTag("01<b>567</b>23", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 12, result);
+		assertEquals("Incorrect end tag position found", 8, result);
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingEndTag3() throws Throwable {
 		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 19, result);
+		assertEquals("Incorrect end tag position found", 15, result);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingEndTag5() throws Throwable {
 		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 5, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 14, result);
+		assertEquals("Incorrect end tag position found", 10, result);
 	}
 
 	/**
@@ -156,6 +156,15 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	public void testFindMatchingEndTag7() throws Throwable {
 		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
 		assertEquals("Incorrect end tag position found", -1, result);
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testFindMatchingEndTag8() throws Throwable {
+		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>", 0, "<b>", "</b>");
+		assertEquals("Incorrect end tag position found", 15, result);
 	}
 
 	/**
