@@ -129,7 +129,7 @@ wikisignature      = ([~]{3,5})
     {templateendchar} {
         if (logger.isTraceEnabled()) logger.trace("templateendchar: " + yytext() + " (" + yystate() + ")");
         this.templateString.append(yytext());
-        if (Utilities.findMatchingEndTag(this.templateString.toString(), 0, "{", "}") != -1) {
+        if (Utilities.findMatchingEndTag(this.templateString, 0, "{", "}") != -1) {
             endState();
             String result = this.parse(TAG_TYPE_TEMPLATE, this.templateString.toString());
             this.templateString = new StringBuilder();

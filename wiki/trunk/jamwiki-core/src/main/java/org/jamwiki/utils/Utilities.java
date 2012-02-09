@@ -185,14 +185,53 @@ public abstract class Utilities {
 	 * "01<b>56<b>01</b>67</b>23" returns 18.
 	 *
 	 * @param content The string to be searched.
-	 * @param start The position within the string to start searching from.
+	 * @param start The position within the string to start searching from (inclusive).
+	 *  Only characters after this position in the string will be examined.
 	 * @param startToken The opening tag to match.
 	 * @param endToken The closing tag to match.
 	 * @return -1 if no matching end tag is found, or the index within the string of the first
 	 *  character of the end tag.
 	 */
 	public static int findMatchingEndTag(CharSequence content, int start, String startToken, String endToken) {
-		return Utilities.findMatchingTag(content.toString(), start, startToken, endToken, false);
+		// do some initial searching to make sure the tokens are available
+		if (content == null || start < 0 || start >= content.length()) {
+			return -1;
+		}
+		int lastEndToken = StringUtils.lastIndexOf(content, endToken);
+		if (lastEndToken == -1 || lastEndToken < start) {
+			return -1;
+		}
+		int firstStartToken = StringUtils.indexOf(content, startToken, start);
+		if (firstStartToken == -1) {
+			return -1;
+		}
+		int pos = start;
+		if (pos < firstStartToken) {
+			pos = firstStartToken;
+		}
+		int count = 0;
+		String contentString = content.toString();
+		String substring;
+		// search for matches within the area that tokens have already been found
+		while (pos >= firstStartToken && pos < (lastEndToken + endToken.length())) {
+			substring = contentString.substring(pos);
+			// search for matches from start-to-end
+			if (substring.startsWith(startToken)) {
+				count++;
+				pos += startToken.length();
+			} else if (substring.startsWith(endToken)) {
+				count--;
+				if (count == 0) {
+					// this tag closes a match, return the position of the
+					// start of the tag
+					return pos;
+				}
+				pos += endToken.length();
+			} else {
+				pos++;
+			}
+		}
+		return -1;
 	}
 
 	/**
@@ -205,54 +244,50 @@ public abstract class Utilities {
 	 * "01234567</b>23" returns -1.
 	 *
 	 * @param content The string to be searched.
-	 * @param start The position within the string to start searching from.
+	 * @param start The position within the string to start searching from (inclusive).
+	 *  Only characters before this position in the string will be examined.
 	 * @param startToken The opening tag to match.
 	 * @param endToken The closing tag to match.
 	 * @return -1 if no matching start tag is found, or the index within the string of the first
 	 *  character of the start tag.
 	 */
 	public static int findMatchingStartTag(CharSequence content, int start, String startToken, String endToken) {
-		return Utilities.findMatchingTag(content.toString(), start, startToken, endToken, true);
-	}
-
-	/**
-	 * Find a matching start/end tag.
-	 */
-	private static int findMatchingTag(String content, int start, String startToken, String endToken, boolean reverse) {
-		if (StringUtils.isBlank(content) || start >= content.length()) {
+		// do some initial searching to make sure the tokens are available
+		if (content == null || start < 0 || start >= content.length()) {
 			return -1;
 		}
-		if (content.indexOf(startToken) == -1 || content.indexOf(endToken) == -1) {
+		int firstStartToken = StringUtils.indexOf(content, startToken);
+		if (firstStartToken == -1 || firstStartToken > start) {
+			return -1;
+		}
+		int lastEndToken = StringUtils.lastIndexOf(content, endToken, start);
+		if (lastEndToken == -1) {
 			return -1;
 		}
 		int pos = start;
+		if (pos >= (lastEndToken + endToken.length())) {
+			pos = lastEndToken + endToken.length() - 1;
+		}
 		int count = 0;
-		String substring = null;
-		boolean atLeastOneMatch = false;
-		while (pos >= 0 && pos < content.length()) {
-			substring = (reverse) ? content.substring(0, pos + 1) : content.substring(pos);
-			if (!reverse && substring.startsWith(startToken)) {
+		String contentString = content.toString();
+		String substring;
+		// search for matches within the area that tokens have already been found
+		while (pos >= firstStartToken && pos < (lastEndToken + endToken.length())) {
+			substring = contentString.substring(0, pos + 1);
+			// search for matches from end-to-beginning
+			if (substring.endsWith(endToken)) {
 				count++;
-				atLeastOneMatch = true;
-				pos += startToken.length();
-			} else if (!reverse && substring.startsWith(endToken)) {
-				count--;
-				pos += endToken.length();
-			} else if (reverse && substring.endsWith(endToken)) {
-				count++;
-				atLeastOneMatch = true;
 				pos -= endToken.length();
-			} else if (reverse && substring.endsWith(startToken)) {
+			} else if (substring.endsWith(startToken)) {
 				count--;
+				if (count == 0) {
+					// this tag opens a match, return the position of the
+					// start of the tag
+					return (pos - startToken.length()) + 1;
+				}
 				pos -= startToken.length();
 			} else {
-				pos = (reverse) ? (pos - 1) : (pos + 1);
-			}
-			if (atLeastOneMatch && count == 0) {
-				// if searching in reverse the cursor is now one position before the
-				// start tag, so increment it.  if searching forwards then the cursor
-				// has been incremented by the length of the end tag, so decrement it.
-				return (reverse) ? pos + 1 : (pos - endToken.length());
+				pos--;
 			}
 		}
 		return -1;

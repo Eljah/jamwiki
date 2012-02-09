@@ -239,11 +239,16 @@ public class JFlexParserUtil {
 	 */
 	protected static List<String> tokenizeParamString(String content) {
 		List<String> tokens = new ArrayList<String>();
+		if (content.indexOf('|') == -1) {
+			// nothing to tokenize
+			tokens.add(content);
+			return tokens;
+		}
 		int pos = 0;
 		int endPos = -1;
 		int closeTagSize = 0;
-		String substring = "";
-		String value = "";
+		String substring;
+		StringBuilder value = new StringBuilder(content.length());
 		while (pos < content.length()) {
 			substring = content.substring(pos);
 			endPos = -1;
@@ -263,21 +268,21 @@ public class JFlexParserUtil {
 				endPos = Utilities.findMatchingEndTag(content, pos, "{|", "|}");
 			} else if (content.charAt(pos) == '|') {
 				// new token
-				tokens.add(value);
-				value = "";
+				tokens.add(value.toString());
+				value = new StringBuilder();
 				pos++;
 				continue;
 			}
 			if (endPos != -1) {
-				value += content.substring(pos, endPos + closeTagSize);
+				value.append(content.substring(pos, endPos + closeTagSize));
 				pos = endPos + closeTagSize;
 			} else {
-				value += content.charAt(pos);
+				value.append(content.charAt(pos));
 				pos++;
 			}
 		}
 		// add the last one
-		tokens.add(value);
+		tokens.add(value.toString());
 		return tokens;
 	}
 }
