@@ -58,12 +58,12 @@ public class TemplateTag implements JFlexParserTag {
 		// re-parse in case of embedded templates or params
 		content = this.parseTemplateBody(parserInput, parserOutput, content, parameterValues);
 		String name = this.parseParamName(content);
-		String defaultValue = this.parseParamDefaultValue(parserInput, parserOutput, content);
 		String value = parameterValues.get(name);
-		if (value == null && defaultValue == null) {
-			return param;
+		if (value != null) {
+			return value;
 		}
-		return (value == null) ? defaultValue : value;
+		String defaultValue = this.parseParamDefaultValue(parserInput, parserOutput, content);
+		return (defaultValue == null) ? param : defaultValue;
 	}
 
 	/**
