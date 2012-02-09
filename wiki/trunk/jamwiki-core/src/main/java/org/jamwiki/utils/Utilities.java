@@ -197,11 +197,11 @@ public abstract class Utilities {
 
 	/**
 	 * Search through content, starting at a specific position, and search backwards for the
-	 * first position before a matching start tag for a specified end tag.  For instance,
+	 * first position of a matching start tag for a specified end tag.  For instance,
 	 * if called with an end tag of "</b>" and a start tag of "<b>", this method
 	 * will operate as follows:
 	 *
-	 * "01<b>567</b>23" returns 1.
+	 * "01<b>567</b>23" returns 2.
 	 * "01234567</b>23" returns -1.
 	 *
 	 * @param content The string to be searched.
@@ -209,7 +209,7 @@ public abstract class Utilities {
 	 * @param startToken The opening tag to match.
 	 * @param endToken The closing tag to match.
 	 * @return -1 if no matching start tag is found, or the index within the string of the first
-	 *  character immediately preceding the start tag.
+	 *  character of the start tag.
 	 */
 	public static int findMatchingStartTag(CharSequence content, int start, String startToken, String endToken) {
 		return Utilities.findMatchingTag(content.toString(), start, startToken, endToken, true);
@@ -249,7 +249,7 @@ public abstract class Utilities {
 				pos = (reverse) ? (pos - 1) : (pos + 1);
 			}
 			if (atLeastOneMatch && count == 0) {
-				return pos;
+				return (reverse) ? pos + 1 : pos;
 			}
 		}
 		return -1;

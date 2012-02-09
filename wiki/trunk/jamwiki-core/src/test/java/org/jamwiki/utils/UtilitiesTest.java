@@ -164,7 +164,7 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingStartTag() throws Throwable {
 		int result = Utilities.findMatchingStartTag("01<b>567</b>23", 13, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 1, result);
+		assertEquals("Incorrect start tag position found", 2, result);
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingStartTag3() throws Throwable {
 		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 19, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 1, result);
+		assertEquals("Incorrect start tag position found", 2, result);
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingStartTag5() throws Throwable {
 		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 14, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 5, result);
+		assertEquals("Incorrect start tag position found", 6, result);
 	}
 
 	/**
@@ -228,6 +228,15 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	public void testFindMatchingStartTag7() throws Throwable {
 		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
 		assertEquals("Incorrect start tag position found", -1, result);
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testFindMatchingStartTag8() throws Throwable {
+		int result = Utilities.findMatchingStartTag("<b>345</b>0", 10, "<b>", "</b>");
+		assertEquals("Incorrect start tag position found", 0, result);
 	}
 
 	/**

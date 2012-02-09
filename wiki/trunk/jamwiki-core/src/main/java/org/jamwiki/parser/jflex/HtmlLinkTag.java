@@ -93,8 +93,7 @@ public class HtmlLinkTag implements JFlexParserTag {
 			if (c == ')' || c == ']' || c == '}') {
 				String closeChar = String.valueOf(c);
 				String openChar = (c == ')') ? "(" : ((c == ']') ? "[" : "{");
-				int pos = Utilities.findMatchingStartTag(text, i, openChar, closeChar);
-				if (pos == -1) {
+				if (Utilities.findMatchingStartTag(text, i, openChar, closeChar) == -1) {
 					buffer.append(c);
 					continue;
 				}
