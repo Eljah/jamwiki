@@ -92,79 +92,39 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingEndTag() throws Throwable {
 		int result = Utilities.findMatchingEndTag("01<b>567</b>23", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 8, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag1() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01234567</b>23", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag2() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>567890123", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag3() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 15, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag4() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>5<b>901234</b>9", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag5() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 5, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 10, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag6() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", -1, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag7() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingEndTag8() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>", 0, "<b>", "</b>");
-		assertEquals("Incorrect end tag position found", 15, result);
+		assertEquals("Failure in end tag matching test #1", 8, result);
+		result = Utilities.findMatchingEndTag("01234567</b>23", 0, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #2", -1, result);
+		result = Utilities.findMatchingEndTag("01<b>567890123", 0, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #3", -1, result);
+		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 0, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #4", 15, result);
+		result = Utilities.findMatchingEndTag("01<b>5<b>901234</b>9", 0, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #5", -1, result);
+		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 5, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #6", 10, result);
+		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", -1, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #7", -1, result);
+		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #8", -1, result);
+		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>", 0, "<b>", "</b>");
+		assertEquals("Failure in end tag matching test #9", 15, result);
+		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]", 0, "[[", "]]");
+		assertEquals("Failure in end tag matching test #10", 18, result);
+		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]", 2, "[[", "]]");
+		assertEquals("Failure in end tag matching test #11", 7, result);
+		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]", 6, "[[", "]]");
+		assertEquals("Failure in end tag matching test #12", -1, result);
+		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]0", 0, "[[", "]]");
+		assertEquals("Failure in end tag matching test #13", 18, result);
+		result = Utilities.findMatchingEndTag("[[[3[][[]]01]]4567]]0", 0, "[", "]");
+		assertEquals("Failure in end tag matching test #14", 18, result);
+		result = Utilities.findMatchingEndTag("[[[3[][[8901]]4567]]0", 0, "[", "]");
+		assertEquals("Failure in end tag matching test #15", -1, result);
+		result = Utilities.findMatchingEndTag("[[[[[]]]89[[]]4567]]0", 0, "[[", "]]");
+		assertEquals("Failure in end tag matching test #16", 18, result);
+		result = Utilities.findMatchingEndTag("0[[[[]]]89[[]]4567]]0", 0, "[[", "]]");
+		assertEquals("Failure in end tag matching test #17", 18, result);
 	}
 
 	/**
@@ -173,79 +133,23 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	@Test
 	public void testFindMatchingStartTag() throws Throwable {
 		int result = Utilities.findMatchingStartTag("01<b>567</b>23", 13, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 2, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag1() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01234567</b>23", 13, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag2() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>567890123", 13, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag3() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 19, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 2, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag4() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>5</b>901234</b>9", 19, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag5() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 14, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 6, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag6() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", -1, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag7() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", -1, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag8() throws Throwable {
-		int result = Utilities.findMatchingStartTag("<b>345</b>0", 10, "<b>", "</b>");
-		assertEquals("Incorrect start tag position found", 0, result);
+		assertEquals("Failure in start tag matching test #1", 2, result);
+		result = Utilities.findMatchingStartTag("01234567</b>23", 13, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #2", -1, result);
+		result = Utilities.findMatchingStartTag("01<b>567890123", 13, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #3", -1, result);
+		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 19, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #4", 2, result);
+		result = Utilities.findMatchingStartTag("01<b>5</b>901234</b>9", 19, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #5", -1, result);
+		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 14, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #6", 6, result);
+		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", -1, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #7", -1, result);
+		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #8", -1, result);
+		result = Utilities.findMatchingStartTag("<b>345</b>0", 10, "<b>", "</b>");
+		assertEquals("Failure in start tag matching test #9", 0, result);
 	}
 
 	/**

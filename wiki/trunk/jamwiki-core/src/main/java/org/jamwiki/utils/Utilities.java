@@ -197,29 +197,27 @@ public abstract class Utilities {
 		if (content == null || start < 0 || start >= content.length()) {
 			return -1;
 		}
-		int lastEndToken = StringUtils.lastIndexOf(content, endToken);
+		String contentString = content.toString();
+		int lastEndToken = contentString.lastIndexOf(endToken);
 		if (lastEndToken == -1 || lastEndToken < start) {
 			return -1;
 		}
-		int firstStartToken = StringUtils.indexOf(content, startToken, start);
+		int firstStartToken = contentString.indexOf(startToken, start);
 		if (firstStartToken == -1) {
 			return -1;
 		}
-		int pos = start;
-		if (pos < firstStartToken) {
-			pos = firstStartToken;
-		}
+		int pos = firstStartToken;
 		int count = 0;
-		String contentString = content.toString();
-		String substring;
+		int nextStart = firstStartToken;
+		int nextEnd = lastEndToken;
 		// search for matches within the area that tokens have already been found
 		while (pos >= firstStartToken && pos < (lastEndToken + endToken.length())) {
-			substring = contentString.substring(pos);
-			// search for matches from start-to-end
-			if (substring.startsWith(startToken)) {
+			if (nextStart != -1 && nextStart < nextEnd) {
+				// cursor is currently at the match of a start token
 				count++;
 				pos += startToken.length();
-			} else if (substring.startsWith(endToken)) {
+			} else {
+				// cursor is currently at the match of an end token
 				count--;
 				if (count == 0) {
 					// this tag closes a match, return the position of the
@@ -227,9 +225,15 @@ public abstract class Utilities {
 					return pos;
 				}
 				pos += endToken.length();
-			} else {
-				pos++;
 			}
+			// jump to the next start or end token
+			nextEnd = contentString.indexOf(endToken, pos);
+			if (nextEnd == -1) {
+				// no more matching end patterns, no match
+				break;
+			}
+			nextStart = contentString.indexOf(startToken, pos);
+			pos = (nextStart == -1) ? nextEnd : Math.min(nextStart, nextEnd);
 		}
 		return -1;
 	}
