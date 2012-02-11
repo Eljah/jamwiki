@@ -26,23 +26,25 @@ import java.util.Map;
  */
 public class HtmlTagItem {
 
-	/** HTML open tag of the form <tag> or <tag attribute="value">. */
-	public static final int TAG_PATTERN_OPEN = 1;
-	/** HTML close tag of the form </tag>. */
-	public static final int TAG_PATTERN_CLOSE = 2;
-	/** HTML tag without content of the form <tag /> or <tag attribute="value" />. */
-	public static final int TAG_PATTERN_EMPTY_BODY = 3;
-	/** The tag type, for example <tag attribute="value"> has a tag type of "tag". */
+	protected enum Pattern {
+		/** HTML open tag of the form &lt;tag> or &lt;tag attribute="value">. */
+		OPEN,
+		/** HTML close tag of the form &lt;/tag>. */
+		CLOSE,
+		/** HTML tag without content of the form &lt;tag /> or &lt;tag attribute="value" />. */
+		EMPTY_BODY
+	}
+	/** The tag type, for example &lt;tag attribute="value"> has a tag type of "tag". */
 	private String tagType;
 	/** The pattern type for the tag - open, close, or empty body. */
-	private int tagPattern;
+	private Pattern tagPattern;
 	/** The tag's attributes, mapped as an ordered list of key-value pairs. */
 	private LinkedHashMap<String, String> attributes;
 
 	/**
 	 *
 	 */
-	protected HtmlTagItem(String tagType, int tagPattern, LinkedHashMap<String, String> attributes) {
+	protected HtmlTagItem(String tagType, Pattern tagPattern, LinkedHashMap<String, String> attributes) {
 		this.tagType = tagType;
 		this.tagPattern = tagPattern;
 		if (attributes != null) {
@@ -61,17 +63,17 @@ public class HtmlTagItem {
 	}
 
 	/**
-	 * Return <code>true</code> if this tag's type is TAG_PATTERN_EMPTY_BODY,
+	 * Return <code>true</code> if this tag's type is Pattern.EMPTY_BODY,
 	 * otherwise return <code>false</code>.
 	 */
 	protected boolean isTagEmptyBody() {
-		return (this.tagPattern == TAG_PATTERN_EMPTY_BODY);
+		return (this.tagPattern == Pattern.EMPTY_BODY);
 	}
 
 	/**
 	 * Return the tag pattern (open tag, close tag, empty body tag).
 	 */
-	protected int getTagPattern() {
+	protected Pattern getPattern() {
 		return this.tagPattern;
 	}
 
@@ -87,7 +89,7 @@ public class HtmlTagItem {
 	 */
 	public String toHtml() {
 		StringBuilder result = new StringBuilder("<");
-		if (this.tagPattern == TAG_PATTERN_CLOSE) {
+		if (this.tagPattern == Pattern.CLOSE) {
 			result.append("/");
 		}
 		result.append(this.tagType);

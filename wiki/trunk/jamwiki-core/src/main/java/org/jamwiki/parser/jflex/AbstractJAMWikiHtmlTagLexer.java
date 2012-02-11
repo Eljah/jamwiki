@@ -26,16 +26,21 @@ import org.jamwiki.utils.WikiLogger;
 public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 
 	protected static final WikiLogger logger = WikiLogger.getLogger(AbstractJAMWikiHtmlTagLexer.class.getName());
+	/** During parsing, the attribute (if any) that is currently being parsed. */
 	protected String currentAttributeKey;
+	/** The raw HTML being parsed. */
 	protected String html;
-	protected int tagPattern;
+	/** An indicator of whether this is an open tag, a close tag, or an empty body tag. */
+	protected HtmlTagItem.Pattern tagPattern;
+	/** The type of HTML tag being parsed, for example "b", "br", "p", etc. */
 	protected String tagType;
+	/** A map of parsed tag attributes. */
 	protected LinkedHashMap<String, String> attributes;
 
 	/**
 	 *
 	 */
-	protected String closeTag(int tagPattern) {
+	protected String closeTag() {
 		return new HtmlTagItem(this.tagType, this.tagPattern, this.attributes).toHtml();
 	}
 
@@ -48,6 +53,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 		}
 		return this.attributes;
 	}
+
 	/**
 	 * Return the HTML tag item that this processor generates.  Note that the tag
 	 * item is only created when the tag parser processes the last character of the
@@ -60,7 +66,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	/**
 	 *
 	 */
-	protected void initialize(int tagPattern) {
+	protected void initialize(HtmlTagItem.Pattern tagPattern) {
 		this.attributes = null;
 		this.currentAttributeKey = null;
 		this.tagPattern = tagPattern;

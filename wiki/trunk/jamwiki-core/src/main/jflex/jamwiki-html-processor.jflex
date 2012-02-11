@@ -159,7 +159,7 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
 
 <YYINITIAL> {
     {tagScript} {
-        this.initialize(HtmlTagItem.TAG_PATTERN_OPEN);
+        this.initialize(HtmlTagItem.Pattern.OPEN);
         int pos = this.yytext().toLowerCase().indexOf("script") + "script".length();
         yypushback(this.html.length() - pos);
         beginState(SCRIPT_ATTRIBUTE_KEY);
@@ -167,19 +167,19 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         return "";
     }
     {tagScriptClose} {
-        this.initialize(HtmlTagItem.TAG_PATTERN_CLOSE);
+        this.initialize(HtmlTagItem.Pattern.CLOSE);
         this.tagType = "script";
-        return this.closeTag(this.tagPattern);
+        return this.closeTag();
     }
     {tagClose} {
-        this.initialize(HtmlTagItem.TAG_PATTERN_CLOSE);
+        this.initialize(HtmlTagItem.Pattern.CLOSE);
         int pos = this.html.indexOf("/");
         yypushback(this.html.length() - (pos + 1));
         beginState(HTML_CLOSE);
         return "";
     }
     {tagContent} {
-        this.initialize(HtmlTagItem.TAG_PATTERN_OPEN);
+        this.initialize(HtmlTagItem.Pattern.OPEN);
         yypushback(this.html.length() - 1);
         beginState(HTML_OPEN);
         return "";
@@ -198,13 +198,13 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         this.tagType = yytext().toLowerCase();
         if (this.tagType.equals("br") || this.tagType.equals("hr")) {
             // handle invalid tags of the form </br> or </hr>
-            this.tagPattern = HtmlTagItem.TAG_PATTERN_EMPTY_BODY;
+            this.tagPattern = HtmlTagItem.Pattern.EMPTY_BODY;
         }
         return "";
     }
     ">" {
         endState();
-        return this.closeTag(this.tagPattern);
+        return this.closeTag();
     }
     . {
         throw new IllegalArgumentException("HTML_CLOSE: Invalid HTML tag: " + this.html);
@@ -311,7 +311,7 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         }
         if (this.tagType.equals("br") || this.tagType.equals("col") || this.tagType.equals("hr")) {
             // these tags may not have content, so explicitly set to empty body
-            this.tagPattern = HtmlTagItem.TAG_PATTERN_EMPTY_BODY;
+            this.tagPattern = HtmlTagItem.Pattern.EMPTY_BODY;
         }
         return "";
     }
@@ -334,8 +334,8 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         }
         // tag close, done
         endState();
-        this.tagPattern = HtmlTagItem.TAG_PATTERN_EMPTY_BODY;
-        return this.closeTag(HtmlTagItem.TAG_PATTERN_EMPTY_BODY);
+        this.tagPattern = HtmlTagItem.Pattern.EMPTY_BODY;
+        return this.closeTag();
     }
     {tagCloseContent} {
         boolean isFinished = ((yychar + this.yytext().length()) == this.html.length());
@@ -344,7 +344,7 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         }
         // tag close, done
         endState();
-        return this.closeTag(this.tagPattern);
+        return this.closeTag();
     }
 }
 <ATTRS_ATTRIBUTE_KEY> {
