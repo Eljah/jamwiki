@@ -9,6 +9,8 @@ Bugfixes:
 
   * Remove semi-colons in the SQL upgrade script that caused problems with
     Oracle (avhohlov2).
+  * Fix a potential XSS vulnerability with pagination on JSP pages.  Reported
+    by Sooraj K.S of SecPod Technologies.
 
 Translation Updates:
 
