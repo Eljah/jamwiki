@@ -32,7 +32,7 @@
 <c:if test="${!empty namespaces}">
 <div class="message">
 	<form method="get" action="<jamwiki:link value="${rootUrl}" />">
-	<input type="hidden" name="num" value="${param.num}" />
+	<input type="hidden" name="num" value="<c:out value="${param.num}" />" />
 	<fieldset>
 	<legend><fmt:message key="common.namespace" /></legend>
 	<div class="row">
