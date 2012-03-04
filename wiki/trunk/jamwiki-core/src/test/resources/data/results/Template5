@@ -16,3 +16,4 @@
 <p>Named param: Example1, Indexed param: <a href="/wiki/en/Example1" title="Example1">Example1</a>, Optional param: none</p>
 <p>Named param: Example1, Indexed param: <a href="/wiki/en/StartingPoints" title="StartingPoints">StartingPoints</a>, Optional param: Example1</p>
 <p>Named param: param, Indexed param: <a href="/wiki/en/Example1" title="Example1">Example1</a>, Optional param: optional</p>
+<p>content = foo=bar</p>
