@@ -2353,7 +2353,7 @@ public class AnsiQueryHandler implements QueryHandler {
 					logger.warn("Invalid namespace reference - bad database data.  Namespace references invalid main namespace with ID " + entry.getKey());
 				}
 				Namespace talkNamespace = entry.getValue();
-				talkNamespace.setMainNamespace(mainNamespace);
+				talkNamespace.setMainNamespaceId(mainNamespace.getId());
 				namespaces.put(talkNamespace.getId(), talkNamespace);
 			}
 		} finally {
@@ -3156,37 +3156,31 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public void updateNamespace(Namespace mainNamespace, Namespace commentsNamespace, Connection conn) throws SQLException {
+	public void updateNamespace(Namespace namespace, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
 			// update if the ID is specified AND a namespace with the same ID already exists
-			boolean isUpdate = (mainNamespace.getId() != null && this.lookupNamespaces(conn).indexOf(mainNamespace) != -1);
-			// if adding determing the namespace ID(s)
-			if (!isUpdate && mainNamespace.getId() == null) {
+			boolean isUpdate = (namespace.getId() != null && this.lookupNamespaces(conn).indexOf(namespace) != -1);
+			// if adding determine the namespace ID(s)
+			if (!isUpdate && namespace.getId() == null) {
 				// note - this returns the last id in the system, so add one
 				int nextId = DatabaseConnection.executeSequenceQuery(STATEMENT_SELECT_NAMESPACE_SEQUENCE, "namespace_id", conn);
 				if (nextId < 200) {
-					// for custom namespaces start with IDs of 200 or more to leave room for future expansion
+					// custom namespaces start with IDs of 200 or more to leave room for future expansion
 					nextId = 199;
 				}
-				mainNamespace.setId(nextId + 1);
-				if (commentsNamespace != null) {
-					commentsNamespace.setId(nextId + 2);
-				}
+				namespace.setId(nextId + 1);
 			}
 			// execute the adds/updates
 			stmt = (isUpdate) ? conn.prepareStatement(STATEMENT_UPDATE_NAMESPACE) : conn.prepareStatement(STATEMENT_INSERT_NAMESPACE);
-			stmt.setString(1, mainNamespace.getDefaultLabel());
-			stmt.setNull(2, Types.INTEGER);
-			stmt.setInt(3, mainNamespace.getId());
-			stmt.addBatch();
-			if (commentsNamespace != null) {
-				stmt.setString(1, commentsNamespace.getDefaultLabel());
-				stmt.setInt(2, commentsNamespace.getMainNamespace().getId());
-				stmt.setInt(3, commentsNamespace.getId());
-				stmt.addBatch();
+			stmt.setString(1, namespace.getDefaultLabel());
+			if (namespace.getMainNamespaceId() != null) {
+				stmt.setInt(2, namespace.getMainNamespaceId());
+			} else {
+				stmt.setNull(2, Types.INTEGER);
 			}
-			stmt.executeBatch();
+			stmt.setInt(3, namespace.getId());
+			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}

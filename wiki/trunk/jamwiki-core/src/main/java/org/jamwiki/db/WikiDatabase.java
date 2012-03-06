@@ -695,21 +695,18 @@ public class WikiDatabase {
 	private static void setupDefaultNamespaces() throws DataAccessException, WikiException {
 		logger.info("Creating default wiki namespaces");
 		List<Namespace> defaultNamespaces = new ArrayList<Namespace>(Namespace.DEFAULT_NAMESPACES.values());
-		Namespace commentsNamespace, mainNamespace;
 		// namespaces are ordered with main first, then comments, so loop through and get each
 		for (int i = 0; i < defaultNamespaces.size(); i++) {
-			mainNamespace = defaultNamespaces.get(i);
+			Namespace mainNamespace = defaultNamespaces.get(i);
+			WikiBase.getDataHandler().writeNamespace(mainNamespace);
 			// some namespaces do not have a comments namespace, so verify one is present
-			commentsNamespace = null;
 			if (defaultNamespaces.size() > (i + 1)) {
-				commentsNamespace = defaultNamespaces.get(i + 1);
-				if (mainNamespace.equals(commentsNamespace.getMainNamespace())) {
+				Namespace commentsNamespace = defaultNamespaces.get(i + 1);
+				if (mainNamespace.getId().equals(commentsNamespace.getMainNamespaceId())) {
+					WikiBase.getDataHandler().writeNamespace(commentsNamespace);
 					i++;
-				} else {
-					commentsNamespace = null;
 				}
 			}
-			WikiBase.getDataHandler().writeNamespace(mainNamespace, commentsNamespace);
 		}
 	}
 

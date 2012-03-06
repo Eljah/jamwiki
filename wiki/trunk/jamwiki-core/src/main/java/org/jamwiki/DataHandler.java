@@ -882,14 +882,11 @@ public interface DataHandler {
 	 * namespace does not already exist, otherwise it will update the existing
 	 * record.
 	 *
-	 * @param mainNamespace The namespace object to add to the database.
-	 * @param commentsNamespace The comments namespace object to add to the database
-	 *  for the corresponding main namespace.  This argument can be <code>null</code>
-	 *  if there is no comments namespace.
+	 * @param namespace The namespace object to add to the database.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 * @throws WikiException Thrown if the namespace information is invalid.
 	 */
-	void writeNamespace(Namespace mainNamespace, Namespace commentsNamespace) throws DataAccessException, WikiException;
+	void writeNamespace(Namespace namespace) throws DataAccessException, WikiException;
 
 	/**
 	 * Add or update virtual-wiki specific labels for a namespace.  This method will

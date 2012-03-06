@@ -194,19 +194,13 @@ public class OracleQueryHandler extends AnsiQueryHandler {
 	 * Override the parent method - Oracle treats empty strings and null the
 	 * same, so this method converts empty strings to " " as a workaround.
 	 */
-	public void updateNamespace(Namespace mainNamespace, Namespace commentsNamespace, Connection conn) throws SQLException {
-		if (StringUtils.isBlank(mainNamespace.getDefaultLabel())) {
-			mainNamespace.setDefaultLabel(" ");
+	public void updateNamespace(Namespace namespace, Connection conn) throws SQLException {
+		if (StringUtils.isBlank(namespace.getDefaultLabel())) {
+			namespace.setDefaultLabel(" ");
 		}
-		if (commentsNamespace != null && StringUtils.isBlank(commentsNamespace.getDefaultLabel())) {
-			commentsNamespace.setDefaultLabel(" ");
-		}
-		super.updateNamespace(mainNamespace, commentsNamespace, conn);
-		if (StringUtils.isBlank(mainNamespace.getDefaultLabel())) {
-			mainNamespace.setDefaultLabel("");
-		}
-		if (commentsNamespace != null && StringUtils.isBlank(commentsNamespace.getDefaultLabel())) {
-			commentsNamespace.setDefaultLabel("");
+		super.updateNamespace(namespace, conn);
+		if (StringUtils.isBlank(namespace.getDefaultLabel())) {
+			namespace.setDefaultLabel("");
 		}
 	}
 

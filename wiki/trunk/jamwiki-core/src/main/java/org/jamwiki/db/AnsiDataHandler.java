@@ -1768,14 +1768,8 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	protected void validateNamespace(Namespace mainNamespace, Namespace commentsNamespace) throws WikiException {
-		checkLength(mainNamespace.getDefaultLabel(), 200);
-		if (commentsNamespace != null) {
-			checkLength(commentsNamespace.getDefaultLabel(), 200);
-			if (commentsNamespace.getMainNamespace() == null || !commentsNamespace.getMainNamespace().equals(mainNamespace)) {
-				throw new WikiException(new WikiMessage("error.commentsnamespace", commentsNamespace.getDefaultLabel(), mainNamespace.getDefaultLabel()));
-			}
-		}
+	protected void validateNamespace(Namespace namespace) throws WikiException {
+		checkLength(namespace.getDefaultLabel(), 200);
 	}
 
 	/**
@@ -1974,13 +1968,13 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	public void writeNamespace(Namespace mainNamespace, Namespace commentsNamespace) throws DataAccessException, WikiException {
-		this.validateNamespace(mainNamespace, commentsNamespace);
+	public void writeNamespace(Namespace namespace) throws DataAccessException, WikiException {
+		this.validateNamespace(namespace);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			this.queryHandler().updateNamespace(mainNamespace, commentsNamespace, conn);
+			this.queryHandler().updateNamespace(namespace, conn);
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);

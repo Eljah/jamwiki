@@ -56,28 +56,28 @@ public class Namespace implements Serializable {
 	public static final int CATEGORY_COMMENTS_ID    = 15;
 	// default namespaces, used during setup.  additional namespaces may be added after setup.
 	// namespace IDs should match Mediawiki to maximize compatibility.
-	private static final Namespace MEDIA                = new Namespace(MEDIA_ID, "Media", null);
-	private static final Namespace SPECIAL              = new Namespace(SPECIAL_ID, "Special", null);
-	private static final Namespace MAIN                 = new Namespace(MAIN_ID, "", null);
-	private static final Namespace COMMENTS             = new Namespace(COMMENTS_ID, "Comments", Namespace.MAIN);
-	private static final Namespace USER                 = new Namespace(USER_ID, "User", null);
-	private static final Namespace USER_COMMENTS        = new Namespace(USER_COMMENTS_ID, "User comments", Namespace.USER);
-	private static final Namespace SITE_CUSTOM          = new Namespace(SITE_CUSTOM_ID, "Project", null);
-	private static final Namespace SITE_CUSTOM_COMMENTS = new Namespace(SITE_CUSTOM_COMMENTS_ID, "Project comments", Namespace.SITE_CUSTOM);
-	private static final Namespace FILE                 = new Namespace(FILE_ID, "Image", null);
-	private static final Namespace FILE_COMMENTS        = new Namespace(FILE_COMMENTS_ID, "Image comments", Namespace.FILE);
-	private static final Namespace JAMWIKI              = new Namespace(JAMWIKI_ID, "JAMWiki", null);
-	private static final Namespace JAMWIKI_COMMENTS     = new Namespace(JAMWIKI_COMMENTS_ID, "JAMWiki comments", Namespace.JAMWIKI);
-	private static final Namespace TEMPLATE             = new Namespace(TEMPLATE_ID, "Template", null);
-	private static final Namespace TEMPLATE_COMMENTS    = new Namespace(TEMPLATE_COMMENTS_ID, "Template comments", Namespace.TEMPLATE);
-	private static final Namespace HELP                 = new Namespace(HELP_ID, "Help", null);
-	private static final Namespace HELP_COMMENTS        = new Namespace(HELP_COMMENTS_ID, "Help comments", Namespace.HELP);
-	private static final Namespace CATEGORY             = new Namespace(CATEGORY_ID, "Category", null);
-	private static final Namespace CATEGORY_COMMENTS    = new Namespace(CATEGORY_COMMENTS_ID, "Category comments", Namespace.CATEGORY);
+	private static final Namespace MEDIA                = new Namespace(MEDIA_ID, "Media");
+	private static final Namespace SPECIAL              = new Namespace(SPECIAL_ID, "Special");
+	private static final Namespace MAIN                 = new Namespace(MAIN_ID, "");
+	private static final Namespace COMMENTS             = new Namespace(COMMENTS_ID, "Comments", MAIN_ID);
+	private static final Namespace USER                 = new Namespace(USER_ID, "User");
+	private static final Namespace USER_COMMENTS        = new Namespace(USER_COMMENTS_ID, "User comments", USER_ID);
+	private static final Namespace SITE_CUSTOM          = new Namespace(SITE_CUSTOM_ID, "Project");
+	private static final Namespace SITE_CUSTOM_COMMENTS = new Namespace(SITE_CUSTOM_COMMENTS_ID, "Project comments", SITE_CUSTOM_ID);
+	private static final Namespace FILE                 = new Namespace(FILE_ID, "Image");
+	private static final Namespace FILE_COMMENTS        = new Namespace(FILE_COMMENTS_ID, "Image comments", FILE_ID);
+	private static final Namespace JAMWIKI              = new Namespace(JAMWIKI_ID, "JAMWiki");
+	private static final Namespace JAMWIKI_COMMENTS     = new Namespace(JAMWIKI_COMMENTS_ID, "JAMWiki comments", JAMWIKI_ID);
+	private static final Namespace TEMPLATE             = new Namespace(TEMPLATE_ID, "Template");
+	private static final Namespace TEMPLATE_COMMENTS    = new Namespace(TEMPLATE_COMMENTS_ID, "Template comments", TEMPLATE_ID);
+	private static final Namespace HELP                 = new Namespace(HELP_ID, "Help");
+	private static final Namespace HELP_COMMENTS        = new Namespace(HELP_COMMENTS_ID, "Help comments", HELP_ID);
+	private static final Namespace CATEGORY             = new Namespace(CATEGORY_ID, "Category");
+	private static final Namespace CATEGORY_COMMENTS    = new Namespace(CATEGORY_COMMENTS_ID, "Category comments", CATEGORY_ID);
 	public static Map<Integer, Namespace> DEFAULT_NAMESPACES = new LinkedHashMap<Integer, Namespace>();
 	private Integer id;
-	private String label;
-	private Namespace mainNamespace;
+	private String defaultLabel;
+	private Integer mainNamespaceId;
 	private Map<String, String> namespaceTranslations;
 
 	static {
@@ -105,18 +105,18 @@ public class Namespace implements Serializable {
 	/**
 	 * Create a namespace.
 	 */
-	public Namespace(Integer id, String label) {
+	public Namespace(Integer id, String defaultLabel) {
 		this.id = id;
-		this.label = label;
+		this.defaultLabel = defaultLabel;
 	}
 
 	/**
 	 * Create a namespace and add it to the global list of namespaces.
 	 */
-	private Namespace(Integer id, String label, Namespace mainNamespace) {
+	private Namespace(Integer id, String defaultLabel, Integer mainNamespaceId) {
 		this.id = id;
-		this.label = label;
-		this.mainNamespace = mainNamespace;
+		this.defaultLabel = defaultLabel;
+		this.mainNamespaceId = mainNamespaceId;
 	}
 
 	/**
@@ -137,14 +137,14 @@ public class Namespace implements Serializable {
 	 *
 	 */
 	public String getDefaultLabel() {
-		return this.label;
+		return this.defaultLabel;
 	}
 
 	/**
 	 * Setter method for the namespace label.
 	 */
-	public void setDefaultLabel(String label) {
-		this.label = label;
+	public void setDefaultLabel(String defaultLabel) {
+		this.defaultLabel = defaultLabel;
 	}
 
 	/**
@@ -152,21 +152,25 @@ public class Namespace implements Serializable {
 	 * return the default namespace label
 	 */
 	public String getLabel(String virtualWiki) {
-		return (virtualWiki != null && this.getNamespaceTranslations().get(virtualWiki) != null) ? this.getNamespaceTranslations().get(virtualWiki) : this.label;
+		return (virtualWiki != null && this.getNamespaceTranslations().get(virtualWiki) != null) ? this.getNamespaceTranslations().get(virtualWiki) : this.defaultLabel;
 	}
 
 	/**
-	 *
+	 * Return the main namespace for this namespace.  If this namespace
+	 * is a comments namespace then its corresponding main namespace is
+	 * returned, otherwise it returns the current namespace ID.
 	 */
-	public Namespace getMainNamespace() {
-		return this.mainNamespace;
+	public Integer getMainNamespaceId() {
+		return this.mainNamespaceId;
 	}
 
 	/**
-	 *
+	 * Set the main namespace for this namespace.  If this namespace
+	 * is a comments namespace then its corresponding main namespace is
+	 * returned, otherwise it returns the current namespace ID.
 	 */
-	public void setMainNamespace(Namespace mainNamespace) {
-		this.mainNamespace = mainNamespace;
+	public void setMainNamespaceId(Integer mainNamespaceId) {
+		this.mainNamespaceId = mainNamespaceId;
 	}
 
 	/**
@@ -210,7 +214,7 @@ public class Namespace implements Serializable {
 		if (namespace == null) {
 			return null;
 		}
-		if (namespace.mainNamespace != null) {
+		if (namespace.mainNamespaceId != null) {
 			// the submitted namespace IS a comments namespace, so return it.
 			return namespace;
 		}
@@ -218,7 +222,7 @@ public class Namespace implements Serializable {
 		// to this namespace.
 		List<Namespace> namespaces = WikiBase.getDataHandler().lookupNamespaces();
 		for (Namespace candidateNamespace : namespaces) {
-			if (candidateNamespace.mainNamespace != null && candidateNamespace.mainNamespace.equals(namespace)) {
+			if (candidateNamespace.mainNamespaceId != null && candidateNamespace.mainNamespaceId.equals(namespace.id)) {
 				return candidateNamespace;
 			}
 		}
@@ -236,7 +240,7 @@ public class Namespace implements Serializable {
 		if (namespace == null) {
 			return null;
 		}
-		return (namespace.mainNamespace == null) ? namespace : namespace.mainNamespace;
+		return (namespace.mainNamespaceId == null) ? namespace : Namespace.namespace(namespace.mainNamespaceId);
 	}
 
 	/**
@@ -261,6 +265,6 @@ public class Namespace implements Serializable {
 	 * Standard equals method.  Two namespaces are equal if they have the same ID.
 	 */
 	public boolean equals(Namespace namespace) {
-		return (namespace != null && this.label.equals(namespace.getDefaultLabel()));
+		return (namespace != null && this.defaultLabel.equals(namespace.getDefaultLabel()));
 	}
 }

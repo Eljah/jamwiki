@@ -117,12 +117,12 @@ public class AdminVirtualWikiServlet extends JAMWikiServlet {
 			WikiUtil.validateNamespaceName(commentsNamespace);
 			// write namespaces to the database
 			Namespace mainNamespaceObj = new Namespace(null, mainNamespace);
-			Namespace commentsNamespaceObj = null;
+			WikiBase.getDataHandler().writeNamespace(mainNamespaceObj);
 			if (!StringUtils.isBlank(commentsNamespace)) {
-				commentsNamespaceObj = new Namespace(null, commentsNamespace);
-				commentsNamespaceObj.setMainNamespace(mainNamespaceObj);
+				Namespace commentsNamespaceObj = new Namespace(null, commentsNamespace);
+				commentsNamespaceObj.setMainNamespaceId(mainNamespaceObj.getId());
+				WikiBase.getDataHandler().writeNamespace(commentsNamespaceObj);
 			}
-			WikiBase.getDataHandler().writeNamespace(mainNamespaceObj, commentsNamespaceObj);
 		} catch (WikiException e) {
 			pageInfo.addError(e.getWikiMessage());
 		} catch (DataAccessException e) {
