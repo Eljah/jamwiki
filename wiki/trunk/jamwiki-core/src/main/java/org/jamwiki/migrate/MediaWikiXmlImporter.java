@@ -341,15 +341,13 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 			if (this.currentTopic.getTopicId() <= 0) {
 				// metadata is needed only for the final import version, so for performance reasons
 				// do not include category or link data for older versions
-				WikiBase.getDataHandler().writeTopic(this.currentTopic, this.currentTopicVersion, null, null);
-			} else {
-				if (forceWrite || this.topicVersionBuffer.size() >= MAX_TOPIC_VERSION_BUFFER) {
-					WikiBase.getDataHandler().writeTopicVersions(this.currentTopic, this.topicVersionBuffer);
-					for (TopicVersion topicVersion : this.topicVersionBuffer) {
-						this.currentTopicVersions.put(topicVersion.getEditDate(), topicVersion.getTopicVersionId());
-					}
-					this.topicVersionBuffer = new ArrayList<TopicVersion>();
+				WikiBase.getDataHandler().writeTopic(this.currentTopic, null, null, null);
+			} else if (forceWrite || this.topicVersionBuffer.size() >= MAX_TOPIC_VERSION_BUFFER) {
+				WikiBase.getDataHandler().writeTopicVersions(this.currentTopic, this.topicVersionBuffer);
+				for (TopicVersion topicVersion : this.topicVersionBuffer) {
+					this.currentTopicVersions.put(topicVersion.getEditDate(), topicVersion.getTopicVersionId());
 				}
+				this.topicVersionBuffer = new ArrayList<TopicVersion>();
 			}
 		} catch (DataAccessException e) {
 			throw new SAXException("Failure while writing topic: " + this.currentTopic.getName(), e);

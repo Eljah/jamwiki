@@ -24,8 +24,10 @@ import org.apache.commons.io.FileUtils;
 import org.jamwiki.JAMWikiUnitTest;
 import org.jamwiki.TestFileUtil;
 import org.jamwiki.WikiBase;
+import org.jamwiki.model.RecentChange;
 import org.jamwiki.model.Topic;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.utils.Pagination;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -159,6 +161,10 @@ public class MigrationUtilTest extends JAMWikiUnitTest {
 		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, TOPIC_NAME3, false);
 		// validate that the current topic content is correct
 		assertEquals("Incorrect topic ordering: " + topic.getTopicId() + " / " + topic.getCurrentVersionId(), "Newest Revision", topic.getTopicContent());
+		Pagination pagination = new Pagination(1000, 0);
+		List<RecentChange> revisions = WikiBase.getDataHandler().getTopicHistory(topic, pagination, false);
+		// there are three revisions in the import file, plus one import revision
+		assertEquals("Incorrect number of revisions imported", 4, revisions.size());
 	}
 
 	/**
