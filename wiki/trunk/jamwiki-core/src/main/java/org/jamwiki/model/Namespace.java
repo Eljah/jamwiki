@@ -17,8 +17,8 @@
 package org.jamwiki.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jamwiki.DataAccessException;
@@ -74,32 +74,11 @@ public class Namespace implements Serializable {
 	private static final Namespace HELP_COMMENTS        = new Namespace(HELP_COMMENTS_ID, "Help comments", HELP_ID);
 	private static final Namespace CATEGORY             = new Namespace(CATEGORY_ID, "Category");
 	private static final Namespace CATEGORY_COMMENTS    = new Namespace(CATEGORY_COMMENTS_ID, "Category comments", CATEGORY_ID);
-	public static Map<Integer, Namespace> DEFAULT_NAMESPACES = new LinkedHashMap<Integer, Namespace>();
 	private Integer id;
 	private String defaultLabel;
 	private Integer mainNamespaceId;
 	private Map<String, String> namespaceTranslations;
 
-	static {
-		DEFAULT_NAMESPACES.put(Namespace.MEDIA.getId(), Namespace.MEDIA);
-		DEFAULT_NAMESPACES.put(Namespace.SPECIAL.getId(), Namespace.SPECIAL);
-		DEFAULT_NAMESPACES.put(Namespace.MAIN.getId(), Namespace.MAIN);
-		DEFAULT_NAMESPACES.put(Namespace.COMMENTS.getId(), Namespace.COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.USER.getId(), Namespace.USER);
-		DEFAULT_NAMESPACES.put(Namespace.USER_COMMENTS.getId(), Namespace.USER_COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.SITE_CUSTOM.getId(), Namespace.SITE_CUSTOM);
-		DEFAULT_NAMESPACES.put(Namespace.SITE_CUSTOM_COMMENTS.getId(), Namespace.SITE_CUSTOM_COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.FILE.getId(), Namespace.FILE);
-		DEFAULT_NAMESPACES.put(Namespace.FILE_COMMENTS.getId(), Namespace.FILE_COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.JAMWIKI.getId(), Namespace.JAMWIKI);
-		DEFAULT_NAMESPACES.put(Namespace.JAMWIKI_COMMENTS.getId(), Namespace.JAMWIKI_COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.TEMPLATE.getId(), Namespace.TEMPLATE);
-		DEFAULT_NAMESPACES.put(Namespace.TEMPLATE_COMMENTS.getId(), Namespace.TEMPLATE_COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.HELP.getId(), Namespace.HELP);
-		DEFAULT_NAMESPACES.put(Namespace.HELP_COMMENTS.getId(), Namespace.HELP_COMMENTS);
-		DEFAULT_NAMESPACES.put(Namespace.CATEGORY.getId(), Namespace.CATEGORY);
-		DEFAULT_NAMESPACES.put(Namespace.CATEGORY_COMMENTS.getId(), Namespace.CATEGORY_COMMENTS);
-	}
 	private static final WikiLogger logger = WikiLogger.getLogger(Namespace.class.getName());
 
 	/**
@@ -261,6 +240,32 @@ public class Namespace implements Serializable {
 		return null;
 	}
 
+	/**
+	 * Return a list of the default namespaces for use by setup.  Note that
+	 * this method exists solely for setup.
+	 */
+	public static Namespace[] retrieveDefaultNamespacesForSetup() {
+		Namespace[] defaultNamespaces = new Namespace[18];
+		defaultNamespaces[0] = Namespace.MEDIA;
+		defaultNamespaces[1]= Namespace.SPECIAL;
+		defaultNamespaces[2] = Namespace.MAIN;
+		defaultNamespaces[3] = Namespace.COMMENTS;
+		defaultNamespaces[4] = Namespace.USER;
+		defaultNamespaces[5] = Namespace.USER_COMMENTS;
+		defaultNamespaces[6] = Namespace.SITE_CUSTOM;
+		defaultNamespaces[7] = Namespace.SITE_CUSTOM_COMMENTS;
+		defaultNamespaces[8] = Namespace.FILE;
+		defaultNamespaces[9] = Namespace.FILE_COMMENTS;
+		defaultNamespaces[10] = Namespace.JAMWIKI;
+		defaultNamespaces[11] = Namespace.JAMWIKI_COMMENTS;
+		defaultNamespaces[12] = Namespace.TEMPLATE;
+		defaultNamespaces[13] = Namespace.TEMPLATE_COMMENTS;
+		defaultNamespaces[14] = Namespace.HELP;
+		defaultNamespaces[15] = Namespace.HELP_COMMENTS;
+		defaultNamespaces[16] = Namespace.CATEGORY;
+		defaultNamespaces[17] = Namespace.CATEGORY_COMMENTS;
+		return defaultNamespaces;
+	}
 	/**
 	 * Standard equals method.  Two namespaces are equal if they have the same ID.
 	 */
