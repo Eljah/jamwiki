@@ -13,20 +13,20 @@ IMPORTANT: The upgrade process will overwrite files that you have modified. You
 must backup any files from your /WEB-INF/classes/ that have been changed prior
 to upgrading.
 
-In most cases upgrades can be handled using a mostly-automated wizard process.
-To upgrade using this automated process follow these steps:
+In the majority of cases upgrades should be done using the automated wizard
+process.  To upgrade using this automated process follow these steps:
 
   1.  Download the latest JAMWiki release from
       http://sourceforge.net/projects/jamwiki/.
-  2.  The following files will need to be backed up from the webapp
-      installation directory:
+  2.  Back up the following files from the webapp directory prior to
+      beginning the upgrade process:
         1.  /WEB-INF/classes/jamwiki.properties
         2.  /WEB-INF/classes/logback.xml (new in JAMWiki 1.0.0)
         3.  (Optional) Any other files in the /WEB-INF/ directory that have
             custom modifications.
   3.  Back up all database data prior to upgrading. If you skip this step you
-      do so at your own risk - major upgrades (such as from 0.7.x 0.8.x) will
-      generally include database schema modifications, and failures while
+      do so at your own risk - major upgrades (such as from 1.1.x to 1.2.x)
+      will generally include database schema modifications, and failures while
       updating the schema can leave your wiki in an unusable state. Users who
       are not using an external database should back up all files in the wiki
       system folder, which is specified by the Special:Admin#database
@@ -36,8 +36,8 @@ To upgrade using this automated process follow these steps:
       the application server's cache.
   5.  Install the new JAMWiki WAR file. See the web application server's
       documentation for instructions. Note that WAR files should be deployed as
-      exploded WAR files as some application servers will lose configuration
-      information otherwise.
+      exploded WAR files as some application servers will otherwise lose
+      JAMWiki configuration information after restarts.
   6.  Restore the files that were backed up in step two to their previous
       locations under the /WEB-INF/ and /WEB-INF/classes/ directories,
       overwriting any new files.
@@ -55,7 +55,7 @@ To upgrade using this automated process follow these steps:
       http://jamwiki.org/wiki/en/Special:History?topic=JAMWiki:System.css),
       selecting the pre-upgrade version, and then editing and saving that
       version.  Note, however, that starting with JAMWiki 1.2 all custom CSS
-      should be done using the JAMWiki:Custom.css topic.
+      should be implemented using the JAMWiki:Custom.css topic.
   11. If you have created any virtual wikis, be sure to restore the
       configuration for each virtual wiki to the /WEB-INF/web-xml file.
 
@@ -86,8 +86,8 @@ followed by 1.0.1.
 
   * JAMWiki now requires Servlet 2.5 and JSP 2.1.  Java 5 has been required
     since JAMWiki 0.8, so this change should be transparent to most users.
-  * This release updates the default StyleSheet topic.  See below for
-    instructions on manaully updating this topic with the new styles.
+  * This release updates the default JAMWiki:System.css topic.  See below for
+    instructions on manually updating this topic with the new styles.
   * The /WEB-INF/spam-blacklist.txt file and the
     /WEB-INF/classes/jamwiki-configuration.xml have been moved to the
     "resources" sub-directory within the JAMWiki system folder.  If these files
@@ -108,7 +108,7 @@ followed by 1.0.1.
     have customized this file be sure to add an appropriate intercept-url.
   * Cache settings are no longer customizable from the Special:Admin tool.
     Advanced users who need to change cache settings can do so by creating a
-    custom ehcache-jamwiki.xml configuration.
+    custom ehcache-jamwiki.xml configuration and placing it in the classpath.
 
   UPGRADE STEPS:
 
@@ -233,7 +233,7 @@ followed by 1.0.1.
     users should rebuild the search index using the tools on the
     Special:Maintenance page.
   * This release updates the default StyleSheet topic.  See below for
-    instructions on manaully updating this topic with the new styles.
+    instructions on manually updating this topic with the new styles.
   * HTML links of the form "[http://example.com]" will now display using
     numbered links to match Mediawiki behavior.  The legacy behavior can be
     restored from the "Parser" tab of the Special:Admin page.
@@ -439,7 +439,7 @@ followed by 1.0.1.
     most users will want to rebuild their search index using the tools on
     the Special:Maintenance page.
   * This release updates the default StyleSheet topic.  See below for
-    instructions on manaully updating this topic with the new styles.
+    instructions on manually updating this topic with the new styles.
   * By default interwiki links that are not preceded by colons
     ("[[:inter:Topic]]") will not be parsed as inline links.  This behavior
     can be changed from the "Parser" tab of the Special:Admin page.

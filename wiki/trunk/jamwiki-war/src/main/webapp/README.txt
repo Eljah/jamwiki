@@ -54,17 +54,17 @@ The basic steps for performing a new JAMWiki install are:
   2. Deploy the JAMWiki WAR file.  See your web application server's
      documentation for specific deployment instructions.  The WAR file should
      be deployed as an exploded WAR to avoid potential issues.
-  3. (Optional) If using an external database create a new database instance
+  3. Update the logback.xml configuration file with appropriate log
+     configuration information.  The logback.xml file can be found in the
+     /WEB-INF/classes/ directory of your installation.  Note that the web
+     application server must have appropriate permissions to write to the log
+     file.
+  4. (Optional) If using an external database create a new database instance
      that can be used by JAMWiki, or verify that a database user is available
      with permission to create tables and sequences.  If support is needed for
      double-byte character sets be sure that the database uses UTF-8 encoding.
-  4. (Optional) If using an external database verify that your JDBC driver is
+  5. (Optional) If using an external database verify that your JDBC driver is
      in the web application server's classpath.
-  5. (Optional) Update the logback.xml configuration file with appropriate log
-     configuration information.  The logback.xml file can be found in the
-     /WEB-INF/classes/ directory of your installation.  Note that the web
-     application server must have appropriate permissions if logging to a
-     specific file or directory.
   6. Once the JAMWiki WAR file has been deployed and the web application
      server started, view the http://<server>/<context>/ page, where <server>
      is the application server URL, and <context> is the application server
@@ -75,14 +75,10 @@ after setup.  Configuration will request the following information:
 
   1. A directory (accessible to the application server) into which JAMWiki
      files can be written.
-  2. A directory (accessible to the web/application server) into which images
-     and other files can be uploaded.
-  3. The relative path (with respect to the web/application server doc root)
-     to the image upload directory.
-  4. The login and password of an administrative user.
-  5. (Optional) If using an external database for storage then the database
+  2. The login and password of an administrative user.
+  3. (Optional) If using an external database for storage then the database
      settings must be provided (see the "Database Settings" section below).
-  6. (Optional) Once setup is complete, JAMWiki can be customized by using the
+  4. (Optional) Once setup is complete, JAMWiki can be customized by using the
      Special:Admin page, accessible to admins by clicking on the "Admin" link
      on the top right portion of all JAMWiki pages.
 
