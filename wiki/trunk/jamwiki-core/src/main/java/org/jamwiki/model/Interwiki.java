@@ -28,9 +28,9 @@ import org.jamwiki.utils.Utilities;
  */
 public class Interwiki implements Serializable {
 
-	private String interwikiDisplay;
-	private String interwikiPattern;
-	private String interwikiPrefix;
+	private final String interwikiDisplay;
+	private final String interwikiPattern;
+	private final String interwikiPrefix;
 	private int interwikiType = -1;
 
 	/**
