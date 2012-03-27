@@ -872,3 +872,6 @@ div.callout input {
 #login div.row span.form-button {
 	margin-left: 100px;
 }
+#antispam-container {
+	display: none;
+}
