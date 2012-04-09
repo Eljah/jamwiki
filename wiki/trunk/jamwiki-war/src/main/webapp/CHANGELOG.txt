@@ -3,7 +3,7 @@
 
 New Features:
 
-  * None.
+  * Upgrade to commons-io-2.2.
 
 Bugfixes:
 
