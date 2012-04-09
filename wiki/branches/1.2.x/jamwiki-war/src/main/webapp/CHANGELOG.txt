@@ -7,7 +7,7 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Fix a Javascript error on the search page with IE.  Reported by shar.
 
 Translation Updates:
 
