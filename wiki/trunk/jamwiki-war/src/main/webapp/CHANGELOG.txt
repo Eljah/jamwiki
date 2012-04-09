@@ -3,6 +3,7 @@
 
 New Features:
 
+  * Upgrade to Spring Framework 3.1.1.RELEASE.
   * Upgrade to commons-io-2.2.
 
 Bugfixes:
