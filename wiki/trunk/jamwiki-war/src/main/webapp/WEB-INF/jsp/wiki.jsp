@@ -82,12 +82,7 @@
 	<c:if test="${!empty pageInfo.redirectUrl}">
 	<div id="contentSub"><fmt:message key="topic.redirect.from"><fmt:param><a href="<c:out value="${pageInfo.redirectUrl}" />"><c:out value="${pageInfo.redirectName}" /></a></fmt:param></fmt:message></div>
 	</c:if>
-<c:set var="contentJsp" scope="page" value="${pageInfo.contentJsp}" />
-<%
-// Servlet 2.3 doesn't understand the EL language, so a scriptlet has to be used...
-String contentJsp = (String)pageContext.getAttribute("contentJsp");
-%>
-	<jsp:include page="<%= contentJsp %>" flush="true" />
+	<jsp:include page="${pageInfo.contentJsp}" flush="true" />
 	<br />
 	</div>
 </div>
