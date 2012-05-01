@@ -252,11 +252,11 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private boolean upgradeSearchIndex(boolean performUpgrade, List<WikiMessage> messages) {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		if (oldVersion.before(1, 1, 0)) {
+		if (oldVersion.before(1, 3, 0)) {
 			upgradeRequired = true;
 			if (performUpgrade) {
-				try {
-					if (oldVersion.before(1, 1, 0)) {
+				if (oldVersion.before(1, 1, 0)) {
+					try {
 						int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
 						if (topicCount < MAX_TOPICS_FOR_AUTOMATIC_UPDATE) {
 							// refresh search engine
@@ -268,10 +268,10 @@ public class UpgradeServlet extends JAMWikiServlet {
 							searchWikiMessage.addWikiLinkParam("Special:Maintenance");
 							messages.add(searchWikiMessage);
 						}
+					} catch (Exception e) {
+						logger.warn("Failure during upgrade while rebuilding search index.  Please use the tools on the Special:Maintenance page to complete this step.", e);
+						messages.add(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
 					}
-				} catch (Exception e) {
-					logger.warn("Failure during upgrade while rebuilding search index.  Please use the tools on the Special:Maintenance page to complete this step.", e);
-					messages.add(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
 				}
 			}
 		}
