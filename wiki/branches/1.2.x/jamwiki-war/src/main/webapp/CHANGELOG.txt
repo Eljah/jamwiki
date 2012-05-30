@@ -11,7 +11,7 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated Italian translations (cclavadetscher).
 
 
 1.2
