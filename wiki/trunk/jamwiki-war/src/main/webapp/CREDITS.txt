@@ -37,6 +37,7 @@ JAMWiki Contributors
                             Samuel (justme)
      Hungarian:             Csaba Tenkes (cstenkes)
                             Daniel Tar (bDaneE)
+     Italian:               Charles Clavadetscher (cclavadetscher)
      Japanese:              Natto Lover (nattolover)
                             jfujikawa
      Polish:                Robert Matyja (dlpa)
