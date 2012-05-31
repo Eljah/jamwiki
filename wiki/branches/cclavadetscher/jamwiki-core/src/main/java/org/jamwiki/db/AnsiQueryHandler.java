@@ -922,6 +922,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_USER);
 			stmt.setString(1, login);
+			stmt.setString(2, login);
 			rs = stmt.executeQuery();
 			List<Role> roles = new ArrayList<Role>();
 			while (rs.next()) {
