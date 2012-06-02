@@ -26,6 +26,7 @@ import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
+import org.jamwiki.model.WikiGroup;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
@@ -56,6 +57,8 @@ public class RolesServlet extends JAMWikiServlet {
 			searchRole(request, next, pageInfo);
 		} else if (function.equals("assignRole")) {
 			assignRole(request, next, pageInfo);
+		} else if (function.equals("modifyGroup")) {
+			modifyGroup(request, next, pageInfo);
 		}
 		return next;
 	}
@@ -162,7 +165,9 @@ public class RolesServlet extends JAMWikiServlet {
 				}
 			} catch (WikiException e) {
 				pageInfo.addError(e.getWikiMessage());
+				role = null;
 			} catch (Exception e) {
+				role = null;
 				logger.error("Failure while adding role", e);
 				pageInfo.addError(new WikiMessage("roles.message.rolefail", e.getMessage()));
 			}
@@ -209,12 +214,53 @@ public class RolesServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private void modifyGroup(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+		String updateGroup = request.getParameter("updateGroup");
+		WikiGroup group = null;
+		if (!StringUtils.isBlank(request.getParameter("Submit"))) {
+			try {
+				// once created a group name cannot be modified, so the text field
+				// will be disabled in the form.
+				boolean update = StringUtils.isBlank(request.getParameter("groupName"));
+				String groupName = (update) ? updateGroup : request.getParameter("groupName");
+				if(!StringUtils.isBlank(groupName)) group = WikiBase.getDataHandler().lookupWikiGroup(groupName);
+				if(group == null) group = new WikiGroup(groupName);
+				group.setDescription(request.getParameter("groupDescription"));
+				WikiUtil.validateWikiGroup(group);
+				WikiBase.getDataHandler().writeWikiGroup(group);
+				if (update) {
+					pageInfo.addMessage(new WikiMessage("group.message.groupupdated", group.getName()));
+				} else {
+					pageInfo.addMessage(new WikiMessage("group.message.groupadded", group.getName()));
+				}
+			} catch (WikiException e) {
+				pageInfo.addError(e.getWikiMessage());
+				group = null;
+			} catch (Exception e) {
+				group = null;
+				logger.error("Failure while adding or modifying group", e);
+				pageInfo.addError(new WikiMessage("group.message.groupfail", e.getMessage()));
+			}
+		}
+		else if (!StringUtils.isBlank("updateGroup")) group = WikiBase.getDataHandler().lookupWikiGroup(updateGroup);
+		if (group != null) {
+			next.addObject("groupName", group.getName());
+			next.addObject("groupDescription", group.getDescription());
+		}
+		this.view(request, next, pageInfo);
+	}
+	
+	/**
+	 *
+	 */
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		List<Role> roles = WikiBase.getDataHandler().getAllRoles();
 		next.addObject("roles", roles);
 		next.addObject("roleCount", roles.size());
 		List<RoleMap> roleMapGroups = WikiBase.getDataHandler().getRoleMapGroups();
 		next.addObject("roleMapGroups", roleMapGroups);
+		List<WikiGroup> groups = WikiBase.getDataHandler().getAllWikiGroups();
+		next.addObject("groups", groups);
 		pageInfo.setAdmin(true);
 		pageInfo.setContentJsp(JSP_ADMIN_ROLES);
 		pageInfo.setPageTitle(new WikiMessage("roles.title"));

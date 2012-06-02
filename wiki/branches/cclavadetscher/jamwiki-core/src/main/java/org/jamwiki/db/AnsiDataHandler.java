@@ -564,6 +564,17 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
+	public List<WikiGroup> getAllWikiGroups() throws DataAccessException {
+		try {
+			return this.queryHandler().getGroups();
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
+	/**
+	 *
+	 */
 	public List<String> getAllTopicNames(String virtualWiki, boolean includeDeleted) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 		Connection conn = null;

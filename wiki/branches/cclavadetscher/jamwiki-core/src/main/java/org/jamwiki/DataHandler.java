@@ -166,6 +166,14 @@ public interface DataHandler {
 	 * @return A List of all Role objects for the wiki.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
+	List<WikiGroup> getAllWikiGroups() throws DataAccessException;
+
+	/**
+	 * Return a List of all Role objects for the wiki.
+	 *
+	 * @return A List of all Role objects for the wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
 	List<Role> getAllRoles() throws DataAccessException;
 
 	/**

@@ -29,6 +29,7 @@
 <li><a href="#group"><fmt:message key="roles.header.group" /></a></li>
 <li><a href="#user"><fmt:message key="roles.header.user" /></a></li>
 <li><a href="#create"><fmt:message key="roles.header.modify" /></a></li>
+<li><a href="#createGroup"><fmt:message key="group.header.modify" /></a></li>
 </ul>
 <div class="submenu-tab-content">
 
@@ -160,6 +161,39 @@
 	<label for="roleDescription"><fmt:message key="roles.caption.roledescription" /></label>
 	<span><textarea class="medium" name="roleDescription" id="roleDescription"><c:out value="${roleDescription}" /></textarea></span>
 	<div class="formhelp"><fmt:message key="roles.help.roledescription" /></div>
+</div>
+<div class="row">
+	<span class="form-button"><input type="submit" name="Submit" value="<fmt:message key="common.button.save" />" /></span>
+</div>
+</fieldset>
+</form>
+</div>
+
+<%-- Create/Update Groups --%>
+<div id="createGroup" class="submenu-tab-item">
+<form action="<jamwiki:link value="Special:Roles" />#createGroup" name="modifyGroupForm" method="post">
+<input type="hidden" name="function" value="modifyGroup" />
+<fieldset>
+<legend><fmt:message key="group.header.modify" /></legend>
+<div class="row">
+	<label for="updateGroup"><fmt:message key="group.caption.selectgroup" />:</label>
+	<span>
+		<select name="updateGroup" id="updateGroup" onchange="document.modifyGroupForm.submit()">
+		<option value=""></option>
+		<c:forEach items="${groups}" var="group"><option value="<c:out value="${group.name}" />" <c:if test="${group.name == groupName}">selected="selected"</c:if>><c:out value="${group.name}" /></option></c:forEach>
+		</select>
+	</span>
+	<div class="formhelp"><fmt:message key="group.help.selectgroup" /></div>
+</div>
+<div class="row">
+	<label for="groupName"><fmt:message key="group.caption.groupname" /></label>
+	<span><input type="text" name="groupName" id="groupName" value="<c:out value="${groupName}" />" size="30" <c:if test="${!empty groupName}">disabled="disabled"</c:if> /></span>
+	<div class="formhelp"><fmt:message key="group.help.groupname" /></div>
+</div>
+<div class="row">
+	<label for="groupDescription"><fmt:message key="group.caption.groupdescription" /></label>
+	<span><textarea class="medium" name="groupDescription" id="groupDescription"><c:out value="${groupDescription}" /></textarea></span>
+	<div class="formhelp"><fmt:message key="group.help.groupdescription" /></div>
 </div>
 <div class="row">
 	<span class="form-button"><input type="submit" name="Submit" value="<fmt:message key="common.button.save" />" /></span>

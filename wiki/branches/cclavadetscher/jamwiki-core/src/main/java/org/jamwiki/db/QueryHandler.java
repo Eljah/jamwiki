@@ -359,6 +359,15 @@ public interface QueryHandler {
 	List<Role> getRoles() throws SQLException;
 
 	/**
+	 * Retrieve a list of all groups that have been defined for the wiki.
+	 *
+	 * @return Returns a list of all groups that have been defined for the wiki,
+	 *  or an empty list if no roles exist.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	List<WikiGroup> getGroups() throws SQLException;
+
+	/**
 	 * Retrieve a list of all history for a specific topic.
 	 *
 	 * @param topicId The id of the topic for which recent changes are being

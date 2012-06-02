@@ -183,6 +183,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_CATEGORIES = null;
 	protected static String STATEMENT_SELECT_CATEGORY_TOPICS = null;
 	protected static String STATEMENT_SELECT_CONFIGURATION = null;
+	protected static String STATEMENT_SELECT_GROUPS = null;
 	protected static String STATEMENT_SELECT_GROUP = null;
 	protected static String STATEMENT_SELECT_GROUP_AUTHORITIES = null;
 	protected static String STATEMENT_SELECT_GROUPS_AUTHORITIES = null;
@@ -958,6 +959,27 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
+	public List<WikiGroup> getGroups() throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUPS);
+			rs = stmt.executeQuery();
+			List<WikiGroup> groups = new ArrayList<WikiGroup>();
+			while (rs.next()) {
+				groups.add(this.initWikiGroup(rs));
+			}
+			return groups;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+	
+	/**
+	 *
+	 */
 	public List<RecentChange> getTopicHistory(int topicId, Pagination pagination, boolean descending, boolean selectDeleted) throws SQLException {
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -1328,6 +1350,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_CATEGORY_TOPICS         = props.getProperty("STATEMENT_SELECT_CATEGORY_TOPICS");
 		STATEMENT_SELECT_CONFIGURATION           = props.getProperty("STATEMENT_SELECT_CONFIGURATION");
 		STATEMENT_SELECT_GROUP                   = props.getProperty("STATEMENT_SELECT_GROUP");
+		STATEMENT_SELECT_GROUPS                  = props.getProperty("STATEMENT_SELECT_GROUPS");
 		STATEMENT_SELECT_GROUP_AUTHORITIES       = props.getProperty("STATEMENT_SELECT_GROUP_AUTHORITIES");
 		STATEMENT_SELECT_GROUPS_AUTHORITIES      = props.getProperty("STATEMENT_SELECT_GROUPS_AUTHORITIES");
 		STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE  = props.getProperty("STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE");
@@ -2176,7 +2199,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			int index = 1;
-			if (!this.autoIncrementPrimaryKeys()) {
+			if (!this.autoIncrementPrimaryKeys() && group.getGroupId()>0) {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_GROUP);
 				int groupId = this.nextWikiGroupId(conn);
 				group.setGroupId(groupId);
@@ -3233,7 +3256,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			DatabaseConnection.closeStatement(stmt);
 		}
 	}
-
+	
 	/**
 	 *
 	 */
