@@ -34,7 +34,9 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.db.QueryHandler;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -567,6 +569,28 @@ public class AnsiDataHandler implements DataHandler {
 	public List<WikiGroup> getAllWikiGroups() throws DataAccessException {
 		try {
 			return this.queryHandler().getGroups();
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public GroupMap getGroupMapGroup(int groupId) throws DataAccessException {
+		try {
+			return this.queryHandler().lookupGroupMapGroup(groupId);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public GroupMap getGroupMapUser(String userLogin) throws DataAccessException {
+		try {
+			return this.queryHandler().lookupGroupMapUser(userLogin);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
@@ -2335,6 +2359,41 @@ public class AnsiDataHandler implements DataHandler {
 		DatabaseConnection.commit(status);
 	}
 
+	/**
+	 * 
+	 */
+	public void writeGroupMap(GroupMap groupMap) throws DataAccessException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction();
+			Connection conn = DatabaseConnection.getConnection();
+			this.queryHandler().deleteGroupMap(groupMap,conn);
+			switch(groupMap.getGroupMapType()) {
+				case GroupMap.GROUP_MAP_GROUP: {
+					int groupId = groupMap.getGroupId();
+					List<String> groupMembers = groupMap.getGroupMembers();
+					for(String groupMember : groupMembers) {
+						this.queryHandler().insertGroupMember(groupMember, groupId, conn);
+					}
+					break;
+				}
+				case GroupMap.GROUP_MAP_USER: {
+					String userLogin = groupMap.getUserLogin();
+					List<Integer> groupIds = groupMap.getGroupIds();
+					for(Integer groupId : groupIds) {
+						this.queryHandler().insertGroupMember(userLogin, groupId.intValue(), conn);
+					}
+					break;
+				}
+				default: throw new SQLException("writeGroupMap - Group type invalid"); 
+			}
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			throw new DataAccessException(e);
+		}
+		DatabaseConnection.commit(status);
+	}
+	
 	/**
 	 *
 	 */

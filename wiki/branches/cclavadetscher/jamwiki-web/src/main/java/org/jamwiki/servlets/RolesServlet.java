@@ -18,6 +18,7 @@ package org.jamwiki.servlets;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
 import org.jamwiki.model.WikiGroup;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
@@ -94,6 +96,19 @@ public class RolesServlet extends JAMWikiServlet {
 		}
 		return results;
 	}
+	
+	private static GroupMap buildGroupMap(String userLogin,String[] groupIds) {
+		GroupMap groupMap = new GroupMap(userLogin);
+		List<Integer> groupIdsList = new ArrayList<Integer>();
+		for(int i=0;i<groupIds.length;i++) {
+			String[] tokens = groupIds[i].split("\\|");
+			if(tokens[0].equals(userLogin)) {
+				groupIdsList.add(new Integer(tokens[1]));
+			}
+		}
+		groupMap.setGroupIds(groupIdsList);
+		return groupMap;
+	}
 
 	/**
 	 *
@@ -120,6 +135,7 @@ public class RolesServlet extends JAMWikiServlet {
 			String[] candidateUsers = request.getParameterValues("candidateUser");
 			String[] candidateUsernames = request.getParameterValues("candidateUsername");
 			String[] userRoles = request.getParameterValues("userRole");
+			String[] userGroups = request.getParameterValues("userGroup");
 			if (candidateUsers != null) {
 				for (int i = 0; i < candidateUsers.length; i++) {
 					int userId = Integer.parseInt(candidateUsers[i]);
@@ -130,6 +146,9 @@ public class RolesServlet extends JAMWikiServlet {
 						roles.add(Role.ROLE_SYSADMIN.getAuthority());
 					}
 					WikiBase.getDataHandler().writeRoleMapUser(username, roles);
+					// handle group assignments
+					GroupMap groupMap = buildGroupMap(username,userGroups);
+					WikiBase.getDataHandler().writeGroupMap(groupMap);
 				}
 				pageInfo.addMessage(new WikiMessage("roles.message.userroleupdate"));
 			}
@@ -139,6 +158,7 @@ public class RolesServlet extends JAMWikiServlet {
 			logger.error("Failure while adding role", e);
 			pageInfo.addError(new WikiMessage("roles.message.rolefail", e.getMessage()));
 		}
+		this.searchRole(request, next, pageInfo);
 		this.view(request, next, pageInfo);
 	}
 
@@ -194,15 +214,34 @@ public class RolesServlet extends JAMWikiServlet {
 	private void searchRole(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		try {
 			String searchLogin = request.getParameter("searchLogin");
+			String searchRole  = request.getParameter("searchRole");
+			String searchGroup = request.getParameter("searchGroup");
 			List<RoleMap> roleMapUsers = null;
+			HashMap<String,GroupMap> groupMaps = new HashMap<String,GroupMap>();
 			if (!StringUtils.isBlank(searchLogin)) {
 				roleMapUsers = WikiBase.getDataHandler().getRoleMapByLogin(searchLogin);
 				next.addObject("searchLogin", searchLogin);
-			} else {
-				String searchRole = request.getParameter("searchRole");
+			} else if(!StringUtils.isBlank(searchRole)) {
 				roleMapUsers = WikiBase.getDataHandler().getRoleMapByRole(searchRole);
 				next.addObject("searchRole", searchRole);
+			} else if(!StringUtils.isBlank(searchGroup)) {
+				GroupMap groupMap = WikiBase.getDataHandler().getGroupMapGroup(Integer.valueOf(searchGroup));
+				roleMapUsers = new ArrayList<RoleMap>();
+				List<String> groupMembers = groupMap.getGroupMembers();
+				for(String userLogin : groupMembers) {
+					List<RoleMap> roleMapUser = WikiBase.getDataHandler().getRoleMapByLogin(userLogin);
+					// The userLogin is unique. We can assume that there is only one item in the list.
+					roleMapUsers.add(roleMapUser.get(0));
+				}
+				next.addObject("searchGroup",searchGroup);
 			}
+			// Add group lists of users
+			if(roleMapUsers != null) {
+				for(RoleMap roleMap : roleMapUsers) {
+					groupMaps.put(roleMap.getUserLogin(),WikiBase.getDataHandler().getGroupMapUser(roleMap.getUserLogin()));
+				}
+			}
+			next.addObject("groupMaps",groupMaps);
 			next.addObject("roleMapUsers", roleMapUsers);
 		} catch (Exception e) {
 			logger.error("Failure while retrieving role", e);

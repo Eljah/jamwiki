@@ -98,16 +98,29 @@
 	</span>
 </div>
 <div class="row">
+	<label><fmt:message key="roles.caption.searchgroup" />:</label>
+	<span>
+		<select name="searchGroup" id="searchGroup" onchange="document.searchRoleForm.submit()">
+		<option value=""></option>
+		<c:forEach items="${groups}" var="group"><option value="<c:out value="${group.groupId}" />" <c:if test="${group.groupId == searchGroup}">selected="selected"</c:if>><c:out value="${group.name}" /></option></c:forEach>
+		</select>
+	</span>
+</div>
+<div class="row">
 	<span class="form-button"><input type="submit" name="search" value="<fmt:message key="search.search" />" /></span>
 </div>
 </form>
 <c:if test="${!empty roleMapUsers}">
 <form action="<jamwiki:link value="Special:Roles" />#user" method="post">
+<input type="hidden" name="searchLogin" value="<c:out value="${searchLogin}" />" />
+<input type="hidden" name="searchRole" value="<c:out value="${searchRole}" />" />
+<input type="hidden" name="searchGroup" value="<c:out value="${searchGroup}" />" />
 <input type="hidden" name="function" value="assignRole" />
 <div class="row">
 <table class="wiki-admin">
 <tr>
 	<th class="first"><fmt:message key="roles.caption.userlogin" /></th>
+	<th><fmt:message key="roles.caption.groups" /></th>
 	<th colspan="3"><fmt:message key="roles.caption.roles" /></th>
 </tr>
 <c:forEach items="${roleMapUsers}" var="roleMap">
@@ -117,6 +130,11 @@
 		<input type="hidden" name="candidateUser" value="<c:out value="${roleMap.userId}" />" />
 		<input type="hidden" name="candidateUsername" value="<c:out value="${roleMap.userLogin}" />" />
 		<c:out value="${roleMap.userLogin}" />
+	</td>
+	<td>
+	<c:forEach items="${groups}" var="group">
+		<input type="checkbox" name="userGroup" value="${roleMap.userLogin}|${group.groupId}" <c:if test="${!empty groupMaps[roleMap.userLogin].groupIdMap[group.groupId]}"> checked="checked"</c:if> />&#160;<c:out value="${group.name}" /><br />
+	</c:forEach>
 	</td>
 	<c:forEach items="${roles}" var="role" varStatus="status">
 		<c:if test="${((3 * status.index) % roleCount) < 3}"><td></c:if>

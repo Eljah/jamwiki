@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -170,6 +171,15 @@ public interface QueryHandler {
 	 */
 	void deleteUserAuthorities(String username, Connection conn) throws SQLException;
 
+	/**
+	 * Delete group membership from database. Notice that this may be the deletion of
+	 * all members of a group (when acting as a container of group users) or the deletion of
+	 * all memberships of a user (when acting as a group list for a user).
+	 * @param groupMap The GroupMap to delete
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	void deleteGroupMap(GroupMap groupMap, Connection conn) throws SQLException;
+	
 	/**
 	 * Delete a user's watchlist entry using the topic name to determine which
 	 * entry to remove.
@@ -928,6 +938,22 @@ public interface QueryHandler {
 	 */
 	int lookupWikiFileCount(int virtualWikiId) throws SQLException;
 
+	/**
+	 * Retrieve the GroupMap associated with the group identified by groupId
+	 * @param groupId The GroupMap to retrieve
+	 * @return The GroupMap
+	 * @throws SQLException
+	 */
+	GroupMap lookupGroupMapGroup(int groupId) throws SQLException;
+
+	/**
+	 * Retrieve the GroupMap associated with the userLogin
+	 * @param userLogin The GroupMap to retrieve
+	 * @return The GroupMap
+	 * @throws SQLException
+	 */
+	GroupMap lookupGroupMapUser(String userLogin) throws SQLException;
+	
 	/**
 	 * Retrieve a result set containing group information given the name of the group.
 	 *
