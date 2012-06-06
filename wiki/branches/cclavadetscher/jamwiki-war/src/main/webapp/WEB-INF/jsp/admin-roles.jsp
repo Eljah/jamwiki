@@ -132,9 +132,11 @@
 		<c:out value="${roleMap.userLogin}" />
 	</td>
 	<td>
+	<c:if test="${!empty groups}">
 	<c:forEach items="${groups}" var="group">
 		<input type="checkbox" name="userGroup" value="${roleMap.userLogin}|${group.groupId}" <c:if test="${!empty groupMaps[roleMap.userLogin].groupIdMap[group.groupId]}"> checked="checked"</c:if> />&#160;<c:out value="${group.name}" /><br />
 	</c:forEach>
+	</c:if>
 	</td>
 	<c:forEach items="${roles}" var="role" varStatus="status">
 		<c:if test="${((3 * status.index) % roleCount) < 3}"><td></c:if>

@@ -154,8 +154,15 @@ public class RolesServlet extends JAMWikiServlet {
 					}
 					WikiBase.getDataHandler().writeRoleMapUser(username, roles);
 					// handle group assignments
-					GroupMap groupMap = buildGroupMap(username,userGroups);
-					WikiBase.getDataHandler().writeGroupMap(groupMap);
+					if(userGroups != null)
+					{
+						GroupMap groupMap = buildGroupMap(username,userGroups);
+						// We must delete the groups GROUP_ANONYMOUS and GROUP_REGISTERED_USER
+						// if available to avoid duplicates in the datase
+						groupMap.getGroupIds().remove(new Integer(1));
+						groupMap.getGroupIds().remove(new Integer(2));
+						WikiBase.getDataHandler().writeGroupMap(groupMap);
+					}
 				}
 				pageInfo.addMessage(new WikiMessage("roles.message.userroleupdate"));
 			}
@@ -166,7 +173,7 @@ public class RolesServlet extends JAMWikiServlet {
 			pageInfo.addError(new WikiMessage("roles.message.rolefail", e.getMessage()));
 		}
 		this.searchRole(request, next, pageInfo);
-		this.view(request, next, pageInfo);
+		// this.view(request, next, pageInfo);
 	}
 
 	/**
