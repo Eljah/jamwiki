@@ -34,7 +34,6 @@ import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.db.QueryHandler;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;

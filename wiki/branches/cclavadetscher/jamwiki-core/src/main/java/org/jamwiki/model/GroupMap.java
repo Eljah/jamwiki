@@ -30,30 +30,50 @@ import java.lang.StringBuffer;
  * <li>As a member with a list of the groups he belongs to.</li>
  * </ul>
  *  * @author cclavadetscher
- *
  */
 public class GroupMap implements Serializable {
 
+	/**
+	 * Constant for a GroupMap representing a group
+	 */
 	public static final int GROUP_MAP_GROUP = 1;
+	/**
+	 * Constant for a GroupMap representing a user
+	 */
 	public static final int GROUP_MAP_USER  = 2;
 	
+	/**
+	 * The type of the GroupMap. Valid values are GroupMap.GROUP_MAP_GROUP
+	 * and GroupMap.GROUP_MAP_USER. The value is set by the costructor depending
+	 * on which instance type of GroupMap is created.
+	 */
 	private int groupMapType = -1;
 	
-	// Attributes when acting as a group containing users
+	/**
+	 * Attributes when acting as a group containing users
+	 */
 	private int groupId = -1;
 	private List<String> groupMembers = null;
 	
-	// Attributes when acting as a user belonging to groups
+	/**
+	 * Attributes when acting as a user belonging to groups
+	 */
 	private String userLogin = null;
 	private List<Integer> groupIds = null;
 	
-	// Constructor when acting as a group containing users
+	/**
+	 * Constructor when acting as a group containing users
+	 * @param groupId The id of the group
+	 */
 	public GroupMap(int groupId) {
 		this.groupMapType = this.GROUP_MAP_GROUP;
 		this.groupId = groupId;
 	}
 	
-	// Constructor when acting as a user contained in groups
+	/**
+	 * Constructor when acting as a user contained in groups
+	 * @param userLogin The login String of the user
+	 */
 	public GroupMap(String userLogin) {
 		this.groupMapType = this.GROUP_MAP_USER;
 		this.userLogin = userLogin;
@@ -104,22 +124,22 @@ public class GroupMap implements Serializable {
 		}
 		return hMap;
 	}
-	
+
+	/**
+	 * Returns a String representation of this GroupMap.
+	 * @return The String representation of this GroupMap
+	 */
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
 		switch(groupMapType) {
 			case GROUP_MAP_GROUP: {
-				sb.append("GroupType: GROUP; GroupId: " + groupId + "; GroupMembers: " + groupMembers);
-				break;
+				return new String("GroupType: GROUP; GroupId: " + groupId + "; GroupMembers: " + groupMembers);
 			}
 			case GROUP_MAP_USER: {
-				sb.append("GroupType: USER; userLogin: " + userLogin + "; Groups: " + groupIds);
-				break;
+				return new String("GroupType: USER; userLogin: " + userLogin + "; Groups: " + groupIds);
 			}
 			default: {
-				sb.append("GroupType: UNDEFINED");
+				return new String("GroupType: UNDEFINED");
 			}
 		}
-		return sb.toString();
 	}
 }

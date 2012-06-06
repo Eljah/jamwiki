@@ -33,7 +33,6 @@ import java.util.TreeMap;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.db.DatabaseConnection;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;

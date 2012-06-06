@@ -97,7 +97,14 @@ public class RolesServlet extends JAMWikiServlet {
 		return results;
 	}
 	
-	private static GroupMap buildGroupMap(String userLogin,String[] groupIds) {
+	/**
+	 * Utility method to create a GroupMap from a userLogin and the array of groups
+	 * the user belongs to. The format of the array elements is "userLogin|groupId"
+	 * 
+	 * @param userLogin The login String of the user
+	 * @param groupIds The array of groups the user belongs to
+	 */
+	private GroupMap buildGroupMap(String userLogin,String[] groupIds) {
 		GroupMap groupMap = new GroupMap(userLogin);
 		List<Integer> groupIdsList = new ArrayList<Integer>();
 		for(int i=0;i<groupIds.length;i++) {

@@ -162,9 +162,11 @@ public interface DataHandler {
 	List<Category> getAllCategories(String virtualWiki, Pagination pagination) throws DataAccessException;
 
 	/**
-	 * Return a List of all Role objects for the wiki.
+	 * Return a List of all custom WikiGroup objects for the wiki, i.e. all groups except the groups
+	 * GROUP_ANONYMOUS and GROUP_REGISTERED_USER. These are managed only internally
+	 * through the application.
 	 *
-	 * @return A List of all Role objects for the wiki.
+	 * @return A List of all custom WikiGroups objects for the wiki
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	List<WikiGroup> getAllWikiGroups() throws DataAccessException;
