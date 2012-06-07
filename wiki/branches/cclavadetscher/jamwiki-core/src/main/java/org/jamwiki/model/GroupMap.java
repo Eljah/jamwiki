@@ -19,6 +19,7 @@ package org.jamwiki.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.StringBuffer;
 
@@ -68,6 +69,7 @@ public class GroupMap implements Serializable {
 	public GroupMap(int groupId) {
 		this.groupMapType = this.GROUP_MAP_GROUP;
 		this.groupId = groupId;
+		this.groupMembers = new ArrayList<String>();
 	}
 	
 	/**
@@ -77,6 +79,7 @@ public class GroupMap implements Serializable {
 	public GroupMap(String userLogin) {
 		this.groupMapType = this.GROUP_MAP_USER;
 		this.userLogin = userLogin;
+		this.groupIds = new ArrayList<Integer>();
 	}
 	
 	public int getGroupMapType() {
@@ -124,7 +127,7 @@ public class GroupMap implements Serializable {
 		}
 		return hMap;
 	}
-
+	
 	/**
 	 * Returns a String representation of this GroupMap.
 	 * @return The String representation of this GroupMap
