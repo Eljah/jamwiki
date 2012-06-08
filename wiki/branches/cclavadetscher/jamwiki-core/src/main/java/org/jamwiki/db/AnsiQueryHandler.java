@@ -188,6 +188,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_CONFIGURATION = null;
 	protected static String STATEMENT_SELECT_GROUP_MAP_GROUP = null;
 	protected static String STATEMENT_SELECT_GROUP_MAP_USER = null;
+	protected static String STATEMENT_SELECT_GROUP_MAP_AUTHORITIES = null;
 	protected static String STATEMENT_SELECT_GROUPS = null;
 	protected static String STATEMENT_SELECT_GROUP = null;
 	protected static String STATEMENT_SELECT_GROUP_BY_ID = null;
@@ -1385,6 +1386,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_CONFIGURATION           = props.getProperty("STATEMENT_SELECT_CONFIGURATION");
 		STATEMENT_SELECT_GROUP_MAP_GROUP         = props.getProperty("STATEMENT_SELECT_GROUP_MAP_GROUP");
 		STATEMENT_SELECT_GROUP_MAP_USER          = props.getProperty("STATEMENT_SELECT_GROUP_MAP_USER");
+		STATEMENT_SELECT_GROUP_MAP_AUTHORITIES   = props.getProperty("STATEMENT_SELECT_GROUP_MAP_AUTHORITIES");
 		STATEMENT_SELECT_GROUP                   = props.getProperty("STATEMENT_SELECT_GROUP");
 		STATEMENT_SELECT_GROUP_BY_ID             = props.getProperty("STATEMENT_SELECT_GROUP_BY_ID");
 		STATEMENT_SELECT_GROUPS                  = props.getProperty("STATEMENT_SELECT_GROUPS");
@@ -2802,11 +2804,20 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setString(1,userLogin);
 			rs = stmt.executeQuery();
 			groupMap = new GroupMap(userLogin);
-			List<Integer> groupIds = new ArrayList();
+			List<Integer> groupIds = new ArrayList<Integer>();
 			while(rs.next()) {
 				groupIds.add(new Integer(rs.getInt("group_id")));
 			}
 			groupMap.setGroupIds(groupIds);
+			// retrieve roles assigned through group assignment
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_AUTHORITIES);
+			stmt.setString(1,userLogin);
+			rs = stmt.executeQuery();
+			List<String> roleNames = new ArrayList<String>();
+			while(rs.next()) {
+				roleNames.add(rs.getString("authority"));
+			}
+			groupMap.setRoleNames(roleNames);
 			return groupMap;
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt,rs);

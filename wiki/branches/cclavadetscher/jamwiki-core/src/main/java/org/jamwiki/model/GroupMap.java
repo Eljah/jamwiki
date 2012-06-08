@@ -61,6 +61,8 @@ public class GroupMap implements Serializable {
 	 */
 	private String userLogin = null;
 	private List<Integer> groupIds = null;
+
+	private List<String> roleNames = null;
 	
 	/**
 	 * Constructor when acting as a group containing users
@@ -107,10 +109,30 @@ public class GroupMap implements Serializable {
 		this.userLogin = userLogin;
 	}
 	public List<Integer> getGroupIds() {
+		if(this.groupIds == null) {
+			return new ArrayList<Integer>();
+		}
 		return groupIds;
 	}
 	public void setGroupIds(List<Integer> groupIds) {
 		this.groupIds = groupIds;
+	}
+	
+	/**
+	 *
+	 */
+	public void setRoleNames(List<String> roleNames) {
+		this.roleNames = roleNames;
+	}
+
+	/**
+	 *
+	 */
+	 public List<String> getRoleNames() {
+		if(this.roleNames == null) {
+			return new ArrayList<String>();
+		}
+		return this.roleNames;
 	}
 	
 	public HashMap getGroupIdMap() {
@@ -127,6 +149,15 @@ public class GroupMap implements Serializable {
 		}
 		return hMap;
 	}
+	public HashMap<String,String> getGroupMapRoles() {
+		HashMap<String,String> hMap = new HashMap<String,String>();
+		if(roleNames != null) {
+			for(String roleName : roleNames) {
+				hMap.put(roleName,roleName);
+			}
+		}
+		return hMap;
+	}
 	
 	/**
 	 * Returns a String representation of this GroupMap.
@@ -135,7 +166,7 @@ public class GroupMap implements Serializable {
 	public String toString() {
 		switch(groupMapType) {
 			case GROUP_MAP_GROUP: {
-				return new String("GroupType: GROUP; GroupId: " + groupId + "; GroupMembers: " + groupMembers);
+				return new String("GroupType: GROUP; GroupId: " + groupId + "; GroupMembers: " + groupMembers + "; groupMapRoles: " + roleNames);
 			}
 			case GROUP_MAP_USER: {
 				return new String("GroupType: USER; userLogin: " + userLogin + "; Groups: " + groupIds);

@@ -140,7 +140,16 @@
 	</td>
 	<c:forEach items="${roles}" var="role" varStatus="status">
 		<c:if test="${((3 * status.index) % roleCount) < 3}"><td></c:if>
-		<jamwiki:checkbox name="userRole" value="${roleMap.userGroup}|${role.authority}" checked="${roleMap.roleNamesMap[role.authority]}" />&#160;<c:out value="${role.authority}" /><br />
+		<c:choose>
+			<c:when test="${!empty groupMaps && !empty groupMaps[roleMap.userLogin].groupMapRoles[role.authority]}">
+				<span style="background-color: #FF9999;">
+			</c:when>
+			<c:otherwise>
+				<span>
+			</c:otherwise>
+		</c:choose>
+		<jamwiki:checkbox name="userRole" value="${roleMap.userGroup}|${role.authority}" checked="${roleMap.roleNamesMap[role.authority]}" />
+		</span>&#160;<c:out value="${role.authority}" /><br />
 		<c:if test="${((3 * status.count) % roleCount) < 3}"></td></c:if>
 	</c:forEach>
 </tr>
