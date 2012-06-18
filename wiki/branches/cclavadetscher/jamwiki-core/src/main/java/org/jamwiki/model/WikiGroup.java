@@ -22,7 +22,7 @@ package org.jamwiki.model;
 public class WikiGroup {
 
 	private String description;
-	private int groupId = -1;
+	private int groupId;
 	private final String name;
 
 	public static final String GROUP_ANONYMOUS = "GROUP_ANONYMOUS";

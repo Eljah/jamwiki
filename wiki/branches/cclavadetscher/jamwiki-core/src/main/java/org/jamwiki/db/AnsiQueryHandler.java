@@ -1750,7 +1750,6 @@ public class AnsiQueryHandler implements QueryHandler {
 	public void insertGroupMember(String username, int groupId, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
-			/*
 			int index = 1;
 			if (!this.autoIncrementPrimaryKeys()) {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_GROUP_MEMBER);
@@ -1761,11 +1760,6 @@ public class AnsiQueryHandler implements QueryHandler {
 			}
 			stmt.setString(index++, username);
 			stmt.setInt(index++, groupId);
-			stmt.executeUpdate();
-			*/
-			stmt = conn.prepareStatement(STATEMENT_INSERT_GROUP_MEMBER_AUTO_INCREMENT);
-			stmt.setString(1, username);
-			stmt.setInt(2, groupId);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
@@ -2244,7 +2238,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			int index = 1;
-			if (!this.autoIncrementPrimaryKeys() && group.getGroupId()>0) {
+			if (!this.autoIncrementPrimaryKeys()) { // && group.getGroupId()>0) {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_GROUP);
 				int groupId = this.nextWikiGroupId(conn);
 				group.setGroupId(groupId);
