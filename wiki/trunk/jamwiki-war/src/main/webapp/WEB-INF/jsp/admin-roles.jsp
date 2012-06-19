@@ -29,6 +29,7 @@
 <li><a href="#group"><fmt:message key="roles.header.group" /></a></li>
 <li><a href="#user"><fmt:message key="roles.header.user" /></a></li>
 <li><a href="#create"><fmt:message key="roles.header.modify" /></a></li>
+<li><a href="#createGroup"><fmt:message key="group.header.modify" /></a></li>
 </ul>
 <div class="submenu-tab-content">
 
@@ -97,16 +98,29 @@
 	</span>
 </div>
 <div class="row">
+	<label><fmt:message key="roles.caption.searchgroup" />:</label>
+	<span>
+		<select name="searchGroup" id="searchGroup" onchange="document.searchRoleForm.submit()">
+		<option value=""></option>
+		<c:forEach items="${groups}" var="group"><option value="<c:out value="${group.groupId}" />" <c:if test="${group.groupId == searchGroup}">selected="selected"</c:if>><c:out value="${group.name}" /></option></c:forEach>
+		</select>
+	</span>
+</div>
+<div class="row">
 	<span class="form-button"><input type="submit" name="search" value="<fmt:message key="search.search" />" /></span>
 </div>
 </form>
 <c:if test="${!empty roleMapUsers}">
 <form action="<jamwiki:link value="Special:Roles" />#user" method="post">
+<input type="hidden" name="searchLogin" value="<c:out value="${searchLogin}" />" />
+<input type="hidden" name="searchRole" value="<c:out value="${searchRole}" />" />
+<input type="hidden" name="searchGroup" value="<c:out value="${searchGroup}" />" />
 <input type="hidden" name="function" value="assignRole" />
 <div class="row">
 <table class="wiki-admin">
 <tr>
 	<th class="first"><fmt:message key="roles.caption.userlogin" /></th>
+	<th><fmt:message key="roles.caption.groups" /></th>
 	<th colspan="3"><fmt:message key="roles.caption.roles" /></th>
 </tr>
 <c:forEach items="${roleMapUsers}" var="roleMap">
@@ -117,9 +131,25 @@
 		<input type="hidden" name="candidateUsername" value="<c:out value="${roleMap.userLogin}" />" />
 		<c:out value="${roleMap.userLogin}" />
 	</td>
+	<td>
+	<c:if test="${!empty groups}">
+	<c:forEach items="${groups}" var="group">
+		<input type="checkbox" name="userGroup" value="${roleMap.userLogin}|${group.groupId}" <c:if test="${!empty groupMaps[roleMap.userLogin].groupIdMap[group.groupId]}"> checked="checked"</c:if> />&#160;<c:out value="${group.name}" /><br />
+	</c:forEach>
+	</c:if>
+	</td>
 	<c:forEach items="${roles}" var="role" varStatus="status">
 		<c:if test="${((3 * status.index) % roleCount) < 3}"><td></c:if>
-		<jamwiki:checkbox name="userRole" value="${roleMap.userGroup}|${role.authority}" checked="${roleMap.roleNamesMap[role.authority]}" />&#160;<c:out value="${role.authority}" /><br />
+		<c:choose>
+			<c:when test="${!empty groupMaps && !empty groupMaps[roleMap.userLogin].groupMapRoles[role.authority]}">
+				<span style="background-color: #FF9999;">
+			</c:when>
+			<c:otherwise>
+				<span>
+			</c:otherwise>
+		</c:choose>
+		<jamwiki:checkbox name="userRole" value="${roleMap.userGroup}|${role.authority}" checked="${roleMap.roleNamesMap[role.authority]}" />
+		</span>&#160;<c:out value="${role.authority}" /><br />
 		<c:if test="${((3 * status.count) % roleCount) < 3}"></td></c:if>
 	</c:forEach>
 </tr>
@@ -168,6 +198,37 @@
 </form>
 </div>
 
+<%-- Create/Update Groups --%>
+<div id="createGroup" class="submenu-tab-item">
+<form action="<jamwiki:link value="Special:Roles" />#createGroup" name="modifyGroupForm" method="post">
+<input type="hidden" name="function" value="modifyGroup" />
+<fieldset>
+<legend><fmt:message key="group.header.modify" /></legend>
+<div class="row">
+	<label for="updateGroup"><fmt:message key="group.caption.selectgroup" />:</label>
+	<span>
+		<select name="updateGroup" id="updateGroup" onchange="document.modifyGroupForm.submit()">
+		<option value=""></option>
+		<c:forEach items="${groups}" var="group"><option value="<c:out value="${group.name}" />" <c:if test="${group.name == groupName}">selected="selected"</c:if>><c:out value="${group.name}" /></option></c:forEach>
+		</select>
+	</span>
+	<div class="formhelp"><fmt:message key="group.help.selectgroup" /></div>
+</div>
+<div class="row">
+	<label for="groupName"><fmt:message key="group.caption.groupname" /></label>
+	<span><input type="text" name="groupName" id="groupName" value="<c:out value="${groupName}" />" size="30" <c:if test="${!empty groupName}">disabled="disabled"</c:if> /></span>
+	<div class="formhelp"><fmt:message key="group.help.groupname" /></div>
+</div>
+<div class="row">
+	<label for="groupDescription"><fmt:message key="group.caption.groupdescription" /></label>
+	<span><textarea class="medium" name="groupDescription" id="groupDescription"><c:out value="${groupDescription}" /></textarea></span>
+	<div class="formhelp"><fmt:message key="group.help.groupdescription" /></div>
+</div>
+<div class="row">
+	<span class="form-button"><input type="submit" name="Submit" value="<fmt:message key="common.button.save" />" /></span>
+</div>
+</fieldset>
+</form>
 </div>
 
 </div>

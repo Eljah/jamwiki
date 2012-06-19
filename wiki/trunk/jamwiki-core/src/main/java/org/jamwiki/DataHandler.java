@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -161,6 +162,16 @@ public interface DataHandler {
 	List<Category> getAllCategories(String virtualWiki, Pagination pagination) throws DataAccessException;
 
 	/**
+	 * Return a List of all custom WikiGroup objects for the wiki, i.e. all groups except the groups
+	 * GROUP_ANONYMOUS and GROUP_REGISTERED_USER. These are managed only internally
+	 * through the application.
+	 *
+	 * @return A List of all custom WikiGroups objects for the wiki
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	List<WikiGroup> getAllWikiGroups() throws DataAccessException;
+
+	/**
 	 * Return a List of all Role objects for the wiki.
 	 *
 	 * @return A List of all Role objects for the wiki.
@@ -293,6 +304,24 @@ public interface DataHandler {
 	 */
 	List<Role> getRoleMapUser(String login) throws DataAccessException;
 
+	/**
+	 * Retrieve the GroupMap for the group identified by groupId. The GroupMap contains
+	 * a list of all its members (logins)
+	 * @param groupId The group to retrieve
+	 * @return The GroupMap for the group identified by groupId.
+	 * @throws DataAccessException
+	 */
+	GroupMap getGroupMapGroup(int groupId) throws DataAccessException;
+	
+	/**
+	 * Retrieve the GroupMap for the user identified by login. The GroupMap contains
+	 * a list of all groups that this login belongs to.
+	 * @param login The user, whose groups must be looked up
+	 * @return The GroupMap of the user identified by login
+	 * @throws DataAccessException
+	 */
+	GroupMap getGroupMapUser(String login) throws DataAccessException;
+	
 	/**
 	 * Retrieve a List of RecentChange objects representing a topic's history,
 	 * sorted chronologically.
@@ -941,6 +970,15 @@ public interface DataHandler {
 	 */
 	void writeRoleMapUser(String username, List<String> roles) throws DataAccessException, WikiException;
 
+	/**
+	 * Write the groupMap to the database. Notice that the method will first delete all entries
+	 * referring to the group or the user (depending on groupMapType) and will then add an
+	 * entry for each group membership.
+	 * @param groupMap The GroupMap to store
+	 * @throws DataAccessException
+	 */
+	void writeGroupMap(GroupMap groupMap) throws DataAccessException;
+	
 	/**
 	 * Add or update a Topic object.  This method will add a new record if
 	 * the Topic does not have a topic ID, otherwise it will perform an update.

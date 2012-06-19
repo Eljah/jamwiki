@@ -34,6 +34,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -103,6 +104,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DELETE_AUTHORITIES = null;
 	protected static String STATEMENT_DELETE_CONFIGURATION = null;
 	protected static String STATEMENT_DELETE_GROUP_AUTHORITIES = null;
+	protected static String STATEMENT_DELETE_GROUP_MAP_GROUP = null;
+	protected static String STATEMENT_DELETE_GROUP_MAP_USER = null;
 	protected static String STATEMENT_DELETE_INTERWIKI = null;
 	protected static String STATEMENT_DELETE_LOG_ITEMS = null;
 	protected static String STATEMENT_DELETE_LOG_ITEMS_BY_TOPIC_VERSION = null;
@@ -183,7 +186,12 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_CATEGORIES = null;
 	protected static String STATEMENT_SELECT_CATEGORY_TOPICS = null;
 	protected static String STATEMENT_SELECT_CONFIGURATION = null;
+	protected static String STATEMENT_SELECT_GROUP_MAP_GROUP = null;
+	protected static String STATEMENT_SELECT_GROUP_MAP_USER = null;
+	protected static String STATEMENT_SELECT_GROUP_MAP_AUTHORITIES = null;
+	protected static String STATEMENT_SELECT_GROUPS = null;
 	protected static String STATEMENT_SELECT_GROUP = null;
+	protected static String STATEMENT_SELECT_GROUP_BY_ID = null;
 	protected static String STATEMENT_SELECT_GROUP_AUTHORITIES = null;
 	protected static String STATEMENT_SELECT_GROUPS_AUTHORITIES = null;
 	protected static String STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE = null;
@@ -351,6 +359,32 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	public void deleteGroupMap(GroupMap groupMap, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		try {
+			switch(groupMap.getGroupMapType()) {
+			case (GroupMap.GROUP_MAP_GROUP): {
+				stmt = conn.prepareStatement(STATEMENT_DELETE_GROUP_MAP_GROUP);
+				stmt.setInt(1, groupMap.getGroupId());
+				stmt.executeUpdate();
+				break;
+			}
+			case (GroupMap.GROUP_MAP_USER): {
+				stmt = conn.prepareStatement(STATEMENT_DELETE_GROUP_MAP_USER);
+				stmt.setString(1, groupMap.getUserLogin());
+				stmt.executeUpdate();
+				break;
+			}
+			default: throw new SQLException("deleteGroupMap - Group type invalid");
+			}
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -922,6 +956,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_USER);
 			stmt.setString(1, login);
+			stmt.setString(2, login);
 			rs = stmt.executeQuery();
 			List<Role> roles = new ArrayList<Role>();
 			while (rs.next()) {
@@ -954,6 +989,27 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 
+	/**
+	 *
+	 */
+	public List<WikiGroup> getGroups() throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUPS);
+			rs = stmt.executeQuery();
+			List<WikiGroup> groups = new ArrayList<WikiGroup>();
+			while (rs.next()) {
+				groups.add(this.initWikiGroup(rs));
+			}
+			return groups;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -1246,6 +1302,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DELETE_AUTHORITIES             = props.getProperty("STATEMENT_DELETE_AUTHORITIES");
 		STATEMENT_DELETE_CONFIGURATION           = props.getProperty("STATEMENT_DELETE_CONFIGURATION");
 		STATEMENT_DELETE_GROUP_AUTHORITIES       = props.getProperty("STATEMENT_DELETE_GROUP_AUTHORITIES");
+		STATEMENT_DELETE_GROUP_MAP_GROUP         = props.getProperty("STATEMENT_DELETE_GROUP_MAP_GROUP");
+		STATEMENT_DELETE_GROUP_MAP_USER          = props.getProperty("STATEMENT_DELETE_GROUP_MAP_USER");
 		STATEMENT_DELETE_INTERWIKI               = props.getProperty("STATEMENT_DELETE_INTERWIKI");
 		STATEMENT_DELETE_LOG_ITEMS               = props.getProperty("STATEMENT_DELETE_LOG_ITEMS");
 		STATEMENT_DELETE_LOG_ITEMS_BY_TOPIC_VERSION = props.getProperty("STATEMENT_DELETE_LOG_ITEMS_BY_TOPIC_VERSION");
@@ -1326,7 +1384,12 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_CATEGORIES              = props.getProperty("STATEMENT_SELECT_CATEGORIES");
 		STATEMENT_SELECT_CATEGORY_TOPICS         = props.getProperty("STATEMENT_SELECT_CATEGORY_TOPICS");
 		STATEMENT_SELECT_CONFIGURATION           = props.getProperty("STATEMENT_SELECT_CONFIGURATION");
+		STATEMENT_SELECT_GROUP_MAP_GROUP         = props.getProperty("STATEMENT_SELECT_GROUP_MAP_GROUP");
+		STATEMENT_SELECT_GROUP_MAP_USER          = props.getProperty("STATEMENT_SELECT_GROUP_MAP_USER");
+		STATEMENT_SELECT_GROUP_MAP_AUTHORITIES   = props.getProperty("STATEMENT_SELECT_GROUP_MAP_AUTHORITIES");
 		STATEMENT_SELECT_GROUP                   = props.getProperty("STATEMENT_SELECT_GROUP");
+		STATEMENT_SELECT_GROUP_BY_ID             = props.getProperty("STATEMENT_SELECT_GROUP_BY_ID");
+		STATEMENT_SELECT_GROUPS                  = props.getProperty("STATEMENT_SELECT_GROUPS");
 		STATEMENT_SELECT_GROUP_AUTHORITIES       = props.getProperty("STATEMENT_SELECT_GROUP_AUTHORITIES");
 		STATEMENT_SELECT_GROUPS_AUTHORITIES      = props.getProperty("STATEMENT_SELECT_GROUPS_AUTHORITIES");
 		STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE  = props.getProperty("STATEMENT_SELECT_GROUP_MEMBERS_SEQUENCE");
@@ -2175,7 +2238,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			int index = 1;
-			if (!this.autoIncrementPrimaryKeys()) {
+			if (!this.autoIncrementPrimaryKeys()) { // && group.getGroupId()>0) {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_GROUP);
 				int groupId = this.nextWikiGroupId(conn);
 				group.setGroupId(groupId);
@@ -2693,6 +2756,69 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
+	 * 
+	 */
+	public GroupMap lookupGroupMapGroup(int groupId) throws SQLException {
+		GroupMap groupMap = null;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		if(lookupWikiGroupById(groupId) != null) {
+			groupMap = new GroupMap(groupId);
+			try {
+				conn = DatabaseConnection.getConnection();
+				stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_GROUP);
+				stmt.setInt(1, groupId);
+				rs = stmt.executeQuery();
+				groupMap = new GroupMap(groupId);
+				List<String> userLogins = new ArrayList();
+				while(rs.next()) {
+					userLogins.add(rs.getString("username"));
+				}
+				groupMap.setGroupMembers(userLogins);
+				return groupMap;
+			} finally {
+				DatabaseConnection.closeConnection(conn, stmt,rs);
+			}
+		}
+		return groupMap;
+	}
+
+	/**
+	 * 
+	 */
+	public GroupMap lookupGroupMapUser(String userLogin) throws SQLException {
+		GroupMap groupMap = null;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_USER);
+			stmt.setString(1,userLogin);
+			rs = stmt.executeQuery();
+			groupMap = new GroupMap(userLogin);
+			List<Integer> groupIds = new ArrayList<Integer>();
+			while(rs.next()) {
+				groupIds.add(new Integer(rs.getInt("group_id")));
+			}
+			groupMap.setGroupIds(groupIds);
+			// retrieve roles assigned through group assignment
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_AUTHORITIES);
+			stmt.setString(1,userLogin);
+			rs = stmt.executeQuery();
+			List<String> roleNames = new ArrayList<String>();
+			while(rs.next()) {
+				roleNames.add(rs.getString("authority"));
+			}
+			groupMap.setRoleNames(roleNames);
+			return groupMap;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt,rs);
+		}
+	}
+
+	/**
 	 *
 	 */
 	public WikiGroup lookupWikiGroup(String groupName) throws SQLException {
@@ -2710,6 +2836,24 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 
+	/**
+	 *
+	 */
+	public WikiGroup lookupWikiGroupById(int groupId) throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_BY_ID);
+			stmt.setInt(1, groupId);
+			rs = stmt.executeQuery();
+			return (rs.next()) ? this.initWikiGroup(rs) : null;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -3232,7 +3376,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			DatabaseConnection.closeStatement(stmt);
 		}
 	}
-
+	
 	/**
 	 *
 	 */
