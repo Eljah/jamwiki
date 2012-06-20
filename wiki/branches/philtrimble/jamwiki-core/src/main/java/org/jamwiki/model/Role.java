@@ -16,6 +16,8 @@
  */
 package org.jamwiki.model;
 
+import org.jamwiki.Environment;
+
 /**
  * Provides an object representing a Wiki role that can be extended by the specific security
  * implementation.
@@ -29,15 +31,15 @@ public class Role {
 	 * available to normal users.  It does not allow the ability to change
 	 * system settings.
 	 */
-	public static final Role ROLE_ADMIN = new Role("ROLE_ADMIN");
+	public static final Role ROLE_ADMIN = new Role(Environment.getValue(Environment.PROP_ROLE_ADMIN));
 	/**
 	 * ROLE_ANONYMOUS is not stored in the database but is instead
 	 * automatically assigned to all non-logged in users by Spring
 	 * Security.
 	 */
-	public static final Role ROLE_ANONYMOUS = new Role("ROLE_ANONYMOUS");
-	public static final Role ROLE_EDIT_EXISTING = new Role("ROLE_EDIT_EXISTING");
-	public static final Role ROLE_EDIT_NEW = new Role("ROLE_EDIT_NEW");
+	public static final Role ROLE_ANONYMOUS = new Role(Environment.getValue(Environment.PROP_ROLE_ANONYMOUS));
+	public static final Role ROLE_EDIT_EXISTING = new Role(Environment.getValue(Environment.PROP_ROLE_EDIT_EXISTING));
+	public static final Role ROLE_EDIT_NEW = new Role(Environment.getValue(Environment.PROP_ROLE_EDIT_NEW));
 	/**
 	 * ROLE_EMBEDDED is meant for use with installations that perform
 	 * authentication and user management in an external system, such as LDAP.
@@ -45,10 +47,10 @@ public class Role {
 	 * from the Special:Roles interface; instead it should be assigned by the
 	 * LDAP or other system that performs user authentication.
 	 */
-	public static final Role ROLE_EMBEDDED = new Role("ROLE_EMBEDDED");
+	public static final Role ROLE_EMBEDDED = new Role(Environment.getValue(Environment.PROP_ROLE_EMBEDDED));
 	/** Role used to control who can import new topics to the wiki using Special:Import. */
-	public static final Role ROLE_IMPORT = new Role("ROLE_IMPORT");
-	public static final Role ROLE_MOVE = new Role("ROLE_MOVE");
+	public static final Role ROLE_IMPORT = new Role(Environment.getValue(Environment.PROP_ROLE_IMPORT));
+	public static final Role ROLE_MOVE = new Role(Environment.getValue(Environment.PROP_ROLE_MOVE));
 	/**
 	 * ROLE_NO_ACCOUNT is meant for use with installations that do not allow
 	 * user account management from within JAMWiki.  This role is not created
@@ -56,14 +58,14 @@ public class Role {
 	 * interface; instead it should be assigned by the LDAP or other system
 	 * that allows account management.
 	 */
-	public static final Role ROLE_NO_ACCOUNT = new Role("ROLE_NO_ACCOUNT");
+	public static final Role ROLE_NO_ACCOUNT = new Role(Environment.getValue(Environment.PROP_ROLE_NO_ACCOUNT));
 	/** Allow users to self-register. */
-	public static final Role ROLE_REGISTER = new Role("ROLE_REGISTER");
+	public static final Role ROLE_REGISTER = new Role(Environment.getValue(Environment.PROP_ROLE_REGISTER));
 	/** ROLE_SYSADMIN provides the ability to change system settings. */
-	public static final Role ROLE_SYSADMIN = new Role("ROLE_SYSADMIN");
-	public static final Role ROLE_TRANSLATE = new Role("ROLE_TRANSLATE");
-	public static final Role ROLE_UPLOAD = new Role("ROLE_UPLOAD");
-	public static final Role ROLE_VIEW = new Role("ROLE_VIEW");
+	public static final Role ROLE_SYSADMIN = new Role(Environment.getValue(Environment.PROP_ROLE_SYSADMIN));
+	public static final Role ROLE_TRANSLATE = new Role(Environment.getValue(Environment.PROP_ROLE_TRANSLATE));
+	public static final Role ROLE_UPLOAD = new Role(Environment.getValue(Environment.PROP_ROLE_UPLOAD));
+	public static final Role ROLE_VIEW = new Role(Environment.getValue(Environment.PROP_ROLE_VIEW));
 
 	private final String authority;
 	private String description;
