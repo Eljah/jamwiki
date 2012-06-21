@@ -3,6 +3,9 @@
 
 New Features:
 
+  * Add the ability to assign users to wiki groups (cclavadetscher).
+  * Allow default role names to be configured via property file to better
+    support LDAP (PhilTrimble).
   * Upgrade to Spring Framework 3.1.1.RELEASE.
   * Upgrade to Lucene Search 3.6.
   * Upgrade to commons-io-2.2.
