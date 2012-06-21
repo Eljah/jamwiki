@@ -88,8 +88,8 @@ properties, and default topics.  Once configuration is complete JAMWiki
 redirects to the wiki home page and is ready for use.  If any problems occur
 during installation please review the detailed installation instructions on
 http://jamwiki.org/wiki/en/Installation.  If your problem persists please
-report it on http://jamwiki.org/wiki/en/Bug_Reports and include any relevant
-information from your log files with the problem report.
+report it on http://jira.jamwiki.org/ and include any relevant information
+from your log files with the problem report.
 
 
 UPGRADES

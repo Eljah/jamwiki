@@ -19,6 +19,24 @@ Translation Updates:
   * None.
 
 
+1.2.1
+=====
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+  * Fix a Javascript error on the search page with IE.  Reported by shar.
+  * Problem with history when using DB2 database.  Reported with a fix by
+    Dennis N Brown.
+
+Translation Updates:
+
+  * Updated Italian translations (cclavadetscher).
+
+
 1.2
 ===
 
