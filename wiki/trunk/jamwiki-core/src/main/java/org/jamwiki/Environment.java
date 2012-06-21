@@ -134,6 +134,20 @@ public class Environment {
 	// Lookup properties file location from system properties first.
 	private static final String PROPERTY_FILE_NAME = System.getProperty("jamwiki.property.file", "jamwiki.properties");
 
+	public static final String PROP_ROLE_ADMIN = "role-admin";
+	public static final String PROP_ROLE_ANONYMOUS = "role-anonymous";
+	public static final String PROP_ROLE_EDIT_EXISTING = "role-edit-existing";
+	public static final String PROP_ROLE_EDIT_NEW = "role-edit-new";
+	public static final String PROP_ROLE_EMBEDDED = "role-embedded";
+	public static final String PROP_ROLE_IMPORT = "role-import";
+	public static final String PROP_ROLE_MOVE = "role-move";
+	public static final String PROP_ROLE_NO_ACCOUNT = "role-no-account";
+	public static final String PROP_ROLE_SYSADMIN = "role-sysadmin";
+	public static final String PROP_ROLE_TRANSLATE = "role-translate";
+	public static final String PROP_ROLE_UPLOAD = "role-upload";
+	public static final String PROP_ROLE_VIEW = "role-view";
+	public static final String PROP_ROLE_REGISTER = "role-register";
+
 	private static Environment ENVIRONMENT_INSTANCE = null;
 	private Properties defaults = null;
 	private SortedProperties props = null;
@@ -282,6 +296,19 @@ public class Environment {
 		this.defaults.setProperty(PROP_TOPIC_USE_PREVIEW, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_TOPIC_USE_SHOW_CHANGES, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_VIRTUAL_WIKI_DEFAULT, "en");
+		this.defaults.setProperty(PROP_ROLE_ADMIN, "ROLE_ADMIN");
+		this.defaults.setProperty(PROP_ROLE_ANONYMOUS, "ROLE_ANONYMOUS");
+		this.defaults.setProperty(PROP_ROLE_EDIT_EXISTING, "ROLE_EDIT_EXISTING");
+		this.defaults.setProperty(PROP_ROLE_EDIT_NEW, "ROLE_EDIT_NEW");
+		this.defaults.setProperty(PROP_ROLE_EMBEDDED, "ROLE_EMBEDDED");
+		this.defaults.setProperty(PROP_ROLE_IMPORT, "ROLE_IMPORT");
+		this.defaults.setProperty(PROP_ROLE_MOVE, "ROLE_MOVE");
+		this.defaults.setProperty(PROP_ROLE_NO_ACCOUNT, "ROLE_NO_ACCOUNT");
+		this.defaults.setProperty(PROP_ROLE_SYSADMIN, "ROLE_SYSADMIN");
+		this.defaults.setProperty(PROP_ROLE_TRANSLATE, "ROLE_TRANSLATE");
+		this.defaults.setProperty(PROP_ROLE_UPLOAD, "ROLE_UPLOAD");
+		this.defaults.setProperty(PROP_ROLE_VIEW, "ROLE_VIEW");
+		this.defaults.setProperty(PROP_ROLE_REGISTER, "ROLE_REGISTER");
 	}
 
 	/**
