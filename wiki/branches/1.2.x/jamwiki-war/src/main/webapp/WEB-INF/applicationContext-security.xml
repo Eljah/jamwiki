@@ -91,10 +91,10 @@
 	-->
 	<!--
 	<ldap-server id="ldapServer" url="ldap://192.168.1.100/dc=mycompany,dc=com" port="389" manager-dn="cn=admin,dc=mycompany,dc=de" manager-password="mypasswd" />
-	<ldap-authentication-provider server-ref="ldapServer" group-search-filter="member={0}" group-search-base="ou=groups" user-search-filter="uid={0}" user-search-base="ou=people" />
-	<authentication-provider>
-		<ldap-user-service server-ref="ldapServer" group-search-filter="member={0}" group-search-base="ou=groups" user-search-filter="uid={0}" user-search-base="ou=people" />
-	</authentication-provider>
+	<ldap-user-service server-ref="ldapServer" group-search-filter="member={0}" group-search-base="ou=groups" user-search-filter="uid={0}" user-search-base="ou=people" />
+	<authentication-manager alias="authenticationManager">
+		<ldap-authentication-provider server-ref="ldapServer" group-search-filter="uniqueMember={0}" group-search-base="ou=groups" user-search-filter="uid={0}" user-search-base="ou=people" />
+	</authentication-manager>
 	-->
 
 	<!--
