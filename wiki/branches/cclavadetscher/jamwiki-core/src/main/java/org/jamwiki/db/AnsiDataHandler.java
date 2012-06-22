@@ -2101,6 +2101,8 @@ public class AnsiDataHandler implements DataHandler {
 				this.validateAuthority(authority);
 				this.queryHandler().insertUserAuthority(username, authority, conn);
 			}
+			// flush the cache
+			CACHE_ROLE_MAP_GROUP.removeAllFromCache();
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -2147,7 +2149,7 @@ public class AnsiDataHandler implements DataHandler {
 				if (topicVersion.getPreviousTopicVersionId() == null && topic.getCurrentVersionId() != null) {
 					topicVersion.setPreviousTopicVersionId(topic.getCurrentVersionId());
 				}
-				List topicVersions = new ArrayList<TopicVersion>();
+				List<TopicVersion> topicVersions = new ArrayList<TopicVersion>();
 				topicVersions.add(topicVersion);
 				addTopicVersions(topic, topicVersions, conn);
 				// update the topic AFTER creating the version so that the current_topic_version_id parameter is set properly

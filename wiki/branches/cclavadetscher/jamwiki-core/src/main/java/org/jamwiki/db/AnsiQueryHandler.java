@@ -865,6 +865,8 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_AUTHORITY);
 			stmt.setString(1, authority);
 			stmt.setString(2, authority);
+			stmt.setString(3, authority);
+			stmt.setString(4, authority);
 			rs = stmt.executeQuery();
 			LinkedHashMap<String, RoleMap> roleMaps = new LinkedHashMap<String, RoleMap>();
 			while (rs.next()) {
@@ -884,7 +886,11 @@ public class AnsiQueryHandler implements QueryHandler {
 						roleMap.setGroupName(rs.getString("group_name"));
 					}
 				}
-				roleMap.addRole(rs.getString("authority"));
+				String roleName = rs.getString("authority");
+				if (roleName != null) {
+					roleMap.addRole(roleName);
+				}
+				// roleMap.addRole(rs.getString("authority"));
 				roleMaps.put(key, roleMap);
 			}
 			return new ArrayList<RoleMap>(roleMaps.values());
@@ -2771,7 +2777,7 @@ public class AnsiQueryHandler implements QueryHandler {
 				stmt.setInt(1, groupId);
 				rs = stmt.executeQuery();
 				groupMap = new GroupMap(groupId);
-				List<String> userLogins = new ArrayList();
+				List<String> userLogins = new ArrayList<String>();
 				while(rs.next()) {
 					userLogins.add(rs.getString("username"));
 				}
