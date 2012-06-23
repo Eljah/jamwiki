@@ -3,7 +3,8 @@
 
 New Features:
 
-  * None.
+  * Support comparison operations in the #expr tag ("{{#expr: -1 < 0}}").
+  * Upgrade to exp4j 0.3.1.
 
 Bugfixes:
 
