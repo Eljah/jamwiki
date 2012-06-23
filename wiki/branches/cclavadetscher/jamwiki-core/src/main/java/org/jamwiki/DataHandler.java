@@ -273,6 +273,21 @@ public interface DataHandler {
 	List<RoleMap> getRoleMapByRole(String roleName) throws DataAccessException;
 
 	/**
+	 * Retrieve a list of RoleMap objects for all users and groups who
+	 * have been assigned the specified role.
+	 *
+	 * @param roleName The name of the role being queried against.
+	 * @param includeInheritedRoles Set to false return only roles that are assigned
+	 *  directly 
+	 * @return A list of RoleMap objects containing all roles for all
+	 *  users and groups who have been assigned the specified role.  If no
+	 *  matches are found then this method returns an empty List.  This
+	 *  method will never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 */
+	List<RoleMap> getRoleMapByRole(String roleName,boolean includeInheritedRoles) throws DataAccessException;
+
+	/**
 	 * Retrieve all roles assigned to a given group.
 	 *
 	 * @param groupName The name of the group for whom roles are being retrieved.

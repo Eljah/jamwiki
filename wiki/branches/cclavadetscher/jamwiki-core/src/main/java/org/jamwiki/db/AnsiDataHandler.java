@@ -664,18 +664,25 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public List<RoleMap> getRoleMapByRole(String authority) throws DataAccessException {
+		return getRoleMapByRole(authority,false);
+	}
+	
+	/**
+	 *
+	 */
+	public List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws DataAccessException {
 		// first check the cache
-		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority);
-		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority)) {
+		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority + includeInheritedRoles);
+		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority + includeInheritedRoles)) {
 			return roleMapList;
 		}
 		// if not in the cache, go to the database
 		try {
-			roleMapList = this.queryHandler().getRoleMapByRole(authority);
+			roleMapList = this.queryHandler().getRoleMapByRole(authority,includeInheritedRoles);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		CACHE_ROLE_MAP_GROUP.addToCache(authority, roleMapList);
+		CACHE_ROLE_MAP_GROUP.addToCache(authority + includeInheritedRoles, roleMapList);
 		return roleMapList;
 	}
 

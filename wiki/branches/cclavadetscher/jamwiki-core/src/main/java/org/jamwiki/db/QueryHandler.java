@@ -321,12 +321,14 @@ public interface QueryHandler {
 	 * groups who have been assigned the specified role.
 	 *
 	 * @param authority The name of the role being queried against.
+	 * @param includeInheritedRoles Set to false return only roles that are assigned
+	 *  directly 
 	 * @return A list of user ids, group ids and role names for all users and
 	 *  groups who have been assigned the specified role, or an empty list if
 	 *  no matches are found.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	List<RoleMap> getRoleMapByRole(String authority) throws SQLException;
+	List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws SQLException;
 
 	/**
 	 * Retrieve a list of all roles assigned to a given group.
