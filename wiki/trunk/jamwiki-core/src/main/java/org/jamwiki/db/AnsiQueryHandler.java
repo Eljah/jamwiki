@@ -181,6 +181,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_INSERT_WIKI_USER = null;
 	protected static String STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT = null;
 	protected static String STATEMENT_SELECT_AUTHORITIES_AUTHORITY = null;
+	protected static String STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL = null;
 	protected static String STATEMENT_SELECT_AUTHORITIES_LOGIN = null;
 	protected static String STATEMENT_SELECT_AUTHORITIES_USER = null;
 	protected static String STATEMENT_SELECT_CATEGORIES = null;
@@ -856,15 +857,23 @@ public class AnsiQueryHandler implements QueryHandler {
 	/**
 	 *
 	 */
-	public List<RoleMap> getRoleMapByRole(String authority) throws SQLException {
+	public List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws SQLException {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_AUTHORITY);
-			stmt.setString(1, authority);
-			stmt.setString(2, authority);
+			if(includeInheritedRoles) {
+				stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL);
+				stmt.setString(1, authority);
+				stmt.setString(2, authority);
+				stmt.setString(3, authority);
+				stmt.setString(4, authority);
+			} else {
+				stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_AUTHORITY);
+				stmt.setString(1, authority);
+				stmt.setString(2, authority);
+			}
 			rs = stmt.executeQuery();
 			LinkedHashMap<String, RoleMap> roleMaps = new LinkedHashMap<String, RoleMap>();
 			while (rs.next()) {
@@ -884,7 +893,11 @@ public class AnsiQueryHandler implements QueryHandler {
 						roleMap.setGroupName(rs.getString("group_name"));
 					}
 				}
-				roleMap.addRole(rs.getString("authority"));
+				String roleName = rs.getString("authority");
+				if (roleName != null) {
+					roleMap.addRole(roleName);
+				}
+				// roleMap.addRole(rs.getString("authority"));
 				roleMaps.put(key, roleMap);
 			}
 			return new ArrayList<RoleMap>(roleMaps.values());
@@ -1379,6 +1392,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_INSERT_WIKI_USER               = props.getProperty("STATEMENT_INSERT_WIKI_USER");
 		STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT = props.getProperty("STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT");
 		STATEMENT_SELECT_AUTHORITIES_AUTHORITY   = props.getProperty("STATEMENT_SELECT_AUTHORITIES_AUTHORITY");
+		STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL = props.getProperty("STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL");
 		STATEMENT_SELECT_AUTHORITIES_LOGIN       = props.getProperty("STATEMENT_SELECT_AUTHORITIES_LOGIN");
 		STATEMENT_SELECT_AUTHORITIES_USER        = props.getProperty("STATEMENT_SELECT_AUTHORITIES_USER");
 		STATEMENT_SELECT_CATEGORIES              = props.getProperty("STATEMENT_SELECT_CATEGORIES");
@@ -2771,7 +2785,7 @@ public class AnsiQueryHandler implements QueryHandler {
 				stmt.setInt(1, groupId);
 				rs = stmt.executeQuery();
 				groupMap = new GroupMap(groupId);
-				List<String> userLogins = new ArrayList();
+				List<String> userLogins = new ArrayList<String>();
 				while(rs.next()) {
 					userLogins.add(rs.getString("username"));
 				}

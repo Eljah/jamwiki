@@ -230,6 +230,9 @@ public class RolesServlet extends JAMWikiServlet {
 	 */
 	private void searchRole(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		try {
+			String includeInheritedRoles = request.getParameter("includeInheritedRoles");
+			Boolean test = new Boolean(includeInheritedRoles == null?false:true);
+			next.addObject("includeInheritedRoles",test);
 			String searchLogin = request.getParameter("searchLogin");
 			String searchRole  = request.getParameter("searchRole");
 			String searchGroup = request.getParameter("searchGroup");
@@ -239,7 +242,7 @@ public class RolesServlet extends JAMWikiServlet {
 				roleMapUsers = WikiBase.getDataHandler().getRoleMapByLogin(searchLogin);
 				next.addObject("searchLogin", searchLogin);
 			} else if(!StringUtils.isBlank(searchRole)) {
-				roleMapUsers = WikiBase.getDataHandler().getRoleMapByRole(searchRole);
+				roleMapUsers = WikiBase.getDataHandler().getRoleMapByRole(searchRole,test.booleanValue());
 				next.addObject("searchRole", searchRole);
 			} else if(!StringUtils.isBlank(searchGroup)) {
 				GroupMap groupMap = WikiBase.getDataHandler().getGroupMapGroup(Integer.valueOf(searchGroup));

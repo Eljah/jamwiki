@@ -95,6 +95,8 @@
 		<option value=""></option>
 		<c:forEach items="${roles}" var="role"><option value="<c:out value="${role.authority}" />" <c:if test="${role.authority == searchRole}">selected="selected"</c:if>><c:out value="${role.authority}" /></option></c:forEach>
 		</select>
+		<input type="checkbox" name="includeInheritedRoles" value="includeInheritedRoles" onchange="document.searchRoleForm.submit()" <c:if test="${includeInheritedRoles}">checked="checked"</c:if> />
+		<fmt:message key="roles.caption.includeInheritedRoles" />
 	</span>
 </div>
 <div class="row">
@@ -115,6 +117,7 @@
 <input type="hidden" name="searchLogin" value="<c:out value="${searchLogin}" />" />
 <input type="hidden" name="searchRole" value="<c:out value="${searchRole}" />" />
 <input type="hidden" name="searchGroup" value="<c:out value="${searchGroup}" />" />
+<input type="hidden" name="includeInheritedRoles" value="<c:out value="${includeInheritedRoles}" />" />
 <input type="hidden" name="function" value="assignRole" />
 <div class="row">
 <table class="wiki-admin">

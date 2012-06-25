@@ -664,18 +664,25 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public List<RoleMap> getRoleMapByRole(String authority) throws DataAccessException {
+		return getRoleMapByRole(authority,false);
+	}
+	
+	/**
+	 *
+	 */
+	public List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws DataAccessException {
 		// first check the cache
-		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority);
-		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority)) {
+		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority + includeInheritedRoles);
+		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority + includeInheritedRoles)) {
 			return roleMapList;
 		}
 		// if not in the cache, go to the database
 		try {
-			roleMapList = this.queryHandler().getRoleMapByRole(authority);
+			roleMapList = this.queryHandler().getRoleMapByRole(authority,includeInheritedRoles);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		CACHE_ROLE_MAP_GROUP.addToCache(authority, roleMapList);
+		CACHE_ROLE_MAP_GROUP.addToCache(authority + includeInheritedRoles, roleMapList);
 		return roleMapList;
 	}
 
@@ -2101,6 +2108,8 @@ public class AnsiDataHandler implements DataHandler {
 				this.validateAuthority(authority);
 				this.queryHandler().insertUserAuthority(username, authority, conn);
 			}
+			// flush the cache
+			CACHE_ROLE_MAP_GROUP.removeAllFromCache();
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -2147,7 +2156,7 @@ public class AnsiDataHandler implements DataHandler {
 				if (topicVersion.getPreviousTopicVersionId() == null && topic.getCurrentVersionId() != null) {
 					topicVersion.setPreviousTopicVersionId(topic.getCurrentVersionId());
 				}
-				List topicVersions = new ArrayList<TopicVersion>();
+				List<TopicVersion> topicVersions = new ArrayList<TopicVersion>();
 				topicVersions.add(topicVersion);
 				addTopicVersions(topic, topicVersions, conn);
 				// update the topic AFTER creating the version so that the current_topic_version_id parameter is set properly
