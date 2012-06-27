@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.sql.Timestamp;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -110,7 +111,21 @@ public class JAMWikiPostAuthenticationFilter implements Filter {
 		Object principal = auth.getPrincipal();
 		// Check if Authentication returns a known principal
 		if (principal instanceof WikiUserDetailsImpl) {
-			// user has gone through the normal authentication path, no need to process further
+			try {
+				// user has gone through the normal authentication path, update last login date
+				// and return.
+				WikiUser wikiUser = WikiBase.getDataHandler().lookupWikiUser(((WikiUserDetailsImpl)principal).getUsername());
+				if(wikiUser != null) {
+					wikiUser.setLastLoginDate(new Timestamp(System.currentTimeMillis()));
+					WikiBase.getDataHandler().writeWikiUser(wikiUser, wikiUser.getUsername(), "");
+				}
+			} catch (DataAccessException e) {
+				logger.error("Failure while updating last login date for ", e);
+				throw new ServletException(e);
+			} catch (WikiException e) {
+				logger.error("Failure while updating last login date for ", e);
+				throw new ServletException(e);
+			}
 			return;
 		}
 		// find out authenticated username
@@ -132,7 +147,7 @@ public class JAMWikiPostAuthenticationFilter implements Filter {
 			return;
 		}
 		// for LDAP and other authentication methods, verify that JAMWiki database records exist
-		try {   
+		try {
 			if (WikiBase.getDataHandler().lookupWikiUser(username) == null) {
 				// if there is a valid security credential & no JAMWiki record for the user, create one
 				WikiUser user = new WikiUser(username);
