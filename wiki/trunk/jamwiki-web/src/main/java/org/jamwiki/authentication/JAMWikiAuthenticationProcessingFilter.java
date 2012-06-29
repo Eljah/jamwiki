@@ -18,6 +18,7 @@ package org.jamwiki.authentication;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,8 +77,8 @@ public class JAMWikiAuthenticationProcessingFilter extends UsernamePasswordAuthe
 	 * Override the parent method to update the last login date on successful
 	 * authentication.
 	 */
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException, ServletException {
-		super.successfulAuthentication(request, response, auth);
+	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException, ServletException {
+		super.successfulAuthentication(request, response, chain, auth);
 		Object principal = auth.getPrincipal();
 		// find authenticated username
 		String username = null;
