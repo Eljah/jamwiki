@@ -132,7 +132,7 @@ public class JAMWikiPostAuthenticationFilter implements Filter {
 			return;
 		}
 		// for LDAP and other authentication methods, verify that JAMWiki database records exist
-		try {   
+		try {
 			if (WikiBase.getDataHandler().lookupWikiUser(username) == null) {
 				// if there is a valid security credential & no JAMWiki record for the user, create one
 				WikiUser user = new WikiUser(username);

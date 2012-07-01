@@ -41,6 +41,7 @@ import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.TopicType;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.model.WikiGroup;
 
 /**
  * This class provides a variety of general utility methods for handling
@@ -591,6 +592,27 @@ public class WikiUtil {
 			throw new WikiException(new WikiMessage("roles.error.description"));
 		}
 		// FIXME - throw a user-friendly error if the role name is already in use
+	}
+
+	/**
+	 * Utility method for determining if the parameters of a Role are valid
+	 * or not.
+	 *
+	 * @param role The Role to validate.
+	 * @throws WikiException Thrown if the role is invalid.
+	 */
+	public static void validateWikiGroup(WikiGroup group) throws WikiException {
+		String groupName = group.getName();
+		if(groupName == null || groupName.length() == 0 || groupName.length() > 30) {
+			throw new WikiException(new WikiMessage("group.error.name", groupName));
+		}
+		Matcher m = WikiUtil.INVALID_ROLE_NAME_PATTERN.matcher(groupName);
+		if (!m.matches()) {
+			throw new WikiException(new WikiMessage("group.error.name", groupName));
+		}
+		if (!StringUtils.isBlank(group.getDescription()) && group.getDescription().length() > 200) {
+			throw new WikiException(new WikiMessage("group.error.description"));
+		}
 	}
 
 	/**

@@ -35,6 +35,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -564,6 +565,39 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
+	public List<WikiGroup> getAllWikiGroups() throws DataAccessException {
+		try {
+			return this.queryHandler().getGroups();
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public GroupMap getGroupMapGroup(int groupId) throws DataAccessException {
+		try {
+			return this.queryHandler().lookupGroupMapGroup(groupId);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public GroupMap getGroupMapUser(String userLogin) throws DataAccessException {
+		try {
+			return this.queryHandler().lookupGroupMapUser(userLogin);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
+	/**
+	 *
+	 */
 	public List<String> getAllTopicNames(String virtualWiki, boolean includeDeleted) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 		Connection conn = null;
@@ -630,18 +664,25 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public List<RoleMap> getRoleMapByRole(String authority) throws DataAccessException {
+		return getRoleMapByRole(authority,false);
+	}
+	
+	/**
+	 *
+	 */
+	public List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws DataAccessException {
 		// first check the cache
-		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority);
-		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority)) {
+		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority + includeInheritedRoles);
+		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority + includeInheritedRoles)) {
 			return roleMapList;
 		}
 		// if not in the cache, go to the database
 		try {
-			roleMapList = this.queryHandler().getRoleMapByRole(authority);
+			roleMapList = this.queryHandler().getRoleMapByRole(authority,includeInheritedRoles);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		}
-		CACHE_ROLE_MAP_GROUP.addToCache(authority, roleMapList);
+		CACHE_ROLE_MAP_GROUP.addToCache(authority + includeInheritedRoles, roleMapList);
 		return roleMapList;
 	}
 
@@ -2067,6 +2108,8 @@ public class AnsiDataHandler implements DataHandler {
 				this.validateAuthority(authority);
 				this.queryHandler().insertUserAuthority(username, authority, conn);
 			}
+			// flush the cache
+			CACHE_ROLE_MAP_GROUP.removeAllFromCache();
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
@@ -2113,7 +2156,7 @@ public class AnsiDataHandler implements DataHandler {
 				if (topicVersion.getPreviousTopicVersionId() == null && topic.getCurrentVersionId() != null) {
 					topicVersion.setPreviousTopicVersionId(topic.getCurrentVersionId());
 				}
-				List topicVersions = new ArrayList<TopicVersion>();
+				List<TopicVersion> topicVersions = new ArrayList<TopicVersion>();
 				topicVersions.add(topicVersion);
 				addTopicVersions(topic, topicVersions, conn);
 				// update the topic AFTER creating the version so that the current_topic_version_id parameter is set properly
@@ -2324,6 +2367,41 @@ public class AnsiDataHandler implements DataHandler {
 		DatabaseConnection.commit(status);
 	}
 
+	/**
+	 * 
+	 */
+	public void writeGroupMap(GroupMap groupMap) throws DataAccessException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction();
+			Connection conn = DatabaseConnection.getConnection();
+			this.queryHandler().deleteGroupMap(groupMap,conn);
+			switch(groupMap.getGroupMapType()) {
+				case GroupMap.GROUP_MAP_GROUP: {
+					int groupId = groupMap.getGroupId();
+					List<String> groupMembers = groupMap.getGroupMembers();
+					for(String groupMember : groupMembers) {
+						this.queryHandler().insertGroupMember(groupMember, groupId, conn);
+					}
+					break;
+				}
+				case GroupMap.GROUP_MAP_USER: {
+					String userLogin = groupMap.getUserLogin();
+					List<Integer> groupIds = groupMap.getGroupIds();
+					for(Integer groupId : groupIds) {
+						this.queryHandler().insertGroupMember(userLogin, groupId.intValue(), conn);
+					}
+					break;
+				}
+				default: throw new SQLException("writeGroupMap - Group type invalid"); 
+			}
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			throw new DataAccessException(e);
+		}
+		DatabaseConnection.commit(status);
+	}
+	
 	/**
 	 *
 	 */

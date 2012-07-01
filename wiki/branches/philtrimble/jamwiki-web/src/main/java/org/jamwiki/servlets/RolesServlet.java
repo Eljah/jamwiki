@@ -18,6 +18,7 @@ package org.jamwiki.servlets;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,8 @@ import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.RoleMap;
+import org.jamwiki.model.WikiGroup;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
@@ -56,6 +59,8 @@ public class RolesServlet extends JAMWikiServlet {
 			searchRole(request, next, pageInfo);
 		} else if (function.equals("assignRole")) {
 			assignRole(request, next, pageInfo);
+		} else if (function.equals("modifyGroup")) {
+			modifyGroup(request, next, pageInfo);
 		}
 		return next;
 	}
@@ -91,6 +96,26 @@ public class RolesServlet extends JAMWikiServlet {
 		}
 		return results;
 	}
+	
+	/**
+	 * Utility method to create a GroupMap from a userLogin and the array of groups
+	 * the user belongs to. The format of the array elements is "userLogin|groupId"
+	 * 
+	 * @param userLogin The login String of the user
+	 * @param groupIds The array of groups the user belongs to
+	 */
+	private GroupMap buildGroupMap(String userLogin,String[] groupIds) {
+		GroupMap groupMap = new GroupMap(userLogin);
+		List<Integer> groupIdsList = new ArrayList<Integer>();
+		for(int i=0;i<groupIds.length;i++) {
+			String[] tokens = groupIds[i].split("\\|");
+			if(tokens[0].equals(userLogin)) {
+				groupIdsList.add(new Integer(tokens[1]));
+			}
+		}
+		groupMap.setGroupIds(groupIdsList);
+		return groupMap;
+	}
 
 	/**
 	 *
@@ -117,6 +142,7 @@ public class RolesServlet extends JAMWikiServlet {
 			String[] candidateUsers = request.getParameterValues("candidateUser");
 			String[] candidateUsernames = request.getParameterValues("candidateUsername");
 			String[] userRoles = request.getParameterValues("userRole");
+			String[] userGroups = request.getParameterValues("userGroup");
 			if (candidateUsers != null) {
 				for (int i = 0; i < candidateUsers.length; i++) {
 					int userId = Integer.parseInt(candidateUsers[i]);
@@ -127,6 +153,19 @@ public class RolesServlet extends JAMWikiServlet {
 						roles.add(Role.ROLE_SYSADMIN.getAuthority());
 					}
 					WikiBase.getDataHandler().writeRoleMapUser(username, roles);
+					// handle group assignments
+					GroupMap groupMap = null;
+					if(userGroups != null) {
+						groupMap = buildGroupMap(username,userGroups);
+						// We must delete the groups GROUP_ANONYMOUS and GROUP_REGISTERED_USER
+						// if available to avoid duplicates in the datase
+						groupMap.getGroupIds().remove(new Integer(1));
+						groupMap.getGroupIds().remove(new Integer(2));
+					}
+					else {
+						groupMap = new GroupMap(username); 
+					}
+					WikiBase.getDataHandler().writeGroupMap(groupMap);
 				}
 				pageInfo.addMessage(new WikiMessage("roles.message.userroleupdate"));
 			}
@@ -136,7 +175,8 @@ public class RolesServlet extends JAMWikiServlet {
 			logger.error("Failure while adding role", e);
 			pageInfo.addError(new WikiMessage("roles.message.rolefail", e.getMessage()));
 		}
-		this.view(request, next, pageInfo);
+		this.searchRole(request, next, pageInfo);
+		// this.view(request, next, pageInfo);
 	}
 
 	/**
@@ -162,7 +202,9 @@ public class RolesServlet extends JAMWikiServlet {
 				}
 			} catch (WikiException e) {
 				pageInfo.addError(e.getWikiMessage());
+				role = null;
 			} catch (Exception e) {
+				role = null;
 				logger.error("Failure while adding role", e);
 				pageInfo.addError(new WikiMessage("roles.message.rolefail", e.getMessage()));
 			}
@@ -188,16 +230,38 @@ public class RolesServlet extends JAMWikiServlet {
 	 */
 	private void searchRole(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		try {
+			String includeInheritedRoles = request.getParameter("includeInheritedRoles");
+			Boolean test = new Boolean(includeInheritedRoles == null?false:true);
+			next.addObject("includeInheritedRoles",test);
 			String searchLogin = request.getParameter("searchLogin");
+			String searchRole  = request.getParameter("searchRole");
+			String searchGroup = request.getParameter("searchGroup");
 			List<RoleMap> roleMapUsers = null;
+			HashMap<String,GroupMap> groupMaps = new HashMap<String,GroupMap>();
 			if (!StringUtils.isBlank(searchLogin)) {
 				roleMapUsers = WikiBase.getDataHandler().getRoleMapByLogin(searchLogin);
 				next.addObject("searchLogin", searchLogin);
-			} else {
-				String searchRole = request.getParameter("searchRole");
-				roleMapUsers = WikiBase.getDataHandler().getRoleMapByRole(searchRole);
+			} else if(!StringUtils.isBlank(searchRole)) {
+				roleMapUsers = WikiBase.getDataHandler().getRoleMapByRole(searchRole,test.booleanValue());
 				next.addObject("searchRole", searchRole);
+			} else if(!StringUtils.isBlank(searchGroup)) {
+				GroupMap groupMap = WikiBase.getDataHandler().getGroupMapGroup(Integer.valueOf(searchGroup));
+				roleMapUsers = new ArrayList<RoleMap>();
+				List<String> groupMembers = groupMap.getGroupMembers();
+				for(String userLogin : groupMembers) {
+					List<RoleMap> roleMapUser = WikiBase.getDataHandler().getRoleMapByLogin(userLogin);
+					// The userLogin is unique. We can assume that there is only one item in the list.
+					roleMapUsers.add(roleMapUser.get(0));
+				}
+				next.addObject("searchGroup",searchGroup);
 			}
+			// Add group lists of users
+			if(roleMapUsers != null) {
+				for(RoleMap roleMap : roleMapUsers) {
+					groupMaps.put(roleMap.getUserLogin(),WikiBase.getDataHandler().getGroupMapUser(roleMap.getUserLogin()));
+				}
+			}
+			next.addObject("groupMaps",groupMaps);
 			next.addObject("roleMapUsers", roleMapUsers);
 		} catch (Exception e) {
 			logger.error("Failure while retrieving role", e);
@@ -209,12 +273,53 @@ public class RolesServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private void modifyGroup(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
+		String updateGroup = request.getParameter("updateGroup");
+		WikiGroup group = null;
+		if (!StringUtils.isBlank(request.getParameter("Submit"))) {
+			try {
+				// once created a group name cannot be modified, so the text field
+				// will be disabled in the form.
+				boolean update = StringUtils.isBlank(request.getParameter("groupName"));
+				String groupName = (update) ? updateGroup : request.getParameter("groupName");
+				if(!StringUtils.isBlank(groupName)) group = WikiBase.getDataHandler().lookupWikiGroup(groupName);
+				if(group == null) group = new WikiGroup(groupName);
+				group.setDescription(request.getParameter("groupDescription"));
+				WikiUtil.validateWikiGroup(group);
+				WikiBase.getDataHandler().writeWikiGroup(group);
+				if (update) {
+					pageInfo.addMessage(new WikiMessage("group.message.groupupdated", group.getName()));
+				} else {
+					pageInfo.addMessage(new WikiMessage("group.message.groupadded", group.getName()));
+				}
+			} catch (WikiException e) {
+				pageInfo.addError(e.getWikiMessage());
+				group = null;
+			} catch (Exception e) {
+				group = null;
+				logger.error("Failure while adding or modifying group", e);
+				pageInfo.addError(new WikiMessage("group.message.groupfail", e.getMessage()));
+			}
+		}
+		else if (!StringUtils.isBlank("updateGroup")) group = WikiBase.getDataHandler().lookupWikiGroup(updateGroup);
+		if (group != null) {
+			next.addObject("groupName", group.getName());
+			next.addObject("groupDescription", group.getDescription());
+		}
+		this.view(request, next, pageInfo);
+	}
+	
+	/**
+	 *
+	 */
 	private void view(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		List<Role> roles = WikiBase.getDataHandler().getAllRoles();
 		next.addObject("roles", roles);
 		next.addObject("roleCount", roles.size());
 		List<RoleMap> roleMapGroups = WikiBase.getDataHandler().getRoleMapGroups();
 		next.addObject("roleMapGroups", roleMapGroups);
+		List<WikiGroup> groups = WikiBase.getDataHandler().getAllWikiGroups();
+		next.addObject("groups", groups);
 		pageInfo.setAdmin(true);
 		pageInfo.setContentJsp(JSP_ADMIN_ROLES);
 		pageInfo.setPageTitle(new WikiMessage("roles.title"));

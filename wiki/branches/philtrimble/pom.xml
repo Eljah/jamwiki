@@ -288,6 +288,20 @@
 			<timezone>-8</timezone>
 		</developer>
 		<developer>
+			<id>cclavadetscher</id>
+			<name>Charles Clavadetscher</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>PhilTrimble</id>
+			<name>Phil Trimble</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
 			<id>rainers</id>
 			<name>Rainer Schmitz</name>
 			<email>rainers at users.sf.net</email>

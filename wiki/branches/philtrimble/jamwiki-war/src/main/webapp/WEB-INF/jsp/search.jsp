@@ -36,7 +36,7 @@
 </fieldset>
 </form>
 
-<script type="text/javascript">document.searchForm.text.focus();</script>
+<script type="text/javascript">document.getElementById("searchTerm").focus();</script>
 <c:choose>
 	<c:when test="${!empty notopic}">
 		<%-- if "jump to" selected but no such topic exists --%>

@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import org.jamwiki.model.Category;
+import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
 import org.jamwiki.model.Interwiki;
 import org.jamwiki.model.LogItem;
@@ -171,6 +172,15 @@ public interface QueryHandler {
 	void deleteUserAuthorities(String username, Connection conn) throws SQLException;
 
 	/**
+	 * Delete group membership from database. Notice that this may be the deletion of
+	 * all members of a group (when acting as a container of group users) or the deletion of
+	 * all memberships of a user (when acting as a group list for a user).
+	 * @param groupMap The GroupMap to delete
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	void deleteGroupMap(GroupMap groupMap, Connection conn) throws SQLException;
+	
+	/**
 	 * Delete a user's watchlist entry using the topic name to determine which
 	 * entry to remove.
 	 *
@@ -311,12 +321,14 @@ public interface QueryHandler {
 	 * groups who have been assigned the specified role.
 	 *
 	 * @param authority The name of the role being queried against.
+	 * @param includeInheritedRoles Set to false return only roles that are assigned
+	 *  directly 
 	 * @return A list of user ids, group ids and role names for all users and
 	 *  groups who have been assigned the specified role, or an empty list if
 	 *  no matches are found.
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	List<RoleMap> getRoleMapByRole(String authority) throws SQLException;
+	List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws SQLException;
 
 	/**
 	 * Retrieve a list of all roles assigned to a given group.
@@ -357,6 +369,15 @@ public interface QueryHandler {
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
 	List<Role> getRoles() throws SQLException;
+
+	/**
+	 * Retrieve a list of all groups that have been defined for the wiki.
+	 *
+	 * @return Returns a list of all groups that have been defined for the wiki,
+	 *  or an empty list if no roles exist.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	List<WikiGroup> getGroups() throws SQLException;
 
 	/**
 	 * Retrieve a list of all history for a specific topic.
@@ -919,6 +940,22 @@ public interface QueryHandler {
 	 */
 	int lookupWikiFileCount(int virtualWikiId) throws SQLException;
 
+	/**
+	 * Retrieve the GroupMap associated with the group identified by groupId
+	 * @param groupId The GroupMap to retrieve
+	 * @return The GroupMap
+	 * @throws SQLException
+	 */
+	GroupMap lookupGroupMapGroup(int groupId) throws SQLException;
+
+	/**
+	 * Retrieve the GroupMap associated with the userLogin
+	 * @param userLogin The GroupMap to retrieve
+	 * @return The GroupMap
+	 * @throws SQLException
+	 */
+	GroupMap lookupGroupMapUser(String userLogin) throws SQLException;
+	
 	/**
 	 * Retrieve a result set containing group information given the name of the group.
 	 *
