@@ -82,13 +82,17 @@ public class XMLUtil {
 		if (tagValue == null) {
 			return;
 		}
-		writer.append('<').append(tagName).append('>');
-		if (escape) {
-			StringEscapeUtils.ESCAPE_XML.translate(tagValue, writer);
+		if (tagValue.length() == 0) {
+			writer.append('<').append(tagName).append(" />");
 		} else {
-			writer.append(tagValue);
+			writer.append('<').append(tagName).append('>');
+			if (escape) {
+				StringEscapeUtils.ESCAPE_XML.translate(tagValue, writer);
+			} else {
+				writer.append(tagValue);
+			}
+			writer.append("</").append(tagName).append('>');
 		}
-		writer.append("</").append(tagName).append('>');
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class XMLUtil {
 		// note - closing a StringWriter is not necessary
 		Writer writer = new StringWriter();
 		try {
-			XMLUtil.buildTag(writer, tagName, tagValue, escape);
+			XMLUtil.buildTag(writer, tagName, tagValue, attributes, escape);
 		} catch (IOException e) {
 			// StringWriter never throws IOException, ignore
 		}
@@ -139,13 +143,17 @@ public class XMLUtil {
 			}
 			writer.append('\"');
 		}
-		writer.append('>');
-		if (escape) {
-			StringEscapeUtils.ESCAPE_XML.translate(tagValue, writer);
+		if (tagValue.length() == 0) {
+			writer.append(" />");
 		} else {
-			writer.append(tagValue);
+			writer.append('>');
+			if (escape) {
+				StringEscapeUtils.ESCAPE_XML.translate(tagValue, writer);
+			} else {
+				writer.append(tagValue);
+			}
+			writer.append("</").append(tagName).append('>');
 		}
-		writer.append("</").append(tagName).append('>');
 	}
 
 	/**

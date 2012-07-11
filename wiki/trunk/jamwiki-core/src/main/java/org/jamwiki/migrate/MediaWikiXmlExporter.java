@@ -25,7 +25,7 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
@@ -64,7 +64,7 @@ public class MediaWikiXmlExporter implements TopicExporter {
 		try {
 			fileWriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
 			bufferedWriter = new BufferedWriter(fileWriter);
-			bufferedWriter.append("<mediawiki xmlns=\"http://www.mediawiki.org/xml/export-0.3/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd\" version=\"0.3\" xml:lang=\"en\">");
+			bufferedWriter.append("<mediawiki xmlns=\"http://www.mediawiki.org/xml/export-0.7/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.mediawiki.org/xml/export-0.7/ http://www.mediawiki.org/xml/export-0.7.xsd\" version=\"0.7\" xml:lang=\"en\">");
 			this.writeSiteInfo(bufferedWriter, virtualWiki);
 			this.writePages(bufferedWriter, virtualWiki, topicNames, excludeHistory);
 			bufferedWriter.append("\n</mediawiki>");
@@ -122,7 +122,7 @@ public class MediaWikiXmlExporter implements TopicExporter {
 		writer.append('\n');
 		XMLUtil.buildTag(writer, "case", "case-sensitive", true);
 		writer.append("\n<namespaces>");
-		Map<String, String> attributes = new HashMap<String, String>();
+		Map<String, String> attributes = new LinkedHashMap<String, String>();
 		List<Namespace> namespaces = WikiBase.getDataHandler().lookupNamespaces();
 		for (Namespace namespace : namespaces) {
 			attributes.put("key", Integer.toString(namespace.getId()));
@@ -147,7 +147,7 @@ public class MediaWikiXmlExporter implements TopicExporter {
 		int maxRevisions = (Environment.getIntValue(Environment.PROP_MAX_TOPIC_VERSION_EXPORT) > 0) ? Environment.getIntValue(Environment.PROP_MAX_TOPIC_VERSION_EXPORT) : 100000;
 		int revisionsRetrieved = 0;
 		List<Integer> topicVersionIds;
-		Map<String, String> textAttributes = new HashMap<String, String>();
+		Map<String, String> textAttributes = new LinkedHashMap<String, String>();
 		textAttributes.put("xml:space", "preserve");
 		for (String topicName : topicNames) {
 			topicVersionIds = new ArrayList<Integer>();
@@ -158,6 +158,8 @@ public class MediaWikiXmlExporter implements TopicExporter {
 			writer.append("\n<page>");
 			writer.append('\n');
 			XMLUtil.buildTag(writer, "title", topic.getName(), true);
+			writer.append('\n');
+			XMLUtil.buildTag(writer, "ns", topic.getNamespace().getId());
 			writer.append('\n');
 			XMLUtil.buildTag(writer, "id", topic.getTopicId());
 			if (excludeHistory || (maxRevisions - revisionsRetrieved) <= 1) {
@@ -195,8 +197,13 @@ public class MediaWikiXmlExporter implements TopicExporter {
 				}
 				writer.append("\n</contributor>");
 				writer.append('\n');
+				if (topicVersion.getEditType() == TopicVersion.EDIT_MINOR) {
+					XMLUtil.buildTag(writer, "minor", "", true);
+					writer.append('\n');
+				}
 				XMLUtil.buildTag(writer, "comment", topicVersion.getEditComment(), true);
 				writer.append('\n');
+				textAttributes.put("bytes", Long.toString(topicVersion.getVersionContent().getBytes().length));
 				XMLUtil.buildTag(writer, "text", topicVersion.getVersionContent(), textAttributes, true);
 				writer.append("\n</revision>");
 				// explicitly null out temp variables to improve garbage collection and
