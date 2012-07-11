@@ -648,8 +648,8 @@ public class ServletUtil {
 	public static Locale retrieveUserLocale(HttpServletRequest request) {
 		try {
 			WikiUser user = ServletUtil.currentWikiUser();
-			if (user.getDefaultLocale() != null) {
-				return LocaleUtils.toLocale(user.getDefaultLocale());
+			if (user.getPreference("user.default.locale") != null) {
+				return LocaleUtils.toLocale(user.getPreference("user.default.locale"));
 			}
 		} catch (AuthenticationCredentialsNotFoundException e) {
 			// ignore

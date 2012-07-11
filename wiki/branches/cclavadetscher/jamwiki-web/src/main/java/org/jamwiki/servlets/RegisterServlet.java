@@ -35,6 +35,7 @@ import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -74,8 +75,8 @@ public class RegisterServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void loadDefaults(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, WikiUser user) throws Exception {
-		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
-			user.setDefaultLocale(request.getLocale().toString());
+		if (StringUtils.isBlank(user.getPreference("user.default.locale")) && request.getLocale() != null) {
+			user.setPreference("user.default.locale",request.getLocale().toString());
 		}
 		TreeMap<String, String> locales = new TreeMap<String, String>();
 		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
@@ -94,6 +95,7 @@ public class RegisterServlet extends JAMWikiServlet {
 		next.addObject("editors", editors);
 		next.addObject("newuser", user);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isRegistrationEnabled());
+		next.addObject("timezones",DateUtil.getTimeZoneIDs());
 		pageInfo.setSpecial(true);
 		pageInfo.setContentJsp(JSP_REGISTER);
 		pageInfo.setPageTitle(new WikiMessage("register.title"));
@@ -145,8 +147,8 @@ public class RegisterServlet extends JAMWikiServlet {
 				this.login(request, user.getUsername(), newPassword);
 			}
 			// update the locale key since the user may have changed default locale
-			if (!StringUtils.isBlank(user.getDefaultLocale())) {
-				Locale locale = LocaleUtils.toLocale(user.getDefaultLocale());
+			if (!StringUtils.isBlank(user.getPreference("user.default.locale"))) {
+				Locale locale = LocaleUtils.toLocale(user.getPreference("user.default.locale"));
 				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
 			}
 			if (isUpdate) {
@@ -173,14 +175,17 @@ public class RegisterServlet extends JAMWikiServlet {
 				user = WikiBase.getDataHandler().lookupWikiUser(userId);
 			}
 		}
-		user.setDisplayName(request.getParameter("displayName"));
-		user.setDefaultLocale(request.getParameter("defaultLocale"));
 		user.setEmail(request.getParameter("email"));
-		user.setEditor(request.getParameter("editor"));
-		user.setSignature(request.getParameter("signature"));
 		// FIXME - need to distinguish between add & update
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
+
+		user.setPreference("user.display.name",request.getParameter("displayName"));
+		user.setPreference("user.default.locale",request.getParameter("defaultLocale"));
+		user.setPreference("user.timezone", request.getParameter("timezone"));
+		user.setPreference("user.datetime.format", request.getParameter("datetimeFormat"));
+		user.setPreference("user.preferred.editor",request.getParameter("editor"));
+		user.setPreference("user.signature",request.getParameter("signature"));
 		return user;
 	}
 

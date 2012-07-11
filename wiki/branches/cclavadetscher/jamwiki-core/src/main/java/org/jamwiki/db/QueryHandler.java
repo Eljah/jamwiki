@@ -18,8 +18,11 @@ package org.jamwiki.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.jamwiki.DataAccessException;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
@@ -459,6 +462,13 @@ public interface QueryHandler {
 	List<RecentChange> getUserContributionsByUserDisplay(String virtualWiki, String userDisplay, Pagination pagination, boolean descending) throws SQLException;
 
 	/**
+	 * Return a hashmap of key/value pairs containing the definde user preferences
+	 * defaults.
+	 * @return
+	 */
+	HashMap<String, String> getUserPreferencesDefaults() throws SQLException;
+	
+	/**
 	 * Retrieve a list of all virtual wiki information for all virtual wikis.
 	 *
 	 * @param conn A database connection to use when connecting to the database
@@ -723,6 +733,15 @@ public interface QueryHandler {
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
 	void insertWikiUser(WikiUser user, Connection conn) throws SQLException;
+	
+	/**
+	 * Add a new key/value preference in the database.
+	 * 
+	 * @param userPreferenceKey The key (or name) of the preference
+	 * @param userPreferenceDefaultValue The default value for this preference
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a list of all topics in a category.
@@ -1016,6 +1035,15 @@ public interface QueryHandler {
 	List<String> lookupWikiUsers(Pagination pagination) throws SQLException;
 
 	/**
+	 * Test if a user preference exists.
+	 * @param userPreferenceKey The user preference to check 
+	 * @return true if the user preference exists.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	boolean existsUserPreferenceDefault(String userPreferenceKey) throws SQLException;
+	
+	
+	/**
 	 * Utility method used when importing to updating the previous topic version ID field
 	 * of topic versions, as well as the current version ID field for the topic record.
 	 *
@@ -1193,6 +1221,15 @@ public interface QueryHandler {
 	 */
 	void updateWikiUser(WikiUser user, Connection conn) throws SQLException;
 
+	/**
+	 * Modify the default value of a named use preference.
+	 * 
+	 * @param userPreferenceKey The key (or name) of the preference to modify
+	 * @param userPreferenceDefaultValue The new default value for the preference
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException;
+	
 	/**
 	 * Add new image or other data to database.
 	 *

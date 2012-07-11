@@ -18,6 +18,7 @@ package org.jamwiki;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -207,6 +208,13 @@ public interface DataHandler {
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	List<WikiFileVersion> getAllWikiFileVersions(String virtualWiki, String topicName, boolean descending) throws DataAccessException;
+
+	/**
+	 * Return a hashmap of key/value pairs containing the definde user preferences
+	 * defaults.
+	 * @return
+	 */
+	HashMap<String, String> getUserPreferencesDefaults() throws DataAccessException;
 
 	/**
 	 * Retrieve a List of all LogItem objects for a given virtual wiki, sorted
@@ -755,7 +763,7 @@ public interface DataHandler {
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	List<String> lookupWikiUsers(Pagination pagination) throws DataAccessException;
-
+	
 	/**
 	 * Move a topic to a new name, creating a redirect topic in the old
 	 * topic location.  An exception will be thrown if the topic cannot be
@@ -1099,6 +1107,15 @@ public interface DataHandler {
 	 * @throws WikiException Thrown if the user information is invalid.
 	 */
 	void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException;
+
+	/**
+	 * Insert or update a user preference default value.
+	 * @param userPreferenceKey The key (or name) of the preference 
+	 * @param userPreferenceDefaultValue The default value for this preference
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the parameter information is invalid.
+	 */
+	void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue) throws DataAccessException, WikiException;
 
 	/**
 	 * Add new image or other data to database.

@@ -17,10 +17,10 @@
 package org.jamwiki.authentication;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.sql.Timestamp;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -111,23 +111,7 @@ public class JAMWikiPostAuthenticationFilter implements Filter {
 		Object principal = auth.getPrincipal();
 		// Check if Authentication returns a known principal
 		if (principal instanceof WikiUserDetailsImpl) {
-			String username = null;
-			try {
-				// user has gone through the normal authentication path, update last login date
-				// and return.
-				username = ((WikiUserDetailsImpl)principal).getUsername();
-				WikiUser wikiUser = WikiBase.getDataHandler().lookupWikiUser(username);
-				if(wikiUser != null) {
-					wikiUser.setLastLoginDate(new Timestamp(System.currentTimeMillis()));
-					WikiBase.getDataHandler().writeWikiUser(wikiUser, wikiUser.getUsername(), "");
-				}
-			// Do not propagate exceptions. In the best case the database is up and running and
-			// this is a smaller issue that does not affect the rest of the application.
-			} catch (DataAccessException e) {
-				logger.error("Failure while updating last login date for " + username, e);
-			} catch (WikiException e) {
-				logger.error("Failure while updating last login date for " + username, e);
-			}
+			// user has gone through the normal authentication path, no need to process further
 			return;
 		}
 		// find out authenticated username

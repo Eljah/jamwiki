@@ -16,11 +16,21 @@
  */
 package org.jamwiki.authentication;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.jamwiki.DataAccessException;
+import org.jamwiki.WikiBase;
+import org.jamwiki.WikiException;
 import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.WikiUtil;
 
 /**
@@ -61,5 +71,38 @@ public class JAMWikiAuthenticationProcessingFilter extends UsernamePasswordAuthe
 		}
 		String virtualWiki = WikiUtil.getVirtualWikiFromURI(request);
 		return uri.endsWith(request.getContextPath() + "/" + virtualWiki + this.getFilterProcessesUrl());
+	}
+
+	/**
+	 * Override the parent method to update the last login date on successful
+	 * authentication.
+	 */
+	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException, ServletException {
+		super.successfulAuthentication(request, response, chain, auth);
+		Object principal = auth.getPrincipal();
+		// find authenticated username
+		String username = null;
+		if (principal instanceof UserDetails) {
+			// using custom authentication with Spring Security UserDetail service
+			username = ((UserDetails)principal).getUsername();
+		} else if (principal instanceof String) {
+			// external authentication returns only username
+			username = String.valueOf(principal);
+		}
+		if (username != null) {
+			try {
+				WikiUser wikiUser = WikiBase.getDataHandler().lookupWikiUser(username);
+				if (wikiUser != null) {
+					wikiUser.setLastLoginDate(new Timestamp(System.currentTimeMillis()));
+					WikiBase.getDataHandler().writeWikiUser(wikiUser, wikiUser.getUsername(), "");
+				}
+			} catch (DataAccessException e) {
+				// log but do not throw - failure to update last login date is non-fatal
+				logger.error("Failure while updating last login date for " + username, e);
+			} catch (WikiException e) {
+				// log but do not throw - failure to update last login date is non-fatal
+				logger.error("Failure while updating last login date for " + username, e);
+			}
+		}
 	}
 }

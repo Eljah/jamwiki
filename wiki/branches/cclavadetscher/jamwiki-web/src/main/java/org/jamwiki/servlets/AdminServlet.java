@@ -114,7 +114,7 @@ public class AdminServlet extends JAMWikiServlet {
 			WikiUtil.validatePassword(password, confirmPassword);
 			String encryptedPassword = Encryption.encrypt(password);
 			user = new WikiUser(userLogin);
-			user.setDisplayName(displayName);
+			user.setPreference("user.display.name",displayName);
 			user.setEmail(email);
 			user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 			user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));

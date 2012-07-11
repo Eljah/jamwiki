@@ -23,7 +23,7 @@
 <%@ include file="page-init.jsp" %>
 
 <div id="register">
-
+<c:out value="${newuser}" />
 <div class="message"><fmt:message key="register.form.info" /></div>
 <form name="form1" method="post" action="<jamwiki:link value="Special:Account" />">
 <input type="hidden" name="userId" value="<c:out value="${newuser.userId}" />" />
@@ -61,7 +61,7 @@
 			<span>
 				<select name="defaultLocale" id="registerDefaultLocale">
 				<c:forEach items="${locales}" var="defaultLocale">
-				<option value="<c:out value="${defaultLocale.value}" />"<c:if test="${newuser.defaultLocale == defaultLocale.value}"> selected="selected"</c:if>><c:out value="${defaultLocale.key}" /></option>
+				<option value="<c:out value="${defaultLocale.value}" />"<c:if test="${newuser.preferences['user.default.locale'] == defaultLocale.value}"> selected="selected"</c:if>><c:out value="${defaultLocale.key}" /></option>
 				</c:forEach>
 				</select>
 			</span>
@@ -97,7 +97,7 @@
 		<legend><fmt:message key="register.caption.userpreferences" /></legend>
 		<div class="row">
 			<label for="registerDisplayName"><fmt:message key="register.caption.displayname" /></label>
-			<span><input type="text" name="displayName" value="<c:out value="${newuser.displayName}" />" id="registerDisplayName" size="50" /></span>
+			<span><input type="text" name="displayName" value="<c:out value="${newuser.preferences['user.display.name']}" />" id="registerDisplayName" size="50" /></span>
 			<div class="formhelp"><fmt:message key="register.help.displayname" /></div>
 		</div>
 		<div class="row">
@@ -105,18 +105,34 @@
 			<span>
 				<select name="defaultLocale" id="registerDefaultLocale">
 				<c:forEach items="${locales}" var="defaultLocale">
-				<option value="<c:out value="${defaultLocale.value}" />"<c:if test="${newuser.defaultLocale == defaultLocale.value}"> selected="selected"</c:if>><c:out value="${defaultLocale.key}" /></option>
+				<option value="<c:out value="${defaultLocale.value}" />"<c:if test="${newuser.preferences['user.default.locale'] == defaultLocale.value}"> selected="selected"</c:if>><c:out value="${defaultLocale.key}" /></option>
 				</c:forEach>
 				</select>
 			</span>
 			<div class="formhelp"><fmt:message key="register.help.locale" /></div>
 		</div>
 		<div class="row">
+		<label for="registerTimezone"><fmt:message key="register.caption.timezone" /></label>
+		<span>
+			<select name="timezone" id="registerTimezone">
+			<c:forEach items="${timezones}" var="timezone">
+			<option value="<c:out value="${timezone}" />"<c:if test="${newuser.preferences['user.timezone'] == timezone}"> selected="selected"</c:if>><c:out value="${timezone}" /></option>
+			</c:forEach>
+			</select>
+		</span>
+		<div class="formhelp"><fmt:message key="register.help.timezone" /></div>
+		</div>
+		<div class="row">
+		<label for="registerDatetimeFormat"><fmt:message key="register.caption.datetime.format" /></label>
+		<span><input type="text" name="datetimeFormat" value="<c:out value="${newuser.preferences['user.datetime.format']}" />" id="registerDatetimeFormat" size="50" /></span>
+		<div class="formhelp"><fmt:message key="register.help.datetime.format" /></div>
+		</div>
+		<div class="row">
 			<label for="registerEditor"><fmt:message key="register.caption.editor" /></label>
 			<span>
 				<select name="editor" id="registerEditor">
 				<c:forEach items="${editors}" var="editor">
-				<option value="<c:out value="${editor.key}" />"<c:if test="${newuser.editor == editor.key}"> selected="selected"</c:if>><c:out value="${editor.value}" /></option>
+				<option value="<c:out value="${editor.key}" />"<c:if test="${newuser.preferences['user.preferred.editor'] == editor.key}"> selected="selected"</c:if>><c:out value="${editor.value}" /></option>
 				</c:forEach>
 				</select>
 			</span>
@@ -124,7 +140,7 @@
 		</div>
 		<div class="row">
 			<label for="registerSignature"><fmt:message key="register.caption.signature" /></label>
-			<span><input type="text" name="signature" value="<c:out value="${newuser.signature}" />" id="registerSignature" size="50" /></span>
+			<span><input type="text" name="signature" value="<c:out value="${newuser.preferences['user.signature']}" />" id="registerSignature" size="50" /></span>
 			<div class="formhelp"><fmt:message key="register.help.signature" /></div>
 		</div>
 		</fieldset>

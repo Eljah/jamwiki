@@ -20,10 +20,12 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
+import org.jamwiki.WikiBase;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
+import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -56,9 +58,11 @@ public class WikiSignatureTag implements JFlexParserTag {
 			signature += " ";
 		}
 		if (includeDate) {
-			SimpleDateFormat format = new SimpleDateFormat();
-			format.applyPattern(Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true));
-			signature += format.format(new java.util.Date());
+			WikiUser user = lexer.getParserInput().getWikiUser();
+			String dateFormat = StringUtils.isBlank(user.getPreference("user.datetime.format"))?Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true):user.getPreference("user.datetime.format");
+			signature += DateUtil.getUserLocalTime(user.getPreference("user.timezone"),
+					                               dateFormat,
+					                               user.getPreference("user.default.locale"));
 		}
 		return signature;
 	}
@@ -85,8 +89,8 @@ public class WikiSignatureTag implements JFlexParserTag {
 	 */
 	private String retrieveUserSignature(ParserInput parserInput) {
 		WikiUser user = parserInput.getWikiUser();
-		if (user != null && !StringUtils.isBlank(user.getSignature())) {
-			return user.getSignature();
+		if (user != null && !StringUtils.isBlank(user.getPreference("user.signature"))) {
+			return user.getPreference("user.signature");
 		}
 		String login = parserInput.getUserDisplay();
 		String email = parserInput.getUserDisplay();
@@ -94,7 +98,7 @@ public class WikiSignatureTag implements JFlexParserTag {
 		String userId = "-1";
 		if (user != null && !StringUtils.isBlank(user.getUsername())) {
 			login = user.getUsername();
-			displayName = (!StringUtils.isBlank(user.getDisplayName())) ? user.getDisplayName() : login;
+			displayName = (!StringUtils.isBlank(user.getPreference("user.display.name"))) ? user.getPreference("user.display.name") : login;
 			email = user.getEmail();
 			userId = Integer.toString(user.getUserId());
 		}

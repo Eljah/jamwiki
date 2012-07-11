@@ -19,6 +19,11 @@ package org.jamwiki.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.jamwiki.DataAccessException;
+import org.jamwiki.DataHandler;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
@@ -172,6 +177,60 @@ public class DatabaseUpgrades {
 			// add the jam_file_data table
 			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_FILE_DATA_TABLE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_file_data"));
+		} catch (SQLException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			logger.error("Database failure during upgrade", e);
+			throw new WikiException(new WikiMessage("upgrade.error.fatal", e.getMessage()));
+		}
+		DatabaseConnection.commit(status);
+	}
+
+	/**
+	 * Perform the required database upgrade steps when upgrading from versions
+	 * older than JAMWiki 1.3.
+	 */
+	public static void upgrade130(List<WikiMessage> messages) throws WikiException {
+		TransactionStatus status = null;
+		try {
+			status = DatabaseConnection.startTransaction(getTransactionDefinition());
+			Connection conn = DatabaseConnection.getConnection();
+			// initialize sequences
+			if (WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_SEQUENCES", conn)) {
+				messages.add(new WikiMessage("upgrade.message.db.object.added", "sequences"));
+			}
+			// New tables as of JAMWiki 1.3
+			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_USER_PREFERENCES_DEFAULTS_TABLE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences_defaults"));
+			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_USER_PREFERENCES_TABLE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences"));
+			DataHandler handler = WikiBase.getDataHandler();
+			handler.writeUserPreferenceDefault("user.display.name", null);
+			handler.writeUserPreferenceDefault("user.default.locale", Locale.getDefault().getLanguage());
+			handler.writeUserPreferenceDefault("user.preferred.editor", "toolbar");
+			handler.writeUserPreferenceDefault("user.signature", null);
+			handler.writeUserPreferenceDefault("user.timezone", TimeZone.getDefault().getID());
+			handler.writeUserPreferenceDefault("user.datetime.format", null);
+			// Create default values for user preferences.
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences_defaults"));
+			// Migrate existing user preferences to new tables
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_DISPLAY_NAME", conn);
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_DEFAULT_LOCALE", conn);
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_EDITOR", conn);
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_SIGNATURE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences"));
+			// Drop old user preference columns from jam_wiki_user
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_DISPLAY_NAME", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated","displayName", "jam_wiki_user"));
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_DEFAULT_LOCALE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated","default_locale", "jam_wiki_user"));
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_EDITOR", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated","editor", "jam_wiki_user"));
+			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_SIGNATURE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated","signature", "jam_wiki_user"));
+		} catch (DataAccessException e) {
+			DatabaseConnection.rollbackOnException(status, e);
+			logger.error("Database failure during upgrade", e);
+			throw new WikiException(new WikiMessage("upgrade.error.fatal", e.getMessage()));
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			logger.error("Database failure during upgrade", e);

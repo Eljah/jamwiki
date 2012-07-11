@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.DataHandler;
@@ -596,6 +598,7 @@ public class WikiDatabase {
 			WikiDatabase.setupDefaultInterwikis();
 			WikiDatabase.setupRoles();
 			WikiDatabase.setupGroups();
+			WikiDatabase.setupUserPreferencesDefaults();
 			WikiDatabase.setupAdminUser(user, username, encryptedPassword);
 			WikiDatabase.setupSpecialPages(locale, user);
 		} catch (SQLException e) {
@@ -838,5 +841,15 @@ public class WikiDatabase {
 			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, user, true, true);
 			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, user, true, false);
 		}
+	}
+	
+	private static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
+		DataHandler handler = WikiBase.getDataHandler();
+		handler.writeUserPreferenceDefault("user.display.name", null);
+		handler.writeUserPreferenceDefault("user.default.locale", Locale.getDefault().getLanguage());
+		handler.writeUserPreferenceDefault("user.preferred.editor", "toolbar");
+		handler.writeUserPreferenceDefault("user.signature", null);
+		handler.writeUserPreferenceDefault("user.timezone", TimeZone.getDefault().getID());
+		handler.writeUserPreferenceDefault("user.datetime.format", null);
 	}
 }

@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.StringUtils;
+
 
 
 public class DateUtil {
@@ -28,9 +30,13 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String getUserLocalTime(String userTimeZone,String dateFormat,String localeString) {
-		TimeZone tz = TimeZone.getTimeZone(userTimeZone);
+		TimeZone tz = TimeZone.getDefault();
+		if(!StringUtils.isBlank(userTimeZone)) {
+			tz = TimeZone.getTimeZone(userTimeZone);
+
+		}
 		Locale locale = Locale.getDefault();
-		if (localeString != null && localeString.length() > 1) {
+		if (!StringUtils.isBlank(localeString)) {
 			String[] parts = localeString.split("_");
 			switch (parts.length) {
 				case 1: {
@@ -43,11 +49,25 @@ public class DateUtil {
 			}
 		}
 		DateFormat df = null;
-		if(dateFormat == null) {
+		if(StringUtils.isBlank(dateFormat)) {
 			df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
 		}
 		else {
-			df = new SimpleDateFormat(dateFormat,locale);
+			int style = -1;
+			if (StringUtils.equalsIgnoreCase(dateFormat, "SHORT")) {
+				style = DateFormat.SHORT;
+			} else if (StringUtils.equalsIgnoreCase(dateFormat, "MEDIUM")) {
+				style = DateFormat.MEDIUM;
+			} else if (StringUtils.equalsIgnoreCase(dateFormat, "LONG")) {
+				style = DateFormat.LONG;
+			} else if (StringUtils.equalsIgnoreCase(dateFormat, "FULL")) {
+				style = DateFormat.FULL;
+			}
+			if (style != -1) {
+				df = DateFormat.getDateTimeInstance(style, style, locale);
+			} else {
+				df = new SimpleDateFormat(dateFormat,locale);
+			}
 		}
 		df.setTimeZone(tz);
 		return df.format(Calendar.getInstance(tz).getTime());

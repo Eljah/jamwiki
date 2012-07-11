@@ -18,8 +18,13 @@ package org.jamwiki.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.HashMap;
+
 import org.apache.commons.lang3.StringUtils;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
+import org.jamwiki.WikiBase;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provides an object representing Wiki-specific information about a user of
@@ -29,17 +34,12 @@ public class WikiUser implements Serializable {
 
 	private Timestamp createDate = new Timestamp(System.currentTimeMillis());
 	private String createIpAddress = "0.0.0.0";
-	private String defaultLocale;
-	private String displayName;
-	/** The user's preferred editor (if any). */
-	private String editor = Environment.getValue(Environment.PROP_TOPIC_EDITOR);
 	private String email;
 	private Timestamp lastLoginDate = new Timestamp(System.currentTimeMillis());
 	private String lastLoginIpAddress = "0.0.0.0";
-	/** The user's custom signature (if any). */
-	private String signature;
 	private final String username;
 	private int userId = -1;
+	private HashMap<String, String> preferences = new HashMap<String, String>();
 
 	/**
 	 *
@@ -75,49 +75,7 @@ public class WikiUser implements Serializable {
 	public void setCreateIpAddress(String createIpAddress) {
 		this.createIpAddress = createIpAddress;
 	}
-
-	/**
-	 *
-	 */
-	public String getDefaultLocale() {
-		return this.defaultLocale;
-	}
-
-	/**
-	 *
-	 */
-	public void setDefaultLocale(String defaultLocale) {
-		this.defaultLocale = defaultLocale;
-	}
-
-	/**
-	 *
-	 */
-	public String getDisplayName() {
-		return this.displayName;
-	}
-
-	/**
-	 *
-	 */
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
-	/**
-	 *
-	 */
-	public String getEditor() {
-		return (StringUtils.isBlank(this.editor)) ? Environment.getValue(Environment.PROP_TOPIC_EDITOR) : this.editor;
-	}
-
-	/**
-	 *
-	 */
-	public void setEditor(String editor) {
-		this.editor = editor;
-	}
-
+	
 	/**
 	 *
 	 */
@@ -163,20 +121,6 @@ public class WikiUser implements Serializable {
 	/**
 	 *
 	 */
-	public String getSignature() {
-		return this.signature;
-	}
-
-	/**
-	 *
-	 */
-	public void setSignature(String signature) {
-		this.signature = signature;
-	}
-
-	/**
-	 *
-	 */
 	public int getUserId() {
 		return this.userId;
 	}
@@ -193,5 +137,36 @@ public class WikiUser implements Serializable {
 	 */
 	public String getUsername() {
 		return username;
+	}
+	
+	public HashMap<String, String> getPreferences() {
+		return preferences;
+	}
+	
+	public void setPreferences(HashMap<String, String> preferences) {
+		this.preferences = preferences;
+	}
+	
+	/**
+	 * Helper method to get a specific preference
+	 */
+	public String getPreference(String preferenceKey) {
+		return preferences.get(preferenceKey);
+	}
+	
+	/**
+	 * Helper method to set a specific preference
+	 */
+	public void setPreference(String preferenceKey, String preferenceValue) {
+		preferences.put(preferenceKey, preferenceValue);
+	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer("WikiUser ID " + userId  + ": " + username);
+		sb.append("; preferences: ");
+		for(String key : preferences.keySet()) {
+			sb.append(key + "=" + preferences.get(key) + "; ");
+		}
+		return sb.toString();
 	}
 }
