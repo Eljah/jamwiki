@@ -59,10 +59,10 @@ public class WikiSignatureTag implements JFlexParserTag {
 		}
 		if (includeDate) {
 			WikiUser user = lexer.getParserInput().getWikiUser();
-			String dateFormat = StringUtils.isBlank(user.getPreference("user.datetime.format"))?Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true):user.getPreference("user.datetime.format");
-			signature += DateUtil.getUserLocalTime(user.getPreference("user.timezone"),
+			String dateFormat = StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT))?Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true):user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT);
+			signature += DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE),
 					                               dateFormat,
-					                               user.getPreference("user.default.locale"));
+					                               user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE));
 		}
 		return signature;
 	}
@@ -89,8 +89,8 @@ public class WikiSignatureTag implements JFlexParserTag {
 	 */
 	private String retrieveUserSignature(ParserInput parserInput) {
 		WikiUser user = parserInput.getWikiUser();
-		if (user != null && !StringUtils.isBlank(user.getPreference("user.signature"))) {
-			return user.getPreference("user.signature");
+		if (user != null && !StringUtils.isBlank(user.getSignature())) {
+			return user.getSignature();
 		}
 		String login = parserInput.getUserDisplay();
 		String email = parserInput.getUserDisplay();
@@ -98,7 +98,7 @@ public class WikiSignatureTag implements JFlexParserTag {
 		String userId = "-1";
 		if (user != null && !StringUtils.isBlank(user.getUsername())) {
 			login = user.getUsername();
-			displayName = (!StringUtils.isBlank(user.getPreference("user.display.name"))) ? user.getPreference("user.display.name") : login;
+			displayName = (!StringUtils.isBlank(user.getDisplayName())) ? user.getDisplayName() : login;
 			email = user.getEmail();
 			userId = Integer.toString(user.getUserId());
 		}

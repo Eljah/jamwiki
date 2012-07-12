@@ -1751,6 +1751,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	private WikiUser initWikiUser(ResultSet rs) throws SQLException {
 		String username = rs.getString("login");
 		WikiUser user = new WikiUser(username);
+		user.setDisplayName(rs.getString("display_name"));
 		user.setUserId(rs.getInt("wiki_user_id"));
 		user.setCreateDate(rs.getTimestamp("create_date"));
 		user.setLastLoginDate(rs.getTimestamp("last_login_date"));
@@ -2332,6 +2333,7 @@ public class AnsiQueryHandler implements QueryHandler {
 				stmt = conn.prepareStatement(STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT, Statement.RETURN_GENERATED_KEYS);
 			}
 			stmt.setString(index++, user.getUsername());
+			stmt.setString(index++, user.getDisplayName());
 			stmt.setTimestamp(index++, user.getCreateDate());
 			stmt.setTimestamp(index++, user.getLastLoginDate());
 			stmt.setString(index++, user.getCreateIpAddress());
@@ -3686,16 +3688,14 @@ public class AnsiQueryHandler implements QueryHandler {
 	public void updateWikiUser(WikiUser user, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		TransactionStatus status = null;
 		try {
-			status = DatabaseConnection.startTransaction();
-			// conn.setAutoCommit(false);
 			stmt = conn.prepareStatement(STATEMENT_UPDATE_WIKI_USER);
 			stmt.setString(1, user.getUsername());
-			stmt.setTimestamp(2, user.getLastLoginDate());
-			stmt.setString(3, user.getLastLoginIpAddress());
-			stmt.setString(4, user.getEmail());
-			stmt.setInt(5, user.getUserId());
+			stmt.setString(2, user.getDisplayName());
+			stmt.setTimestamp(3, user.getLastLoginDate());
+			stmt.setString(4, user.getLastLoginIpAddress());
+			stmt.setString(5, user.getEmail());
+			stmt.setInt(6, user.getUserId());
 			stmt.executeUpdate();
 			// Store user preferences
 			HashMap<String, String> defaults = new HashMap<String, String>();
@@ -3731,14 +3731,12 @@ public class AnsiQueryHandler implements QueryHandler {
 				}
 			}
 		} catch (SQLException e) {
-			DatabaseConnection.rollbackOnException(status, e);
+			logger.error(e.getMessage());
 			throw e;
 		} catch (Exception e) {
-			DatabaseConnection.rollbackOnException(status, e);
+			logger.error(e.getMessage());
 			throw new SQLException(e);
 		}
-		DatabaseConnection.commit(status);
-		DatabaseConnection.closeStatement(stmt);
 	}
 	
 	public void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {

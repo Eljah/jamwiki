@@ -629,7 +629,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 * *****
 	 */
-	public HashMap<String, String> getUserPreferencesDefaults() throws DataAccessException {
+	public Map<String, String> getUserPreferencesDefaults() throws DataAccessException {
 		try {
 			return this.queryHandler().getUserPreferencesDefaults();
 		} catch (SQLException e) {
@@ -1936,13 +1936,13 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	protected void validateWikiUser(WikiUser user) throws WikiException {
 		checkLength(user.getUsername(), 100);
-		checkLength(user.getPreference("user.display.name"), 100);
+		checkLength(user.getDisplayName(), 100);
 		checkLength(user.getCreateIpAddress(), 39);
 		checkLength(user.getLastLoginIpAddress(), 39);
-		checkLength(user.getPreference("user.default.locale"), 8);
+		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE), 8);
 		checkLength(user.getEmail(), 100);
-		checkLength(user.getPreference("user.preferred.editor"), 50);
-		checkLength(user.getPreference("user.signature"), 255);
+		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR), 50);
+		checkLength(user.getSignature(), 250);
 	}
 
 	/**

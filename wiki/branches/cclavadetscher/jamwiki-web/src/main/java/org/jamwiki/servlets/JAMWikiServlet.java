@@ -236,8 +236,8 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 			String userPage = Namespace.namespace(Namespace.USER_ID).getLabel(virtualWiki) + Namespace.SEPARATOR + user.getUsername();
 			String userCommentsPage = Namespace.namespace(Namespace.USER_COMMENTS_ID).getLabel(virtualWiki) + Namespace.SEPARATOR + user.getUsername();
 			String username = user.getUsername();
-			if (!StringUtils.isBlank(user.getPreference("user.display.name"))) {
-				username = user.getPreference("user.display.name");
+			if (!StringUtils.isBlank(user.getDisplayName())) {
+				username = user.getDisplayName();
 			}
 			// user name will be escaped by the jamwiki:link tag
 			WikiMessage userMenuMessage = new WikiMessage("usermenu.user");

@@ -214,7 +214,7 @@ public interface DataHandler {
 	 * defaults.
 	 * @return
 	 */
-	HashMap<String, String> getUserPreferencesDefaults() throws DataAccessException;
+	Map<String, String> getUserPreferencesDefaults() throws DataAccessException;
 
 	/**
 	 * Retrieve a List of all LogItem objects for a given virtual wiki, sorted

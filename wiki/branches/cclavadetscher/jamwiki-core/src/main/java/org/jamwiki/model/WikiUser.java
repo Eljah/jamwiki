@@ -19,6 +19,7 @@ package org.jamwiki.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -39,6 +40,23 @@ public class WikiUser implements Serializable {
 	private String lastLoginIpAddress = "0.0.0.0";
 	private final String username;
 	private int userId = -1;
+	private String displayName = null;
+	
+	// Constants for user preferences
+	public static String USER_PREFERENCE_SIGNATURE = "user.signature";
+	public static String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
+	public static String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
+	public static String USER_PREFERENCE_TIMEZONE = "user.timezone";
+	public static String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
+	
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
 	private HashMap<String, String> preferences = new HashMap<String, String>();
 
 	/**
@@ -146,6 +164,13 @@ public class WikiUser implements Serializable {
 	public void setPreferences(HashMap<String, String> preferences) {
 		this.preferences = preferences;
 	}
+
+	/**
+	 * Shortcut to get the user signature
+	 */
+	public String getSignature() {
+		return preferences.get(WikiUser.USER_PREFERENCE_SIGNATURE);
+	}
 	
 	/**
 	 * Helper method to get a specific preference
@@ -162,7 +187,7 @@ public class WikiUser implements Serializable {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer("WikiUser ID " + userId  + ": " + username);
+		StringBuffer sb = new StringBuffer("WikiUser ID " + userId  + ": " + username + "; displayName: " + displayName);
 		sb.append("; preferences: ");
 		for(String key : preferences.keySet()) {
 			sb.append(key + "=" + preferences.get(key) + "; ");

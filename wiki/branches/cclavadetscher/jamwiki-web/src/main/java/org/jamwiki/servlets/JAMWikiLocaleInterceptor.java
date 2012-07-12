@@ -62,7 +62,7 @@ public class JAMWikiLocaleInterceptor extends LocaleChangeInterceptor {
 		Locale locale = null;
 		try {
 			WikiUser user = ServletUtil.currentWikiUser();
-			locale = LocaleUtils.toLocale(user.getPreference("user.default.locale"));
+			locale = LocaleUtils.toLocale(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE));
 		} catch (AuthenticationCredentialsNotFoundException e) {
 			// do nothing, just use a default locale
 		}

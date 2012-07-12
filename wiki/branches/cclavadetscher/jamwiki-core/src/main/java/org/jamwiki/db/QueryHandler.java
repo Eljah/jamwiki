@@ -466,7 +466,7 @@ public interface QueryHandler {
 	 * defaults.
 	 * @return
 	 */
-	HashMap<String, String> getUserPreferencesDefaults() throws SQLException;
+	Map<String, String> getUserPreferencesDefaults() throws SQLException;
 	
 	/**
 	 * Retrieve a list of all virtual wiki information for all virtual wikis.

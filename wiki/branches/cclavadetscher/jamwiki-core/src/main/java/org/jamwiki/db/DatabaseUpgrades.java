@@ -27,6 +27,7 @@ import org.jamwiki.DataHandler;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
+import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -204,23 +205,19 @@ public class DatabaseUpgrades {
 			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_USER_PREFERENCES_TABLE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences"));
 			DataHandler handler = WikiBase.getDataHandler();
-			handler.writeUserPreferenceDefault("user.display.name", null);
-			handler.writeUserPreferenceDefault("user.default.locale", Locale.getDefault().getLanguage());
-			handler.writeUserPreferenceDefault("user.preferred.editor", "toolbar");
-			handler.writeUserPreferenceDefault("user.signature", null);
-			handler.writeUserPreferenceDefault("user.timezone", TimeZone.getDefault().getID());
-			handler.writeUserPreferenceDefault("user.datetime.format", null);
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null);
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null);
 			// Create default values for user preferences.
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences_defaults"));
 			// Migrate existing user preferences to new tables
-			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_DISPLAY_NAME", conn);
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_DEFAULT_LOCALE", conn);
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_EDITOR", conn);
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_MIGRATE_USER_PREFERENCES_SIGNATURE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences"));
 			// Drop old user preference columns from jam_wiki_user
-			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_DISPLAY_NAME", conn);
-			messages.add(new WikiMessage("upgrade.message.db.data.updated","displayName", "jam_wiki_user"));
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_DEFAULT_LOCALE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.data.updated","default_locale", "jam_wiki_user"));
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_EDITOR", conn);

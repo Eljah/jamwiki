@@ -75,8 +75,8 @@ public class RegisterServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void loadDefaults(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, WikiUser user) throws Exception {
-		if (StringUtils.isBlank(user.getPreference("user.default.locale")) && request.getLocale() != null) {
-			user.setPreference("user.default.locale",request.getLocale().toString());
+		if (StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) && request.getLocale() != null) {
+			user.setPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE,request.getLocale().toString());
 		}
 		TreeMap<String, String> locales = new TreeMap<String, String>();
 		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
@@ -147,8 +147,8 @@ public class RegisterServlet extends JAMWikiServlet {
 				this.login(request, user.getUsername(), newPassword);
 			}
 			// update the locale key since the user may have changed default locale
-			if (!StringUtils.isBlank(user.getPreference("user.default.locale"))) {
-				Locale locale = LocaleUtils.toLocale(user.getPreference("user.default.locale"));
+			if (!StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE))) {
+				Locale locale = LocaleUtils.toLocale(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE));
 				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
 			}
 			if (isUpdate) {
@@ -179,13 +179,12 @@ public class RegisterServlet extends JAMWikiServlet {
 		// FIXME - need to distinguish between add & update
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
-
-		user.setPreference("user.display.name",request.getParameter("displayName"));
-		user.setPreference("user.default.locale",request.getParameter("defaultLocale"));
-		user.setPreference("user.timezone", request.getParameter("timezone"));
-		user.setPreference("user.datetime.format", request.getParameter("datetimeFormat"));
-		user.setPreference("user.preferred.editor",request.getParameter("editor"));
-		user.setPreference("user.signature",request.getParameter("signature"));
+		user.setDisplayName(request.getParameter("displayName"));
+		user.setPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE,request.getParameter("defaultLocale"));
+		user.setPreference(WikiUser.USER_PREFERENCE_TIMEZONE, request.getParameter("timezone"));
+		user.setPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, request.getParameter("datetimeFormat"));
+		user.setPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR,request.getParameter("editor"));
+		user.setPreference(WikiUser.USER_PREFERENCE_SIGNATURE,request.getParameter("signature"));
 		return user;
 	}
 

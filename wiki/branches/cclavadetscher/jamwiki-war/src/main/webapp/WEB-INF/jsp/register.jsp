@@ -23,7 +23,6 @@
 <%@ include file="page-init.jsp" %>
 
 <div id="register">
-<c:out value="${newuser}" />
 <div class="message"><fmt:message key="register.form.info" /></div>
 <form name="form1" method="post" action="<jamwiki:link value="Special:Account" />">
 <input type="hidden" name="userId" value="<c:out value="${newuser.userId}" />" />
@@ -50,6 +49,11 @@
 		<div class="row">
 			<label for="registerConfirmPassword"><fmt:message key="register.caption.confirmpassword" /></label>
 			<span><input type="password" name="confirmPassword" value="<c:out value="${confirmPassword}" />" id="registerConfirmPassword" size="50" /></span>
+		</div>
+		<div class="row">
+			<label for="registerDisplayName"><fmt:message key="register.caption.displayname" /></label>
+			<span><input type="text" name="displayName" value="<c:out value="${newuser.displayName}" />" id="registerDisplayName" size="50" /></span>
+			<div class="formhelp"><fmt:message key="register.help.displayname" /></div>
 		</div>
 		<div class="row">
 			<label for="registerEmail"><fmt:message key="register.caption.email" /></label>
@@ -88,6 +92,11 @@
 			<span><c:out value="${newuser.username}" /></span>
 		</div>
 		<div class="row">
+			<label for="registerDisplayName"><fmt:message key="register.caption.displayname" /></label>
+			<span><input type="text" name="displayName" value="<c:out value="${newuser.displayName}" />" id="registerDisplayName" size="50" /></span>
+			<div class="formhelp"><fmt:message key="register.help.displayname" /></div>
+		</div>
+		<div class="row">
 			<label for="registerEmail"><fmt:message key="register.caption.email" /></label>
 			<span><input type="text" name="email" value="<c:out value="${newuser.email}" />" id="registerEmail" size="50" /></span>
 			<div class="formhelp"><fmt:message key="register.help.email" /></div>
@@ -95,11 +104,6 @@
 		</fieldset>
 		<fieldset>
 		<legend><fmt:message key="register.caption.userpreferences" /></legend>
-		<div class="row">
-			<label for="registerDisplayName"><fmt:message key="register.caption.displayname" /></label>
-			<span><input type="text" name="displayName" value="<c:out value="${newuser.preferences['user.display.name']}" />" id="registerDisplayName" size="50" /></span>
-			<div class="formhelp"><fmt:message key="register.help.displayname" /></div>
-		</div>
 		<div class="row">
 			<label for="registerDefaultLocale"><fmt:message key="register.caption.locale" /></label>
 			<span>
