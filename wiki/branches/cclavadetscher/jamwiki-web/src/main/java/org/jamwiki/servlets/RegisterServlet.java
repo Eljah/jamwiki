@@ -75,8 +75,8 @@ public class RegisterServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void loadDefaults(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, WikiUser user) throws Exception {
-		if (StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) && request.getLocale() != null) {
-			user.setPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE,request.getLocale().toString());
+		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
+			user.setDefaultLocale(request.getLocale().toString());
 		}
 		TreeMap<String, String> locales = new TreeMap<String, String>();
 		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
@@ -90,6 +90,8 @@ public class RegisterServlet extends JAMWikiServlet {
 			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
 			locales.put(value, key);
 		}
+		String datetimeFormatPreview = DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE), user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
+		next.addObject("datetimeFormatPreview", datetimeFormatPreview);
 		next.addObject("locales", locales);
 		Map editors = WikiConfiguration.getInstance().getEditors();
 		next.addObject("editors", editors);
@@ -147,8 +149,8 @@ public class RegisterServlet extends JAMWikiServlet {
 				this.login(request, user.getUsername(), newPassword);
 			}
 			// update the locale key since the user may have changed default locale
-			if (!StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE))) {
-				Locale locale = LocaleUtils.toLocale(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE));
+			if (!StringUtils.isBlank(user.getDefaultLocale())) {
+				Locale locale = LocaleUtils.toLocale(user.getDefaultLocale());
 				request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, locale);
 			}
 			if (isUpdate) {
@@ -180,11 +182,11 @@ public class RegisterServlet extends JAMWikiServlet {
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
 		user.setDisplayName(request.getParameter("displayName"));
-		user.setPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE,request.getParameter("defaultLocale"));
+		user.setDefaultLocale(request.getParameter("defaultLocale"));
 		user.setPreference(WikiUser.USER_PREFERENCE_TIMEZONE, request.getParameter("timezone"));
 		user.setPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, request.getParameter("datetimeFormat"));
 		user.setPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR,request.getParameter("editor"));
-		user.setPreference(WikiUser.USER_PREFERENCE_SIGNATURE,request.getParameter("signature"));
+		user.setSignature(request.getParameter("signature"));
 		return user;
 	}
 

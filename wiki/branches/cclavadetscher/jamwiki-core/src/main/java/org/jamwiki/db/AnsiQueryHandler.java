@@ -2348,16 +2348,21 @@ public class AnsiQueryHandler implements QueryHandler {
 				user.setUserId(rs.getInt(1));
 			}
 			// Store user preferences
+			stmt.close();
+			if(rs != null) rs.close();
 			HashMap<String, String> defaults = new HashMap<String, String>();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				defaults.put(rs.getString(1), rs.getString(2));
 			}
+			stmt.close();
+			rs.close();
 			stmt = conn.prepareStatement(STATEMENT_DELETE_USER_PREFERENCES);
 			int userId = user.getUserId();
 			stmt.setInt(1, userId);
 			stmt.executeUpdate();
+			stmt.close();
 			HashMap<String, String> preferences = user.getPreferences();
 			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE);
 			// Only store preferences that are not default
@@ -3698,16 +3703,20 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt(6, user.getUserId());
 			stmt.executeUpdate();
 			// Store user preferences
+			stmt.close();
 			HashMap<String, String> defaults = new HashMap<String, String>();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				defaults.put(rs.getString(1), rs.getString(2));
 			}
+			stmt.close();
+			rs.close();
 			stmt = conn.prepareStatement(STATEMENT_DELETE_USER_PREFERENCES);
 			int userId = user.getUserId();
 			stmt.setInt(1, userId);
 			stmt.executeUpdate();
+			stmt.close();
 			HashMap<String, String> preferences = user.getPreferences();
 			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE);
 			// Only store preferences that are not default

@@ -86,8 +86,8 @@ public class TranslationServlet extends JAMWikiServlet {
 		String language = request.getParameter("language");
 		if (StringUtils.isBlank(language)) {
 			WikiUser user = ServletUtil.currentWikiUser();
-			if (!StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE))) {
-				language = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE).split("_")[0];
+			if (!StringUtils.isBlank(user.getDefaultLocale())) {
+				language = user.getDefaultLocale().split("_")[0];
 			} else if (request.getLocale() != null) {
 				language = request.getLocale().getLanguage();
 			} else {

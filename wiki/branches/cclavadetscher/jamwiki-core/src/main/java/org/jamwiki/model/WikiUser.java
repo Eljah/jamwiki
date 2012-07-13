@@ -57,6 +57,14 @@ public class WikiUser implements Serializable {
 		this.displayName = displayName;
 	}
 
+	public String getDefaultLocale() {
+		return preferences.get(USER_PREFERENCE_DEFAULT_LOCALE);
+	}
+	
+	public void setDefaultLocale(String defaultLocale) {
+		preferences.put(USER_PREFERENCE_DEFAULT_LOCALE, defaultLocale);
+	}
+	
 	private HashMap<String, String> preferences = new HashMap<String, String>();
 
 	/**
@@ -170,6 +178,10 @@ public class WikiUser implements Serializable {
 	 */
 	public String getSignature() {
 		return preferences.get(WikiUser.USER_PREFERENCE_SIGNATURE);
+	}
+	
+	public void setSignature(String signature) {
+		preferences.put(USER_PREFERENCE_SIGNATURE, signature);
 	}
 	
 	/**

@@ -128,7 +128,7 @@
 		</div>
 		<div class="row">
 		<label for="registerDatetimeFormat"><fmt:message key="register.caption.datetime.format" /></label>
-		<span><input type="text" name="datetimeFormat" value="<c:out value="${newuser.preferences['user.datetime.format']}" />" id="registerDatetimeFormat" size="50" /></span>
+		<span><input type="text" name="datetimeFormat" value="<c:out value="${newuser.preferences['user.datetime.format']}" />" id="registerDatetimeFormat" size="50" /> <fmt:message key="edit.action.preview" />: <c:out value="${datetimeFormatPreview}" /></span>
 		<div class="formhelp"><fmt:message key="register.help.datetime.format" /></div>
 		</div>
 		<div class="row">

@@ -1939,7 +1939,7 @@ public class AnsiDataHandler implements DataHandler {
 		checkLength(user.getDisplayName(), 100);
 		checkLength(user.getCreateIpAddress(), 39);
 		checkLength(user.getLastLoginIpAddress(), 39);
-		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE), 8);
+		checkLength(user.getDefaultLocale(), 8);
 		checkLength(user.getEmail(), 100);
 		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR), 50);
 		checkLength(user.getSignature(), 250);
