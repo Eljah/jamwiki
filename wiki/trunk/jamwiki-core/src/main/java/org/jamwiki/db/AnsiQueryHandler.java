@@ -3738,9 +3738,6 @@ public class AnsiQueryHandler implements QueryHandler {
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			throw e;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new SQLException(e);
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}

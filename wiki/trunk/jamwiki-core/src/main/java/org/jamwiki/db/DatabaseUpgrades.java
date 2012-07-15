@@ -219,11 +219,11 @@ public class DatabaseUpgrades {
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences"));
 			// Drop old user preference columns from jam_wiki_user
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_DEFAULT_LOCALE", conn);
-			messages.add(new WikiMessage("upgrade.message.db.data.updated","default_locale", "jam_wiki_user"));
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_wiki_user"));
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_EDITOR", conn);
-			messages.add(new WikiMessage("upgrade.message.db.data.updated","editor", "jam_wiki_user"));
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_wiki_user"));
 			WikiBase.getDataHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_SIGNATURE", conn);
-			messages.add(new WikiMessage("upgrade.message.db.data.updated","signature", "jam_wiki_user"));
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_wiki_user"));
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			logger.error("Database failure during upgrade", e);
