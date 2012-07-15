@@ -3,6 +3,7 @@
 
 New Features:
 
+  * Update Mediawiki XML exports to use the 0.7 XSD (previously 0.3).
   * Upgrade to Spring Framework 3.1.1.RELEASE.
   * Upgrade to Lucene Search 3.6.
   * Upgrade to commons-io-2.2.

@@ -31,6 +31,7 @@ public final class MediaWikiConstants {
 	static final String MEDIAWIKI_ELEMENT_TOPIC_NAME = "title";
 	static final String MEDIAWIKI_ELEMENT_TOPIC_VERSION = "revision";
 	static final String MEDIAWIKI_ELEMENT_TOPIC_VERSION_COMMENT = "comment";
+	static final String MEDIAWIKI_ELEMENT_TOPIC_VERSION_MINOR_EDIT = "minor";
 	static final String MEDIAWIKI_ELEMENT_TOPIC_VERSION_EDIT_DATE = "timestamp";
 	static final String MEDIAWIKI_ELEMENT_TOPIC_VERSION_IP = "ip";
 	static final String MEDIAWIKI_ELEMENT_TOPIC_VERSION_USERNAME = "username";

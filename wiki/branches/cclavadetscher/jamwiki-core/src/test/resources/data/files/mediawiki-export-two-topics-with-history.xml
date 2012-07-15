@@ -1,4 +1,4 @@
-<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="en">
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.7/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.7/ http://www.mediawiki.org/xml/export-0.7.xsd" version="0.7" xml:lang="en">
   <siteinfo>
     <sitename>Wikipedia</sitename>
     <base>http://en.wikipedia.org/wiki/Main_Page</base>
@@ -29,6 +29,7 @@
   </siteinfo>
   <page>
     <title>Test Page 1</title>
+    <ns>0</ns>
     <id>1507255</id>
     <revision>
       <id>10276743</id>
@@ -59,6 +60,7 @@ Link to user talk page: [[User talk: Test User]]</text>
         <username>Test User</username>
         <id>192361</id>
       </contributor>
+      <minor />
       <comment>add additional link</comment>
       <text xml:space="preserve">Test Page
 
@@ -88,6 +90,7 @@ Link to template talk page: [[Template talk:Test Template]]</text>
   </page>
   <page>
     <title>Template talk:Test Template</title>
+    <ns>11</ns>
     <id>6809149</id>
     <revision>
       <id>73374310</id>
