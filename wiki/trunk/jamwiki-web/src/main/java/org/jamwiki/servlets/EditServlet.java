@@ -176,7 +176,7 @@ public class EditServlet extends JAMWikiServlet {
 			next.addObject("watchTopic", true);
 		}
 		pageInfo.setContentJsp(JSP_EDIT);
-		String editor = user.getEditor();
+		String editor = user.getPreference("user.preferred.editor");
 		next.addObject("editor", editor);
 		next.addObject("contents", contents);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isEditEnabled(user));

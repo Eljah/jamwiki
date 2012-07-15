@@ -32,7 +32,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
+import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
+import org.jamwiki.WikiBase;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
@@ -54,6 +56,7 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserDetails;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
+import org.springframework.transaction.TransactionStatus;
 
 /**
  * Default implementation of the QueryHandler implementation for retrieving, inserting,
@@ -101,6 +104,9 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_CREATE_WIKI_FILE_VERSION_TABLE = null;
 	protected static String STATEMENT_CREATE_WIKI_USER_TABLE = null;
 	protected static String STATEMENT_CREATE_WIKI_USER_LOGIN_INDEX = null;
+	protected static String STATEMENT_CREATE_USER_PREFERENCES_DEFAULTS_TABLE = null;
+	protected static String STATEMENT_CREATE_USER_PREFERENCES_TABLE = null;
+	protected static String STATEMENT_CREATE_USER_PREFERENCES_WIKI_USER_INDEX = null;
 	protected static String STATEMENT_DELETE_AUTHORITIES = null;
 	protected static String STATEMENT_DELETE_CONFIGURATION = null;
 	protected static String STATEMENT_DELETE_GROUP_AUTHORITIES = null;
@@ -117,6 +123,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DELETE_TOPIC_LINKS = null;
 	protected static String STATEMENT_DELETE_TOPIC_VERSION = null;
 	protected static String STATEMENT_DELETE_WATCHLIST_ENTRY = null;
+	protected static String STATEMENT_DELETE_USER_PREFERENCES_DEFAULTS = null;
+	protected static String STATEMENT_DELETE_USER_PREFERENCES = null;
 	protected static String STATEMENT_DROP_AUTHORITIES_TABLE = null;
 	protected static String STATEMENT_DROP_CATEGORY_TABLE = null;
 	protected static String STATEMENT_DROP_CONFIGURATION_TABLE = null;
@@ -180,6 +188,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_INSERT_WIKI_FILE_VERSION_AUTO_INCREMENT = null;
 	protected static String STATEMENT_INSERT_WIKI_USER = null;
 	protected static String STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT = null;
+	protected static String STATEMENT_INSERT_USER_PREFERENCE = null;
+	protected static String STATEMENT_INSERT_USER_PREFERENCE_DEFAULTS = null;
 	protected static String STATEMENT_SELECT_AUTHORITIES_AUTHORITY = null;
 	protected static String STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL = null;
 	protected static String STATEMENT_SELECT_AUTHORITIES_LOGIN = null;
@@ -240,6 +250,8 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_WIKI_USER_LOGIN = null;
 	protected static String STATEMENT_SELECT_WIKI_USER_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_WIKI_USERS = null;
+	protected static String STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS = null;
+	protected static String STATEMENT_SELECT_USER_PREFERENCES = null;
 	protected static String STATEMENT_UPDATE_GROUP = null;
 	protected static String STATEMENT_UPDATE_ROLE = null;
 	protected static String STATEMENT_UPDATE_NAMESPACE = null;
@@ -253,6 +265,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_UPDATE_VIRTUAL_WIKI = null;
 	protected static String STATEMENT_UPDATE_WIKI_FILE = null;
 	protected static String STATEMENT_UPDATE_WIKI_USER = null;
+	protected static String STATEMENT_UPDATE_USER_PREFERENCE_DEFAULTS = null;
 	protected static String STATEMENT_CREATE_FILE_DATA_TABLE = null;
 	protected static String STATEMENT_DROP_FILE_DATA_TABLE = null;
 	protected static String STATEMENT_INSERT_FILE_DATA = null;
@@ -309,6 +322,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USERS_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_WIKI_USER_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_WIKI_USER_LOGIN_INDEX, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_PREFERENCES_DEFAULTS_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_PREFERENCES_TABLE, conn);
+		DatabaseConnection.executeUpdate(STATEMENT_CREATE_USER_PREFERENCES_WIKI_USER_INDEX, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_NAMESPACE_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_NAMESPACE_TRANSLATION_TABLE, conn);
 		DatabaseConnection.executeUpdate(STATEMENT_CREATE_TOPIC_TABLE, conn);
@@ -1023,6 +1039,24 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	
+	public HashMap<String, String> getUserPreferencesDefaults() throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
+			rs = stmt.executeQuery();
+			HashMap<String, String> defaultPreferences = new HashMap<String, String>();
+			while (rs.next()) {
+				defaultPreferences.put(rs.getString(1), rs.getString(2));
+			}
+			return defaultPreferences;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -1286,6 +1320,9 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_CREATE_VIRTUAL_WIKI_TABLE      = props.getProperty("STATEMENT_CREATE_VIRTUAL_WIKI_TABLE");
 		STATEMENT_CREATE_WIKI_USER_TABLE         = props.getProperty("STATEMENT_CREATE_WIKI_USER_TABLE");
 		STATEMENT_CREATE_WIKI_USER_LOGIN_INDEX   = props.getProperty("STATEMENT_CREATE_WIKI_USER_LOGIN_INDEX");
+		STATEMENT_CREATE_USER_PREFERENCES_DEFAULTS_TABLE = props.getProperty("STATEMENT_CREATE_USER_PREFERENCES_DEFAULTS_TABLE");
+		STATEMENT_CREATE_USER_PREFERENCES_TABLE  = props.getProperty("STATEMENT_CREATE_USER_PREFERENCES_TABLE");
+		STATEMENT_CREATE_USER_PREFERENCES_WIKI_USER_INDEX = props.getProperty("STATEMENT_CREATE_USER_PREFERENCES_WIKI_USER_INDEX");
 		STATEMENT_CREATE_TOPIC_CURRENT_VERSION_CONSTRAINT = props.getProperty("STATEMENT_CREATE_TOPIC_CURRENT_VERSION_CONSTRAINT");
 		STATEMENT_CREATE_TOPIC_TABLE             = props.getProperty("STATEMENT_CREATE_TOPIC_TABLE");
 		STATEMENT_CREATE_TOPIC_LINKS_TABLE       = props.getProperty("STATEMENT_CREATE_TOPIC_LINKS_TABLE");
@@ -1328,6 +1365,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DELETE_TOPIC_LINKS             = props.getProperty("STATEMENT_DELETE_TOPIC_LINKS");
 		STATEMENT_DELETE_TOPIC_VERSION           = props.getProperty("STATEMENT_DELETE_TOPIC_VERSION");
 		STATEMENT_DELETE_WATCHLIST_ENTRY         = props.getProperty("STATEMENT_DELETE_WATCHLIST_ENTRY");
+		STATEMENT_DELETE_USER_PREFERENCES_DEFAULTS = props.getProperty("STATEMENT_DELETE_USER_PREFERENCES_DEFAULTS");
+		STATEMENT_DELETE_USER_PREFERENCES        = props.getProperty("STATEMENT_DELETE_USER_PREFERENCES");
 		STATEMENT_DROP_AUTHORITIES_TABLE         = props.getProperty("STATEMENT_DROP_AUTHORITIES_TABLE");
 		STATEMENT_DROP_CATEGORY_TABLE            = props.getProperty("STATEMENT_DROP_CATEGORY_TABLE");
 		STATEMENT_DROP_CONFIGURATION_TABLE       = props.getProperty("STATEMENT_DROP_CONFIGURATION_TABLE");
@@ -1391,6 +1430,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_INSERT_WIKI_FILE_VERSION_AUTO_INCREMENT = props.getProperty("STATEMENT_INSERT_WIKI_FILE_VERSION_AUTO_INCREMENT");
 		STATEMENT_INSERT_WIKI_USER               = props.getProperty("STATEMENT_INSERT_WIKI_USER");
 		STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT = props.getProperty("STATEMENT_INSERT_WIKI_USER_AUTO_INCREMENT");
+		STATEMENT_INSERT_USER_PREFERENCE_DEFAULTS = props.getProperty("STATEMENT_INSERT_USER_PREFERENCE_DEFAULTS");
+		STATEMENT_INSERT_USER_PREFERENCE         = props.getProperty("STATEMENT_INSERT_USER_PREFERENCE");
 		STATEMENT_SELECT_AUTHORITIES_AUTHORITY   = props.getProperty("STATEMENT_SELECT_AUTHORITIES_AUTHORITY");
 		STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL = props.getProperty("STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL");
 		STATEMENT_SELECT_AUTHORITIES_LOGIN       = props.getProperty("STATEMENT_SELECT_AUTHORITIES_LOGIN");
@@ -1451,6 +1492,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_WIKI_USER_LOGIN         = props.getProperty("STATEMENT_SELECT_WIKI_USER_LOGIN");
 		STATEMENT_SELECT_WIKI_USER_SEQUENCE      = props.getProperty("STATEMENT_SELECT_WIKI_USER_SEQUENCE");
 		STATEMENT_SELECT_WIKI_USERS              = props.getProperty("STATEMENT_SELECT_WIKI_USERS");
+		STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS = props.getProperty("STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS");
+		STATEMENT_SELECT_USER_PREFERENCES        = props.getProperty("STATEMENT_SELECT_USER_PREFERENCES");
 		STATEMENT_UPDATE_GROUP                   = props.getProperty("STATEMENT_UPDATE_GROUP");
 		STATEMENT_UPDATE_NAMESPACE               = props.getProperty("STATEMENT_UPDATE_NAMESPACE");
 		STATEMENT_UPDATE_RECENT_CHANGES_PREVIOUS_VERSION_ID = props.getProperty("STATEMENT_UPDATE_RECENT_CHANGES_PREVIOUS_VERSION_ID");
@@ -1708,16 +1751,13 @@ public class AnsiQueryHandler implements QueryHandler {
 	private WikiUser initWikiUser(ResultSet rs) throws SQLException {
 		String username = rs.getString("login");
 		WikiUser user = new WikiUser(username);
-		user.setUserId(rs.getInt("wiki_user_id"));
 		user.setDisplayName(rs.getString("display_name"));
+		user.setUserId(rs.getInt("wiki_user_id"));
 		user.setCreateDate(rs.getTimestamp("create_date"));
 		user.setLastLoginDate(rs.getTimestamp("last_login_date"));
 		user.setCreateIpAddress(rs.getString("create_ip_address"));
 		user.setLastLoginIpAddress(rs.getString("last_login_ip_address"));
-		user.setDefaultLocale(rs.getString("default_locale"));
 		user.setEmail(rs.getString("email"));
-		user.setEditor(rs.getString("editor"));
-		user.setSignature(rs.getString("signature"));
 		return user;
 	}
 
@@ -2298,10 +2338,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setTimestamp(index++, user.getLastLoginDate());
 			stmt.setString(index++, user.getCreateIpAddress());
 			stmt.setString(index++, user.getLastLoginIpAddress());
-			stmt.setString(index++, user.getDefaultLocale());
 			stmt.setString(index++, user.getEmail());
-			stmt.setString(index++, user.getEditor());
-			stmt.setString(index++, user.getSignature());
 			stmt.executeUpdate();
 			if (this.autoIncrementPrimaryKeys()) {
 				rs = stmt.getGeneratedKeys();
@@ -2310,12 +2347,66 @@ public class AnsiQueryHandler implements QueryHandler {
 				}
 				user.setUserId(rs.getInt(1));
 			}
+			// Store user preferences
+			stmt.close();
+			if(rs != null) rs.close();
+			HashMap<String, String> defaults = new HashMap<String, String>();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				defaults.put(rs.getString(1), rs.getString(2));
+			}
+			stmt.close();
+			rs.close();
+			stmt = conn.prepareStatement(STATEMENT_DELETE_USER_PREFERENCES);
+			int userId = user.getUserId();
+			stmt.setInt(1, userId);
+			stmt.executeUpdate();
+			stmt.close();
+			HashMap<String, String> preferences = user.getPreferences();
+			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE);
+			// Only store preferences that are not default
+			for(String key : defaults.keySet()) {
+				String defVal = defaults.get(key);
+				String cusVal = preferences.get(key);
+				if(StringUtils.isBlank(cusVal)) {
+					user.setPreference(key, defVal);
+				}
+				else {
+					if(StringUtils.isBlank(defVal) || !defaults.get(key).equals(preferences.get(key))) {
+						stmt.setInt(1, userId);
+						stmt.setString(2, key);
+						stmt.setString(3, cusVal);
+						stmt.executeUpdate();
+					}
+					else {
+						stmt.setInt(1, userId);
+						stmt.setString(2, key);
+						stmt.setString(3, cusVal);
+						stmt.executeUpdate();
+					}
+				}
+			}
 		} finally {
 			// close only the statement and result set - leave the connection open for further use
 			DatabaseConnection.closeConnection(null, stmt, rs);
 		}
 	}
 
+	public void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE_DEFAULTS);
+			stmt.setString(1, userPreferenceKey);
+			stmt.setString(2, userPreferenceDefaultValue);
+			stmt.executeUpdate();
+		} finally {
+			// close only the statement and result set - leave the connection open for further use
+			DatabaseConnection.closeConnection(null, stmt, rs);
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -2880,7 +2971,25 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_USER);
 			stmt.setInt(1, userId);
 			rs = stmt.executeQuery();
-			return (rs.next()) ? this.initWikiUser(rs) : null;
+			if(rs.next()) {
+				WikiUser user = this.initWikiUser(rs);
+				HashMap<String, String> preferences = new HashMap<String, String>();
+				stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					preferences.put(rs.getString(1), rs.getString(2));
+				}
+				stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES);
+				stmt.setInt(1,userId);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					preferences.put(rs.getString(1), rs.getString(2));
+				}
+				user.setPreferences(preferences);
+				return user;
+			}
+			else return null;
+			// return (rs.next()) ? this.initWikiUser(rs) : null;
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt, rs);
 		}
@@ -3581,22 +3690,78 @@ public class AnsiQueryHandler implements QueryHandler {
 	 */
 	public void updateWikiUser(WikiUser user, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_UPDATE_WIKI_USER);
 			stmt.setString(1, user.getUsername());
 			stmt.setString(2, user.getDisplayName());
 			stmt.setTimestamp(3, user.getLastLoginDate());
 			stmt.setString(4, user.getLastLoginIpAddress());
-			stmt.setString(5, user.getDefaultLocale());
-			stmt.setString(6, user.getEmail());
-			stmt.setString(7, user.getEditor());
-			stmt.setString(8, user.getSignature());
-			stmt.setInt(9, user.getUserId());
+			stmt.setString(5, user.getEmail());
+			stmt.setInt(6, user.getUserId());
+			stmt.executeUpdate();
+			// Store user preferences
+			stmt.close();
+			HashMap<String, String> defaults = new HashMap<String, String>();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				defaults.put(rs.getString(1), rs.getString(2));
+			}
+			stmt.close();
+			rs.close();
+			stmt = conn.prepareStatement(STATEMENT_DELETE_USER_PREFERENCES);
+			int userId = user.getUserId();
+			stmt.setInt(1, userId);
+			stmt.executeUpdate();
+			stmt.close();
+			HashMap<String, String> preferences = user.getPreferences();
+			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE);
+			// Only store preferences that are not default
+			for(String key : preferences.keySet()) {
+				String defVal = defaults.get(key);
+				String cusVal = preferences.get(key);
+				if(StringUtils.isBlank(cusVal)) continue;
+				if(StringUtils.isBlank(defVal) || !defaults.get(key).equals(preferences.get(key))) {
+					stmt.setInt(1, userId);
+					stmt.setString(2, key);
+					stmt.setString(3, cusVal);
+					stmt.executeUpdate();
+				}
+				else {
+					stmt.setInt(1, userId);
+					stmt.setString(2, key);
+					stmt.setString(3, cusVal);
+					stmt.executeUpdate();
+				}
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			throw e;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new SQLException(e);
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+	
+	public void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		try {
+			stmt.setString(1, userPreferenceDefaultValue);
+			stmt.setString(2, userPreferenceKey);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}
 	}
+	
+	public boolean existsUserPreferenceDefault(String userPreferenceKey) throws SQLException {
+		HashMap<String, String> defaultPrefs = this.getUserPreferencesDefaults();
+		return defaultPrefs.containsKey(userPreferenceKey);
+	}
+	
 	/**
 	 *
 	 */

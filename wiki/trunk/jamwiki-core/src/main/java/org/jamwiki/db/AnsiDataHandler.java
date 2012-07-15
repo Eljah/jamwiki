@@ -627,6 +627,17 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * *****
+	 */
+	public Map<String, String> getUserPreferencesDefaults() throws DataAccessException {
+		try {
+			return this.queryHandler().getUserPreferencesDefaults();
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+	
+	/**
 	 *
 	 */
 	public List<LogItem> getLogItems(String virtualWiki, int logType, Pagination pagination, boolean descending) throws DataAccessException {
@@ -1930,8 +1941,8 @@ public class AnsiDataHandler implements DataHandler {
 		checkLength(user.getLastLoginIpAddress(), 39);
 		checkLength(user.getDefaultLocale(), 8);
 		checkLength(user.getEmail(), 100);
-		checkLength(user.getEditor(), 50);
-		checkLength(user.getSignature(), 255);
+		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR), 50);
+		checkLength(user.getSignature(), 250);
 	}
 
 	/**
@@ -2448,6 +2459,21 @@ public class AnsiDataHandler implements DataHandler {
 		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 
+	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue) throws DataAccessException {
+		try {
+			Connection conn = DatabaseConnection.getConnection();
+			if (this.queryHandler().existsUserPreferenceDefault(userPreferenceKey)) {
+				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, conn);
+			}
+			else {
+				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, conn);
+			}
+				
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+	
 	/**
 	 *
 	 */

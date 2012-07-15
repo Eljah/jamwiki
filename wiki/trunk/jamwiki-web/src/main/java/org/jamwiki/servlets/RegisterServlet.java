@@ -35,6 +35,7 @@ import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -89,11 +90,14 @@ public class RegisterServlet extends JAMWikiServlet {
 			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
 			locales.put(value, key);
 		}
+		String datetimeFormatPreview = DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE), user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
+		next.addObject("datetimeFormatPreview", datetimeFormatPreview);
 		next.addObject("locales", locales);
 		Map editors = WikiConfiguration.getInstance().getEditors();
 		next.addObject("editors", editors);
 		next.addObject("newuser", user);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isRegistrationEnabled());
+		next.addObject("timezones",DateUtil.getTimeZoneIDs());
 		pageInfo.setSpecial(true);
 		pageInfo.setContentJsp(JSP_REGISTER);
 		pageInfo.setPageTitle(new WikiMessage("register.title"));
@@ -173,14 +177,16 @@ public class RegisterServlet extends JAMWikiServlet {
 				user = WikiBase.getDataHandler().lookupWikiUser(userId);
 			}
 		}
-		user.setDisplayName(request.getParameter("displayName"));
-		user.setDefaultLocale(request.getParameter("defaultLocale"));
 		user.setEmail(request.getParameter("email"));
-		user.setEditor(request.getParameter("editor"));
-		user.setSignature(request.getParameter("signature"));
 		// FIXME - need to distinguish between add & update
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
+		user.setDisplayName(request.getParameter("displayName"));
+		user.setDefaultLocale(request.getParameter("defaultLocale"));
+		user.setPreference(WikiUser.USER_PREFERENCE_TIMEZONE, request.getParameter("timezone"));
+		user.setPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, request.getParameter("datetimeFormat"));
+		user.setPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR,request.getParameter("editor"));
+		user.setSignature(request.getParameter("signature"));
 		return user;
 	}
 
