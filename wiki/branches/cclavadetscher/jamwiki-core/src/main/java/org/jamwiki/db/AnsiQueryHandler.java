@@ -2373,13 +2373,11 @@ public class AnsiQueryHandler implements QueryHandler {
 					user.setPreference(key, defVal);
 				}
 				else {
-					if(!StringUtils.isBlank(defVal)) {
-						if(!defaults.get(key).equals(preferences.get(key))) {
-							stmt.setInt(1, userId);
-							stmt.setString(2, key);
-							stmt.setString(3, cusVal);
-							stmt.executeUpdate();
-						}
+					if(StringUtils.isBlank(defVal) || !defaults.get(key).equals(preferences.get(key))) {
+						stmt.setInt(1, userId);
+						stmt.setString(2, key);
+						stmt.setString(3, cusVal);
+						stmt.executeUpdate();
 					}
 					else {
 						stmt.setInt(1, userId);
@@ -3724,13 +3722,11 @@ public class AnsiQueryHandler implements QueryHandler {
 				String defVal = defaults.get(key);
 				String cusVal = preferences.get(key);
 				if(StringUtils.isBlank(cusVal)) continue;
-				if(!StringUtils.isBlank(defVal)) {
-					if(!defaults.get(key).equals(preferences.get(key))) {
-						stmt.setInt(1, userId);
-						stmt.setString(2, key);
-						stmt.setString(3, cusVal);
-						stmt.executeUpdate();
-					}
+				if(StringUtils.isBlank(defVal) || !defaults.get(key).equals(preferences.get(key))) {
+					stmt.setInt(1, userId);
+					stmt.setString(2, key);
+					stmt.setString(3, cusVal);
+					stmt.executeUpdate();
 				}
 				else {
 					stmt.setInt(1, userId);
@@ -3745,6 +3741,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new SQLException(e);
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
 		}
 	}
 	

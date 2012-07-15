@@ -7,6 +7,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jamwiki.Environment;
+import org.jamwiki.model.WikiUser;
 
 
 
@@ -49,8 +51,14 @@ public class DateUtil {
 			}
 		}
 		DateFormat df = null;
+		String dateFormatProp = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true);
 		if(StringUtils.isBlank(dateFormat)) {
-			df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+			if(StringUtils.isBlank(dateFormatProp)) {
+				df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+			}
+			else {
+				df = new SimpleDateFormat(dateFormatProp,locale);
+			}
 		}
 		else {
 			int style = -1;

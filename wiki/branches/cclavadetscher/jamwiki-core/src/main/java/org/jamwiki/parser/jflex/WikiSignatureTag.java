@@ -59,9 +59,9 @@ public class WikiSignatureTag implements JFlexParserTag {
 		}
 		if (includeDate) {
 			WikiUser user = lexer.getParserInput().getWikiUser();
-			String dateFormat = StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT))?Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true):user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT);
+			// String dateFormat = StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT))?Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true):user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT);
 			signature += DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE),
-					                               dateFormat,
+												   user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT),
 					                               user.getDefaultLocale());
 		}
 		return signature;
