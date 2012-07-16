@@ -35,6 +35,10 @@ import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.ParserException;
+import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.jflex.JFlexParser;
 import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
@@ -92,6 +96,7 @@ public class RegisterServlet extends JAMWikiServlet {
 		}
 		String datetimeFormatPreview = DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE), user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
 		next.addObject("datetimeFormatPreview", datetimeFormatPreview);
+		next.addObject("signaturePreview", this.signaturePreview(request, pageInfo, user));
 		next.addObject("locales", locales);
 		Map editors = WikiConfiguration.getInstance().getEditors();
 		next.addObject("editors", editors);
@@ -188,6 +193,29 @@ public class RegisterServlet extends JAMWikiServlet {
 		user.setPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR,request.getParameter("editor"));
 		user.setSignature(request.getParameter("signature"));
 		return user;
+	}
+
+	/**
+	 *
+	 */
+	private String signaturePreview(HttpServletRequest request, WikiPageInfo pageInfo, WikiUser user) {
+		String signature = request.getParameter("signature");
+		if (StringUtils.isBlank(signature)) {
+			signature = user.getSignature();
+		}
+		ParserInput parserInput = new ParserInput(pageInfo.getVirtualWikiName(), "");
+		parserInput.setContext(request.getContextPath());
+		parserInput.setLocale(request.getLocale());
+		parserInput.setWikiUser(user);
+		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
+		ParserOutput parserOutput = new ParserOutput();
+		try {
+			// FIXME - should not need to specify mode
+			return WikiBase.getParserInstance().parseFragment(parserInput, parserOutput, signature, JFlexParser.MODE_PROCESS);
+		} catch (ParserException e) {
+			logger.error("Failure while parsing user signature " + signature, e);
+		}
+		return "";
 	}
 
 	/**

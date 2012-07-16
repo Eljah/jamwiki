@@ -144,7 +144,7 @@
 		</div>
 		<div class="row">
 			<label for="registerSignature"><fmt:message key="register.caption.signature" /></label>
-			<span><input type="text" name="signature" value="<c:out value="${newuser.preferences['user.signature']}" />" id="registerSignature" size="50" /></span>
+			<span><input type="text" name="signature" value="<c:out value="${newuser.preferences['user.signature']}" />" id="registerSignature" size="50" /> <fmt:message key="edit.action.preview" />: <c:out value="${signaturePreview}" escapeXml="false" /></span>
 			<div class="formhelp"><fmt:message key="register.help.signature" /></div>
 		</div>
 		</fieldset>
