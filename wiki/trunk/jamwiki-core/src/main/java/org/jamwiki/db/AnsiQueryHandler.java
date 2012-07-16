@@ -2379,12 +2379,6 @@ public class AnsiQueryHandler implements QueryHandler {
 						stmt.setString(3, cusVal);
 						stmt.executeUpdate();
 					}
-					else {
-						stmt.setInt(1, userId);
-						stmt.setString(2, key);
-						stmt.setString(3, cusVal);
-						stmt.executeUpdate();
-					}
 				}
 			}
 		} finally {
@@ -3723,12 +3717,6 @@ public class AnsiQueryHandler implements QueryHandler {
 				String cusVal = preferences.get(key);
 				if(StringUtils.isBlank(cusVal)) continue;
 				if(StringUtils.isBlank(defVal) || !defaults.get(key).equals(preferences.get(key))) {
-					stmt.setInt(1, userId);
-					stmt.setString(2, key);
-					stmt.setString(3, cusVal);
-					stmt.executeUpdate();
-				}
-				else {
 					stmt.setInt(1, userId);
 					stmt.setString(2, key);
 					stmt.setString(3, cusVal);
