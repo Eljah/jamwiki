@@ -94,7 +94,12 @@ public class RegisterServlet extends JAMWikiServlet {
 			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
 			locales.put(value, key);
 		}
-		String datetimeFormatPreview = DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE), user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
+		String datetimeFormatPreview = null;
+		try {
+			datetimeFormatPreview = DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE), user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
+		} catch (IllegalArgumentException e) {
+			// handled in validate()
+		}
 		next.addObject("datetimeFormatPreview", datetimeFormatPreview);
 		next.addObject("signaturePreview", this.signaturePreview(request, pageInfo, user));
 		next.addObject("locales", locales);
@@ -255,6 +260,12 @@ public class RegisterServlet extends JAMWikiServlet {
 		String result = ServletUtil.checkForSpam(request, user.getUsername());
 		if (result != null) {
 			pageInfo.addError(new WikiMessage("edit.exception.spam", result));
+		}
+		String dateFormat = request.getParameter("datetimeFormat");
+		try {
+			DateUtil.getUserLocalTime(null, dateFormat, null);
+		} catch (IllegalArgumentException e) {
+			pageInfo.addError(new WikiMessage("register.error.dateinvalid", dateFormat));
 		}
 	}
 

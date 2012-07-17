@@ -21,15 +21,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
-
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
-import org.jamwiki.model.WikiUser;
 
 /**
  * Utility methods for working with dates and time zones.
  */
 public class DateUtil {
+
+	private static final WikiLogger logger = WikiLogger.getLogger(DateUtil.class.getName());
 
 	/**
 	 * The method returns the current date and/or time for a specific time zone.
@@ -46,58 +47,54 @@ public class DateUtil {
 	 * the language (e.g. "en") or the combination of language and ISO 2 digit country code (e.g. "en_US").
 	 * A value of null or of a non existing locale will force the method to use the default locale of
 	 * the server. 
+	 * @throws IllegalArgumentException Thrown if the dateFormat or localeString is invalid.
 	 * @return
 	 */
-	public static String getUserLocalTime(String userTimeZone,String dateFormat,String localeString) {
+	public static String getUserLocalTime(String userTimeZone, String dateFormat, String localeString) throws IllegalArgumentException {
 		TimeZone tz = TimeZone.getDefault();
-		if(!StringUtils.isBlank(userTimeZone)) {
+		if (!StringUtils.isBlank(userTimeZone)) {
 			tz = TimeZone.getTimeZone(userTimeZone);
-
 		}
 		Locale locale = Locale.getDefault();
 		if (!StringUtils.isBlank(localeString)) {
-			String[] parts = localeString.split("_");
-			switch (parts.length) {
-				case 1: {
-					locale = new Locale(parts[0]);
-					break;
-				}
-				case 2: {
-					locale = new Locale(parts[0],parts[1]);
-				}
+			try {
+				locale = LocaleUtils.toLocale(localeString);
+			} catch (IllegalArgumentException e) {
+				logger.warn("Failure while initializing locale from string: " + localeString);
 			}
 		}
-		DateFormat df = null;
-		String dateFormatProp = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true);
-		if(StringUtils.isBlank(dateFormat)) {
-			if(StringUtils.isBlank(dateFormatProp)) {
-				df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-			}
-			else {
-				df = new SimpleDateFormat(dateFormatProp,locale);
-			}
+		String dateFormatString = dateFormat;
+		if (dateFormatString == null) {
+			dateFormatString = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
 		}
-		else {
-			int style = -1;
-			if (StringUtils.equalsIgnoreCase(dateFormat, "SHORT")) {
-				style = DateFormat.SHORT;
-			} else if (StringUtils.equalsIgnoreCase(dateFormat, "MEDIUM")) {
-				style = DateFormat.MEDIUM;
-			} else if (StringUtils.equalsIgnoreCase(dateFormat, "LONG")) {
-				style = DateFormat.LONG;
-			} else if (StringUtils.equalsIgnoreCase(dateFormat, "FULL")) {
-				style = DateFormat.FULL;
-			}
-			if (style != -1) {
-				df = DateFormat.getDateTimeInstance(style, style, locale);
-			} else {
-				df = new SimpleDateFormat(dateFormat,locale);
-			}
-		}
+		DateFormat df = DateUtil.stringToDateFormat(dateFormatString, locale);
 		df.setTimeZone(tz);
 		return df.format(Calendar.getInstance(tz).getTime());
 	}
 
+	/**
+	 *
+	 */
+	private static DateFormat stringToDateFormat(String dateFormatString, Locale locale) throws IllegalArgumentException {
+		if (StringUtils.isBlank(dateFormatString)) {
+			return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		}
+		int style = -1;
+		if (StringUtils.equalsIgnoreCase(dateFormatString, "SHORT")) {
+			style = DateFormat.SHORT;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "MEDIUM")) {
+			style = DateFormat.MEDIUM;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "LONG")) {
+			style = DateFormat.LONG;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "FULL")) {
+			style = DateFormat.FULL;
+		}
+		if (style != -1) {
+			return DateFormat.getDateTimeInstance(style, style, locale);
+		} else {
+			return new SimpleDateFormat(dateFormatString, locale);
+		}
+	}
 	/**
 	 * Returns a list of available time zones. The list is used to get the time zone
 	 * of a user in the user preferences dialog.
