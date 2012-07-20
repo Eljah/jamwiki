@@ -2379,12 +2379,6 @@ public class AnsiQueryHandler implements QueryHandler {
 						stmt.setString(3, cusVal);
 						stmt.executeUpdate();
 					}
-					else {
-						stmt.setInt(1, userId);
-						stmt.setString(2, key);
-						stmt.setString(3, cusVal);
-						stmt.executeUpdate();
-					}
 				}
 			}
 		} finally {
@@ -3728,19 +3722,10 @@ public class AnsiQueryHandler implements QueryHandler {
 					stmt.setString(3, cusVal);
 					stmt.executeUpdate();
 				}
-				else {
-					stmt.setInt(1, userId);
-					stmt.setString(2, key);
-					stmt.setString(3, cusVal);
-					stmt.executeUpdate();
-				}
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			throw e;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new SQLException(e);
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}

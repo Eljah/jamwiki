@@ -104,49 +104,39 @@
 		</fieldset>
 		<fieldset>
 		<legend><fmt:message key="register.caption.userpreferences" /></legend>
-		<div class="row">
-			<label for="registerDefaultLocale"><fmt:message key="register.caption.locale" /></label>
-			<span>
-				<select name="defaultLocale" id="registerDefaultLocale">
-				<c:forEach items="${locales}" var="defaultLocale">
-				<option value="<c:out value="${defaultLocale.value}" />"<c:if test="${newuser.preferences['user.default.locale'] == defaultLocale.value}"> selected="selected"</c:if>><c:out value="${defaultLocale.key}" /></option>
-				</c:forEach>
-				</select>
-			</span>
-			<div class="formhelp"><fmt:message key="register.help.locale" /></div>
-		</div>
-		<div class="row">
-		<label for="registerTimezone"><fmt:message key="register.caption.timezone" /></label>
-		<span>
-			<select name="timezone" id="registerTimezone">
-			<c:forEach items="${timezones}" var="timezone">
-			<option value="<c:out value="${timezone}" />"<c:if test="${newuser.preferences['user.timezone'] == timezone}"> selected="selected"</c:if>><c:out value="${timezone}" /></option>
+		<c:if test="${!empty userPreferences}">
+			<c:forEach var="preference" items="${userPreferences.items}">
+			<div class="row">
+				<label for="${preference.key}"><fmt:message key="${preference.value.label}" /></label>
+				<!-- handle content type -->
+				<span>
+					<c:choose>
+						<c:when test="${!empty preference.value.list}">
+							<select name="${preference.key}" id="${preference.key}">
+								<c:forEach var="item" items="${preference.value.list}">
+								<option value="<c:out value="${item}" />"<c:if test="${newuser.preferences[preference.key] == item}"> selected="selected"</c:if>><c:out value="${item}" /></option>
+								</c:forEach>
+							</select>
+						</c:when>
+						<c:when test="${!empty preference.value.map}">
+							<select name="${preference.key}" id="${preference.key}">
+								<c:forEach var="item" items="${preference.value.map}">
+								<option value="<c:out value="${item.key}" />"<c:if test="${newuser.preferences[preference.key] == item.key}"> selected="selected"</c:if>><c:out value="${item.value}" /></option>
+								</c:forEach>
+							</select>
+						</c:when>
+						<c:otherwise>
+							<input type="text" name="${preference.key}" value="<c:out value="${newuser.preferences[preference.key]}" />" id="${preference.key}" size="50" />
+						</c:otherwise>
+					</c:choose>
+					<c:if test="${!empty preference.value.preview}">
+						<fmt:message key="edit.action.preview" />: <c:out value="${preference.value.preview}" escapeXml="false" />
+					</c:if>
+				</span>
+				<div class="formhelp"><fmt:message key="${preference.value.help}" /></div>
+				</div>
 			</c:forEach>
-			</select>
-		</span>
-		<div class="formhelp"><fmt:message key="register.help.timezone" /></div>
-		</div>
-		<div class="row">
-		<label for="registerDatetimeFormat"><fmt:message key="register.caption.datetime.format" /></label>
-		<span><input type="text" name="datetimeFormat" value="<c:out value="${newuser.preferences['user.datetime.format']}" />" id="registerDatetimeFormat" size="50" /> <fmt:message key="edit.action.preview" />: <c:out value="${datetimeFormatPreview}" /></span>
-		<div class="formhelp"><fmt:message key="register.help.datetime.format" /></div>
-		</div>
-		<div class="row">
-			<label for="registerEditor"><fmt:message key="register.caption.editor" /></label>
-			<span>
-				<select name="editor" id="registerEditor">
-				<c:forEach items="${editors}" var="editor">
-				<option value="<c:out value="${editor.key}" />"<c:if test="${newuser.preferences['user.preferred.editor'] == editor.key}"> selected="selected"</c:if>><c:out value="${editor.value}" /></option>
-				</c:forEach>
-				</select>
-			</span>
-			<div class="formhelp"><fmt:message key="register.help.editor" /></div>
-		</div>
-		<div class="row">
-			<label for="registerSignature"><fmt:message key="register.caption.signature" /></label>
-			<span><input type="text" name="signature" value="<c:out value="${newuser.preferences['user.signature']}" />" id="registerSignature" size="50" /></span>
-			<div class="formhelp"><fmt:message key="register.help.signature" /></div>
-		</div>
+		</c:if>
 		</fieldset>
 		<fieldset>
 		<legend><fmt:message key="register.caption.changepassword" /></legend>

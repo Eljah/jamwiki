@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.utils.UserPreferencesUtil;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -42,13 +43,6 @@ public class WikiUser implements Serializable {
 	private int userId = -1;
 	private String displayName = null;
 	
-	// Constants for user preferences
-	public static String USER_PREFERENCE_SIGNATURE = "user.signature";
-	public static String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
-	public static String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
-	public static String USER_PREFERENCE_TIMEZONE = "user.timezone";
-	public static String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
-	
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -58,11 +52,11 @@ public class WikiUser implements Serializable {
 	}
 
 	public String getDefaultLocale() {
-		return preferences.get(USER_PREFERENCE_DEFAULT_LOCALE);
+		return preferences.get(UserPreferencesUtil.USER_PREFERENCE_DEFAULT_LOCALE);
 	}
 	
 	public void setDefaultLocale(String defaultLocale) {
-		preferences.put(USER_PREFERENCE_DEFAULT_LOCALE, defaultLocale);
+		preferences.put(UserPreferencesUtil.USER_PREFERENCE_DEFAULT_LOCALE, defaultLocale);
 	}
 	
 	private HashMap<String, String> preferences = new HashMap<String, String>();
@@ -177,11 +171,11 @@ public class WikiUser implements Serializable {
 	 * Shortcut to get the user signature
 	 */
 	public String getSignature() {
-		return preferences.get(WikiUser.USER_PREFERENCE_SIGNATURE);
+		return preferences.get(UserPreferencesUtil.USER_PREFERENCE_SIGNATURE);
 	}
 	
 	public void setSignature(String signature) {
-		preferences.put(USER_PREFERENCE_SIGNATURE, signature);
+		preferences.put(UserPreferencesUtil.USER_PREFERENCE_SIGNATURE, signature);
 	}
 	
 	/**

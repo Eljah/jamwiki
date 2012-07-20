@@ -53,6 +53,7 @@ import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.ResourceUtil;
+import org.jamwiki.utils.UserPreferencesUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
@@ -845,10 +846,10 @@ public class WikiDatabase {
 	
 	private static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
 		DataHandler handler = WikiBase.getDataHandler();
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null);
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null);
+		handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
+		handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
+		handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_SIGNATURE, null);
+		handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
+		handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_DATETIME_FORMAT, null);
 	}
 }

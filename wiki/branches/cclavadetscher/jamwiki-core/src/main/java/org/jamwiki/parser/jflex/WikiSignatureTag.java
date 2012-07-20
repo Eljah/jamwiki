@@ -26,6 +26,7 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.utils.DateUtil;
+import org.jamwiki.utils.UserPreferencesUtil;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -60,9 +61,7 @@ public class WikiSignatureTag implements JFlexParserTag {
 		if (includeDate) {
 			WikiUser user = lexer.getParserInput().getWikiUser();
 			// String dateFormat = StringUtils.isBlank(user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT))?Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true):user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT);
-			signature += DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE),
-												   user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT),
-					                               user.getDefaultLocale());
+			signature += DateUtil.getUserLocalTime(user.getPreference(UserPreferencesUtil.USER_PREFERENCE_TIMEZONE), user.getPreference(UserPreferencesUtil.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
 		}
 		return signature;
 	}

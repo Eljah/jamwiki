@@ -3,6 +3,14 @@
 
 New Features:
 
+  * Add user preferences Timezone and Datetime format (cclavadetscher).
+  * Preview of current Datetime format (cclavadetscher).
+  * Preview of current Signature (wrh2).
+  * Add the ability to create wiki groups (cclavadetscher).
+  * Add the ability to assign users to wiki groups (cclavadetscher).
+  * Display user roles inherited from group membership (cclavadetscher).
+  * Allow default role names to be configured via property file to better
+    support LDAP (PhilTrimble).
   * Update Mediawiki XML exports to use the 0.7 XSD (previously 0.3).
   * Upgrade to Spring Framework 3.1.1.RELEASE.
   * Upgrade to Lucene Search 3.6.
@@ -10,12 +18,12 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Update of last login date and time after login (wrh2, cclavadetscher).
 
 Translation Updates:
 
-  * None.
-
+  * Italian (cclavadetscher).
+  * German (cclavadetscher).
 
 1.2
 ===

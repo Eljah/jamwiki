@@ -1,19 +1,46 @@
+/**
+ * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, version 2.1, dated February 1999.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the latest version of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program (LICENSE.txt); if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.jamwiki.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
-
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.WikiUser;
 
-
-
+/**
+ * Utility methods for working with dates and time zones.
+ */
 public class DateUtil {
 
+	private static final WikiLogger logger = WikiLogger.getLogger(DateUtil.class.getName());
+
+	private static final String[] dateFormats = new String[]{ "SHORT",
+															  "MEDIUM",
+															  "LONG",
+															  "FULL",
+															  "dd.MM.yyyy HH:mm z" };
+	
 	/**
 	 * The method returns the current date and/or time for a specific time zone.
 	 * The value is returned as a date formatted String, based on the formatting
@@ -29,58 +56,60 @@ public class DateUtil {
 	 * the language (e.g. "en") or the combination of language and ISO 2 digit country code (e.g. "en_US").
 	 * A value of null or of a non existing locale will force the method to use the default locale of
 	 * the server. 
+	 * @throws IllegalArgumentException Thrown if the dateFormat or localeString is invalid.
 	 * @return
 	 */
-	public static String getUserLocalTime(String userTimeZone,String dateFormat,String localeString) {
+	public static String getUserLocalTime(String userTimeZone, String dateFormat, String localeString) throws IllegalArgumentException {
 		TimeZone tz = TimeZone.getDefault();
-		if(!StringUtils.isBlank(userTimeZone)) {
+		if (!StringUtils.isBlank(userTimeZone)) {
 			tz = TimeZone.getTimeZone(userTimeZone);
-
 		}
 		Locale locale = Locale.getDefault();
 		if (!StringUtils.isBlank(localeString)) {
-			String[] parts = localeString.split("_");
-			switch (parts.length) {
-				case 1: {
-					locale = new Locale(parts[0]);
-					break;
-				}
-				case 2: {
-					locale = new Locale(parts[0],parts[1]);
-				}
+			try {
+				locale = LocaleUtils.toLocale(localeString);
+			} catch (IllegalArgumentException e) {
+				logger.warn("Failure while initializing locale from string: " + localeString);
 			}
 		}
-		DateFormat df = null;
-		String dateFormatProp = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN,true,true);
-		if(StringUtils.isBlank(dateFormat)) {
-			if(StringUtils.isBlank(dateFormatProp)) {
-				df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-			}
-			else {
-				df = new SimpleDateFormat(dateFormatProp,locale);
-			}
+		String dateFormatString = dateFormat;
+		if (dateFormatString == null) {
+			dateFormatString = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
 		}
-		else {
-			int style = -1;
-			if (StringUtils.equalsIgnoreCase(dateFormat, "SHORT")) {
-				style = DateFormat.SHORT;
-			} else if (StringUtils.equalsIgnoreCase(dateFormat, "MEDIUM")) {
-				style = DateFormat.MEDIUM;
-			} else if (StringUtils.equalsIgnoreCase(dateFormat, "LONG")) {
-				style = DateFormat.LONG;
-			} else if (StringUtils.equalsIgnoreCase(dateFormat, "FULL")) {
-				style = DateFormat.FULL;
-			}
-			if (style != -1) {
-				df = DateFormat.getDateTimeInstance(style, style, locale);
-			} else {
-				df = new SimpleDateFormat(dateFormat,locale);
-			}
-		}
+		SimpleDateFormat df = DateUtil.stringToDateFormat(dateFormatString, locale);
 		df.setTimeZone(tz);
 		return df.format(Calendar.getInstance(tz).getTime());
 	}
 
+	/**
+	 *
+	 */
+	private static SimpleDateFormat stringToDateFormat(String dateFormatString, Locale locale) throws IllegalArgumentException {
+		if (StringUtils.isBlank(dateFormatString)) {
+			return (SimpleDateFormat)DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		}
+		int style = -1;
+		if (StringUtils.equalsIgnoreCase(dateFormatString, "SHORT")) {
+			style = DateFormat.SHORT;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "MEDIUM")) {
+			style = DateFormat.MEDIUM;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "LONG")) {
+			style = DateFormat.LONG;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "FULL")) {
+			style = DateFormat.FULL;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "DEFAULT")) {
+			style = DateFormat.DEFAULT;
+		}
+		if (style != -1) {
+			SimpleDateFormat sdf = (SimpleDateFormat)DateFormat.getDateTimeInstance(style, style, locale); 
+			String pattern = sdf.toPattern();
+			if(pattern.indexOf("z") < 0) sdf = new SimpleDateFormat(pattern + " z",locale);
+			return sdf;
+		} else {
+			return new SimpleDateFormat(dateFormatString, locale);
+		}
+	}
+	
 	/**
 	 * Returns a list of available time zones. The list is used to get the time zone
 	 * of a user in the user preferences dialog.
@@ -89,5 +118,18 @@ public class DateUtil {
 	 */
 	public static String[] getTimeZoneIDs() {
 		return TimeZone.getAvailableIDs();
+	}
+	
+	public static Map<String, String> getDatetimeFormats(WikiUser user) {
+		String timezone   = user.getPreference(UserPreferencesUtil.USER_PREFERENCE_TIMEZONE);
+		String locale     = user.getPreference(UserPreferencesUtil.USER_PREFERENCE_DEFAULT_LOCALE);
+		String sysDefault = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
+		
+		HashMap<String, String> formats = new HashMap<String, String>();
+		formats.put("", getUserLocalTime(timezone,sysDefault,locale));
+		for(String format : dateFormats) {
+			formats.put(format, getUserLocalTime(timezone,format,locale));
+		}
+		return formats;
 	}
 }

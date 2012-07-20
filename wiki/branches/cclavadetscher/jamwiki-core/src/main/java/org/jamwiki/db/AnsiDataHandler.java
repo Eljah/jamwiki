@@ -1939,10 +1939,12 @@ public class AnsiDataHandler implements DataHandler {
 		checkLength(user.getDisplayName(), 100);
 		checkLength(user.getCreateIpAddress(), 39);
 		checkLength(user.getLastLoginIpAddress(), 39);
-		checkLength(user.getDefaultLocale(), 8);
 		checkLength(user.getEmail(), 100);
-		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR), 50);
-		checkLength(user.getSignature(), 250);
+		// Check user preferences. Max length for each value is 250
+		HashMap<String, String> preferences = user.getPreferences();
+		for(String key : preferences.keySet()) {
+			checkLength(preferences.get(key), 250);
+		}
 	}
 
 	/**
