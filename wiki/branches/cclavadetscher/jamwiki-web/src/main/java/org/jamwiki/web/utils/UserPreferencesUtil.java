@@ -1,4 +1,4 @@
-package org.jamwiki.utils;
+package org.jamwiki.web.utils;
 
 import java.util.Locale;
 import java.util.Map;
@@ -8,6 +8,8 @@ import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiConfiguration;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.utils.DateUtil;
+import org.jamwiki.utils.WikiLogger;
 
 public class UserPreferencesUtil {
 
@@ -16,11 +18,13 @@ public class UserPreferencesUtil {
 	private static HashMap<String, String> defaults = null;
 
 	// Constants for user preferences
+	/*
 	public static final String USER_PREFERENCE_SIGNATURE = "user.signature";
 	public static final String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
 	public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
 	public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
 	public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
+	*/
 	
 	// This is a workaround. It should be possible to get the signature preview directly
 	// from a method...
@@ -82,7 +86,7 @@ public class UserPreferencesUtil {
 		 * a list of values. 
 		 */
 		public String[] getList() {
-			if(prefName.equals(USER_PREFERENCE_TIMEZONE)) {
+			if(prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
 				return DateUtil.getTimeZoneIDs();
 			}
 			else return null;
@@ -94,7 +98,7 @@ public class UserPreferencesUtil {
 		 * the user, while value is used to display the content in the dropdown box. 
 		 */
 		public Map getMap() {
-			if(prefName.equals(USER_PREFERENCE_DEFAULT_LOCALE)) {
+			if(prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
 				HashMap<String, String> locales = new HashMap<String, String>();
 				Locale[] localeArray = Locale.getAvailableLocales();
 				for (int i = 0; i < localeArray.length; i++) {
@@ -103,9 +107,9 @@ public class UserPreferencesUtil {
 					locales.put(key, value);
 				}
 				return locales;
-			} else if (prefName.equals(USER_PREFERENCE_PREFERRED_EDITOR)) {
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {
 				return WikiConfiguration.getInstance().getEditors();
-			} else if (prefName.equals(USER_PREFERENCE_DATETIME_FORMAT)) {
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATETIME_FORMAT)) {
 				return DateUtil.getDatetimeFormats(user);
 			}
 			else return null;
@@ -122,7 +126,7 @@ public class UserPreferencesUtil {
 		 * Add an if statement if a property has a preview to display on screen. 
 		 */
 		public String getPreview() {
-			if(prefName.equals(USER_PREFERENCE_SIGNATURE)) {
+			if(prefName.equals(WikiUser.USER_PREFERENCE_SIGNATURE)) {
 				return UserPreferencesUtil.signaturePreview;
 			}
 			else return null;
