@@ -42,10 +42,10 @@ import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.jflex.JFlexParser;
 import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Encryption;
-import org.jamwiki.utils.UserPreferencesUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.jamwiki.validator.ReCaptchaUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 

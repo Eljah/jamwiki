@@ -121,8 +121,8 @@ public class DateUtil {
 	}
 	
 	public static Map<String, String> getDatetimeFormats(WikiUser user) {
-		String timezone   = user.getPreference(UserPreferencesUtil.USER_PREFERENCE_TIMEZONE);
-		String locale     = user.getPreference(UserPreferencesUtil.USER_PREFERENCE_DEFAULT_LOCALE);
+		String timezone   = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
+		String locale     = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		String sysDefault = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
 		
 		HashMap<String, String> formats = new HashMap<String, String>();

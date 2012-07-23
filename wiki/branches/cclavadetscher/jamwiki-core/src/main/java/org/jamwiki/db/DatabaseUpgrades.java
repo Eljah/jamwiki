@@ -28,7 +28,6 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.WikiUser;
-import org.jamwiki.utils.UserPreferencesUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -206,11 +205,11 @@ public class DatabaseUpgrades {
 			WikiBase.getDataHandler().executeUpgradeUpdate("STATEMENT_CREATE_USER_PREFERENCES_TABLE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences"));
 			DataHandler handler = WikiBase.getDataHandler();
-			handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
-			handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
-			handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_SIGNATURE, null);
-			handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
-			handler.writeUserPreferenceDefault(UserPreferencesUtil.USER_PREFERENCE_DATETIME_FORMAT, null);
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null);
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
+			handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null);
 			// Create default values for user preferences.
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences_defaults"));
 			// Migrate existing user preferences to new tables
