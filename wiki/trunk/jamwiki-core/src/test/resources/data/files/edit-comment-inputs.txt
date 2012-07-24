@@ -11,7 +11,7 @@ test
 [[Example2]] /* Section */
 /* Section */ {{PAGENAME}}
 /* {{PAGENAME}} */
-/* Section */ link to [[Image:Test Image.jpg]]
+/* Section */ link to [[File:Test Image.jpg]]
 /* [[Example2]] */
 /* [[Example2|Test]] */
 /* Section 1 */ /* Section 2 */

@@ -197,7 +197,7 @@ public class ImageLinkTag implements JFlexParserTag {
 			caption += (StringUtils.isBlank(caption)) ? token : "|" + token;
 		}
 		// parse the caption and strip anything prior to the last "|" to handle syntax of
-		// the form "[[Image:Example.gif|caption1|caption2]]".
+		// the form "[[File:Example.gif|caption1|caption2]]".
 		if (!StringUtils.isBlank(caption)) {
 			caption = JFlexParserUtil.parseFragment(parserInput, parserOutput, caption, mode);
 			int pos = caption.indexOf('|');

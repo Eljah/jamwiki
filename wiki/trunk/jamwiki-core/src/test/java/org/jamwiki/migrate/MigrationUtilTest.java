@@ -193,8 +193,8 @@ public class MigrationUtilTest extends JAMWikiUnitTest {
 		assertTrue("User talk:Test", (topic.getTopicContent().indexOf("User talk:Test - [[User comments:Test]]") != -1));
 		assertTrue("Wikipedia:Test", (topic.getTopicContent().indexOf("Wikipedia:Test - [[Project:Test]]") != -1));
 		assertTrue("Wikipedia talk:Test", (topic.getTopicContent().indexOf("Wikipedia talk:Test - [[Project comments:Test]]") != -1));
-		assertTrue("File:Test", (topic.getTopicContent().indexOf("File:Test - [[Image:Test]]") != -1));
-		assertTrue("File talk:Test", (topic.getTopicContent().indexOf("File talk:Test - [[Image comments:Test]]") != -1));
+		assertTrue("File:Test", (topic.getTopicContent().indexOf("File:Test - [[File:Test]]") != -1));
+		assertTrue("File talk:Test", (topic.getTopicContent().indexOf("File talk:Test - [[File comments:Test]]") != -1));
 		assertTrue("Template:Test", (topic.getTopicContent().indexOf("Template:Test - [[Template:Test]]") != -1));
 		assertTrue("Template talk:Test", (topic.getTopicContent().indexOf("Template talk:Test - [[Template comments:Test]]") != -1));
 		assertTrue("Category:Test", (topic.getTopicContent().indexOf("Category:Test - [[Category:Test]]") != -1));

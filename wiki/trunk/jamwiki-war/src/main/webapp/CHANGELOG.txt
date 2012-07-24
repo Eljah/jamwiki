@@ -7,6 +7,7 @@ New Features:
   * Allow default role names to be configured via property file to better
     support LDAP (PhilTrimble).
   * Update Mediawiki XML exports to use the 0.7 XSD (previously 0.3).
+  * Change the default image namespace from "Image" to "File" for new installs.
   * Upgrade to Spring Framework 3.1.1.RELEASE.
   * Upgrade to Lucene Search 3.6.
   * Upgrade to commons-io-2.2.
