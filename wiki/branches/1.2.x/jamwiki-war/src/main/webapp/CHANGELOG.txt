@@ -12,7 +12,7 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated German translations (axelclk).
 
 
 1.2.1
