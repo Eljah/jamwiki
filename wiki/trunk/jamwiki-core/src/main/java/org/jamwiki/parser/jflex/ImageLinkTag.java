@@ -109,7 +109,7 @@ public class ImageLinkTag implements JFlexParserTag {
 		// do not escape html for caption since parser does it above
 		try {
 			String virtualWiki = (wikiLink.getAltVirtualWiki() == null) ? parserInput.getVirtualWiki() : wikiLink.getAltVirtualWiki().getName();
-			return ImageUtil.buildImageLinkHtml(context, virtualWiki, wikiLink.getDestination(), imageMetadata, null, false);
+			return ImageUtil.buildImageLinkHtml(context, virtualWiki, wikiLink.getDestination(), imageMetadata, null, false, null);
 		} catch (IOException e) {
 			// FIXME - display a broken image icon or something better
 			logger.warn("I/O Failure while parsing image link: " + e.getMessage(), e);

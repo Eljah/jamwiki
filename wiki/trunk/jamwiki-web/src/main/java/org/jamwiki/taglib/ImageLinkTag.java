@@ -60,7 +60,7 @@ public class ImageLinkTag extends TagSupport {
 		}
 		try {
 			try {
-				html = ImageUtil.buildImageLinkHtml(request.getContextPath(), tagVirtualWiki, this.value, imageMetadata, this.style, true);
+				html = ImageUtil.buildImageLinkHtml(request.getContextPath(), tagVirtualWiki, this.value, imageMetadata, this.style, true, null);
 			} catch (IOException e) {
 				// FIXME - display a broken image icon or something better
 				logger.warn("I/O Failure while parsing image link: " + e.getMessage(), e);
