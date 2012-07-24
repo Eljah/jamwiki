@@ -128,9 +128,15 @@
 		</div>
 		<div class="row">
 		<label for="registerDatetimeFormat"><fmt:message key="register.caption.datetime.format" /></label>
-		<span><input type="text" name="datetimeFormat" value="<c:out value="${newuser.preferences['user.datetime.format']}" />" id="registerDatetimeFormat" size="50" /> <fmt:message key="edit.action.preview" />: <c:out value="${datetimeFormatPreview}" /></span>
+		<span><input type="text" name="datetimeFormat" value="<c:out value="${newuser.preferences['user.datetime.format']}" />" id="registerDatetimeFormat" size="50" /></span>
 		<div class="formhelp"><fmt:message key="register.help.datetime.format" /></div>
 		</div>
+		<c:if test="${!empty datetimeFormatPreview}">
+			<div class="row">
+				<label><fmt:message key="common.current"><fmt:param><fmt:message key="register.caption.datetime.format" /></fmt:param></fmt:message></label>
+				<span><c:out value="${datetimeFormatPreview}" /></span>
+			</div>
+		</c:if>
 		<div class="row">
 			<label for="registerEditor"><fmt:message key="register.caption.editor" /></label>
 			<span>
@@ -144,9 +150,15 @@
 		</div>
 		<div class="row">
 			<label for="registerSignature"><fmt:message key="register.caption.signature" /></label>
-			<span><input type="text" name="signature" value="<c:out value="${newuser.preferences['user.signature']}" />" id="registerSignature" size="50" /> <fmt:message key="edit.action.preview" />: <c:out value="${signaturePreview}" escapeXml="false" /></span>
+			<span><input type="text" name="signature" value="<c:out value="${newuser.preferences['user.signature']}" />" id="registerSignature" size="50" /></span>
 			<div class="formhelp"><fmt:message key="register.help.signature" /></div>
 		</div>
+		<c:if test="${!empty signaturePreview}">
+			<div class="row">
+				<label><fmt:message key="common.current"><fmt:param><fmt:message key="register.caption.signature" /></fmt:param></fmt:message></label>
+				<span><c:out value="${signaturePreview}" escapeXml="false" /></span>
+			</div>
+		</c:if>
 		</fieldset>
 		<fieldset>
 		<legend><fmt:message key="register.caption.changepassword" /></legend>
