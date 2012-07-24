@@ -22,6 +22,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
+import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.parser.image.ImageMetadata;
 import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.WikiLogger;
@@ -35,6 +36,7 @@ public class ImageLinkTag extends TagSupport {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(ImageLinkTag.class.getName());
 	private String allowEnlarge = null;
+	private WikiFileVersion fileVersion = null;
 	private String maxHeight = null;
 	private String maxWidth = null;
 	private String style = null;
@@ -60,7 +62,7 @@ public class ImageLinkTag extends TagSupport {
 		}
 		try {
 			try {
-				html = ImageUtil.buildImageLinkHtml(request.getContextPath(), tagVirtualWiki, this.value, imageMetadata, this.style, true, null);
+				html = ImageUtil.buildImageLinkHtml(request.getContextPath(), tagVirtualWiki, this.value, imageMetadata, this.style, true, this.fileVersion);
 			} catch (IOException e) {
 				// FIXME - display a broken image icon or something better
 				logger.warn("I/O Failure while parsing image link: " + e.getMessage(), e);
@@ -91,6 +93,22 @@ public class ImageLinkTag extends TagSupport {
 	 */
 	public void setAllowEnlarge(String allowEnlarge) {
 		this.allowEnlarge = allowEnlarge;
+	}
+
+	/**
+	 * If rendering an image for anything but the current version then
+	 * the file version object must be supplied.
+	 */
+	public WikiFileVersion getFileVersion() {
+		return this.fileVersion;
+	}
+
+	/**
+	 * If rendering an image for anything but the current version then
+	 * the file version object must be supplied.
+	 */
+	public void setFileVersion(WikiFileVersion fileVersion) {
+		this.fileVersion = fileVersion;
 	}
 
 	/**
