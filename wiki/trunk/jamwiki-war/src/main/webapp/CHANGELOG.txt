@@ -23,6 +23,23 @@ Translation Updates:
   * None.
 
 
+1.2.2
+=====
+
+New Features:
+
+  * Support comparison operations in the #expr tag ("{{#expr: -1 < 0}}").
+  * Upgrade to exp4j 0.3.1.
+
+Bugfixes:
+
+  * None.
+
+Translation Updates:
+
+  * Updated German translations (axelclk).
+
+
 1.2.1
 =====
 

@@ -20,6 +20,7 @@ import java.util.EmptyStackException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import de.congrace.exp4j.CustomFunction;
+import de.congrace.exp4j.CustomOperator;
 import de.congrace.exp4j.ExpressionBuilder;
 import de.congrace.exp4j.InvalidCustomFunctionException;
 import de.congrace.exp4j.UnknownFunctionException;
@@ -39,9 +40,14 @@ public abstract class MathUtil {
 	private static CustomFunction FUNCTION_LN;
 	private static CustomFunction FUNCTION_ROUND;
 	private static CustomFunction FUNCTION_TRUNC;
+	private static CustomOperator OPERATOR_GT;
+	private static CustomOperator OPERATOR_GTE;
+	private static CustomOperator OPERATOR_LT;
+	private static CustomOperator OPERATOR_LTE;
 
 	static {
 		MathUtil.initializeCustomFunctions();
+		MathUtil.initializeCustomOperators();
 	}
 
 	/**
@@ -68,6 +74,10 @@ public abstract class MathUtil {
 					.withCustomFunction(FUNCTION_LN)
 					.withCustomFunction(FUNCTION_ROUND)
 					.withCustomFunction(FUNCTION_TRUNC)
+					.withOperation(OPERATOR_GT)
+					.withOperation(OPERATOR_GTE)
+					.withOperation(OPERATOR_LT)
+					.withOperation(OPERATOR_LTE)
 					.withVariable("e", Math.E)
 					.withVariable("pi", Math.PI)
 					.build()
@@ -110,5 +120,31 @@ public abstract class MathUtil {
 		} catch (InvalidCustomFunctionException e) {
 			logger.error("Failure while initializing MathUtil", e);
 		}
+	}
+
+	/**
+	 *
+	 */
+	private static void initializeCustomOperators() {
+		OPERATOR_GT = new CustomOperator(">", true, 4, 2) {
+			protected double applyOperation(double[] values) {
+				return (values[0] > values[1]) ? 1d : 0d;
+			}
+		};
+		OPERATOR_GTE = new CustomOperator(">=", true, 4, 2) {
+			protected double applyOperation(double[] values) {
+				return (values[0] >= values[1]) ? 1d : 0d;
+			}
+		};
+		OPERATOR_LT = new CustomOperator("<", true, 4, 2) {
+			protected double applyOperation(double[] values) {
+				return (values[0] < values[1]) ? 1d : 0d;
+			}
+		};
+		OPERATOR_LTE = new CustomOperator("<=", true, 4, 2) {
+			protected double applyOperation(double[] values) {
+				return (values[0] <= values[1]) ? 1d : 0d;
+			}
+		};
 	}
 }

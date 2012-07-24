@@ -99,8 +99,10 @@ public abstract class ParserFunctionUtil {
 	private static String evaluateExpression(String expr) throws IllegalArgumentException {
 		double result = MathUtil.evaluateExpression(expr);
 		BigDecimal bigDecimal = new BigDecimal(result);
-		// trim to eight decimal places maximum
-		bigDecimal = bigDecimal.setScale(8, BigDecimal.ROUND_HALF_UP);
+		if (bigDecimal.scale() > 8) {
+			// trim to eight decimal places maximum
+			bigDecimal = bigDecimal.setScale(8, BigDecimal.ROUND_HALF_UP);
+		}
 		bigDecimal = bigDecimal.stripTrailingZeros();
 		return bigDecimal.toString();
 	}
