@@ -845,10 +845,10 @@ public class WikiDatabase {
 	
 	private static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
 		DataHandler handler = WikiBase.getDataHandler();
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null);
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage(),1000,1);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID(),1000,2);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null,1000,3);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar",2000,1);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null,2000,2);
 	}
 }

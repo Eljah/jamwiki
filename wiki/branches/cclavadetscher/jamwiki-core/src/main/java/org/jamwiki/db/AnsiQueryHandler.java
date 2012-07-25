@@ -1057,6 +1057,28 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	
+	public String[] getUserPreferencesDefaultsOrder() throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		ArrayList<String> orderedKeys = new ArrayList<String>();
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				orderedKeys.add(rs.getString(1));
+			}
+			String[] retVal = new String[orderedKeys.size()];
+			for(int i=0;i<orderedKeys.size();i++) {
+				retVal[i] = orderedKeys.get(i).toString();
+			}
+			return retVal;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -2387,13 +2409,15 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 
-	public void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {
+	public void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, int userPreferenceGroupId, int sequenceNr, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE_DEFAULTS);
 			stmt.setString(1, userPreferenceKey);
 			stmt.setString(2, userPreferenceDefaultValue);
+			stmt.setInt(3, userPreferenceGroupId);
+			stmt.setInt(4, sequenceNr);
 			stmt.executeUpdate();
 		} finally {
 			// close only the statement and result set - leave the connection open for further use
@@ -3731,11 +3755,14 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	
-	public void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {
+	public void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, int userPreferenceGroupId, int sequenceNr, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
+			stmt = conn.prepareStatement(STATEMENT_UPDATE_USER_PREFERENCE_DEFAULTS);
 			stmt.setString(1, userPreferenceDefaultValue);
-			stmt.setString(2, userPreferenceKey);
+			stmt.setInt(2, userPreferenceGroupId);
+			stmt.setInt(3, sequenceNr);
+			stmt.setString(4, userPreferenceKey);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);

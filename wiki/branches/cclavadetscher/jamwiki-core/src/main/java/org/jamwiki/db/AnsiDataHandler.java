@@ -637,6 +637,14 @@ public class AnsiDataHandler implements DataHandler {
 		}
 	}
 	
+	public String[] getUserPreferencesDefaultsOrder() throws DataAccessException {
+		try {
+			return this.queryHandler().getUserPreferencesDefaultsOrder();
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
 	/**
 	 *
 	 */
@@ -2461,14 +2469,14 @@ public class AnsiDataHandler implements DataHandler {
 		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 
-	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue) throws DataAccessException {
+	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, int userPreferenceGroupId, int sequenceNr) throws DataAccessException {
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			if (this.queryHandler().existsUserPreferenceDefault(userPreferenceKey)) {
-				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, conn);
+				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupId, sequenceNr, conn);
 			}
 			else {
-				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, conn);
+				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupId, sequenceNr, conn);
 			}
 				
 		} catch (SQLException e) {

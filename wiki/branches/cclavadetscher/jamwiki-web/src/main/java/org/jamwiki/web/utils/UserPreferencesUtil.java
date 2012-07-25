@@ -16,15 +16,7 @@ public class UserPreferencesUtil {
 	private static final WikiLogger logger = WikiLogger.getLogger(UserPreferencesUtil.class.getName());
 	private WikiUser user = null;
 	private static HashMap<String, String> defaults = null;
-
-	// Constants for user preferences
-	/*
-	public static final String USER_PREFERENCE_SIGNATURE = "user.signature";
-	public static final String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
-	public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
-	public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
-	public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
-	*/
+	private static String[] orderedKeys = null;
 	
 	// This is a workaround. It should be possible to get the signature preview directly
 	// from a method...
@@ -34,6 +26,7 @@ public class UserPreferencesUtil {
 		this.user = user;
 		try {
 			defaults = (HashMap<String, String>)WikiBase.getDataHandler().getUserPreferencesDefaults();
+			orderedKeys = (String[])WikiBase.getDataHandler().getUserPreferencesDefaultsOrder();
 		} catch(DataAccessException e) {
 			logger.error(e.toString());
 		}
@@ -43,6 +36,7 @@ public class UserPreferencesUtil {
 		if(defaults == null) {
 			try {
 				defaults = (HashMap<String, String>)WikiBase.getDataHandler().getUserPreferencesDefaults();
+				orderedKeys = (String[])WikiBase.getDataHandler().getUserPreferencesDefaultsOrder();
 			} catch(DataAccessException e) {
 				logger.error(e.toString());
 			}
@@ -52,6 +46,22 @@ public class UserPreferencesUtil {
 			items.put(item, new UserPreferenceItem(item));
 		}
 		return items;
+	}
+
+	public String[] getListOrder() {
+		if(orderedKeys == null) {
+			try {
+				defaults = (HashMap<String, String>)WikiBase.getDataHandler().getUserPreferencesDefaults();
+				orderedKeys = (String[])WikiBase.getDataHandler().getUserPreferencesDefaultsOrder();
+			} catch(DataAccessException e) {
+				logger.error(e.toString());
+			}
+		}
+		HashMap items = new HashMap<String, UserPreferenceItem>();
+		for(String item : defaults.keySet()) {
+			items.put(item, new UserPreferenceItem(item));
+		}
+		return orderedKeys;
 	}
 	
 	// This is a workaround. It should be possible to get the signature preview directly
