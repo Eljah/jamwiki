@@ -629,7 +629,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 * *****
 	 */
-	public Map<String, String> getUserPreferencesDefaults() throws DataAccessException {
+	public Map<String, Map<String, String>> getUserPreferencesDefaults() throws DataAccessException {
 		try {
 			return this.queryHandler().getUserPreferencesDefaults();
 		} catch (SQLException e) {
@@ -1939,10 +1939,12 @@ public class AnsiDataHandler implements DataHandler {
 		checkLength(user.getDisplayName(), 100);
 		checkLength(user.getCreateIpAddress(), 39);
 		checkLength(user.getLastLoginIpAddress(), 39);
-		checkLength(user.getDefaultLocale(), 8);
 		checkLength(user.getEmail(), 100);
-		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR), 50);
-		checkLength(user.getSignature(), 250);
+		// Check user preferences. Max length for each value is 250
+		HashMap<String, String> preferences = user.getPreferences();
+		for(String key : preferences.keySet()) {
+			checkLength(preferences.get(key), 250);
+		}
 	}
 
 	/**
@@ -2459,14 +2461,14 @@ public class AnsiDataHandler implements DataHandler {
 		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 
-	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue) throws DataAccessException {
+	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr) throws DataAccessException {
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			if (this.queryHandler().existsUserPreferenceDefault(userPreferenceKey)) {
-				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, conn);
+				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
 			}
 			else {
-				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, conn);
+				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
 			}
 				
 		} catch (SQLException e) {

@@ -19,11 +19,14 @@ package org.jamwiki.utils;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
+import org.jamwiki.model.WikiUser;
 
 /**
  * Utility methods for working with dates and time zones.
@@ -32,6 +35,12 @@ public class DateUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(DateUtil.class.getName());
 
+	private static final String[] dateFormats = new String[]{ "SHORT",
+															  "MEDIUM",
+															  "LONG",
+															  "FULL",
+															  "dd.MM.yyyy HH:mm z" };
+	
 	/**
 	 * The method returns the current date and/or time for a specific time zone.
 	 * The value is returned as a date formatted String, based on the formatting
@@ -67,7 +76,7 @@ public class DateUtil {
 		if (dateFormatString == null) {
 			dateFormatString = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
 		}
-		DateFormat df = DateUtil.stringToDateFormat(dateFormatString, locale);
+		SimpleDateFormat df = DateUtil.stringToDateFormat(dateFormatString, locale);
 		df.setTimeZone(tz);
 		return df.format(Calendar.getInstance(tz).getTime());
 	}
@@ -75,9 +84,9 @@ public class DateUtil {
 	/**
 	 *
 	 */
-	private static DateFormat stringToDateFormat(String dateFormatString, Locale locale) throws IllegalArgumentException {
+	private static SimpleDateFormat stringToDateFormat(String dateFormatString, Locale locale) throws IllegalArgumentException {
 		if (StringUtils.isBlank(dateFormatString)) {
-			return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+			return (SimpleDateFormat)DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
 		}
 		int style = -1;
 		if (StringUtils.equalsIgnoreCase(dateFormatString, "SHORT")) {
@@ -88,13 +97,19 @@ public class DateUtil {
 			style = DateFormat.LONG;
 		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "FULL")) {
 			style = DateFormat.FULL;
+		} else if (StringUtils.equalsIgnoreCase(dateFormatString, "DEFAULT")) {
+			style = DateFormat.DEFAULT;
 		}
 		if (style != -1) {
-			return DateFormat.getDateTimeInstance(style, style, locale);
+			SimpleDateFormat sdf = (SimpleDateFormat)DateFormat.getDateTimeInstance(style, style, locale); 
+			String pattern = sdf.toPattern();
+			if(pattern.indexOf("z") < 0) sdf = new SimpleDateFormat(pattern + " z",locale);
+			return sdf;
 		} else {
 			return new SimpleDateFormat(dateFormatString, locale);
 		}
 	}
+	
 	/**
 	 * Returns a list of available time zones. The list is used to get the time zone
 	 * of a user in the user preferences dialog.
@@ -103,5 +118,18 @@ public class DateUtil {
 	 */
 	public static String[] getTimeZoneIDs() {
 		return TimeZone.getAvailableIDs();
+	}
+	
+	public static Map<String, String> getDatetimeFormats(WikiUser user) {
+		String timezone   = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
+		String locale     = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
+		String sysDefault = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
+		
+		HashMap<String, String> formats = new HashMap<String, String>();
+		formats.put("", getUserLocalTime(timezone,sysDefault,locale));
+		for(String format : dateFormats) {
+			formats.put(format, getUserLocalTime(timezone,format,locale));
+		}
+		return formats;
 	}
 }

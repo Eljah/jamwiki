@@ -845,10 +845,10 @@ public class WikiDatabase {
 	
 	private static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
 		DataHandler handler = WikiBase.getDataHandler();
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage());
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar");
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null);
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID());
-		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage(),WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,1);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID(),WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,2);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null,WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,3);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar",WikiUser.USER_PREFERENCES_GROUP_EDITING,1);
+		handler.writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null,WikiUser.USER_PREFERENCES_GROUP_EDITING,2);
 	}
 }

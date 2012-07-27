@@ -16,8 +16,10 @@
  */
 package org.jamwiki.servlets;
 
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +46,8 @@ import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.jamwiki.validator.ReCaptchaUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil.UserPreferenceItem;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -82,32 +86,14 @@ public class RegisterServlet extends JAMWikiServlet {
 		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
 			user.setDefaultLocale(request.getLocale().toString());
 		}
-		TreeMap<String, String> locales = new TreeMap<String, String>();
-		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
-		for (Map.Entry<String, String> entry : translations.entrySet()) {
-			String value = entry.getKey() + " - " + entry.getValue();
-			locales.put(value, entry.getKey());
-		}
-		Locale[] localeArray = Locale.getAvailableLocales();
-		for (int i = 0; i < localeArray.length; i++) {
-			String key = localeArray[i].toString();
-			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
-			locales.put(value, key);
-		}
-		String datetimeFormatPreview = null;
-		try {
-			datetimeFormatPreview = DateUtil.getUserLocalTime(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE), user.getPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT), user.getDefaultLocale());
-		} catch (IllegalArgumentException e) {
-			// handled in validate()
-		}
-		next.addObject("datetimeFormatPreview", datetimeFormatPreview);
-		next.addObject("signaturePreview", this.signaturePreview(request, pageInfo, user));
-		next.addObject("locales", locales);
-		Map editors = WikiConfiguration.getInstance().getEditors();
-		next.addObject("editors", editors);
 		next.addObject("newuser", user);
+		// Note: adding the signature preview this way is a workaround. Better would be
+		// if the preview can be generated in UserPreferencesUtil inner class
+		// UserPreferenceItem directly...
+		UserPreferencesUtil userPreferences = new UserPreferencesUtil(user);
+		userPreferences.setSignaturePreview(this.signaturePreview(request, pageInfo, user));
+		next.addObject("userPreferences", userPreferences);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isRegistrationEnabled());
-		next.addObject("timezones",DateUtil.getTimeZoneIDs());
 		pageInfo.setSpecial(true);
 		pageInfo.setContentJsp(JSP_REGISTER);
 		pageInfo.setPageTitle(new WikiMessage("register.title"));
@@ -192,11 +178,12 @@ public class RegisterServlet extends JAMWikiServlet {
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
 		user.setDisplayName(request.getParameter("displayName"));
-		user.setDefaultLocale(request.getParameter("defaultLocale"));
-		user.setPreference(WikiUser.USER_PREFERENCE_TIMEZONE, request.getParameter("timezone"));
-		user.setPreference(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, request.getParameter("datetimeFormat"));
-		user.setPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR,request.getParameter("editor"));
-		user.setSignature(request.getParameter("signature"));
+		LinkedHashMap<String, Map<String, UserPreferenceItem>> preferences = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)new UserPreferencesUtil(user).getGroups();
+		for(String group : preferences.keySet()) {
+			for(String key : preferences.get(group).keySet()) {
+				user.setPreference(key, request.getParameter(key));
+			}
+		}
 		return user;
 	}
 

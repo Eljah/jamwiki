@@ -1039,7 +1039,10 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	
-	public HashMap<String, String> getUserPreferencesDefaults() throws SQLException {
+	/**
+	 * 
+	 */
+	public LinkedHashMap<String, Map<String, String>> getUserPreferencesDefaults() throws SQLException {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1047,16 +1050,27 @@ public class AnsiQueryHandler implements QueryHandler {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES_DEFAULTS);
 			rs = stmt.executeQuery();
-			HashMap<String, String> defaultPreferences = new HashMap<String, String>();
+			// the map of groups containing the maps to their preferences
+			LinkedHashMap<String, Map<String, String>> groups = new LinkedHashMap<String, Map<String, String>>();
+			LinkedHashMap<String, String> defaultPreferences = null;
+			String lastGroup = null;
 			while (rs.next()) {
+				// get the group name
+				String group = rs.getString(3);
+				// test if we need a new list of items for a new group
+				if(group != null && (lastGroup == null || !lastGroup.equals(group))) {
+					lastGroup = group;
+					defaultPreferences = new LinkedHashMap<String, String>();
+				}
 				defaultPreferences.put(rs.getString(1), rs.getString(2));
+				groups.put(group, defaultPreferences);
 			}
-			return defaultPreferences;
+			return groups;
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt, rs);
 		}
 	}
-	
+
 	/**
 	 *
 	 */
@@ -2387,13 +2401,15 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 
-	public void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {
+	public void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE_DEFAULTS);
 			stmt.setString(1, userPreferenceKey);
 			stmt.setString(2, userPreferenceDefaultValue);
+			stmt.setString(3, userPreferenceGroupKey);
+			stmt.setInt(4, sequenceNr);
 			stmt.executeUpdate();
 		} finally {
 			// close only the statement and result set - leave the connection open for further use
@@ -3731,11 +3747,14 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 	
-	public void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, Connection conn) throws SQLException {
+	public void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
+			stmt = conn.prepareStatement(STATEMENT_UPDATE_USER_PREFERENCE_DEFAULTS);
 			stmt.setString(1, userPreferenceDefaultValue);
-			stmt.setString(2, userPreferenceKey);
+			stmt.setString(2, userPreferenceGroupKey);
+			stmt.setInt(3, sequenceNr);
+			stmt.setString(4, userPreferenceKey);
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
@@ -3743,8 +3762,11 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 	
 	public boolean existsUserPreferenceDefault(String userPreferenceKey) throws SQLException {
-		HashMap<String, String> defaultPrefs = this.getUserPreferencesDefaults();
-		return defaultPrefs.containsKey(userPreferenceKey);
+		HashMap<String, Map<String, String>> defaultPrefs = this.getUserPreferencesDefaults();
+		for(Map<String, String> group: defaultPrefs.values()) {
+			if(group.containsKey(userPreferenceKey)) return true;
+		}
+		return false;
 	}
 	
 	/**

@@ -210,12 +210,15 @@ public interface DataHandler {
 	List<WikiFileVersion> getAllWikiFileVersions(String virtualWiki, String topicName, boolean descending) throws DataAccessException;
 
 	/**
-	 * Return a hashmap of key/value pairs containing the definde user preferences
+	 * Return a hashmap of key/map(key/value) pairs containing the defined user preferences
 	 * defaults.
+	 * The map returned has the following structure:
+	 * pref_group_key -> Map(pref_key -> pref_value)
+	 * the pref_group_key points to a map of pref key/value pairs that belong to it.
 	 * @return
 	 */
-	Map<String, String> getUserPreferencesDefaults() throws DataAccessException;
-
+	Map<String, Map<String, String>> getUserPreferencesDefaults() throws DataAccessException;
+	
 	/**
 	 * Retrieve a List of all LogItem objects for a given virtual wiki, sorted
 	 * chronologically.
@@ -1115,7 +1118,7 @@ public interface DataHandler {
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 * @throws WikiException Thrown if the parameter information is invalid.
 	 */
-	void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue) throws DataAccessException, WikiException;
+	void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr) throws DataAccessException, WikiException;
 
 	/**
 	 * Add new image or other data to database.

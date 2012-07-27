@@ -3,7 +3,12 @@
 
 New Features:
 
+  * Re-engineering of user preference data handling (cclavadetscher).
+  * Add user preferences Timezone and Datetime format (cclavadetscher).
+  * Preview of current Signature (wrh2).
+  * Add the ability to create wiki groups (cclavadetscher).
   * Add the ability to assign users to wiki groups (cclavadetscher).
+  * Display user roles inherited from group membership (cclavadetscher).
   * Allow default role names to be configured via property file to better
     support LDAP (PhilTrimble).
   * Display thumbnails of image versions on image topic pages, similar to the
@@ -16,13 +21,39 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Update of last login date and time after login (wrh2, cclavadetscher).
 
 Translation Updates:
 
   * None.
 
+1.2.2
+=====
 
+New Features:
+
+  * Support comparison operations in the #expr tag ("{{#expr: -1 < 0}}").
+  * Upgrade to exp4j 0.3.1.
+
+Bugfixes:
+
+  * None.
+
+Translation Updates:
+
+  * Updated German translations (axelclk).
+
+
+1.2.1
+=====
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+<<<<<<< .working
 1.2.2
 =====
 
@@ -58,6 +89,17 @@ Translation Updates:
   * Updated Italian translations (cclavadetscher).
 
 
+=======
+  * Fix a Javascript error on the search page with IE.  Reported by shar.
+  * Problem with history when using DB2 database.  Reported with a fix by
+    Dennis N Brown.
+
+Translation Updates:
+
+  * Updated Italian translations (cclavadetscher).
+
+
+>>>>>>> .merge-right.r4125
 1.2
 ===
 
