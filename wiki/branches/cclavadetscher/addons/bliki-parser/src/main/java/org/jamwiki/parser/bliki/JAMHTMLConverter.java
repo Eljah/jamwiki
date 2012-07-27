@@ -70,7 +70,7 @@ public class JAMHTMLConverter extends HTMLConverter {
 		}
 		try {
 			resultBuffer.append(ImageUtil.buildImageLinkHtml(fParserInput.getContext(), fParserInput.getVirtualWiki(), model
-					.getImageNamespace() + Namespace.SEPARATOR + imageName, imageMetadata, null, false));
+					.getImageNamespace() + Namespace.SEPARATOR + imageName, imageMetadata, null, false, null));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

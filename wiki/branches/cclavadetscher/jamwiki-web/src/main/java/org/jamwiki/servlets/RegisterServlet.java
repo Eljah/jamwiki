@@ -86,20 +86,6 @@ public class RegisterServlet extends JAMWikiServlet {
 		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
 			user.setDefaultLocale(request.getLocale().toString());
 		}
-		/*
-		TreeMap<String, String> locales = new TreeMap<String, String>();
-		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
-		for (Map.Entry<String, String> entry : translations.entrySet()) {
-			String value = entry.getKey() + " - " + entry.getValue();
-			locales.put(value, entry.getKey());
-		}
-		Locale[] localeArray = Locale.getAvailableLocales();
-		for (int i = 0; i < localeArray.length; i++) {
-			String key = localeArray[i].toString();
-			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
-			locales.put(value, key);
-		}
-		*/
 		next.addObject("newuser", user);
 		// Note: adding the signature preview this way is a workaround. Better would be
 		// if the preview can be generated in UserPreferencesUtil inner class

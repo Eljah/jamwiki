@@ -35,8 +35,8 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 	public void testBuildImageLinkHtml() throws Throwable {
 		ImageMetadata imageMetadata = new ImageMetadata();
 		imageMetadata.setLink("");
-		String actualResult = ImageUtil.buildImageLinkHtml("/wiki", "en", "Image:Test Image.jpg", imageMetadata, null, true);
-		String expectedResult = "<img class=\"wikiimg\" src=\"/files/test_image.jpg\" width=\"400\" height=\"267\" alt=\"Image:Test Image.jpg\" />";
+		String actualResult = ImageUtil.buildImageLinkHtml("/wiki", "en", "File:Test Image.jpg", imageMetadata, null, true, null);
+		String expectedResult = "<img class=\"wikiimg\" src=\"/files/test_image.jpg\" width=\"400\" height=\"267\" alt=\"File:Test Image.jpg\" />";
 		assertEquals("Image link HTML built incorrectly", expectedResult, actualResult);
 	}
 
@@ -45,22 +45,22 @@ public class ImageUtilTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testBuildImageFileDocrootUrl() throws Throwable {
-		String actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "Image:Test Image.jpg", false);
+		String actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "File:Test Image.jpg", false);
 		String expectedResult = "/files/test_image.jpg";
 		assertEquals("Relative image link URL incorrect", expectedResult, actualResult);
-		actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "Image:Test Image.jpg", true);
+		actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "File:Test Image.jpg", true);
 		expectedResult = "http://example.com/files/test_image.jpg";
 		assertEquals("Absolute image link URL incorrect", expectedResult, actualResult);
 		String originalFileServerUrl = Environment.getValue(Environment.PROP_FILE_SERVER_URL);
 		try {
 			Environment.setValue(Environment.PROP_FILE_SERVER_URL, "http://media.example.com");
-			actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "Image:Test Image.jpg", false);
+			actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "File:Test Image.jpg", false);
 			expectedResult = "http://media.example.com/files/test_image.jpg";
 			assertEquals("Alternate image link URL incorrect", expectedResult, actualResult);
-			actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "Image:Test Image.jpg", true);
+			actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "File:Test Image.jpg", true);
 			assertEquals("Alternate image link URL (forced) incorrect", expectedResult, actualResult);
 			Environment.setValue(Environment.PROP_FILE_SERVER_URL, "//media.example.com");
-			actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "Image:Test Image.jpg", false);
+			actualResult = ImageUtil.buildImageFileUrl("/wiki", "en", "File:Test Image.jpg", false);
 			expectedResult = "//media.example.com/files/test_image.jpg";
 			assertEquals("Alternate image link URL (no protocol) incorrect", expectedResult, actualResult);
 		} finally {

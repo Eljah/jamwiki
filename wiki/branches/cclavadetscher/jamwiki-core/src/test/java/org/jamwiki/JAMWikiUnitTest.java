@@ -111,7 +111,7 @@ public abstract class JAMWikiUnitTest {
 		WikiLink wikiLink = new WikiLink(null, virtualWiki.getName(), topicName);
 		Topic topic = new Topic(virtualWiki.getName(), wikiLink.getNamespace(), wikiLink.getArticle());
 		topic.setTopicContent(contents);
-		if (topicName.toLowerCase().startsWith("image:")) {
+		if (topicName.toLowerCase().startsWith("file:")) {
 			this.setupImage(virtualWiki, topic);
 			return topic;
 		}
@@ -150,23 +150,23 @@ public abstract class JAMWikiUnitTest {
 	 * second image is set up in only the shared virtual wiki.
 	 */
 	private void setupImage(VirtualWiki virtualWiki, Topic topic) throws DataAccessException, IOException, WikiException {
-		if (!topic.getName().toLowerCase().startsWith("image:")) {
+		if (!topic.getName().toLowerCase().startsWith("file:")) {
 			throw new IllegalArgumentException("Cannot call JAMWikiUtilTest.setupImage for non-image topics");
 		}
 		TopicVersion topicVersion = new TopicVersion(null, "127.0.0.1", null, topic.getTopicContent(), topic.getTopicContent().length());
 		topic.setTopicType(TopicType.IMAGE);
 		topicVersion.setEditType(TopicVersion.EDIT_UPLOAD);
-		// hard code image details - Image:Test Image.jpg will be created for both the "en"
-		// and "test" virtual wikis, while Image:Test Image2.jpg will be created only for
+		// hard code image details - File:Test Image.jpg will be created for both the "en"
+		// and "test" virtual wikis, while File:Test Image2.jpg will be created only for
 		// the "test" virtual wiki.
 		WikiFileVersion wikiFileVersion = new WikiFileVersion();
-		if (topic.getName().equals("Image:Test Image.jpg") && virtualWiki.getName().equals("en")) {
+		if (topic.getName().equals("File:Test Image.jpg") && virtualWiki.getName().equals("en")) {
 			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
 			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image.jpg", "/test_image.jpg", "image/jpeg", 61136, null);
-		} else if (topic.getName().equals("Image:Test Image.jpg") && virtualWiki.getName().equals("test")) {
+		} else if (topic.getName().equals("File:Test Image.jpg") && virtualWiki.getName().equals("test")) {
 			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
 			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image_shared.jpg", "/test_image_shared.jpg", "image/jpeg", 61136, null);
-		} else if (topic.getName().equals("Image:Test Image2.jpg") && virtualWiki.getName().equals("test")) {
+		} else if (topic.getName().equals("File:Test Image2.jpg") && virtualWiki.getName().equals("test")) {
 			WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
 			ImageUtil.writeWikiFile(topic, wikiFileVersion, null, "127.0.0.1", "test_image2_shared.jpg", "/test_image2_shared.jpg", "image/jpeg", 61136, null);
 		}
