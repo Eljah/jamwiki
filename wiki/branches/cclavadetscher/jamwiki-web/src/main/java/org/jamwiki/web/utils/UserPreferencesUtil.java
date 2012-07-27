@@ -1,8 +1,26 @@
+/**
+ * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, version 2.1, dated February 1999.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the latest version of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program (LICENSE.txt); if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package org.jamwiki.web.utils;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
@@ -15,8 +33,8 @@ public class UserPreferencesUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(UserPreferencesUtil.class.getName());
 	private WikiUser user = null;
-	private static HashMap<String, String> defaults = null;
-	private static String[] orderedKeys = null;
+	private static LinkedHashMap<String, Map<String, String>> defaults = null;
+	private static LinkedHashMap<String, Map<String, UserPreferenceItem>> groups = null;
 	
 	// This is a workaround. It should be possible to get the signature preview directly
 	// from a method...
@@ -25,43 +43,57 @@ public class UserPreferencesUtil {
 	public UserPreferencesUtil(WikiUser user) {
 		this.user = user;
 		try {
-			defaults = (HashMap<String, String>)WikiBase.getDataHandler().getUserPreferencesDefaults();
-			orderedKeys = (String[])WikiBase.getDataHandler().getUserPreferencesDefaultsOrder();
+			defaults = (LinkedHashMap<String, Map<String, String>>)WikiBase.getDataHandler().getUserPreferencesDefaults();
 		} catch(DataAccessException e) {
 			logger.error(e.toString());
 		}
 	}
+
+	/**
+	 * Convenience method to retrieve the UserPreferenceItem for a single preference. 
+	 * @param preferenceKey
+	 * @return
+	 */
+	public UserPreferenceItem getPreference(String preferenceKey) {
+		LinkedHashMap<String, Map<String, UserPreferenceItem>> map = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)getGroups();
+		for(String group : map.keySet()) {
+			for(String key : map.get(group).keySet()) {
+				if(preferenceKey.equals(key)) return map.get(group).get(key);
+			}
+		}
+		return null;
+	}
 	
-	public Map<String, UserPreferenceItem> getItems() {
+	/**
+	 * The method return a map with the following structure:
+	 * pref_group_key -> Map(pref_key -> Instance of UserPreferenceItem for pref_key)
+	 * UserPreferenceItems implements the getters necessary to automate the display of
+	 * user preferences choices in JSTL.
+	 * @return
+	 */
+	public Map<String, Map<String, UserPreferenceItem>> getGroups() {
 		if(defaults == null) {
 			try {
-				defaults = (HashMap<String, String>)WikiBase.getDataHandler().getUserPreferencesDefaults();
-				orderedKeys = (String[])WikiBase.getDataHandler().getUserPreferencesDefaultsOrder();
+				defaults = (LinkedHashMap<String, Map<String, String>>)WikiBase.getDataHandler().getUserPreferencesDefaults();
 			} catch(DataAccessException e) {
 				logger.error(e.toString());
 			}
 		}
-		HashMap items = new HashMap<String, UserPreferenceItem>();
-		for(String item : defaults.keySet()) {
-			items.put(item, new UserPreferenceItem(item));
+		if(groups == null) {
+			groups = new LinkedHashMap<String, Map<String, UserPreferenceItem>>();
 		}
-		return items;
-	}
-
-	public String[] getListOrder() {
-		if(orderedKeys == null) {
-			try {
-				defaults = (HashMap<String, String>)WikiBase.getDataHandler().getUserPreferencesDefaults();
-				orderedKeys = (String[])WikiBase.getDataHandler().getUserPreferencesDefaultsOrder();
-			} catch(DataAccessException e) {
-				logger.error(e.toString());
+		String lastKey = null;
+		LinkedHashMap<String, UserPreferenceItem> items = null;
+		for(String group : defaults.keySet()) {
+			if(lastKey == null || !lastKey.equals(group)) {
+				items = new LinkedHashMap<String, UserPreferenceItem>();
 			}
+			for(String item : defaults.get(group).keySet()) {
+				items.put(item, new UserPreferenceItem(item));
+			}
+			groups.put(group, items);
 		}
-		HashMap items = new HashMap<String, UserPreferenceItem>();
-		for(String item : defaults.keySet()) {
-			items.put(item, new UserPreferenceItem(item));
-		}
-		return orderedKeys;
+		return groups;
 	}
 	
 	// This is a workaround. It should be possible to get the signature preview directly
@@ -75,6 +107,10 @@ public class UserPreferencesUtil {
 		
 		public UserPreferenceItem(String prefName) {
 			this.prefName = prefName;
+		}
+		
+		public String getKey() {
+			return this.prefName;
 		}
 		
 		/**
@@ -109,7 +145,7 @@ public class UserPreferencesUtil {
 		 */
 		public Map getMap() {
 			if(prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
-				HashMap<String, String> locales = new HashMap<String, String>();
+				LinkedHashMap<String, String> locales = new LinkedHashMap<String, String>();
 				Locale[] localeArray = Locale.getAvailableLocales();
 				for (int i = 0; i < localeArray.length; i++) {
 					String key = localeArray[i].toString();

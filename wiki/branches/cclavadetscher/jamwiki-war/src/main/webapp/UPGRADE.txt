@@ -23,7 +23,8 @@ process.  To upgrade using this automated process follow these steps:
         1.  /WEB-INF/classes/jamwiki.properties
         2.  /WEB-INF/classes/logback.xml (new in JAMWiki 1.0.0)
         3.  (Optional) Any other files in the /WEB-INF/ directory that have
-            custom modifications, e.g. applicationContext-security.xml
+            custom modifications, e.g. applicationContext-security.xml or
+            web.xml
   3.  Back up all database data prior to upgrading. If you skip this step you
       do so at your own risk - major upgrades (such as from 1.1.x to 1.2.x)
       will generally include database schema modifications, and failures while
@@ -100,6 +101,8 @@ followed by 1.0.1.
         CREATE TABLE jam_user_preferences_defaults (
             pref_key VARCHAR(100),
             pref_value VARCHAR(250),
+            pref_group_key VARCHAR(100),
+            seq_nr INTEGER,
             CONSTRAINT jam_p_uprefdef PRIMARY KEY (pref_key)
         )
 
@@ -124,11 +127,11 @@ followed by 1.0.1.
         if necessary.
         Setting default values to null is the same as instructing the application to use system defaults as
         for example the signature_date property for user.datetime.format.
-        INSERT INTO jam_user_preferences_defaults VALUES('user.default.locale','en')
-        INSERT INTO jam_user_preferences_defaults VALUES('user.signature',NULL,)
-        INSERT INTO jam_user_preferences_defaults VALUES('user.preferred.editor','toolbar')
-        INSERT INTO jam_user_preferences_defaults VALUES('user.timezone',"PST")
-        INSERT INTO jam_user_preferences_defaults VALUES('user.datetime.format',NULL)
+        INSERT INTO jam_user_preferences_defaults VALUES('user.preferred.editor','toolbar','user.preferences.group.editing',1)
+        INSERT INTO jam_user_preferences_defaults VALUES('user.signature',NULL,'user.preferences.group.editing',2)
+        INSERT INTO jam_user_preferences_defaults VALUES('user.default.locale','en','user.preferences.group.internationalization',1)
+        INSERT INTO jam_user_preferences_defaults VALUES('user.datetime.format',NULL,'user.preferences.group.internationalization',2)
+        INSERT INTO jam_user_preferences_defaults VALUES('user.timezone',"PST",'user.preferences.group.internationalization',3)
     d.  Migrate existing user preference values.
         INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
         SELECT wiki_user_id, 'user.default.locale', default_locale

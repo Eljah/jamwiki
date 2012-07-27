@@ -466,15 +466,7 @@ public interface QueryHandler {
 	 * defaults.
 	 * @return
 	 */
-	Map<String, String> getUserPreferencesDefaults() throws SQLException;
-	
-	/**
-	 * Return an ordered list (an array) of preference keys. This is used to apply
-	 * the order defined in the database instead of the natural order of the keys in
-	 * the hashmap returned by getUserPreferencesDefaults().
-	 * @return
-	 */
-	public String[] getUserPreferencesDefaultsOrder() throws SQLException;
+	Map<String, Map<String, String>> getUserPreferencesDefaults() throws SQLException;
 	
 	/**
 	 * Retrieve a list of all virtual wiki information for all virtual wikis.
@@ -749,7 +741,7 @@ public interface QueryHandler {
 	 * @param userPreferenceDefaultValue The default value for this preference
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, int userPreferenceGroupId, int sequenceNr, Connection conn) throws SQLException;
+	void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a list of all topics in a category.
@@ -1236,7 +1228,7 @@ public interface QueryHandler {
 	 * @param userPreferenceDefaultValue The new default value for the preference
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
-	void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, int userPreferenceGroupId, int sequenceNr, Connection conn) throws SQLException;
+	void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr, Connection conn) throws SQLException;
 	
 	/**
 	 * Add new image or other data to database.

@@ -16,6 +16,7 @@
  */
 package org.jamwiki.servlets;
 
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.jamwiki.validator.ReCaptchaUtil;
 import org.jamwiki.web.utils.UserPreferencesUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil.UserPreferenceItem;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -84,6 +86,7 @@ public class RegisterServlet extends JAMWikiServlet {
 		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
 			user.setDefaultLocale(request.getLocale().toString());
 		}
+		/*
 		TreeMap<String, String> locales = new TreeMap<String, String>();
 		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
 		for (Map.Entry<String, String> entry : translations.entrySet()) {
@@ -96,13 +99,14 @@ public class RegisterServlet extends JAMWikiServlet {
 			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
 			locales.put(value, key);
 		}
+		*/
 		next.addObject("newuser", user);
 		// Note: adding the signature preview this way is a workaround. Better would be
 		// if the preview can be generated in UserPreferencesUtil inner class
 		// UserPreferenceItem directly...
 		UserPreferencesUtil userPreferences = new UserPreferencesUtil(user);
 		userPreferences.setSignaturePreview(this.signaturePreview(request, pageInfo, user));
-		next.addObject("userPreferences", new UserPreferencesUtil(user));
+		next.addObject("userPreferences", userPreferences);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isRegistrationEnabled());
 		pageInfo.setSpecial(true);
 		pageInfo.setContentJsp(JSP_REGISTER);
@@ -188,9 +192,11 @@ public class RegisterServlet extends JAMWikiServlet {
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
 		user.setDisplayName(request.getParameter("displayName"));
-		Set<String> keys = new UserPreferencesUtil(user).getItems().keySet();
-		for(String key : keys) {
-			user.setPreference(key, request.getParameter(key));
+		LinkedHashMap<String, Map<String, UserPreferenceItem>> preferences = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)new UserPreferencesUtil(user).getGroups();
+		for(String group : preferences.keySet()) {
+			for(String key : preferences.get(group).keySet()) {
+				user.setPreference(key, request.getParameter(key));
+			}
 		}
 		return user;
 	}

@@ -60,17 +60,20 @@
 			<span><input type="text" name="email" value="<c:out value="${newuser.email}" />" id="registerEmail" size="50" /></span>
 			<div class="formhelp"><fmt:message key="register.help.email" /></div>
 		</div>
-		<div class="row">
-			<label for="registerDefaultLocale"><fmt:message key="register.caption.locale" /></label>
-			<span>
-				<select name="defaultLocale" id="registerDefaultLocale">
-				<c:forEach items="${locales}" var="defaultLocale">
-				<option value="<c:out value="${defaultLocale.value}" />"<c:if test="${newuser.preferences['user.default.locale'] == defaultLocale.value}"> selected="selected"</c:if>><c:out value="${defaultLocale.key}" /></option>
-				</c:forEach>
-				</select>
-			</span>
-			<div class="formhelp"><fmt:message key="register.help.locale" /></div>
-		</div>
+		<c:if test="${!empty userPreferences.groups['user.preferences.group.internationalization']['user.default.locale']}">
+			<c:set var="locale" value="${userPreferences.groups['user.preferences.group.internationalization']['user.default.locale']}" />
+			<div class="row">
+				<label for="${locale.key}"><fmt:message key="${locale.label}" /></label>
+				<span>
+					<select name="${locale.key}" id="${locale.key}">
+					<c:forEach items="${locale.map}" var="defaultLocale">
+						<option value="<c:out value="${defaultLocale.key}" />"<c:if test="${newuser.preferences['user.default.locale'] == defaultLocale.key}"> selected="selected"</c:if>><c:out value="${defaultLocale.value}" /></option>
+					</c:forEach>
+					</select>
+				</span>
+				<div class="formhelp"><fmt:message key="locale.help" /></div>
+			</div>
+		</c:if>
 		<c:if test="${recaptchaEnabled}">
 			<div class="row">
 				<div class="captcha"><div class="captcha-label"><fmt:message key="common.caption.captcha" /></div><jamwiki:recaptcha /></div>
@@ -105,38 +108,45 @@
 		<fieldset>
 		<legend><fmt:message key="register.caption.userpreferences" /></legend>
 		<c:if test="${!empty userPreferences}">
-			<c:forEach var="preferenceItem" items="${userPreferences.listOrder}">
-			<c:set var="preference" value="${userPreferences.items[preferenceItem]}" />
+		<c:forEach var="group" items="${userPreferences.groups}">
+			<fieldset>
+			<legend><fmt:message key="${group.key}" /></legend>
+			<c:forEach var="preference" items="${group.value}">
 			<div class="row">
-				<label for="${preferenceItem}"><fmt:message key="${preference.label}" /></label>
+				<label for="${preference.key}"><fmt:message key="${preference.value.label}" /></label>
 				<!-- handle content type -->
 				<span>
 					<c:choose>
-						<c:when test="${!empty preference.list}">
-							<select name="${preferenceItem}" id="${preferenceItem}">
-								<c:forEach var="item" items="${preference.list}">
-								<option value="<c:out value="${item}" />"<c:if test="${newuser.preferences[preferenceItem] == item}"> selected="selected"</c:if>><c:out value="${item}" /></option>
+						<c:when test="${!empty preference.value.list}">
+							<select name="${preference.key}" id="${preference.key}">
+								<c:forEach var="item" items="${preference.value.list}">
+								<option value="<c:out value="${item}" />"<c:if test="${newuser.preferences[preference.key] == item}"> selected="selected"</c:if>><c:out value="${item}" /></option>
 								</c:forEach>
 							</select>
 						</c:when>
-						<c:when test="${!empty preference.map}">
-							<select name="${preferenceItem}" id="${preferenceItem}">
-								<c:forEach var="item" items="${preference.map}">
-								<option value="<c:out value="${item.key}" />"<c:if test="${newuser.preferences[preferenceItem] == item.key}"> selected="selected"</c:if>><c:out value="${item.value}" /></option>
+						<c:when test="${!empty preference.value.map}">
+							<select name="${preference.key}" id="${preference.key}">
+								<c:forEach var="item" items="${preference.value.map}">
+								<option value="<c:out value="${item.key}" />"<c:if test="${newuser.preferences[preference.key] == item.key}"> selected="selected"</c:if>><c:out value="${item.value}" /></option>
 								</c:forEach>
 							</select>
 						</c:when>
 						<c:otherwise>
-							<input type="text" name="${preferenceItem}" value="<c:out value="${newuser.preferences[preferenceItem]}" />" id="${preferenceItem}" size="50" />
+							<input type="text" name="${preference.key}" value="<c:out value="${newuser.preferences[preference.key]}" />" id="${preference.key}" size="50" />
 						</c:otherwise>
 					</c:choose>
-					<c:if test="${!empty preference.preview}">
-						<fmt:message key="edit.action.preview" />: <c:out value="${preference.preview}" escapeXml="false" />
-					</c:if>
 				</span>
-				<div class="formhelp"><fmt:message key="${preference.help}" /></div>
-				</div>
+				<div class="formhelp"><fmt:message key="${preference.value.help}" /></div>
+				<c:if test="${!empty preference.value.preview}">
+					<div class"row">
+						<label><fmt:message key="common.current"><fmt:param><fmt:message key="${preference.value.label}" /></fmt:param></fmt:message></label>
+						<span><c:out value="${preference.value.preview}" escapeXml="false" /></span>
+					</div>
+				</c:if>
+			</div>
 			</c:forEach>
+			</fieldset>
+		</c:forEach>
 		</c:if>
 		</fieldset>
 		<fieldset>

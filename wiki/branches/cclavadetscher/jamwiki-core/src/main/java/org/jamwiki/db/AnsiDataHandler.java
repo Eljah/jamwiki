@@ -629,7 +629,7 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 * *****
 	 */
-	public Map<String, String> getUserPreferencesDefaults() throws DataAccessException {
+	public Map<String, Map<String, String>> getUserPreferencesDefaults() throws DataAccessException {
 		try {
 			return this.queryHandler().getUserPreferencesDefaults();
 		} catch (SQLException e) {
@@ -637,14 +637,6 @@ public class AnsiDataHandler implements DataHandler {
 		}
 	}
 	
-	public String[] getUserPreferencesDefaultsOrder() throws DataAccessException {
-		try {
-			return this.queryHandler().getUserPreferencesDefaultsOrder();
-		} catch (SQLException e) {
-			throw new DataAccessException(e);
-		}
-	}
-
 	/**
 	 *
 	 */
@@ -2469,14 +2461,14 @@ public class AnsiDataHandler implements DataHandler {
 		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 
-	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, int userPreferenceGroupId, int sequenceNr) throws DataAccessException {
+	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr) throws DataAccessException {
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			if (this.queryHandler().existsUserPreferenceDefault(userPreferenceKey)) {
-				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupId, sequenceNr, conn);
+				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
 			}
 			else {
-				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupId, sequenceNr, conn);
+				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
 			}
 				
 		} catch (SQLException e) {

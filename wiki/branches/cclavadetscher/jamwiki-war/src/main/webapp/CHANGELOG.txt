@@ -3,8 +3,8 @@
 
 New Features:
 
+  * Re-engineering of user preference data handling (cclavadetscher).
   * Add user preferences Timezone and Datetime format (cclavadetscher).
-  * Preview of current Datetime format (cclavadetscher).
   * Preview of current Signature (wrh2).
   * Add the ability to create wiki groups (cclavadetscher).
   * Add the ability to assign users to wiki groups (cclavadetscher).

@@ -42,12 +42,14 @@ public class WikiUser implements Serializable {
 	private int userId = -1;
 	private String displayName = null;
 
-	// Constants for user preferences
-	public static final String USER_PREFERENCE_SIGNATURE = "user.signature";
-	public static final String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
-	public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
-	public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
-	public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
+	// Constants for user preference groups and preferences
+	public static final String USER_PREFERENCES_GROUP_EDITING = "user.preferences.group.editing";
+		public static final String USER_PREFERENCE_SIGNATURE = "user.signature";
+		public static final String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
+	public static final String USER_PREFERENCES_GROUP_INTERNATIONALIZATION = "user.preferences.group.internationalization";
+		public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
+		public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
+		public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
 	
 	public String getDisplayName() {
 		return displayName;
