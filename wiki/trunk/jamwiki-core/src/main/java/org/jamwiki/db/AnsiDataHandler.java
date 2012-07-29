@@ -93,6 +93,7 @@ public class AnsiDataHandler implements DataHandler {
 	private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
 
 	protected QueryHandler queryHandler;
+	protected AnsiDataValidator dataValidator = new AnsiDataValidator();
 
 	/**
 	 *
@@ -108,7 +109,7 @@ public class AnsiDataHandler implements DataHandler {
 		int virtualWikiId = -1;
 		for (Category category : categoryList) {
 			virtualWikiId = this.lookupVirtualWikiId(category.getVirtualWiki());
-			this.validateCategory(category);
+			this.dataValidator.validateCategory(category);
 		}
 		try {
 			this.queryHandler().insertCategories(categoryList, virtualWikiId, topicId, conn);
@@ -133,7 +134,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addLogItem(LogItem logItem, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(logItem.getVirtualWiki());
-		this.validateLogItem(logItem);
+		this.dataValidator.validateLogItem(logItem);
 		try {
 			this.queryHandler().insertLogItem(logItem, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -146,7 +147,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addRecentChange(RecentChange change, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(change.getVirtualWiki());
-		this.validateRecentChange(change);
+		this.dataValidator.validateRecentChange(change);
 		try {
 			this.queryHandler().insertRecentChange(change, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -160,7 +161,7 @@ public class AnsiDataHandler implements DataHandler {
 	private void addTopic(Topic topic, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(topic.getVirtualWiki());
 		try {
-			this.validateTopic(topic);
+			this.dataValidator.validateTopic(topic);
 			this.queryHandler().insertTopic(topic, virtualWikiId, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -199,7 +200,7 @@ public class AnsiDataHandler implements DataHandler {
 		for (TopicVersion topicVersion : topicVersions) {
 			topicVersion.setTopicId(topic.getTopicId());
 			topicVersion.initializeVersionParams(topic);
-			this.validateTopicVersion(topicVersion);
+			this.dataValidator.validateTopicVersion(topicVersion);
 		}
 		try {
 			this.queryHandler().insertTopicVersions(topicVersions, conn);
@@ -213,7 +214,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addUserBlock(UserBlock userBlock, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateUserBlock(userBlock);
+			this.dataValidator.validateUserBlock(userBlock);
 			this.queryHandler().insertUserBlock(userBlock, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -224,7 +225,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void addUserDetails(WikiUserDetails userDetails, Connection conn) throws DataAccessException, WikiException {
-		this.validateUserDetails(userDetails);
+		this.dataValidator.validateUserDetails(userDetails);
 		try {
 			this.queryHandler().insertUserDetails(userDetails, conn);
 		} catch (SQLException e) {
@@ -237,7 +238,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addVirtualWiki(VirtualWiki virtualWiki, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateVirtualWiki(virtualWiki);
+			this.dataValidator.validateVirtualWiki(virtualWiki);
 			this.queryHandler().insertVirtualWiki(virtualWiki, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -248,7 +249,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void addWatchlistEntry(int virtualWikiId, String topicName, int userId, Connection conn) throws DataAccessException, WikiException {
-		this.validateWatchlistEntry(topicName);
+		this.dataValidator.validateWatchlistEntry(topicName);
 		try {
 			this.queryHandler().insertWatchlistEntry(virtualWikiId, topicName, userId, conn);
 		} catch (SQLException e) {
@@ -262,7 +263,7 @@ public class AnsiDataHandler implements DataHandler {
 	private void addWikiFile(WikiFile wikiFile, Connection conn) throws DataAccessException, WikiException {
 		try {
 			int virtualWikiId = this.lookupVirtualWikiId(wikiFile.getVirtualWiki());
-			this.validateWikiFile(wikiFile);
+			this.dataValidator.validateWikiFile(wikiFile);
 			this.queryHandler().insertWikiFile(wikiFile, virtualWikiId, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -274,7 +275,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addWikiFileVersion(WikiFileVersion wikiFileVersion, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateWikiFileVersion(wikiFileVersion);
+			this.dataValidator.validateWikiFileVersion(wikiFileVersion);
 			this.queryHandler().insertWikiFileVersion(wikiFileVersion, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -286,7 +287,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addWikiGroup(WikiGroup group, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateWikiGroup(group);
+			this.dataValidator.validateWikiGroup(group);
 			this.queryHandler().insertWikiGroup(group, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -298,7 +299,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addWikiUser(WikiUser user, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateWikiUser(user);
+			this.dataValidator.validateWikiUser(user);
 			this.queryHandler().insertWikiUser(user, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -413,15 +414,6 @@ public class AnsiDataHandler implements DataHandler {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 *
-	 */
-	private static void checkLength(String value, int maxLength) throws WikiException {
-		if (value != null && value.length() > maxLength) {
-			throw new WikiException(new WikiMessage("error.fieldlength", value, Integer.valueOf(maxLength).toString()));
-		}
 	}
 
 	/**
@@ -1687,7 +1679,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void updateTopic(Topic topic, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(topic.getVirtualWiki());
-		this.validateTopic(topic);
+		this.dataValidator.validateTopic(topic);
 		try {
 			this.queryHandler().updateTopic(topic, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -1699,7 +1691,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateUserBlock(UserBlock userBlock, Connection conn) throws DataAccessException, WikiException {
-		this.validateUserBlock(userBlock);
+		this.dataValidator.validateUserBlock(userBlock);
 		try {
 			this.queryHandler().updateUserBlock(userBlock, conn);
 		} catch (SQLException e) {
@@ -1711,7 +1703,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateUserDetails(WikiUserDetails userDetails, Connection conn) throws DataAccessException, WikiException {
-		this.validateUserDetails(userDetails);
+		this.dataValidator.validateUserDetails(userDetails);
 		try {
 			this.queryHandler().updateUserDetails(userDetails, conn);
 		} catch (SQLException e) {
@@ -1723,7 +1715,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateVirtualWiki(VirtualWiki virtualWiki, Connection conn) throws DataAccessException, WikiException {
-		this.validateVirtualWiki(virtualWiki);
+		this.dataValidator.validateVirtualWiki(virtualWiki);
 		try {
 			this.queryHandler().updateVirtualWiki(virtualWiki, conn);
 		} catch (SQLException e) {
@@ -1736,7 +1728,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void updateWikiFile(WikiFile wikiFile, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(wikiFile.getVirtualWiki());
-		this.validateWikiFile(wikiFile);
+		this.dataValidator.validateWikiFile(wikiFile);
 		try {
 			this.queryHandler().updateWikiFile(wikiFile, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -1748,7 +1740,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateWikiGroup(WikiGroup group, Connection conn) throws DataAccessException, WikiException {
-		this.validateWikiGroup(group);
+		this.dataValidator.validateWikiGroup(group);
 		try {
 			this.queryHandler().updateWikiGroup(group, conn);
 		} catch (SQLException e) {
@@ -1760,7 +1752,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateWikiUser(WikiUser user, Connection conn) throws DataAccessException, WikiException {
-		this.validateWikiUser(user);
+		this.dataValidator.validateWikiUser(user);
 		try {
 			this.queryHandler().updateWikiUser(user, conn);
 		} catch (SQLException e) {
@@ -1786,172 +1778,8 @@ public class AnsiDataHandler implements DataHandler {
 	/**
 	 *
 	 */
-	protected void validateAuthority(String role) throws WikiException {
-		checkLength(role, 30);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateCategory(Category category) throws WikiException {
-		checkLength(category.getName(), 200);
-		checkLength(category.getSortKey(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateConfiguration(Map<String, String> configuration) throws WikiException {
-		for (Map.Entry<String, String> entry : configuration.entrySet()) {
-			checkLength(entry.getKey(), 50);
-			checkLength(entry.getValue(), 500);
-		}
-	}
-
-	/**
-	 *
-	 */
-	protected void validateLogItem(LogItem logItem) throws WikiException {
-		checkLength(logItem.getUserDisplayName(), 200);
-		checkLength(logItem.getLogParamString(), 500);
-		logItem.setLogComment(StringUtils.substring(logItem.getLogComment(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateNamespace(Namespace namespace) throws WikiException {
-		checkLength(namespace.getDefaultLabel(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateNamespaceTranslation(Namespace namespace, String virtualWiki) throws WikiException {
-		checkLength(namespace.getLabel(virtualWiki), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateRecentChange(RecentChange change) throws WikiException {
-		checkLength(change.getTopicName(), 200);
-		checkLength(change.getAuthorName(), 200);
-		checkLength(change.getVirtualWiki(), 100);
-		change.setChangeComment(StringUtils.substring(change.getChangeComment(), 0, 200));
-		checkLength(change.getParamString(), 500);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateRole(Role role) throws WikiException {
-		checkLength(role.getAuthority(), 30);
-		role.setDescription(StringUtils.substring(role.getDescription(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateTopic(Topic topic) throws WikiException {
-		checkLength(topic.getName(), 200);
-		checkLength(topic.getRedirectTo(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateTopicVersion(TopicVersion topicVersion) throws WikiException {
-		checkLength(topicVersion.getAuthorDisplay(), 100);
-		checkLength(topicVersion.getVersionParamString(), 500);
-		topicVersion.setEditComment(StringUtils.substring(topicVersion.getEditComment(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateUserBlock(UserBlock userBlock) throws WikiException {
-		checkLength(userBlock.getBlockReason(), 200);
-		checkLength(userBlock.getUnblockReason(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateUserDetails(WikiUserDetails userDetails) throws WikiException {
-		checkLength(userDetails.getUsername(), 100);
-		// do not throw exception containing password info
-		if (userDetails.getPassword() != null && userDetails.getPassword().length() > 100) {
-			throw new WikiException(new WikiMessage("error.fieldlength", "-", "100"));
-		}
-	}
-
-	/**
-	 *
-	 */
-	protected void validateVirtualWiki(VirtualWiki virtualWiki) throws WikiException {
-		checkLength(virtualWiki.getName(), 100);
-		checkLength(virtualWiki.getRootTopicName(), 200);
-		checkLength(virtualWiki.getLogoImageUrl(), 200);
-		checkLength(virtualWiki.getMetaDescription(), 500);
-		checkLength(virtualWiki.getSiteName(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWatchlistEntry(String topicName) throws WikiException {
-		checkLength(topicName, 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiFile(WikiFile wikiFile) throws WikiException {
-		checkLength(wikiFile.getFileName(), 200);
-		checkLength(wikiFile.getUrl(), 200);
-		checkLength(wikiFile.getMimeType(), 100);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiFileVersion(WikiFileVersion wikiFileVersion) throws WikiException {
-		checkLength(wikiFileVersion.getUrl(), 200);
-		checkLength(wikiFileVersion.getMimeType(), 100);
-		checkLength(wikiFileVersion.getAuthorDisplay(), 100);
-		wikiFileVersion.setUploadComment(StringUtils.substring(wikiFileVersion.getUploadComment(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiGroup(WikiGroup group) throws WikiException {
-		checkLength(group.getName(), 30);
-		group.setDescription(StringUtils.substring(group.getDescription(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiUser(WikiUser user) throws WikiException {
-		checkLength(user.getUsername(), 100);
-		checkLength(user.getDisplayName(), 100);
-		checkLength(user.getCreateIpAddress(), 39);
-		checkLength(user.getLastLoginIpAddress(), 39);
-		checkLength(user.getEmail(), 100);
-		// Check user preferences. Max length for each value is 250
-		HashMap<String, String> preferences = user.getPreferences();
-		for(String key : preferences.keySet()) {
-			checkLength(preferences.get(key), 250);
-		}
-	}
-
-	/**
-	 *
-	 */
 	public void writeConfiguration(Map<String, String> configuration) throws DataAccessException, WikiException {
-		this.validateConfiguration(configuration);
+		this.dataValidator.validateConfiguration(configuration);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -2023,7 +1851,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	public void writeNamespace(Namespace namespace) throws DataAccessException, WikiException {
-		this.validateNamespace(namespace);
+		this.dataValidator.validateNamespace(namespace);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -2043,7 +1871,7 @@ public class AnsiDataHandler implements DataHandler {
 	public void writeNamespaceTranslations(List<Namespace> namespaces, String virtualWiki) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 		for (Namespace namespace : namespaces) {
-			this.validateNamespaceTranslation(namespace, virtualWiki);
+			this.dataValidator.validateNamespaceTranslation(namespace, virtualWiki);
 		}
 		TransactionStatus status = null;
 		try {
@@ -2066,7 +1894,7 @@ public class AnsiDataHandler implements DataHandler {
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			this.validateRole(role);
+			this.dataValidator.validateRole(role);
 			if (update) {
 				this.queryHandler().updateRole(role, conn);
 			} else {
@@ -2093,7 +1921,7 @@ public class AnsiDataHandler implements DataHandler {
 			Connection conn = DatabaseConnection.getConnection();
 			this.queryHandler().deleteGroupAuthorities(groupId, conn);
 			for (String authority : roles) {
-				this.validateAuthority(authority);
+				this.dataValidator.validateAuthority(authority);
 				this.queryHandler().insertGroupAuthority(groupId, authority, conn);
 			}
 			// flush the cache
@@ -2118,7 +1946,7 @@ public class AnsiDataHandler implements DataHandler {
 			Connection conn = DatabaseConnection.getConnection();
 			this.queryHandler().deleteUserAuthorities(username, conn);
 			for (String authority : roles) {
-				this.validateAuthority(authority);
+				this.dataValidator.validateAuthority(authority);
 				this.queryHandler().insertUserAuthority(username, authority, conn);
 			}
 			// flush the cache
