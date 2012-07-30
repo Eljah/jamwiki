@@ -101,6 +101,19 @@ public class AnsiDataHandler implements DataHandler {
 		this.queryHandler = new AnsiQueryHandler();
 	}
 
+	public void clearAllCaches() {
+		CACHE_INTERWIKI_LIST.removeAllFromCache();
+		CACHE_NAMESPACE_LIST.removeAllFromCache();
+		CACHE_ROLE_MAP_GROUP.removeAllFromCache();
+		CACHE_TOPIC_NAMES_BY_NAME.removeAllFromCache();
+		CACHE_TOPICS_BY_ID.removeAllFromCache();
+		CACHE_TOPIC_IDS_BY_NAME.removeAllFromCache();
+		CACHE_TOPIC_VERSIONS.removeAllFromCache();
+		CACHE_USER_BLOCKS_ACTIVE.removeAllFromCache();
+		CACHE_USER_BY_USER_ID.removeAllFromCache();
+		CACHE_USER_BY_USER_NAME.removeAllFromCache();
+		CACHE_VIRTUAL_WIKI_LIST.removeAllFromCache();
+	}
 	/**
 	 *
 	 */
