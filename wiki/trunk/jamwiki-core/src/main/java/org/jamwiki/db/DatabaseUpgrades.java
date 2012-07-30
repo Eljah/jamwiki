@@ -234,5 +234,7 @@ public class DatabaseUpgrades {
 			throw new WikiException(new WikiMessage("upgrade.error.fatal", e.getMessage()));
 		}
 		DatabaseConnection.commit(status);
+		WikiDatabase.initialize();
+		WikiBase.getDataHandler().clearAllCaches();
 	}
 }
