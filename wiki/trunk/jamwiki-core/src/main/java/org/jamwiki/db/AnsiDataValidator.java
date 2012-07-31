@@ -227,7 +227,9 @@ public class AnsiDataValidator {
 		checkLength(user.getLastLoginIpAddress(), 39);
 		checkLength(user.getDefaultLocale(), 8);
 		checkLength(user.getEmail(), 100);
-		checkLength(user.getPreference(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR), 50);
-		checkLength(user.getSignature(), 250);
+		// loop through preferences and check length
+		for(String preference : user.getPreferences().values()) {
+			checkLength(preference, 250);
+		}
 	}
 }
