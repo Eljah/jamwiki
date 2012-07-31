@@ -36,6 +36,7 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.WikiLink;
+import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
@@ -327,6 +328,8 @@ public class UpgradeServlet extends JAMWikiServlet {
 		try {
 			if (this.upgradeDatabase(false, null)) {
 				upgradeDetails.add(new WikiMessage("upgrade.caption.database"));
+				WikiDatabase.initialize();
+				WikiCache.initialize();
 			}
 		} catch (Exception e) {
 			// never thrown when the first parameter is false
