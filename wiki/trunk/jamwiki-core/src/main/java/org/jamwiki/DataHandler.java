@@ -76,8 +76,6 @@ public interface DataHandler {
 	/** Intersystems Cache data handler class */
 	public static final String DATA_HANDLER_CACHE = "org.jamwiki.db.CacheDataHandler";
 
-	public void clearAllCaches();
-	
 	/**
 	 * Determine if a value matching the given username and password exists in
 	 * the data store.

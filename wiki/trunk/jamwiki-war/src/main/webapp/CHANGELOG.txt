@@ -22,6 +22,7 @@ New Features:
 Bugfixes:
 
   * Update of last login date and time after login (wrh2, cclavadetscher).
+  * Ensure that the cache is flushed after upgrades (cclavadetscher).
 
 Translation Updates:
 
