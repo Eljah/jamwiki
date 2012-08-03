@@ -2987,6 +2987,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		WikiUser user = null;
 		try {
 			conn = DatabaseConnection.getConnection();
 			stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_USER);
@@ -2995,11 +2996,11 @@ public class AnsiQueryHandler implements QueryHandler {
 			if (!rs.next()) {
 				return null;
 			}
+			user = this.initWikiUser(rs);
 		} finally {
 			// close only the statement and result set - leave the connection open for further use
 			DatabaseConnection.closeConnection(null, stmt, rs);
 		}
-		WikiUser user = this.initWikiUser(rs);
 		// get the default user preferences
 		Map<String, String> preferences = this.lookupUserPreferencesDefaults(conn);
 		// overwrite the defaults with any user-specific preferences
