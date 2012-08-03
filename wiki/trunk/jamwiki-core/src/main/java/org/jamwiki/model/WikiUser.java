@@ -41,33 +41,44 @@ public class WikiUser implements Serializable {
 	private final String username;
 	private int userId = -1;
 	private String displayName = null;
+	private Map<String, String> preferences;
 
 	// Constants for user preference groups and preferences
 	public static final String USER_PREFERENCES_GROUP_EDITING = "user.preferences.group.editing";
-		public static final String USER_PREFERENCE_SIGNATURE = "user.signature";
-		public static final String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
+	public static final String USER_PREFERENCE_SIGNATURE = "user.signature";
+	public static final String USER_PREFERENCE_PREFERRED_EDITOR = "user.preferred.editor";
 	public static final String USER_PREFERENCES_GROUP_INTERNATIONALIZATION = "user.preferences.group.internationalization";
-		public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
-		public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
-		public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
-	
+	public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
+	public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
+	public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
+
+	/**
+	 *
+	 */
 	public String getDisplayName() {
 		return displayName;
 	}
 
+	/**
+	 *
+	 */
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
 
+	/**
+	 *
+	 */
 	public String getDefaultLocale() {
-		return preferences.get(USER_PREFERENCE_DEFAULT_LOCALE);
+		return this.getPreferences().get(USER_PREFERENCE_DEFAULT_LOCALE);
 	}
-	
+
+	/**
+	 *
+	 */
 	public void setDefaultLocale(String defaultLocale) {
-		preferences.put(USER_PREFERENCE_DEFAULT_LOCALE, defaultLocale);
+		this.getPreferences().put(USER_PREFERENCE_DEFAULT_LOCALE, defaultLocale);
 	}
-	
-	private HashMap<String, String> preferences = new HashMap<String, String>();
 
 	/**
 	 *
@@ -166,12 +177,21 @@ public class WikiUser implements Serializable {
 	public String getUsername() {
 		return username;
 	}
-	
-	public HashMap<String, String> getPreferences() {
+
+	/**
+	 *
+	 */
+	public Map<String, String> getPreferences() {
+		if (this.preferences == null) {
+			this.preferences = new HashMap<String, String>();
+		}
 		return preferences;
 	}
-	
-	public void setPreferences(HashMap<String, String> preferences) {
+
+	/**
+	 *
+	 */
+	public void setPreferences(Map<String, String> preferences) {
 		this.preferences = preferences;
 	}
 
@@ -179,32 +199,35 @@ public class WikiUser implements Serializable {
 	 * Shortcut to get the user signature
 	 */
 	public String getSignature() {
-		return preferences.get(USER_PREFERENCE_SIGNATURE);
+		return this.getPreferences().get(USER_PREFERENCE_SIGNATURE);
 	}
 	
 	public void setSignature(String signature) {
-		preferences.put(USER_PREFERENCE_SIGNATURE, signature);
+		this.getPreferences().put(USER_PREFERENCE_SIGNATURE, signature);
 	}
 	
 	/**
 	 * Helper method to get a specific preference
 	 */
 	public String getPreference(String preferenceKey) {
-		return preferences.get(preferenceKey);
+		return this.getPreferences().get(preferenceKey);
 	}
 	
 	/**
 	 * Helper method to set a specific preference
 	 */
 	public void setPreference(String preferenceKey, String preferenceValue) {
-		preferences.put(preferenceKey, preferenceValue);
+		this.getPreferences().put(preferenceKey, preferenceValue);
 	}
-	
+
+	/**
+	 *
+	 */
 	public String toString() {
 		StringBuffer sb = new StringBuffer("WikiUser ID " + userId  + ": " + username + "; displayName: " + displayName);
 		sb.append("; preferences: ");
-		for(String key : preferences.keySet()) {
-			sb.append(key + "=" + preferences.get(key) + "; ");
+		for (String key : preferences.keySet()) {
+			sb.append(key + "=" + this.getPreferences().get(key) + "; ");
 		}
 		return sb.toString();
 	}

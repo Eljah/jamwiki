@@ -2375,7 +2375,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt(1, userId);
 			stmt.executeUpdate();
 			stmt.close();
-			HashMap<String, String> preferences = user.getPreferences();
+			Map<String, String> preferences = user.getPreferences();
 			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE);
 			// Only store preferences that are not default
 			for(String key : defaults.keySet()) {
@@ -3723,7 +3723,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setInt(1, userId);
 			stmt.executeUpdate();
 			stmt.close();
-			HashMap<String, String> preferences = user.getPreferences();
+			Map<String, String> preferences = user.getPreferences();
 			stmt = conn.prepareStatement(STATEMENT_INSERT_USER_PREFERENCE);
 			// Only store preferences that are not default
 			for(String key : preferences.keySet()) {
