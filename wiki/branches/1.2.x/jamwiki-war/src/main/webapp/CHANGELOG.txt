@@ -8,7 +8,7 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Fix potential database connection leak during topic lookup.
 
 Translation Updates:
 
