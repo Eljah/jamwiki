@@ -2535,38 +2535,36 @@ public class AnsiQueryHandler implements QueryHandler {
 			return null;
 		}
 		boolean closeConnection = (conn == null);
-		PreparedStatement stmt = null;
+		PreparedStatement stmt1 = null;
+		PreparedStatement stmt2 = null;
 		ResultSet rs = null;
 		Topic topic = null;
 		try {
 			if (conn == null) {
 				conn = DatabaseConnection.getConnection();
 			}
-			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC);
-			stmt.setString(1, pageName);
-			stmt.setInt(2, virtualWikiId);
-			stmt.setInt(3, namespace.getId());
-			rs = stmt.executeQuery();
+			stmt1 = conn.prepareStatement(STATEMENT_SELECT_TOPIC);
+			stmt1.setString(1, pageName);
+			stmt1.setInt(2, virtualWikiId);
+			stmt1.setInt(3, namespace.getId());
+			rs = stmt1.executeQuery();
 			topic = (rs.next() ? this.initTopic(rs) : null);
-		} finally {
-			DatabaseConnection.closeConnection(null, stmt, rs);
-		}
-		try {
 			if (topic == null && !namespace.isCaseSensitive() && !pageName.toLowerCase().equals(pageName)) {
-				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_LOWER);
-				stmt.setString(1, pageName.toLowerCase());
-				stmt.setInt(2, virtualWikiId);
-				stmt.setInt(3, namespace.getId());
-				rs = stmt.executeQuery();
+				stmt2 = conn.prepareStatement(STATEMENT_SELECT_TOPIC_LOWER);
+				stmt2.setString(1, pageName.toLowerCase());
+				stmt2.setInt(2, virtualWikiId);
+				stmt2.setInt(3, namespace.getId());
+				rs = stmt2.executeQuery();
 				topic = (rs.next() ? this.initTopic(rs) : null);
 			}
 			return topic;
 		} finally {
+			DatabaseConnection.closeStatement(stmt1);
 			if (closeConnection) {
-				DatabaseConnection.closeConnection(conn, stmt, rs);
+				DatabaseConnection.closeConnection(conn, stmt2, rs);
 			} else {
 				// close only the statement and result set - leave the connection open for further use
-				DatabaseConnection.closeConnection(null, stmt, rs);
+				DatabaseConnection.closeConnection(null, stmt2, rs);
 			}
 		}
 	}
@@ -2662,32 +2660,30 @@ public class AnsiQueryHandler implements QueryHandler {
 			return null;
 		}
 		Connection conn = null;
-		PreparedStatement stmt = null;
+		PreparedStatement stmt1 = null;
+		PreparedStatement stmt2 = null;
 		ResultSet rs = null;
 		String topicName = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_NAME);
-			stmt.setString(1, pageName);
-			stmt.setInt(2, virtualWikiId);
-			stmt.setInt(3, namespace.getId());
-			rs = stmt.executeQuery();
+			stmt1 = conn.prepareStatement(STATEMENT_SELECT_TOPIC_NAME);
+			stmt1.setString(1, pageName);
+			stmt1.setInt(2, virtualWikiId);
+			stmt1.setInt(3, namespace.getId());
+			rs = stmt1.executeQuery();
 			topicName = (rs.next() ? rs.getString("topic_name") : null);
-		} finally {
-			DatabaseConnection.closeConnection(null, stmt, rs);
-		}
-		try {
 			if (topicName == null && !namespace.isCaseSensitive() && !pageName.toLowerCase().equals(pageName)) {
-				stmt = conn.prepareStatement(STATEMENT_SELECT_TOPIC_NAME_LOWER);
-				stmt.setString(1, pageName.toLowerCase());
-				stmt.setInt(2, virtualWikiId);
-				stmt.setInt(3, namespace.getId());
-				rs = stmt.executeQuery();
+				stmt2 = conn.prepareStatement(STATEMENT_SELECT_TOPIC_NAME_LOWER);
+				stmt2.setString(1, pageName.toLowerCase());
+				stmt2.setInt(2, virtualWikiId);
+				stmt2.setInt(3, namespace.getId());
+				rs = stmt2.executeQuery();
 				topicName = (rs.next() ? rs.getString("topic_name") : null);
 			}
 			return topicName;
 		} finally {
-			DatabaseConnection.closeConnection(conn, stmt, rs);
+			DatabaseConnection.closeStatement(stmt1);
+			DatabaseConnection.closeConnection(conn, stmt2, rs);
 		}
 	}
 
@@ -2911,28 +2907,24 @@ public class AnsiQueryHandler implements QueryHandler {
 	public GroupMap lookupGroupMapUser(String userLogin) throws SQLException {
 		GroupMap groupMap = null;
 		Connection conn = null;
-		PreparedStatement stmt = null;
+		PreparedStatement stmt1 = null;
+		PreparedStatement stmt2 = null;
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_USER);
-			stmt.setString(1,userLogin);
-			rs = stmt.executeQuery();
+			stmt1 = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_USER);
+			stmt1.setString(1,userLogin);
+			rs = stmt1.executeQuery();
 			groupMap = new GroupMap(userLogin);
 			List<Integer> groupIds = new ArrayList<Integer>();
 			while (rs.next()) {
 				groupIds.add(new Integer(rs.getInt("group_id")));
 			}
 			groupMap.setGroupIds(groupIds);
-		} finally {
-			// close only the statement and result set - leave the connection open for further use
-			DatabaseConnection.closeConnection(null, stmt, rs);
-		}
-		try {
 			// retrieve roles assigned through group assignment
-			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_AUTHORITIES);
-			stmt.setString(1, userLogin);
-			rs = stmt.executeQuery();
+			stmt2 = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_AUTHORITIES);
+			stmt2.setString(1, userLogin);
+			rs = stmt2.executeQuery();
 			List<String> roleNames = new ArrayList<String>();
 			while (rs.next()) {
 				roleNames.add(rs.getString("authority"));
@@ -2940,7 +2932,8 @@ public class AnsiQueryHandler implements QueryHandler {
 			groupMap.setRoleNames(roleNames);
 			return groupMap;
 		} finally {
-			DatabaseConnection.closeConnection(conn, stmt,rs);
+			DatabaseConnection.closeStatement(stmt1);
+			DatabaseConnection.closeConnection(conn, stmt2,rs);
 		}
 	}
 
@@ -2985,36 +2978,33 @@ public class AnsiQueryHandler implements QueryHandler {
 	 */
 	public WikiUser lookupWikiUser(int userId) throws SQLException {
 		Connection conn = null;
-		PreparedStatement stmt = null;
+		PreparedStatement stmt1 = null;
+		PreparedStatement stmt2 = null;
 		ResultSet rs = null;
 		WikiUser user = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			stmt = conn.prepareStatement(STATEMENT_SELECT_WIKI_USER);
-			stmt.setInt(1, userId);
-			rs = stmt.executeQuery();
+			stmt1 = conn.prepareStatement(STATEMENT_SELECT_WIKI_USER);
+			stmt1.setInt(1, userId);
+			rs = stmt1.executeQuery();
 			if (!rs.next()) {
 				return null;
 			}
 			user = this.initWikiUser(rs);
-		} finally {
-			// close only the statement and result set - leave the connection open for further use
-			DatabaseConnection.closeConnection(null, stmt, rs);
-		}
-		// get the default user preferences
-		Map<String, String> preferences = this.lookupUserPreferencesDefaults(conn);
-		// overwrite the defaults with any user-specific preferences
-		try {
-			stmt = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES);
-			stmt.setInt(1, userId);
-			rs = stmt.executeQuery();
+			// get the default user preferences
+			Map<String, String> preferences = this.lookupUserPreferencesDefaults(conn);
+			// overwrite the defaults with any user-specific preferences
+			stmt2 = conn.prepareStatement(STATEMENT_SELECT_USER_PREFERENCES);
+			stmt2.setInt(1, userId);
+			rs = stmt2.executeQuery();
 			while (rs.next()) {
 				preferences.put(rs.getString(1), rs.getString(2));
 			}
 			user.setPreferences(preferences);
 			return user;
 		} finally {
-			DatabaseConnection.closeConnection(conn, stmt, rs);
+			DatabaseConnection.closeStatement(stmt1);
+			DatabaseConnection.closeConnection(conn, stmt2, rs);
 		}
 	}
 
