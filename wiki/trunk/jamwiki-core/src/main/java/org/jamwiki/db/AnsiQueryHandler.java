@@ -2881,29 +2881,28 @@ public class AnsiQueryHandler implements QueryHandler {
 	 * 
 	 */
 	public GroupMap lookupGroupMapGroup(int groupId) throws SQLException {
-		GroupMap groupMap = null;
+		if (lookupWikiGroupById(groupId) == null) {
+			return null;
+		}
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		if(lookupWikiGroupById(groupId) != null) {
+		GroupMap groupMap = new GroupMap(groupId);
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_GROUP);
+			stmt.setInt(1, groupId);
+			rs = stmt.executeQuery();
 			groupMap = new GroupMap(groupId);
-			try {
-				conn = DatabaseConnection.getConnection();
-				stmt = conn.prepareStatement(STATEMENT_SELECT_GROUP_MAP_GROUP);
-				stmt.setInt(1, groupId);
-				rs = stmt.executeQuery();
-				groupMap = new GroupMap(groupId);
-				List<String> userLogins = new ArrayList<String>();
-				while(rs.next()) {
-					userLogins.add(rs.getString("username"));
-				}
-				groupMap.setGroupMembers(userLogins);
-				return groupMap;
-			} finally {
-				DatabaseConnection.closeConnection(conn, stmt,rs);
+			List<String> userLogins = new ArrayList<String>();
+			while (rs.next()) {
+				userLogins.add(rs.getString("username"));
 			}
+			groupMap.setGroupMembers(userLogins);
+			return groupMap;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt,rs);
 		}
-		return groupMap;
 	}
 
 	/**
