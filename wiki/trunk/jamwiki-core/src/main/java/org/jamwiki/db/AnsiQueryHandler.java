@@ -123,7 +123,6 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_DELETE_TOPIC_LINKS = null;
 	protected static String STATEMENT_DELETE_TOPIC_VERSION = null;
 	protected static String STATEMENT_DELETE_WATCHLIST_ENTRY = null;
-	protected static String STATEMENT_DELETE_USER_PREFERENCES_DEFAULTS = null;
 	protected static String STATEMENT_DELETE_USER_PREFERENCES = null;
 	protected static String STATEMENT_DROP_AUTHORITIES_TABLE = null;
 	protected static String STATEMENT_DROP_CATEGORY_TABLE = null;
@@ -1379,7 +1378,6 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_DELETE_TOPIC_LINKS             = props.getProperty("STATEMENT_DELETE_TOPIC_LINKS");
 		STATEMENT_DELETE_TOPIC_VERSION           = props.getProperty("STATEMENT_DELETE_TOPIC_VERSION");
 		STATEMENT_DELETE_WATCHLIST_ENTRY         = props.getProperty("STATEMENT_DELETE_WATCHLIST_ENTRY");
-		STATEMENT_DELETE_USER_PREFERENCES_DEFAULTS = props.getProperty("STATEMENT_DELETE_USER_PREFERENCES_DEFAULTS");
 		STATEMENT_DELETE_USER_PREFERENCES        = props.getProperty("STATEMENT_DELETE_USER_PREFERENCES");
 		STATEMENT_DROP_AUTHORITIES_TABLE         = props.getProperty("STATEMENT_DROP_AUTHORITIES_TABLE");
 		STATEMENT_DROP_CATEGORY_TABLE            = props.getProperty("STATEMENT_DROP_CATEGORY_TABLE");
