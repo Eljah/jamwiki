@@ -3727,7 +3727,6 @@ public class AnsiQueryHandler implements QueryHandler {
 	 */
 	private void updateWikiUserPreferences(WikiUser user, Connection conn) throws SQLException {
 		PreparedStatement stmt = null;
-		ResultSet rs = null;
 		Map<String, String> defaults = this.lookupUserPreferencesDefaults(conn);
 		try {
 			stmt = conn.prepareStatement(STATEMENT_DELETE_USER_PREFERENCES);

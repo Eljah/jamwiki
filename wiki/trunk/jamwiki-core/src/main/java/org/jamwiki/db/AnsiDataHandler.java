@@ -1331,21 +1331,18 @@ public class AnsiDataHandler implements DataHandler {
 		if (result != null || CACHE_USER_BY_USER_NAME.isKeyInCache(username)) {
 			return result;
 		}
-		TransactionStatus status = null;
+		Connection conn = null;
 		try {
-			status = DatabaseConnection.startTransaction();
-			Connection conn = DatabaseConnection.getConnection();
+			conn = DatabaseConnection.getConnection();
 			int userId = this.queryHandler().lookupWikiUser(username, conn);
 			if (userId != -1) {
 				result = lookupWikiUser(userId);
 			}
+			CACHE_USER_BY_USER_NAME.addToCache(username, result);
+			return result;
 		} catch (SQLException e) {
-			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
 		}
-		DatabaseConnection.commit(status);
-		CACHE_USER_BY_USER_NAME.addToCache(username, result);
-		return result;
 	}
 
 	/**
@@ -2249,9 +2246,10 @@ public class AnsiDataHandler implements DataHandler {
 	public void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
 		WikiUtil.validateUserName(user.getUsername());
 		TransactionStatus status = null;
+		Connection conn = null;
 		try {
 			status = DatabaseConnection.startTransaction();
-			Connection conn = DatabaseConnection.getConnection();
+			conn = DatabaseConnection.getConnection();
 			if (user.getUserId() <= 0) {
 				WikiUserDetails userDetails = new WikiUserDetails(username, encryptedPassword);
 				this.addUserDetails(userDetails, conn);
@@ -2273,6 +2271,10 @@ public class AnsiDataHandler implements DataHandler {
 				}
 				this.updateWikiUser(user, conn);
 			}
+			DatabaseConnection.commit(status);
+			// update the cache AFTER the commit
+			CACHE_USER_BY_USER_ID.addToCache(user.getUserId(), user);
+			CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
@@ -2283,10 +2285,6 @@ public class AnsiDataHandler implements DataHandler {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
 		}
-		DatabaseConnection.commit(status);
-		// update the cache AFTER the commit
-		CACHE_USER_BY_USER_ID.addToCache(user.getUserId(), user);
-		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 
 	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr) throws DataAccessException {
