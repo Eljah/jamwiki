@@ -2284,8 +2284,6 @@ public class AnsiDataHandler implements DataHandler {
 		} catch (WikiException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
-		} finally {
-			DatabaseConnection.closeConnection(conn);
 		}
 	}
 

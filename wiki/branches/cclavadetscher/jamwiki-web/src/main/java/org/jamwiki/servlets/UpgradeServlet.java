@@ -328,6 +328,8 @@ public class UpgradeServlet extends JAMWikiServlet {
 		try {
 			if (this.upgradeDatabase(false, null)) {
 				upgradeDetails.add(new WikiMessage("upgrade.caption.database"));
+				// Flush connection pool to manage database schema change
+				WikiDatabase.initialize();
 				WikiCache.initialize();
 			}
 		} catch (Exception e) {
