@@ -250,6 +250,9 @@ public class UpgradeServlet extends JAMWikiServlet {
 				DatabaseUpgrades.upgrade130(messages);
 			}
 		}
+		// Flush connection pool to manage database schema change
+		WikiDatabase.initialize();
+		WikiCache.initialize();
 		return upgradeRequired;
 	}
 
@@ -328,9 +331,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 		try {
 			if (this.upgradeDatabase(false, null)) {
 				upgradeDetails.add(new WikiMessage("upgrade.caption.database"));
-				// Flush connection pool to manage database schema change
-				WikiDatabase.initialize();
-				WikiCache.initialize();
 			}
 		} catch (Exception e) {
 			// never thrown when the first parameter is false
