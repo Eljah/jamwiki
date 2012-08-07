@@ -354,6 +354,16 @@ table#diff col.diff-content {
 	margin-top: 1em;
 	clear: both;
 }
+table#filehistory {
+	border-collapse: collapse;
+}
+#filehistory td, #filehistory th {
+	border: 1px solid #aaa;
+	padding: 4px;
+}
+.nowrap {
+	white-space: nowrap;
+}
 
 /* tab menu */
 
