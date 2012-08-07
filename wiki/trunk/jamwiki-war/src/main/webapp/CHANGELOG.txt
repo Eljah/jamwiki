@@ -54,33 +54,13 @@ New Features:
 
 Bugfixes:
 
-<<<<<<< .working
-1.2.2
-=====
-
-New Features:
-
-  * Support comparison operations in the #expr tag ("{{#expr: -1 < 0}}").
-  * Upgrade to exp4j 0.3.1.
-
-Bugfixes:
-
-  * None.
+  * Fix a Javascript error on the search page with IE.  Reported by shar.
+  * Problem with history when using DB2 database.  Reported with a fix by
+    Dennis N Brown.
 
 Translation Updates:
 
-  * Updated German translations (axelclk).
-
-
-1.2.1
-=====
-
-New Features:
-
-  * None.
-
-Bugfixes:
-
+  * Updated Italian translations (cclavadetscher).
   * Fix a Javascript error on the search page with IE.  Reported by shar.
   * Problem with history when using DB2 database.  Reported with a fix by
     Dennis N Brown.
@@ -90,17 +70,6 @@ Translation Updates:
   * Updated Italian translations (cclavadetscher).
 
 
-=======
-  * Fix a Javascript error on the search page with IE.  Reported by shar.
-  * Problem with history when using DB2 database.  Reported with a fix by
-    Dennis N Brown.
-
-Translation Updates:
-
-  * Updated Italian translations (cclavadetscher).
-
-
->>>>>>> .merge-right.r4125
 1.2
 ===
 
