@@ -26,7 +26,8 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated Japanese translations (nattolover).
+
 
 1.2.2
 =====
