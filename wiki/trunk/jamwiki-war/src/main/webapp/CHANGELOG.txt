@@ -29,17 +29,33 @@ Translation Updates:
   * Updated Japanese translations (nattolover).
 
 
+1.2.3
+=====
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+  * None.
+
+Translation Updates:
+
+  * None.
+
+
 1.2.2
 =====
 
 New Features:
 
   * Support comparison operations in the #expr tag ("{{#expr: -1 < 0}}").
-  * Upgrade to exp4j 0.3.1.
+  * Upgrade to exp4j 0.3.2.
 
 Bugfixes:
 
-  * None.
+  * Fix potential database connection leak during topic lookup.
 
 Translation Updates:
 
