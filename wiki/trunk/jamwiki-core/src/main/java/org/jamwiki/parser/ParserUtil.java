@@ -46,7 +46,7 @@ public class ParserUtil {
 			return null;
 		}
 		if (parserOutput == null) {
-			parserOutput = new ParserOutput();
+			parserOutput = ParserOutput.IMMUTABLE_PARSER_OUTPUT;
 		}
 		return WikiBase.getParserInstance().parseHTML(parserInput, parserOutput, content);
 	}
@@ -64,8 +64,7 @@ public class ParserUtil {
 		if (content == null) {
 			return null;
 		}
-		ParserOutput parserOutput = new ParserOutput();
-		return WikiBase.getParserInstance().parseEditComment(parserInput, parserOutput, content);
+		return WikiBase.getParserInstance().parseEditComment(parserInput, ParserOutput.IMMUTABLE_PARSER_OUTPUT, content);
 	}
 
 	/**
@@ -143,8 +142,7 @@ public class ParserUtil {
 	 * @throws ParserException Thrown if a parser error occurs.
 	 */
 	public static String[] parseSlice(String context, Locale locale, String virtualWiki, String topicName, int section) throws ParserException {
-		ParserOutput parserOutput = new ParserOutput();
-		return ParserUtil.executeSliceOrSplice(parserOutput, context, locale, virtualWiki, topicName, section, null, true);
+		return ParserUtil.executeSliceOrSplice(ParserOutput.IMMUTABLE_PARSER_OUTPUT, context, locale, virtualWiki, topicName, section, null, true);
 	}
 
 	/**

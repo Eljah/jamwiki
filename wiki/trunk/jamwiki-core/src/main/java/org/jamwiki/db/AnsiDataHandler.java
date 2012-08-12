@@ -1974,7 +1974,7 @@ public class AnsiDataHandler implements DataHandler {
 	 * @param links A List of all topic names that are linked to from the
 	 *  current topic.
 	 */
-	public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
+	public void writeTopic(Topic topic, TopicVersion topicVersion, Map<String, String> categories, List<String> links) throws DataAccessException, WikiException {
 		long start = System.currentTimeMillis();
 		LinkUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
 		TransactionStatus status = null;

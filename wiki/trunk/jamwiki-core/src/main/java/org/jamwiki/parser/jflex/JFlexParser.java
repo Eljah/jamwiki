@@ -236,14 +236,14 @@ public class JFlexParser implements JAMWikiParser {
 			return raw;
 		}
 		long start = System.currentTimeMillis();
-		String output = raw;
-		ParserOutput parserOutput = new ParserOutput();
-		output = this.parseTemplate(parserInput, parserOutput, output, JFlexParser.MODE_MINIMAL);
-		if (logger.isInfoEnabled()) {
-			String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
-			logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+		try {
+			return this.parseTemplate(parserInput, ParserOutput.IMMUTABLE_PARSER_OUTPUT, raw, JFlexParser.MODE_MINIMAL);
+		} finally {
+			if (logger.isInfoEnabled()) {
+				String topicName = (!StringUtils.isBlank(parserInput.getTopicName())) ? parserInput.getTopicName() : null;
+				logger.info("Parse time (parseHTML) for " + topicName + " (" + ((System.currentTimeMillis() - start) / 1000.000) + " s.)");
+			}
 		}
-		return output;
 	}
 
 	/**
