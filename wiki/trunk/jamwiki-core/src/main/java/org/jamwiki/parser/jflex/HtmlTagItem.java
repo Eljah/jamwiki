@@ -16,6 +16,7 @@
  */
 package org.jamwiki.parser.jflex;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,30 +36,29 @@ public class HtmlTagItem {
 		EMPTY_BODY
 	}
 	/** The tag type, for example &lt;tag attribute="value"> has a tag type of "tag". */
-	private String tagType;
+	private final String tagType;
 	/** The pattern type for the tag - open, close, or empty body. */
-	private Pattern tagPattern;
+	private final Pattern tagPattern;
 	/** The tag's attributes, mapped as an ordered list of key-value pairs. */
-	private LinkedHashMap<String, String> attributes;
+	private final Map<String, String> attributes;
 
 	/**
 	 *
 	 */
-	protected HtmlTagItem(String tagType, Pattern tagPattern, LinkedHashMap<String, String> attributes) {
+	protected HtmlTagItem(String tagType, Pattern tagPattern, Map<String, String> attributes) {
 		this.tagType = tagType;
 		this.tagPattern = tagPattern;
-		if (attributes != null) {
+		if (attributes != null && !attributes.isEmpty()) {
 			this.attributes = new LinkedHashMap<String, String>(attributes);
+		} else {
+			this.attributes = Collections.emptyMap();
 		}
 	}
 
 	/**
 	 * Return a mapping of key-value pairs for all attributes of this tag.
 	 */
-	protected LinkedHashMap<String, String> getAttributes() {
-		if (this.attributes == null) {
-			this.attributes = new LinkedHashMap<String, String>();
-		}
+	protected Map<String, String> getAttributes() {
 		return this.attributes;
 	}
 
