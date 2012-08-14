@@ -46,7 +46,7 @@ public class ParserUtil {
 			return null;
 		}
 		if (parserOutput == null) {
-			parserOutput = ParserOutput.IMMUTABLE_PARSER_OUTPUT;
+			parserOutput = new ParserOutput();
 		}
 		return WikiBase.getParserInstance().parseHTML(parserInput, parserOutput, content);
 	}
