@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.ResourceUtil;
@@ -60,7 +59,7 @@ public class LocalDataSource extends BasicDataSource {
 		setValidationQuery(WikiDatabase.getConnectionValidationQuery());
 		setPoolPreparedStatements(Environment.getBooleanValue(Environment.PROP_DBCP_POOL_PREPARED_STATEMENTS));
 		setMaxOpenPreparedStatements(Environment.getIntValue(Environment.PROP_DBCP_MAX_OPEN_PREPARED_STATEMENTS));
-		if (Environment.getValue(Environment.PROP_DB_TYPE).equals(DataHandler.DATA_HANDLER_ORACLE)) {
+		if (Environment.getValue(Environment.PROP_DB_TYPE).equals(QueryHandler.QUERY_HANDLER_ORACLE)) {
 			// handle clobs as strings, Oracle 10g and higher drivers (ojdbc14.jar)
 			addConnectionProperty("SetBigStringTryClob", "true");
 		}

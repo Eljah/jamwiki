@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.JAMWikiParser;
 import org.jamwiki.SearchEngine;
@@ -90,26 +89,6 @@ public class WikiUtil {
 			}
 		}
 		return new Pagination(num, offset);
-	}
-
-	/**
-	 * Utility method to retrieve an instance of the current data handler.
-	 *
-	 * @return An instance of the current data handler.
-	 * @throws IOException Thrown if a data handler instance can not be
-	 *  instantiated.
-	 */
-	public static DataHandler dataHandlerInstance() throws IOException {
-		if (StringUtils.isBlank(Environment.getValue(Environment.PROP_DB_TYPE))) {
-			// this is a problem, but it should never occur
-			logger.warn("WikiUtil.dataHandlerInstance called without a valid PROP_DB_TYPE value");
-		}
-		String dataHandlerClass = Environment.getValue(Environment.PROP_DB_TYPE);
-		try {
-			return (DataHandler)ResourceUtil.instantiateClass(dataHandlerClass);
-		} catch (ClassCastException e) {
-			throw new IllegalStateException("Data handler specified in jamwiki.properties does not implement org.jamwiki.DataHandler: " + dataHandlerClass);
-		}
 	}
 
 	/**

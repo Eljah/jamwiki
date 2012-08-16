@@ -45,7 +45,7 @@ public class WikiConfiguration {
 
 	private static WikiConfiguration instance = null;
 
-	private List<WikiConfigurationObject> dataHandlers = null;
+	private List<WikiConfigurationObject> queryHandlers = null;
 	private Map<String, String> editors = null;
 	private List<WikiConfigurationObject> parsers = null;
 	private List<WikiConfigurationObject> jflexParserCustomTags = null;
@@ -55,10 +55,10 @@ public class WikiConfiguration {
 	/** Name of the configuration file. */
 	private static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration.xml";
 	/** XSD for the configuration file. */
-	private static final String JAMWIKI_CONFIGURATION_XSD = "jamwiki-configuration-1.2.xsd";
+	private static final String JAMWIKI_CONFIGURATION_XSD = "jamwiki-configuration-1.3.xsd";
 	private static final String XML_CONFIGURATION_ROOT = "configuration";
-	private static final String XML_DATA_HANDLER = "data-handler";
-	private static final String XML_DATA_HANDLER_ROOT = "data-handlers";
+	private static final String XML_QUERY_HANDLER = "query-handler";
+	private static final String XML_QUERY_HANDLER_ROOT = "query-handlers";
 	private static final String XML_EDITOR = "editor";
 	private static final String XML_EDITOR_ROOT = "editors";
 	private static final String XML_INIT_PARAM = "init-param";
@@ -98,8 +98,8 @@ public class WikiConfiguration {
 	/**
 	 *
 	 */
-	public List<WikiConfigurationObject> getDataHandlers() {
-		return this.dataHandlers;
+	public List<WikiConfigurationObject> getQueryHandlers() {
+		return this.queryHandlers;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class WikiConfiguration {
 	 *
 	 */
 	private void initialize() {
-		this.dataHandlers = new ArrayList<WikiConfigurationObject>();
+		this.queryHandlers = new ArrayList<WikiConfigurationObject>();
 		this.editors = new LinkedHashMap<String, String>();
 		this.jflexParserCustomTags = new ArrayList<WikiConfigurationObject>();
 		this.parsers = new ArrayList<WikiConfigurationObject>();
@@ -170,8 +170,8 @@ public class WikiConfiguration {
 				this.parsers = this.parseConfigurationObjects(child, XML_PARSER);
 			} else if (child.getNodeName().equals(XML_PARSER_CUSTOM_TAG_ROOT)) {
 				this.jflexParserCustomTags = this.parseConfigurationObjects(child, XML_PARSER_CUSTOM_TAG);
-			} else if (child.getNodeName().equals(XML_DATA_HANDLER_ROOT)) {
-				this.dataHandlers = this.parseConfigurationObjects(child, XML_DATA_HANDLER);
+			} else if (child.getNodeName().equals(XML_QUERY_HANDLER_ROOT)) {
+				this.queryHandlers = this.parseConfigurationObjects(child, XML_QUERY_HANDLER);
 			} else if (child.getNodeName().equals(XML_EDITOR_ROOT)) {
 				this.parseMapNodes(child, this.editors, XML_EDITOR);
 			} else if (child.getNodeName().equals(XML_SEARCH_ENGINE_ROOT)) {

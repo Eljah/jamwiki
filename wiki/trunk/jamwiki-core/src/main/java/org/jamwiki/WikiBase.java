@@ -18,6 +18,7 @@ package org.jamwiki;
 
 import java.io.IOException;
 import java.util.Locale;
+import org.jamwiki.db.AnsiDataHandler;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.WikiUtil;
@@ -29,7 +30,6 @@ import org.jamwiki.utils.WikiLogger;
  * to all core wiki structures.  In addition this class provides utility methods
  * for resetting core structures including caches and permissions.
  *
- * @see org.jamwiki.DataHandler
  * @see org.jamwiki.SearchEngine
  */
 public class WikiBase {
@@ -39,7 +39,7 @@ public class WikiBase {
 	/** The singleton instance of this class. */
 	private static WikiBase instance = null;
 	/** The data handler that looks after read/write operations. */
-	private static DataHandler dataHandler = null;
+	private static AnsiDataHandler dataHandler = null;
 	/** The search engine instance. */
 	private static SearchEngine searchEngine = null;
 	/** An instance of the current parser. */
@@ -100,7 +100,10 @@ public class WikiBase {
 	 * @return The current data handler instance, or <code>null</code>
 	 *  if the handler has not yet been initialized.
 	 */
-	public static DataHandler getDataHandler() {
+	public static AnsiDataHandler getDataHandler() {
+		if (WikiBase.dataHandler == null) {
+			WikiBase.dataHandler = new AnsiDataHandler();
+		}
 		return WikiBase.dataHandler;
 	}
 
@@ -145,7 +148,7 @@ public class WikiBase {
 	 */
 	public static void reload() throws IOException {
 		WikiConfiguration.reset();
-		WikiBase.dataHandler = WikiUtil.dataHandlerInstance();
+		WikiBase.dataHandler = new AnsiDataHandler();
 		if (WikiBase.searchEngine != null) {
 			WikiBase.searchEngine.shutdown();
 		}
