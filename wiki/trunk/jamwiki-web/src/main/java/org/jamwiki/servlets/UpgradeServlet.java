@@ -16,6 +16,8 @@
  */
 package org.jamwiki.servlets;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.WikiVersion;
@@ -225,6 +228,14 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private boolean upgradeConfigXmlRequired() {
+		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
+		return (oldVersion.before(1, 3, 0));
+	}
+
+	/**
+	 *
+	 */
 	private boolean upgradeDatabase(boolean performUpgrade, List<WikiMessage> messages) throws WikiException {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
@@ -343,6 +354,15 @@ public class UpgradeServlet extends JAMWikiServlet {
 		}
 		if (this.upgradeStyleSheetRequired()) {
 			upgradeDetails.add(new WikiMessage("upgrade.caption.stylesheet"));
+		}
+		if (this.upgradeConfigXmlRequired()) {
+			File file = null;
+			try {
+				file = WikiConfiguration.getInstance().retrieveConfigFile();
+				upgradeDetails.add(new WikiMessage("upgrade.caption.config", file.getAbsolutePath()));
+			} catch (IOException e) {
+				logger.warn("Unable to retrieve configuration file location", e);
+			}
 		}
 		upgradeDetails.add(new WikiMessage("upgrade.caption.releasenotes"));
 		upgradeDetails.add(new WikiMessage("upgrade.caption.manual"));

@@ -24,7 +24,7 @@ import org.jamwiki.parser.ParserException;
  * interface is still under development, so anyone interested in building
  * their own custom tags should be aware that this is NOT a stable API.
  *
- * See the <code>/WEB-INF/classes/jamwiki-configuration.xml</code> for
+ * See the <code>/WEB-INF/classes/jamwiki-configuration-1.3.xml</code> for
  * configuration - any custom parser tag must currently be identified in
  * that file in order for it to be used by the parser.
  */

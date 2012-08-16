@@ -53,7 +53,7 @@ public class WikiConfiguration {
 	private Map<String, String> translations = null;
 
 	/** Name of the configuration file. */
-	private static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration.xml";
+	private static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration-1.3.xml";
 	/** XSD for the configuration file. */
 	private static final String JAMWIKI_CONFIGURATION_XSD = "jamwiki-configuration-1.3.xsd";
 	private static final String XML_CONFIGURATION_ROOT = "configuration";
@@ -98,13 +98,6 @@ public class WikiConfiguration {
 	/**
 	 *
 	 */
-	public List<WikiConfigurationObject> getQueryHandlers() {
-		return this.queryHandlers;
-	}
-
-	/**
-	 *
-	 */
 	public Map<String, String> getEditors() {
 		return this.editors;
 	}
@@ -114,6 +107,13 @@ public class WikiConfiguration {
 	 */
 	public List<WikiConfigurationObject> getParsers() {
 		return this.parsers;
+	}
+
+	/**
+	 *
+	 */
+	public List<WikiConfigurationObject> getQueryHandlers() {
+		return this.queryHandlers;
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class WikiConfiguration {
 		try {
 			// "get resource file" for the XSD to ensure it is copied to the setup directory
 			ResourceUtil.getJAMWikiResourceFile(JAMWIKI_CONFIGURATION_XSD);
-			file = ResourceUtil.getJAMWikiResourceFile(JAMWIKI_CONFIGURATION_FILE);
+			file = this.retrieveConfigFile();
 			document = XMLUtil.parseXML(file, false);
 		} catch (ParseException e) {
 			// this should never happen unless someone mangles the config file
@@ -305,5 +305,13 @@ public class WikiConfiguration {
 	 */
 	public static void reset() {
 		WikiConfiguration.instance = null;
+	}
+
+	/**
+	 * Returns the XML config file from the system setup folder containing wiki
+	 * configuration data.
+	 */
+	public File retrieveConfigFile() throws IOException {
+		return ResourceUtil.getJAMWikiResourceFile(JAMWIKI_CONFIGURATION_FILE);
 	}
 }
