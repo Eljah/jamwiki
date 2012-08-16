@@ -142,7 +142,8 @@ public class ParserUtil {
 	 * @throws ParserException Thrown if a parser error occurs.
 	 */
 	public static String[] parseSlice(String context, Locale locale, String virtualWiki, String topicName, int section) throws ParserException {
-		return ParserUtil.executeSliceOrSplice(ParserOutput.IMMUTABLE_PARSER_OUTPUT, context, locale, virtualWiki, topicName, section, null, true);
+		ParserOutput parserOutput = new ParserOutput();
+		return ParserUtil.executeSliceOrSplice(parserOutput, context, locale, virtualWiki, topicName, section, null, true);
 	}
 
 	/**
