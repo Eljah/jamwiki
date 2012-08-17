@@ -21,12 +21,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.DataAccessException;
-import org.jamwiki.Environment;
-import org.jamwiki.WikiBase;
-import org.jamwiki.utils.WikiLogger;
-
 /**
  * Provides an object representing Wiki-specific information about a user of
  * the Wiki.

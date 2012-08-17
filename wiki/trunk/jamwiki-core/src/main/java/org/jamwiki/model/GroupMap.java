@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.lang.StringBuffer;
 
 /**
  * This class is a container for managing groups and their members. It can be

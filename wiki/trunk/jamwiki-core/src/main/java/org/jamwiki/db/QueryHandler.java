@@ -18,11 +18,8 @@ package org.jamwiki.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.jamwiki.DataAccessException;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
@@ -483,7 +480,7 @@ public interface QueryHandler {
 	List<RecentChange> getUserContributionsByUserDisplay(String virtualWiki, String userDisplay, Pagination pagination, boolean descending) throws SQLException;
 
 	/**
-	 * Return a hashmap of key/value pairs containing the definde user preferences
+	 * Return a map of key/value pairs containing the definde user preferences
 	 * defaults.
 	 * @return
 	 */

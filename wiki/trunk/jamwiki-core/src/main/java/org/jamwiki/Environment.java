@@ -33,7 +33,6 @@ import org.jamwiki.db.QueryHandler;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.WikiLogger;
-import org.jamwiki.utils.WikiUtil;
 
 /**
  * The <code>Environment</code> class is instantiated as a singleton to
