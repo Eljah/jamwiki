@@ -553,32 +553,6 @@ public class AnsiDataHandler {
 	}
 
 	/**
-	 * This method should be called only during upgrades and provides the capability
-	 * to execute a SQL query from a QueryHandler-specific property file.
-	 *
-	 * @param prop The name of the SQL property file value to execute.
-	 * @param conn The SQL connection to use when executing the SQL.
-	 * @throws SQLException Thrown if any error occurs during execution.
-	 */
-	public void executeUpgradeQuery(String prop, Connection conn) throws SQLException {
-		this.queryHandler().executeUpgradeQuery(prop, conn);
-	}
-
-	/**
-	 * This method should be called only during upgrades and provides the capability
-	 * to execute update SQL from a QueryHandler-specific property file.
-	 *
-	 * @param prop The name of the SQL property file value to execute.
-	 * @param conn The SQL connection to use when executing the SQL.
-	 * @throws SQLException Thrown if any error occurs during execution.
-	 *
-	 * @return true if action actually performed and false otherwise.
-	 */
-	public boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
-		return this.queryHandler().executeUpgradeUpdate(prop, conn);
-	}
-
-	/**
 	 * Determine the largest namespace ID for all current defined namespaces.
 	 */
 	private int findMaxNamespaceId() throws DataAccessException {

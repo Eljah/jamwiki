@@ -32,9 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
-import org.jamwiki.WikiBase;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
@@ -56,7 +54,6 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserDetails;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
-import org.springframework.transaction.TransactionStatus;
 
 /**
  * Default implementation of the QueryHandler implementation for retrieving, inserting,
@@ -619,7 +616,12 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
+	 * This method should be called only during upgrades and provides the capability
+	 * to execute a SQL query from a QueryHandler-specific property file.
 	 *
+	 * @param prop The name of the SQL property file value to execute.
+	 * @param conn The SQL connection to use when executing the SQL.
+	 * @throws SQLException Thrown if any error occurs during execution.
 	 */
 	public void executeUpgradeQuery(String prop, Connection conn) throws SQLException {
 		String sql = this.props.getProperty(prop);
@@ -636,7 +638,14 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
+	 * This method should be called only during upgrades and provides the capability
+	 * to execute update SQL from a QueryHandler-specific property file.
 	 *
+	 * @param prop The name of the SQL property file value to execute.
+	 * @param conn The SQL connection to use when executing the SQL.
+	 * @throws SQLException Thrown if any error occurs during execution.
+	 *
+	 * @return true if action actually performed and false otherwise.
 	 */
 	public boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
 		String sql = this.props.getProperty(prop);
