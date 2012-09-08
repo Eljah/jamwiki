@@ -7,7 +7,8 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Error after clicking on the "Links" tab using DB2.  Reported with a fix by
+    Dennis N Brown.
 
 Translation Updates:
 
