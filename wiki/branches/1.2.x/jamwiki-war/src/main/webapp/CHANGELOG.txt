@@ -11,7 +11,8 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated German translations (axelclk).
+  * Updated Russian translations (shar).
 
 
 1.2.2
