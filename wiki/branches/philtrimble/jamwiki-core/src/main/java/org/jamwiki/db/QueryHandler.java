@@ -47,6 +47,27 @@ import org.jamwiki.utils.Pagination;
  */
 public interface QueryHandler {
 
+	/** Ansi query handler class */
+	public static final String QUERY_HANDLER_ANSI = "org.jamwiki.db.AnsiQueryHandler";
+	/** DB2 query handler class */
+	public static final String QUERY_HANDLER_DB2 = "org.jamwiki.db.DB2QueryHandler";
+	/** DB2/400 query handler class */
+	public static final String QUERY_HANDLER_DB2400 = "org.jamwiki.db.DB2400QueryHandler";
+	/** HSql query handler class */
+	public static final String QUERY_HANDLER_HSQL = "org.jamwiki.db.HSqlQueryHandler";
+	/** MSSql query handler class */
+	public static final String QUERY_HANDLER_MSSQL = "org.jamwiki.db.MSSqlQueryHandler";
+	/** MySql query handler class */
+	public static final String QUERY_HANDLER_MYSQL = "org.jamwiki.db.MySqlQueryHandler";
+	/** Oracle query handler class */
+	public static final String QUERY_HANDLER_ORACLE = "org.jamwiki.db.OracleQueryHandler";
+	/** Postgres query handler class */
+	public static final String QUERY_HANDLER_POSTGRES = "org.jamwiki.db.PostgresQueryHandler";
+	/** Sybase ASA query handler class */
+	public static final String QUERY_HANDLER_SYBASE = "org.jamwiki.db.SybaseASAQueryHandler";
+	/** Intersystems Cache query handler class */
+	public static final String QUERY_HANDLER_CACHE = "org.jamwiki.db.CacheQueryHandler";
+
 	/**
 	 * Retrieve a result set containing all user information for a given WikiUser.
 	 *
@@ -459,6 +480,13 @@ public interface QueryHandler {
 	List<RecentChange> getUserContributionsByUserDisplay(String virtualWiki, String userDisplay, Pagination pagination, boolean descending) throws SQLException;
 
 	/**
+	 * Return a map of key/value pairs containing the definde user preferences
+	 * defaults.
+	 * @return
+	 */
+	Map<String, Map<String, String>> getUserPreferencesDefaults() throws SQLException;
+	
+	/**
 	 * Retrieve a list of all virtual wiki information for all virtual wikis.
 	 *
 	 * @param conn A database connection to use when connecting to the database
@@ -723,6 +751,15 @@ public interface QueryHandler {
 	 * @throws SQLException Thrown if any error occurs during method execution.
 	 */
 	void insertWikiUser(WikiUser user, Connection conn) throws SQLException;
+	
+	/**
+	 * Add a new key/value preference in the database.
+	 * 
+	 * @param userPreferenceKey The key (or name) of the preference
+	 * @param userPreferenceDefaultValue The default value for this preference
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	void insertUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr, Connection conn) throws SQLException;
 
 	/**
 	 * Retrieve a list of all topics in a category.
@@ -1016,6 +1053,15 @@ public interface QueryHandler {
 	List<String> lookupWikiUsers(Pagination pagination) throws SQLException;
 
 	/**
+	 * Test if a user preference exists.
+	 * @param userPreferenceKey The user preference to check 
+	 * @return true if the user preference exists.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	boolean existsUserPreferenceDefault(String userPreferenceKey) throws SQLException;
+	
+	
+	/**
 	 * Utility method used when importing to updating the previous topic version ID field
 	 * of topic versions, as well as the current version ID field for the topic record.
 	 *
@@ -1193,6 +1239,15 @@ public interface QueryHandler {
 	 */
 	void updateWikiUser(WikiUser user, Connection conn) throws SQLException;
 
+	/**
+	 * Modify the default value of a named use preference.
+	 * 
+	 * @param userPreferenceKey The key (or name) of the preference to modify
+	 * @param userPreferenceDefaultValue The new default value for the preference
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	void updateUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr, Connection conn) throws SQLException;
+	
 	/**
 	 * Add new image or other data to database.
 	 *

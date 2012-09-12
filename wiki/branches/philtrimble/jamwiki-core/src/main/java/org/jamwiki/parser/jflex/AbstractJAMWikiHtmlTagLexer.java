@@ -16,7 +16,9 @@
  */
 package org.jamwiki.parser.jflex;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -35,7 +37,19 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	/** The type of HTML tag being parsed, for example "b", "br", "p", etc. */
 	protected String tagType;
 	/** A map of parsed tag attributes. */
-	protected LinkedHashMap<String, String> attributes;
+	protected Map<String, String> attributes = Collections.emptyMap();
+
+	/**
+	 *
+	 */
+	protected void addAttribute(String key, String value) {
+		if (this.attributes.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.attributes = new LinkedHashMap<String, String>();
+		}
+		this.attributes.put(key, value);
+	}
 
 	/**
 	 *
@@ -47,10 +61,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	/**
 	 *
 	 */
-	protected LinkedHashMap<String, String> getAttributes() {
-		if (this.attributes == null) {
-			this.attributes = new LinkedHashMap<String, String>();
-		}
+	protected Map<String, String> getAttributes() {
 		return this.attributes;
 	}
 
@@ -67,7 +78,7 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	 *
 	 */
 	protected void initialize(HtmlTagItem.Pattern tagPattern) {
-		this.attributes = null;
+		this.attributes = Collections.emptyMap();
 		this.currentAttributeKey = null;
 		this.tagPattern = tagPattern;
 		this.html = yytext();
@@ -79,6 +90,21 @@ public abstract class AbstractJAMWikiHtmlTagLexer extends JFlexLexer {
 	 */
 	protected void initializeCurrentAttribute(String key) {
 		this.currentAttributeKey = key.toLowerCase();
-		this.getAttributes().put(this.currentAttributeKey, null);
+		if (this.attributes.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.attributes = new LinkedHashMap<String, String>();
+		}
+		this.attributes.put(this.currentAttributeKey, null);
+	}
+
+	/**
+	 *
+	 */
+	protected void removeAttribute(String key) {
+		if (this.attributes.isEmpty()) {
+			return;
+		}
+		this.attributes.remove(key);
 	}
 }

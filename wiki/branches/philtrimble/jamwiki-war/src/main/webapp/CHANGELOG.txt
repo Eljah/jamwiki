@@ -3,12 +3,40 @@
 
 New Features:
 
+  * Re-engineering of user preference data handling (cclavadetscher).
+  * Add user preferences Timezone and Datetime format (cclavadetscher).
+  * Preview of current Signature (wrh2).
+  * Add the ability to create wiki groups (cclavadetscher).
   * Add the ability to assign users to wiki groups (cclavadetscher).
+  * Display user roles inherited from group membership (cclavadetscher).
   * Allow default role names to be configured via property file to better
     support LDAP (PhilTrimble).
-  * Upgrade to Spring Framework 3.1.1.RELEASE.
-  * Upgrade to Lucene Search 3.6.
+  * Display thumbnails of image versions on image topic pages, similar to the
+    Mediawiki GUI.
+  * Update Mediawiki XML exports to use the 0.7 XSD (previously 0.3).
+  * Change the default image namespace from "Image" to "File" for new installs.
+  * Upgrade to Spring Framework 3.1.2.RELEASE.
+  * Upgrade to Spring Security 3.1.2.RELEASE.
+  * Upgrade to Lucene Search 3.6.1.
   * Upgrade to commons-io-2.2.
+  * Upgrade to exp4j 0.3.3.
+
+Bugfixes:
+
+  * Update of last login date and time after login (wrh2, cclavadetscher).
+  * Ensure that the cache is flushed after upgrades (cclavadetscher).
+
+Translation Updates:
+
+  * Updated Japanese translations (nattolover).
+
+
+1.2.3
+=====
+
+New Features:
+
+  * None.
 
 Bugfixes:
 
@@ -17,6 +45,23 @@ Bugfixes:
 Translation Updates:
 
   * None.
+
+
+1.2.2
+=====
+
+New Features:
+
+  * Support comparison operations in the #expr tag ("{{#expr: -1 < 0}}").
+  * Upgrade to exp4j 0.3.2.
+
+Bugfixes:
+
+  * Fix potential database connection leak during topic lookup.
+
+Translation Updates:
+
+  * Updated German translations (axelclk).
 
 
 1.2.1
@@ -28,6 +73,13 @@ New Features:
 
 Bugfixes:
 
+  * Fix a Javascript error on the search page with IE.  Reported by shar.
+  * Problem with history when using DB2 database.  Reported with a fix by
+    Dennis N Brown.
+
+Translation Updates:
+
+  * Updated Italian translations (cclavadetscher).
   * Fix a Javascript error on the search page with IE.  Reported by shar.
   * Problem with history when using DB2 database.  Reported with a fix by
     Dennis N Brown.

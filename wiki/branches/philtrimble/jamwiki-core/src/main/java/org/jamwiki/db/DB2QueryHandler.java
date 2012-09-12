@@ -38,7 +38,7 @@ public class DB2QueryHandler extends AnsiQueryHandler {
 	/**
 	 *
 	 */
-	protected DB2QueryHandler() {
+	public DB2QueryHandler() {
 		Properties defaults = Environment.loadProperties(AnsiQueryHandler.SQL_PROPERTY_FILE_NAME);
 		Properties props = Environment.loadProperties(SQL_PROPERTY_FILE_NAME, defaults);
 		super.init(props);

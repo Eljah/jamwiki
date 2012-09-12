@@ -17,7 +17,6 @@
 package org.jamwiki.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +63,8 @@ public class Namespace implements Serializable {
 	private static final Namespace USER_COMMENTS        = new Namespace(USER_COMMENTS_ID, "User comments", USER_ID);
 	private static final Namespace SITE_CUSTOM          = new Namespace(SITE_CUSTOM_ID, "Project");
 	private static final Namespace SITE_CUSTOM_COMMENTS = new Namespace(SITE_CUSTOM_COMMENTS_ID, "Project comments", SITE_CUSTOM_ID);
-	private static final Namespace FILE                 = new Namespace(FILE_ID, "Image");
-	private static final Namespace FILE_COMMENTS        = new Namespace(FILE_COMMENTS_ID, "Image comments", FILE_ID);
+	private static final Namespace FILE                 = new Namespace(FILE_ID, "File");
+	private static final Namespace FILE_COMMENTS        = new Namespace(FILE_COMMENTS_ID, "File comments", FILE_ID);
 	private static final Namespace JAMWIKI              = new Namespace(JAMWIKI_ID, "JAMWiki");
 	private static final Namespace JAMWIKI_COMMENTS     = new Namespace(JAMWIKI_COMMENTS_ID, "JAMWiki comments", JAMWIKI_ID);
 	private static final Namespace TEMPLATE             = new Namespace(TEMPLATE_ID, "Template");

@@ -60,13 +60,11 @@ import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.parser.WikiLink;
-import org.jamwiki.parser.image.ImageUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SpamFilter;
 import org.jamwiki.utils.Utilities;
-import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.security.core.Authentication;
@@ -899,13 +897,6 @@ public class ServletUtil {
 		}
 		WikiUser wikiUser;
 		for (WikiFileVersion fileVersion : fileVersions) {
-			String relativeFileUrl = fileVersion.getUrl();
-			if (!ImageUtil.isImagesOnFS()) {
-				relativeFileUrl = ImageUtil.buildDatabaseRelativeUrl(wikiFile.getFileId(), fileVersion.getFileVersionId(), null, fileVersion.getUrl());
-			}
-			// update version urls to include web root path
-			String url = ImageUtil.buildImageUrl(request.getContextPath(), relativeFileUrl, false);
-			fileVersion.setUrl(url);
 			// make sure the authorDisplay field is equal to the login for non-anonymous uploads
 			if (fileVersion.getAuthorId() != null) {
 				try {

@@ -493,8 +493,8 @@ public class AdminServlet extends JAMWikiServlet {
 		pageInfo.setPageTitle(new WikiMessage("admin.title"));
 		Map<String, String> editors = WikiConfiguration.getInstance().getEditors();
 		next.addObject("editors", editors);
-		List<WikiConfigurationObject> dataHandlers = WikiConfiguration.getInstance().getDataHandlers();
-		next.addObject("dataHandlers", dataHandlers);
+		List<WikiConfigurationObject> queryHandlers = WikiConfiguration.getInstance().getQueryHandlers();
+		next.addObject("queryHandlers", queryHandlers);
 		List<WikiConfigurationObject> searchEngines = WikiConfiguration.getInstance().getSearchEngines();
 		next.addObject("searchEngines", searchEngines);
 		List<WikiConfigurationObject> parsers = WikiConfiguration.getInstance().getParsers();
@@ -534,7 +534,7 @@ public class AdminServlet extends JAMWikiServlet {
 		pageInfo.setPageTitle(new WikiMessage("admin.maintenance.title"));
 		boolean allowExport = Environment.getValue(Environment.PROP_BASE_PERSISTENCE_TYPE).equals(WikiBase.PERSISTENCE_INTERNAL);
 		next.addObject("allowExport", allowExport);
-		List<WikiConfigurationObject> dataHandlers = WikiConfiguration.getInstance().getDataHandlers();
-		next.addObject("dataHandlers", dataHandlers);
+		List<WikiConfigurationObject> queryHandlers = WikiConfiguration.getInstance().getQueryHandlers();
+		next.addObject("queryHandlers", queryHandlers);
 	}
 }

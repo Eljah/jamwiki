@@ -303,6 +303,8 @@ public class MediaWikiXmlImporter extends DefaultHandler implements TopicImporte
 			previousTopicContentLength = StringUtils.length(topicContent);
 		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_VERSION_COMMENT.equals(qName)) {
 			this.currentTopicVersion.setEditComment(currentElementBuffer.toString().trim());
+		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_VERSION_MINOR_EDIT.equals(qName)) {
+			this.currentTopicVersion.setEditType(TopicVersion.EDIT_MINOR);
 		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_VERSION_EDIT_DATE.equals(qName)) {
 			this.currentTopicVersion.setEditDate(this.parseMediaWikiTimestamp(currentElementBuffer.toString().trim()));
 		} else if (MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_VERSION_IP.equals(qName) || MediaWikiConstants.MEDIAWIKI_ELEMENT_TOPIC_VERSION_USERNAME.equals(qName)) {

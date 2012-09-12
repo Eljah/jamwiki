@@ -231,13 +231,16 @@ public abstract class ImageUtil {
 	 *  HTML escaped.  This value should be <code>true</code> in any case
 	 *  where the caption is not guaranteed to be free from potentially
 	 *  malicious HTML code.
+	 * @param fileVersion If building image HTML for anything other than the
+	 *  current file version then the version object must be provided, otherwise
+	 *  this parameter should be <code>null</code>.
 	 * @return The full HTML required to display an image enclosed within an
 	 *  HTML anchor tag that links to the image topic page.
 	 * @throws DataAccessException Thrown if any error occurs while retrieving image
 	 *  information.
 	 * @throws IOException Thrown if any error occurs while reading image information.
 	 */
-	public static String buildImageLinkHtml(String context, String linkVirtualWiki, String topicName, ImageMetadata imageMetadata, String style, boolean escapeHtml) throws DataAccessException, IOException {
+	public static String buildImageLinkHtml(String context, String linkVirtualWiki, String topicName, ImageMetadata imageMetadata, String style, boolean escapeHtml, WikiFileVersion fileVersion) throws DataAccessException, IOException {
 		String url = ImageUtil.buildImageFileUrl(context, linkVirtualWiki, topicName, false);
 		if (url == null) {
 			return ImageUtil.buildUploadLink(context, linkVirtualWiki, topicName);
@@ -251,7 +254,7 @@ public abstract class ImageUtil {
 		WikiFile wikiFile = WikiBase.getDataHandler().lookupWikiFile(topic.getVirtualWiki(), topic.getName());
 		WikiImage wikiImage = null;
 		try {
-			wikiImage = ImageUtil.initializeWikiImage(wikiFile, imageMetadata);
+			wikiImage = ImageUtil.initializeWikiImage(wikiFile, imageMetadata, fileVersion);
 		} catch (FileNotFoundException e) {
 			// do not log the full exception as the logs can fill up very for this sort of error, and it is generally due to a bad configuration.  instead log a warning message so that the administrator can try to fix the problem
 			logger.warn("File not found while parsing image link for topic: " + topic.getVirtualWiki() + " / " + topicName + ".  Make sure that the following file exists and is readable by the JAMWiki installation: " + e.getMessage());
@@ -578,15 +581,22 @@ public abstract class ImageUtil {
 	 * @param imageMetadata The maximum width or height for the initialized
 	 *  WikiImage object.  Setting this value to 0 or less will cause the
 	 *  value to be ignored.
+	 * @param fileVersion The specific file version.  If this parameter is
+	 *  <code>null</code> then the current version is used.
 	 * @return An initialized WikiImage object.
 	 * @throws IOException Thrown if an error occurs while initializing the
 	 *  WikiImage object.
 	 */
-	private static WikiImage initializeWikiImage(WikiFile wikiFile, ImageMetadata imageMetadata) throws DataAccessException, IOException {
+	private static WikiImage initializeWikiImage(WikiFile wikiFile, ImageMetadata imageMetadata, WikiFileVersion fileVersion) throws DataAccessException, IOException {
 		if (wikiFile == null) {
 			throw new IllegalArgumentException("wikiFile may not be null");
 		}
 		WikiImage wikiImage = new WikiImage(wikiFile);
+		if (fileVersion != null) {
+			wikiImage.setFileSize(fileVersion.getFileSize());
+			wikiImage.setMimeType(fileVersion.getMimeType());
+			wikiImage.setUrl(fileVersion.getUrl());
+		}
 		// get the size of the original (unresized) image
 		Dimension originalDimensions = ImageUtil.retrieveFromCache(wikiImage);
 		if (originalDimensions == null) {

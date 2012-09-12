@@ -16,6 +16,8 @@
  */
 package org.jamwiki.servlets;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.WikiVersion;
@@ -36,6 +39,7 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.WikiLink;
+import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
@@ -224,6 +228,14 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private boolean upgradeConfigXmlRequired() {
+		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
+		return (oldVersion.before(1, 3, 0));
+	}
+
+	/**
+	 *
+	 */
 	private boolean upgradeDatabase(boolean performUpgrade, List<WikiMessage> messages) throws WikiException {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
@@ -243,6 +255,15 @@ public class UpgradeServlet extends JAMWikiServlet {
 				DatabaseUpgrades.upgrade120(messages);
 			}
 		}
+		if (oldVersion.before(1, 3, 0)) {
+			upgradeRequired = true;
+			if (performUpgrade) {
+				DatabaseUpgrades.upgrade130(messages);
+			}
+		}
+		// Flush connection pool to manage database schema change
+		WikiDatabase.initialize();
+		WikiCache.initialize();
 		return upgradeRequired;
 	}
 
@@ -306,7 +327,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 	 */
 	private boolean upgradeStyleSheetRequired() {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		return (oldVersion.before(1, 2, 0));
+		return (oldVersion.before(1, 3, 0));
 	}
 
 	/**
@@ -333,6 +354,15 @@ public class UpgradeServlet extends JAMWikiServlet {
 		}
 		if (this.upgradeStyleSheetRequired()) {
 			upgradeDetails.add(new WikiMessage("upgrade.caption.stylesheet"));
+		}
+		if (this.upgradeConfigXmlRequired()) {
+			File file = null;
+			try {
+				file = WikiConfiguration.getInstance().retrieveConfigFile();
+				upgradeDetails.add(new WikiMessage("upgrade.caption.config", file.getAbsolutePath()));
+			} catch (IOException e) {
+				logger.warn("Unable to retrieve configuration file location", e);
+			}
 		}
 		upgradeDetails.add(new WikiMessage("upgrade.caption.releasenotes"));
 		upgradeDetails.add(new WikiMessage("upgrade.caption.manual"));

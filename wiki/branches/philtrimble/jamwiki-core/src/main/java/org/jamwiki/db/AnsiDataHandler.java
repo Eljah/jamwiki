@@ -29,7 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
@@ -60,16 +59,16 @@ import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
+import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.transaction.TransactionStatus;
 
 /**
- * Default implementation of the {@link org.jamwiki.DataHandler} interface for
- * ANSI SQL compatible databases.
+ * Default handler for ANSI SQL compatible databases.
  */
-public class AnsiDataHandler implements DataHandler {
+public class AnsiDataHandler {
 
 	/** Any topic lookup that takes longer than the specified time (in ms) will trigger a log message. */
 	private static final int TIME_LIMIT_TOPIC_LOOKUP = 20;
@@ -92,13 +91,29 @@ public class AnsiDataHandler implements DataHandler {
 	private static final WikiCache<String, List<VirtualWiki>> CACHE_VIRTUAL_WIKI_LIST = new WikiCache<String, List<VirtualWiki>>("org.jamwiki.db.AnsiDataHandler.CACHE_VIRTUAL_WIKI_LIST");
 	private static final WikiLogger logger = WikiLogger.getLogger(AnsiDataHandler.class.getName());
 
-	protected QueryHandler queryHandler;
+	// TODO - remove when the ability to upgrade to 1.3 is deprecated
+	private static final Map<String, String> LEGACY_DATA_HANDLER_MAP = new HashMap<String, String>();
+	static {
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.AnsiDataHandler", QueryHandler.QUERY_HANDLER_ANSI);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.DB2DataHandler", QueryHandler.QUERY_HANDLER_DB2);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.DB2400DataHandler", QueryHandler.QUERY_HANDLER_DB2400);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.HSqlDataHandler", QueryHandler.QUERY_HANDLER_HSQL);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.MSSqlDataHandler", QueryHandler.QUERY_HANDLER_MSSQL);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.MySqlDataHandler", QueryHandler.QUERY_HANDLER_MYSQL);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.OracleDataHandler", QueryHandler.QUERY_HANDLER_ORACLE);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.PostgresDataHandler", QueryHandler.QUERY_HANDLER_POSTGRES);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.SybaseASADataHandler", QueryHandler.QUERY_HANDLER_SYBASE);
+		LEGACY_DATA_HANDLER_MAP.put("org.jamwiki.db.CacheDataHandler", QueryHandler.QUERY_HANDLER_CACHE);
+	}
+
+	protected final QueryHandler queryHandler;
+	protected AnsiDataValidator dataValidator = new AnsiDataValidator();
 
 	/**
 	 *
 	 */
 	public AnsiDataHandler() {
-		this.queryHandler = new AnsiQueryHandler();
+		this.queryHandler = this.queryHandlerInstance();
 	}
 
 	/**
@@ -108,7 +123,7 @@ public class AnsiDataHandler implements DataHandler {
 		int virtualWikiId = -1;
 		for (Category category : categoryList) {
 			virtualWikiId = this.lookupVirtualWikiId(category.getVirtualWiki());
-			this.validateCategory(category);
+			this.dataValidator.validateCategory(category);
 		}
 		try {
 			this.queryHandler().insertCategories(categoryList, virtualWikiId, topicId, conn);
@@ -133,7 +148,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addLogItem(LogItem logItem, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(logItem.getVirtualWiki());
-		this.validateLogItem(logItem);
+		this.dataValidator.validateLogItem(logItem);
 		try {
 			this.queryHandler().insertLogItem(logItem, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -146,7 +161,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addRecentChange(RecentChange change, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(change.getVirtualWiki());
-		this.validateRecentChange(change);
+		this.dataValidator.validateRecentChange(change);
 		try {
 			this.queryHandler().insertRecentChange(change, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -160,7 +175,7 @@ public class AnsiDataHandler implements DataHandler {
 	private void addTopic(Topic topic, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(topic.getVirtualWiki());
 		try {
-			this.validateTopic(topic);
+			this.dataValidator.validateTopic(topic);
 			this.queryHandler().insertTopic(topic, virtualWikiId, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -199,7 +214,7 @@ public class AnsiDataHandler implements DataHandler {
 		for (TopicVersion topicVersion : topicVersions) {
 			topicVersion.setTopicId(topic.getTopicId());
 			topicVersion.initializeVersionParams(topic);
-			this.validateTopicVersion(topicVersion);
+			this.dataValidator.validateTopicVersion(topicVersion);
 		}
 		try {
 			this.queryHandler().insertTopicVersions(topicVersions, conn);
@@ -213,7 +228,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addUserBlock(UserBlock userBlock, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateUserBlock(userBlock);
+			this.dataValidator.validateUserBlock(userBlock);
 			this.queryHandler().insertUserBlock(userBlock, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -224,7 +239,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void addUserDetails(WikiUserDetails userDetails, Connection conn) throws DataAccessException, WikiException {
-		this.validateUserDetails(userDetails);
+		this.dataValidator.validateUserDetails(userDetails);
 		try {
 			this.queryHandler().insertUserDetails(userDetails, conn);
 		} catch (SQLException e) {
@@ -237,7 +252,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addVirtualWiki(VirtualWiki virtualWiki, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateVirtualWiki(virtualWiki);
+			this.dataValidator.validateVirtualWiki(virtualWiki);
 			this.queryHandler().insertVirtualWiki(virtualWiki, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -248,7 +263,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void addWatchlistEntry(int virtualWikiId, String topicName, int userId, Connection conn) throws DataAccessException, WikiException {
-		this.validateWatchlistEntry(topicName);
+		this.dataValidator.validateWatchlistEntry(topicName);
 		try {
 			this.queryHandler().insertWatchlistEntry(virtualWikiId, topicName, userId, conn);
 		} catch (SQLException e) {
@@ -262,7 +277,7 @@ public class AnsiDataHandler implements DataHandler {
 	private void addWikiFile(WikiFile wikiFile, Connection conn) throws DataAccessException, WikiException {
 		try {
 			int virtualWikiId = this.lookupVirtualWikiId(wikiFile.getVirtualWiki());
-			this.validateWikiFile(wikiFile);
+			this.dataValidator.validateWikiFile(wikiFile);
 			this.queryHandler().insertWikiFile(wikiFile, virtualWikiId, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -274,7 +289,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addWikiFileVersion(WikiFileVersion wikiFileVersion, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateWikiFileVersion(wikiFileVersion);
+			this.dataValidator.validateWikiFileVersion(wikiFileVersion);
 			this.queryHandler().insertWikiFileVersion(wikiFileVersion, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -286,7 +301,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addWikiGroup(WikiGroup group, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateWikiGroup(group);
+			this.dataValidator.validateWikiGroup(group);
 			this.queryHandler().insertWikiGroup(group, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -298,7 +313,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void addWikiUser(WikiUser user, Connection conn) throws DataAccessException, WikiException {
 		try {
-			this.validateWikiUser(user);
+			this.dataValidator.validateWikiUser(user);
 			this.queryHandler().insertWikiUser(user, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
@@ -306,7 +321,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Determine if a value matching the given username and password exists in
+	 * the data store.
 	 *
+	 * @param username The username that is being validated against.
+	 * @param password The password that is being validated against.
+	 * @return <code>true</code> if the username / password combination matches
+	 *  an existing record in the data store, <code>false</code> otherwise.
+	 * @throws DataAccessException Thrown if an error occurs while accessing the data
+	 *  store.
 	 */
 	public boolean authenticate(String username, String password) throws DataAccessException {
 		if (StringUtils.isBlank(password)) {
@@ -396,7 +419,16 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Determine if a topic can be moved to a new location.  If the
+	 * destination is not an existing topic, is a topic that has been deleted,
+	 * or is a topic that redirects to the source topic then this method
+	 * should return <code>true</code>.
 	 *
+	 * @param fromTopic The Topic that is being moved.
+	 * @param destination The new name for the topic.
+	 * @return <code>true</code> if the topic can be moved to the destination,
+	 *  <code>false</code> otherwise.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public boolean canMoveTopic(Topic fromTopic, String destination) throws DataAccessException {
 		Topic toTopic = this.lookupTopic(fromTopic.getVirtualWiki(), destination, false);
@@ -416,16 +448,10 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Delete an interwiki record from the interwiki table.
 	 *
-	 */
-	private static void checkLength(String value, int maxLength) throws WikiException {
-		if (value != null && value.length() > maxLength) {
-			throw new WikiException(new WikiMessage("error.fieldlength", value, Integer.valueOf(maxLength).toString()));
-		}
-	}
-
-	/**
-	 *
+	 * @param interwiki The Interwiki record to be deleted.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public void deleteInterwiki(Interwiki interwiki) throws DataAccessException {
 		Connection conn = null;
@@ -452,7 +478,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Mark a topic deleted by setting its delete date to a non-null value.
+	 * Prior to calling this method the topic content should also be set
+	 * empty.  This method will also delete recent changes for the topic,
+	 * and a new TopicVersion should be supplied reflecting the topic deletion
+	 * event.
 	 *
+	 * @param topic The Topic object that is being deleted.
+	 * @param topicVersion A TopicVersion object that indicates the delete
+	 *  date, author, and other parameters for the topic.  If this value is
+	 *  <code>null</code> then no version is saved, nor is any recent change
+	 *  entry created.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
 	public void deleteTopic(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -515,20 +553,6 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 *
-	 */
-	public void executeUpgradeQuery(String prop, Connection conn) throws SQLException {
-		this.queryHandler().executeUpgradeQuery(prop, conn);
-	}
-
-	/**
-	 *
-	 */
-	public boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
-		return this.queryHandler().executeUpgradeUpdate(prop, conn);
-	}
-
-	/**
 	 * Determine the largest namespace ID for all current defined namespaces.
 	 */
 	private int findMaxNamespaceId() throws DataAccessException {
@@ -540,7 +564,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a List of all Category objects for a given virtual wiki.
 	 *
+	 * @param virtualWiki The virtual wiki for which categories are being
+	 *  retrieved.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @return A List of all Category objects for a given virutal wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Category> getAllCategories(String virtualWiki, Pagination pagination) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -552,7 +583,10 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a List of all Role objects for the wiki.
 	 *
+	 * @return A List of all Role objects for the wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Role> getAllRoles() throws DataAccessException {
 		try {
@@ -563,7 +597,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a List of all custom WikiGroup objects for the wiki, i.e. all groups except the groups
+	 * GROUP_ANONYMOUS and GROUP_REGISTERED_USER. These are managed only internally
+	 * through the application.
 	 *
+	 * @return A List of all custom WikiGroups objects for the wiki
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<WikiGroup> getAllWikiGroups() throws DataAccessException {
 		try {
@@ -574,7 +613,11 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * 
+	 * Retrieve the GroupMap for the group identified by groupId. The GroupMap contains
+	 * a list of all its members (logins)
+	 * @param groupId The group to retrieve
+	 * @return The GroupMap for the group identified by groupId.
+	 * @throws DataAccessException
 	 */
 	public GroupMap getGroupMapGroup(int groupId) throws DataAccessException {
 		try {
@@ -583,9 +626,13 @@ public class AnsiDataHandler implements DataHandler {
 			throw new DataAccessException(e);
 		}
 	}
-	
+
 	/**
-	 * 
+	 * Retrieve the GroupMap for the user identified by login. The GroupMap contains
+	 * a list of all groups that this login belongs to.
+	 * @param login The user, whose groups must be looked up
+	 * @return The GroupMap of the user identified by login
+	 * @throws DataAccessException
 	 */
 	public GroupMap getGroupMapUser(String userLogin) throws DataAccessException {
 		try {
@@ -596,7 +643,16 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a List of all topic names for all topics that exist for
+	 * the virtual wiki.
 	 *
+	 * @param virtualWiki The virtual wiki for which topics are being
+	 *  retrieved.
+	 * @param includeDeleted Set to <code>true</code> if deleted topics
+	 *  should be included in the results.
+	 * @return A List of all topic names for all non-deleted topics that
+	 *  exist for the virtual wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<String> getAllTopicNames(String virtualWiki, boolean includeDeleted) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -612,7 +668,17 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of all TopicVersions for a given topic, sorted
+	 * chronologically.
 	 *
+	 * @param virtualWiki The virtual wiki for the topic being queried.
+	 * @param topicName The name of the topic being queried.
+	 * @param descending Set to <code>true</code> if the results should be
+	 *  sorted with the most recent version first, <code>false</code> if the
+	 *  results should be sorted with the oldest versions first.
+	 * @return A List of all TopicVersion objects for the given topic.
+	 *  If no matching topic exists then an exception is thrown.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<WikiFileVersion> getAllWikiFileVersions(String virtualWiki, String topicName, boolean descending) throws DataAccessException {
 		WikiFile wikiFile = lookupWikiFile(virtualWiki, topicName);
@@ -627,7 +693,35 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a map of key/map(key/value) pairs containing the defined user preferences
+	 * defaults.  The map returned has the following structure:
+	 * pref_group_key -> Map(pref_key -> pref_value)
+	 * the pref_group_key points to a map of pref key/value pairs that belong to it.
+	 */
+	public Map<String, Map<String, String>> getUserPreferencesDefaults() throws DataAccessException {
+		try {
+			return this.queryHandler().getUserPreferencesDefaults();
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
+	/**
+	 * Retrieve a List of all LogItem objects for a given virtual wiki, sorted
+	 * chronologically.
 	 *
+	 * @param virtualWiki The virtual wiki for which log items are being
+	 *  retrieved.
+	 * @param logType Set to <code>-1</code> if all log items should be returned,
+	 *  otherwise set the log type for items to retrieve.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @param descending Set to <code>true</code> if the results should be
+	 *  sorted with the most recent log items first, <code>false</code> if the
+	 *  results should be sorted with the oldest items first.
+	 * @return A List of LogItem objects for a given virtual wiki, sorted
+	 *  chronologically.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<LogItem> getLogItems(String virtualWiki, int logType, Pagination pagination, boolean descending) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -639,7 +733,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of all RecentChange objects for a given virtual
+	 * wiki, sorted chronologically.
 	 *
+	 * @param virtualWiki The virtual wiki for which recent changes are being
+	 *  retrieved.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @param descending Set to <code>true</code> if the results should be
+	 *  sorted with the most recent changes first, <code>false</code> if the
+	 *  results should be sorted with the oldest changes first.
+	 * @return A List of all RecentChange objects for a given virtual
+	 *  wiki, sorted chronologically.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RecentChange> getRecentChanges(String virtualWiki, Pagination pagination, boolean descending) throws DataAccessException {
 		try {
@@ -650,7 +756,17 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of RoleMap objects for all users whose login
+	 * contains the given login fragment.
 	 *
+	 * @param loginFragment A value that must be contained with the user's
+	 *  login.  This method will return partial matches, so "name" will
+	 *  match "name", "firstname" and "namesake".
+	 * @return A list of RoleMap objects containing all roles for all
+	 *  users whose login contains the login fragment.  If no matches are
+	 *  found then this method returns an empty List.  This method will
+	 *  never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RoleMap> getRoleMapByLogin(String loginFragment) throws DataAccessException {
 		try {
@@ -661,14 +777,32 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a list of RoleMap objects for all users and groups who
+	 * have been assigned the specified role.
 	 *
+	 * @param roleName The name of the role being queried against.
+	 * @return A list of RoleMap objects containing all roles for all
+	 *  users and groups who have been assigned the specified role.  If no
+	 *  matches are found then this method returns an empty List.  This
+	 *  method will never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RoleMap> getRoleMapByRole(String authority) throws DataAccessException {
 		return getRoleMapByRole(authority,false);
 	}
-	
+
 	/**
+	 * Retrieve a list of RoleMap objects for all users and groups who
+	 * have been assigned the specified role.
 	 *
+	 * @param roleName The name of the role being queried against.
+	 * @param includeInheritedRoles Set to false return only roles that are assigned
+	 *  directly 
+	 * @return A list of RoleMap objects containing all roles for all
+	 *  users and groups who have been assigned the specified role.  If no
+	 *  matches are found then this method returns an empty List.  This
+	 *  method will never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws DataAccessException {
 		// first check the cache
@@ -687,7 +821,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve all roles assigned to a given group.
 	 *
+	 * @param groupName The name of the group for whom roles are being retrieved.
+	 * @return An array of Role objects for the given group, or an empty
+	 *  array if no roles are assigned to the group.  This method will
+	 *  never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Role> getRoleMapGroup(String groupName) throws DataAccessException {
 		try {
@@ -698,7 +838,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a list of RoleMap objects for all groups.
 	 *
+	 * @return A list of RoleMap objects containing all roles for all
+	 *  groups.  If no matches are found then this method returns an empty
+	 *  List.  This method will never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RoleMap> getRoleMapGroups() throws DataAccessException {
 		try {
@@ -709,7 +854,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve all roles assigned to a given user.
 	 *
+	 * @param login The login of the user for whom roles are being retrieved.
+	 * @return A list of Role objects for the given user, or an empty
+	 *  array if no roles are assigned to the user.  This method will
+	 *  never return <code>null</code>.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Role> getRoleMapUser(String login) throws DataAccessException {
 		try {
@@ -720,7 +871,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of RecentChange objects representing a topic's history,
+	 * sorted chronologically.
 	 *
+	 * @param topic The topic whose history is being retrieved.  Note that revisions
+	 *  will be returned even if the topic is currently deleted.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @param descending Set to <code>true</code> if the results should be
+	 *  sorted with the most recent changes first, <code>false</code> if the
+	 *  results should be sorted with the oldest changes first.
+	 * @return A List of all RecentChange objects representing a topic's history,
+	 *  sorted chronologically.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RecentChange> getTopicHistory(Topic topic, Pagination pagination, boolean descending) throws DataAccessException {
 		if (topic == null) {
@@ -734,7 +897,16 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of topic names for all admin-only topics, sorted
+	 * alphabetically.
 	 *
+	 * @param virtualWiki The virtual wiki for which admin-only topics are
+	 *  being retrieved.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @return A List of topic names for all admin-only topics, sorted
+	 *  alphabetically.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<String> getTopicsAdmin(String virtualWiki, Pagination pagination) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -746,7 +918,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a map of all active user blocks, where the key is the ip or user id
+	 * of the blocked user and the value is the UserBlock object.
 	 *
+	 * @return A map of all active user blocks, where the key is the ip or user id
+	 * of the blocked user and the value is the UserBlock object.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Map<Object, UserBlock> getUserBlocks() throws DataAccessException {
 		// for performance reasons cache all active blocks.  in general there
@@ -775,7 +952,22 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of RecentChange objects corresponding to all
+	 * changes made by a particular user.
 	 *
+	 * @param virtualWiki The virtual wiki for which changes are being
+	 *  retrieved.
+	 * @param userString Either a user display, which is typically an IP
+	 *  address (for anonymous users) or the user login corresponding to
+	 *  the user for whom contributions are being retrieved.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @param descending Set to <code>true</code> if the results should be
+	 *  sorted with the most recent changes first, <code>false</code> if the
+	 *  results should be sorted with the oldest changes first.
+	 * @return A List of RecentChange objects corresponding to all
+	 *  changes made by a particular user.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RecentChange> getUserContributions(String virtualWiki, String userString, Pagination pagination, boolean descending) throws DataAccessException {
 		try {
@@ -790,7 +982,11 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * Return a List of all VirtualWiki objects that exist for the Wiki.
+	 * Return a List of all VirtualWiki objects that exist for the wiki.
+	 *
+	 * @return A List of all VirtualWiki objects that exist for the
+	 *  wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<VirtualWiki> getVirtualWikiList() throws DataAccessException {
 		List<VirtualWiki> virtualWikis = CACHE_VIRTUAL_WIKI_LIST.retrieveFromCache(CACHE_VIRTUAL_WIKI_LIST.getCacheName());
@@ -812,9 +1008,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * Retrieve a watchlist containing a List of topic ids and topic
-	 * names that can be used to determine if a topic is in a user's current
-	 * watchlist.
+	 * Retrieve a user's watchlist.
+	 *
+	 * @param virtualWiki The virtual wiki for which a watchlist is being
+	 *  retrieved.
+	 * @param userId The ID of the user whose watchlist is being retrieved.
+	 * @return The Watchlist object for the user.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Watchlist getWatchlist(String virtualWiki, int userId) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -827,8 +1027,18 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * Retrieve a watchlist containing a List of RecentChanges objects
-	 * that can be used for display on the Special:Watchlist page.
+	 * Retrieve a List of RecentChange objects corresponding to a user's
+	 * watchlist.  This method is primarily used to display a user's watchlist
+	 * on the Special:Watchlist page.
+	 *
+	 * @param virtualWiki The virtual wiki for which a watchlist is being
+	 *  retrieved.
+	 * @param userId The ID of the user whose watchlist is being retrieved.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @return A List of RecentChange objects corresponding to a user's
+	 *  watchlist.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<RecentChange> getWatchlist(String virtualWiki, int userId, Pagination pagination) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -840,7 +1050,16 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a List of Category objects corresponding to all topics
+	 * that belong to the category, sorted by either the topic name, or
+	 * category sort key (if specified).
 	 *
+	 * @param virtualWiki The virtual wiki for the category being queried.
+	 * @param categoryName The name of the category being queried.
+	 * @return A List of all Category objects corresponding to all
+	 *  topics that belong to the category, sorted by either the topic name,
+	 *  or category sort key (if specified).
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Category> lookupCategoryTopics(String virtualWiki, String categoryName) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -852,7 +1071,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a map of key-value pairs corresponding to all configuration values
+	 * currently set up for the system.
 	 *
+	 * @return A map of key-value pairs corresponding to all configuration values
+	 * currently set up for the system.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Map<String, String> lookupConfiguration() throws DataAccessException {
 		try {
@@ -863,7 +1087,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Given an interwiki prefix, return the Interwiki that corresponds to that prefix,
+	 * or <code>null</code> if no match exists.
 	 *
+	 * @param interwikiPrefix The value to query to see if a matching interwiki record
+	 *  exists.
+	 * @return The matching Interwiki object, or <code>null</code> if no match is found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Interwiki lookupInterwiki(String interwikiPrefix) throws DataAccessException {
 		if (interwikiPrefix == null) {
@@ -880,7 +1110,10 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return all interwiki records currently available for the wiki.
 	 *
+	 * @return A list of all Interwiki records currently available for the wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Interwiki> lookupInterwikis() throws DataAccessException {
 		// first check the cache
@@ -903,7 +1136,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Given a namespace string, return the namespace that corresponds to that string,
+	 * or <code>null</code> if no match exists.
 	 *
+	 * @param virtualWiki The virtual wiki for the namespace being queried.
+	 * @param namespaceString The value to query to see if a matching namespace exists.
+	 * @return The matching Namespace object, or <code>null</code> if no match is found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Namespace lookupNamespace(String virtualWiki, String namespaceString) throws DataAccessException {
 		if (namespaceString == null) {
@@ -920,7 +1159,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Given a namespace ID return the corresponding namespace, or <code>null</code>
+	 * if no match exists.
 	 *
+	 * @param namespaceId The ID for the namespace being retrieved.
+	 * @return The matching Namespace object, or <code>null</code> if no match is found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Namespace lookupNamespaceById(int namespaceId) throws DataAccessException {
 		for (Namespace namespace : this.lookupNamespaces()) {
@@ -934,7 +1178,10 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return all namespaces currently available for the wiki.
 	 *
+	 * @return A list of all Namespace objects currently available for the wiki.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<Namespace> lookupNamespaces() throws DataAccessException {
 		// first check the cache
@@ -957,14 +1204,39 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a Topic object that matches the given virtual wiki and topic
+	 * name.  Note that when a shared image repository is in use this method
+	 * should first try to retrieve images from the specified virtual wiki,
+	 * but if that search fails then a second search should be performed
+	 * against the shared repository.
 	 *
+	 * @param virtualWiki The virtual wiki for the topic being queried.
+	 * @param topicName The name of the topic being queried.
+	 * @param deleteOK Set to <code>true</code> if deleted topics can be
+	 *  retrieved, <code>false</code> otherwise.
+	 * @return A Topic object that matches the given virtual wiki and topic
+	 *  name, or <code>null</code> if no matching topic exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Topic lookupTopic(String virtualWiki, String topicName, boolean deleteOK) throws DataAccessException {
 		return this.lookupTopic(virtualWiki, topicName, deleteOK, null);
 	}
 
 	/**
+	 * Retrieve a Topic object that matches the given virtual wiki, namespace
+	 * and page name.  Note that when a shared image repository is in use this
+	 * method should first try to retrieve images from the specified virtual
+	 * wiki, but if that search fails then a second search should be performed
+	 * against the shared repository.
 	 *
+	 * @param virtualWiki The virtual wiki for the topic being queried.
+	 * @param namespace The namespace of the topic being queried.
+	 * @param pageName The page name of the topic being queried.
+	 * @param deleteOK Set to <code>true</code> if deleted topics can be
+	 *  retrieved, <code>false</code> otherwise.
+	 * @return A Topic object that matches the given virtual wiki, namespace
+	 *  and page name, or <code>null</code> if no matching topic exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Topic lookupTopic(String virtualWiki, Namespace namespace, String pageName, boolean deleteOK) throws DataAccessException {
 		return this.lookupTopic(virtualWiki, namespace, pageName, deleteOK, null);
@@ -1042,7 +1314,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a Topic object that matches the given topic id and virtual wiki.  Note
+	 * that this method can return deleted topics.
 	 *
+	 * @param topicId The identifier of the topic being queried.
+	 * @return A Topic object that matches the given virtual wiki and topic
+	 * id, or <code>null</code> if no matching topic exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Topic lookupTopicById(int topicId) throws DataAccessException {
 		return this.lookupTopicById(topicId, null);
@@ -1070,11 +1348,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * Return a count of all topics, including redirects, comments pages and templates,
-	 * currently available on the Wiki.  This method excludes deleted topics.
+	 * Return a count of all topics, including redirects, comments pages and
+	 * templates, for the given virtual wiki.  Deleted topics are not included
+	 * in the count.
 	 *
-	 * @param virtualWiki The virtual wiki for which the total topic count is being returned
-	 *  for.
+	 * @param virtualWiki The virtual wiki for which the total topic count is
+	 *  being returned.
+	 * @param namespaceId An optional parameter to specify that results should only
+	 *  be from the specified namespace.  If this value is <code>null</code> then
+	 *  results will be returned from all namespaces.
+	 * @return A count of all topics, including redirects, comments pages and
+	 *  templates, for the given virtual wiki and (optionally) namespace.  Deleted
+	 *  topics are not included in the count.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public int lookupTopicCount(String virtualWiki, Integer namespaceId) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -1088,7 +1374,21 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a List of topic names for all non-deleted topics in the
+	 * virtual wiki that match a specific topic type.
 	 *
+	 * @param virtualWiki The virtual wiki for the topics being queried.
+	 * @param topicType1 The type of topics to return.
+	 * @param topicType2 The type of topics to return.  Set to the same value
+	 *  as topicType1 if only one type is needed.
+	 * @param namespaceId An optional parameter to specify that results should only
+	 *  be from the specified namespace.  If this value is <code>null</code> then
+	 *  results will be returned from all namespaces.
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @return A map of topic id and topic name for all non-deleted topics in the
+	 *  virtual wiki that match a specific topic type.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Map<Integer, String> lookupTopicByType(String virtualWiki, TopicType topicType1, TopicType topicType2, Integer namespaceId, Pagination pagination) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -1102,7 +1402,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * This method is used primarily to determine if a topic with a given name exists,
+	 * taking as input a topic name and virtual wiki and returning the corresponding
+	 * topic name, or <code>null</code> if no matching topic exists.  This method will
+	 * return only non-deleted topics and performs better for cases where a caller only
+	 * needs to know if a topic exists, but does not need a full Topic object.
 	 *
+	 * @param virtualWiki The virtual wiki for the topic being queried.
+	 * @param namespace The Namespace for the topic being retrieved.
+	 * @param pageName The topic pageName (topic name without the namespace) for
+	 *  the topic being retrieved.
+	 * @return The name of the Topic object that matches the given virtual wiki and topic
+	 * name, or <code>null</code> if no matching topic exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public String lookupTopicName(String virtualWiki, Namespace namespace, String pageName) throws DataAccessException {
 		if (StringUtils.isBlank(virtualWiki) || StringUtils.isBlank(pageName)) {
@@ -1143,7 +1455,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Find the names for all topics that link to a specified topic.
 	 *
+	 * @param virtualWiki The virtual wiki for the topic.
+	 * @param topicName The name of the topic.
+	 * @return A list of topic name and (for redirects) the redirect topic
+	 *  name for all topics that link to the specified topic.  If no results
+	 *  are found then an empty list is returned.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<String[]> lookupTopicLinks(String virtualWiki, String topicName) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -1161,7 +1480,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Find the names for all un-linked topics in the main namespace.
 	 *
+	 * @param virtualWiki The virtual wiki to query against.
+	 * @param namespaceId The ID for the namespace being retrieved.
+	 * @return A list of topic names for all topics that are not linked to by
+	 *  any other topic.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<String> lookupTopicLinkOrphans(String virtualWiki, int namespaceId) throws DataAccessException {
 		// FIXME - caching needed
@@ -1174,7 +1499,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a TopicVersion object for a given topic version ID.
 	 *
+	 * @param topicVersionId The ID of the topic version being retrieved.
+	 * @return A TopicVersion object matching the given topic version ID,
+	 *  or <code>null</code> if no matching topic version is found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public TopicVersion lookupTopicVersion(int topicVersionId) throws DataAccessException {
 		TopicVersion topicVersion = CACHE_TOPIC_VERSIONS.retrieveFromCache(topicVersionId);
@@ -1191,7 +1521,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve the next topic version ID chronologically for a given topic
+	 * version, or <code>null</code> if there is no next topic version ID.
 	 *
+	 * @param topicVersionId The ID of the topic version whose next topic version
+	 *  ID is being retrieved.
+	 * @return The next topic version ID chronologically for a given topic
+	 * version, or <code>null</code> if there is no next topic version ID.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public Integer lookupTopicVersionNextId(int topicVersionId) throws DataAccessException {
 		try {
@@ -1202,7 +1539,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Find any active user block for the given user or IP address.
 	 *
+	 * @param wikiUserId The wiki user ID, or <code>null</code> if the search is
+	 *  by IP address.
+	 * @param ipAddress The IP address, or <code>null</code> if the search is by
+	 *  user ID.
+	 * @return A currently-active user block for the ID or IP address, or
+	 *  <code>null</code> if no block is currently active.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public UserBlock lookupUserBlock(Integer wikiUserId, String ipAddress) throws DataAccessException {
 		Map<Object, UserBlock> userBlocks = this.getUserBlocks();
@@ -1218,7 +1563,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Given a virtual wiki name, return the corresponding VirtualWiki object.
 	 *
+	 * @param virtualWikiName The name of the VirtualWiki object that is
+	 *  being retrieved.
+	 * @return The VirtualWiki object that corresponds to the virtual wiki
+	 *  name being queried, or <code>null</code> if no matching VirtualWiki
+	 *  can be found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public VirtualWiki lookupVirtualWiki(String virtualWikiName) throws DataAccessException {
 		List<VirtualWiki> virtualWikis = this.getVirtualWikiList();
@@ -1241,7 +1593,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a WikiFile object for a given virtual wiki and topic name.
 	 *
+	 * @param virtualWiki The virtual wiki for the file being queried.
+	 * @param topicName The topic name for the file being queried.
+	 * @return The WikiFile object for the given virtual wiki and topic name,
+	 *  or <code>null</code> if no matching WikiFile exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public WikiFile lookupWikiFile(String virtualWiki, String topicName) throws DataAccessException {
 		if (StringUtils.isBlank(virtualWiki) || StringUtils.isBlank(topicName)) {
@@ -1278,10 +1636,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * Return a count of all wiki files currently available on the Wiki.  This
-	 * method excludes deleted files.
+	 * Return a count of all wiki files for the given virtual wiki.  Deleted
+	 * files are not included in the count.
 	 *
-	 * @param virtualWiki The virtual wiki of the files being retrieved.
+	 * @param virtualWiki The virtual wiki for which the total file count is
+	 *  being returned.
+	 * @return A count of all wiki files for the given virtual wiki.  Deleted
+	 *  files are not included in the count.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public int lookupWikiFileCount(String virtualWiki) throws DataAccessException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
@@ -1293,7 +1655,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a WikiGroup object for a given group name.
 	 *
+	 * @param groupName The group name for the group being queried.
+	 * @return The WikiGroup object for the given group name, or
+	 *  <code>null</code> if no matching group exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public WikiGroup lookupWikiGroup(String groupName) throws DataAccessException {
 		try {
@@ -1304,7 +1671,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a WikiUser object matching a given user ID.
 	 *
+	 * @param userId The ID of the WikiUser being retrieved.
+	 * @return The WikiUser object matching the given user ID, or
+	 *  <code>null</code> if no matching WikiUser exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public WikiUser lookupWikiUser(int userId) throws DataAccessException {
 		WikiUser user = CACHE_USER_BY_USER_ID.retrieveFromCache(userId);
@@ -1321,32 +1693,37 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a WikiUser object matching a given username.
 	 *
+	 * @param username The username of the WikiUser being retrieved.
+	 * @return The WikiUser object matching the given username, or
+	 *  <code>null</code> if no matching WikiUser exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public WikiUser lookupWikiUser(String username) throws DataAccessException {
 		WikiUser result = CACHE_USER_BY_USER_NAME.retrieveFromCache(username);
 		if (result != null || CACHE_USER_BY_USER_NAME.isKeyInCache(username)) {
 			return result;
 		}
-		TransactionStatus status = null;
+		Connection conn = null;
 		try {
-			status = DatabaseConnection.startTransaction();
-			Connection conn = DatabaseConnection.getConnection();
+			conn = DatabaseConnection.getConnection();
 			int userId = this.queryHandler().lookupWikiUser(username, conn);
 			if (userId != -1) {
 				result = lookupWikiUser(userId);
 			}
+			CACHE_USER_BY_USER_NAME.addToCache(username, result);
+			return result;
 		} catch (SQLException e) {
-			DatabaseConnection.rollbackOnException(status, e);
 			throw new DataAccessException(e);
 		}
-		DatabaseConnection.commit(status);
-		CACHE_USER_BY_USER_NAME.addToCache(username, result);
-		return result;
 	}
 
 	/**
 	 * Return a count of all wiki users.
+	 *
+	 * @return A count of all wiki users.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public int lookupWikiUserCount() throws DataAccessException {
 		try {
@@ -1357,7 +1734,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Retrieve a WikiUser object matching a given username.
 	 *
+	 * @param username The username of the WikiUser being retrieved.
+	 * @return The encrypted password for the given user name, or
+	 *  <code>null</code> if no matching WikiUser exists.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public String lookupWikiUserEncryptedPassword(String username) throws DataAccessException {
 		try {
@@ -1368,7 +1750,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Return a List of user logins for all wiki users.
 	 *
+	 * @param pagination A Pagination object indicating the total number of
+	 *  results and offset for the results to be retrieved.
+	 * @return A List of user logins for all wiki users.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public List<String> lookupWikiUsers(Pagination pagination) throws DataAccessException {
 		try {
@@ -1379,7 +1766,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Move a topic to a new name, creating a redirect topic in the old
+	 * topic location.  An exception will be thrown if the topic cannot be
+	 * moved for any reason.
 	 *
+	 * @param fromTopic The Topic object that is being moved.
+	 * @param destination The new name for the topic.
+	 * @param user The WikiUser who will be credited in the topic version
+	 *  associated with this topic move as having performed the move.
+	 * @param ipAddress The IP address of the user making the topic move.
+	 * @param moveComment The edit comment to associate with the topic
+	 *  move.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
 	public void moveTopic(Topic fromTopic, String destination, WikiUser user, String ipAddress, String moveComment) throws DataAccessException, WikiException {
 		// set up the version record to record the topic move
@@ -1449,7 +1848,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Utility method used when importing to updating the previous topic version ID field
+	 * of topic versions, as well as the current version ID field for the topic record.
 	 *
+	 * @param topic The topic record to update.
+	 * @param topicVersionIdList A list of all topic version IDs for the topic, sorted
+	 *  chronologically from oldest to newest.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public void orderTopicVersions(Topic topic, List<Integer> topicVersionIdList) throws DataAccessException {
 		try {
@@ -1462,7 +1867,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Remove a topic version from the database.  This action deletes the record
+	 * entirely, including references in other tables, and cannot be undone.
 	 *
+	 * @param topic The topic record for which a version is being purged.
+	 * @param topicVersionId The ID of the topic version being deleted.
+	 * @param user The WikiUser who will be credited in the log record
+	 *  associated with this action.
+	 * @param ipAddress The IP address of the user deleting the topic version.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public void purgeTopicVersion(Topic topic, int topicVersionId, WikiUser user, String ipAddress) throws DataAccessException, WikiException {
 		// 1. get the topic version record.  if no such record exists
@@ -1523,7 +1936,41 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Utility method to retrieve an instance of the current query handler.
 	 *
+	 * @return An instance of the current query handler.
+	 * @throws IllegalStateException Thrown if a data handler instance can not be
+	 *  instantiated.
+	 */
+	private QueryHandler queryHandlerInstance() {
+		if (StringUtils.isBlank(Environment.getValue(Environment.PROP_DB_TYPE))) {
+			// this is a problem, but it should never occur
+			logger.warn("AnsiDataHandler.queryHandlerInstance called without a valid PROP_DB_TYPE value");
+		}
+		String queryHandlerClass = Environment.getValue(Environment.PROP_DB_TYPE);
+		// TODO - remove when the ability to upgrade to 1.3 is removed
+		String dataHandlerClass = LEGACY_DATA_HANDLER_MAP.get(queryHandlerClass);
+		if (dataHandlerClass != null) {
+			queryHandlerClass = dataHandlerClass;
+			Environment.setValue(Environment.PROP_DB_TYPE, queryHandlerClass);
+			try {
+				Environment.saveConfiguration();
+			} catch (WikiException e) {
+				throw new IllegalStateException("Failure while updating properties", e);
+			}
+		}
+		try {
+			return (QueryHandler)ResourceUtil.instantiateClass(queryHandlerClass);
+		} catch (ClassCastException e) {
+			throw new IllegalStateException("Query handler specified in jamwiki.properties does not implement org.jamwiki.db.QueryHandler: " + dataHandlerClass);
+		}
+	}
+
+	/**
+	 * Delete all existing log entries and reload the log item table based
+	 * on the most recent topic versions, uploads, and user signups.
+	 *
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public void reloadLogItems() throws DataAccessException {
 		TransactionStatus status = null;
@@ -1542,7 +1989,10 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Delete all existing recent changes and reload the recent changes based
+	 * on the most recent topic versions.
 	 *
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public void reloadRecentChanges() throws DataAccessException {
 		int limit = Environment.getIntValue(Environment.PROP_MAX_RECENT_CHANGES);
@@ -1559,7 +2009,18 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Perform any required setup steps for the DataHandler instance.
 	 *
+	 * @param locale The locale to be used when setting up the data handler
+	 *  instance.  This parameter will affect any messages or defaults used
+	 *  for the DataHandler.
+	 * @param user The admin user to use when creating default topics and
+	 *  other DataHandler parameters.
+	 * @param username The admin user's username (login).
+	 * @param encryptedPassword The admin user's encrypted password.  This value
+	 *  is only required when creating a new admin user.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if a setup failure occurs.
 	 */
 	public void setup(Locale locale, WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
 		WikiDatabase.initialize();
@@ -1580,7 +2041,17 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Create the special pages used on the wiki, such as the left menu and
+	 * default stylesheet.
 	 *
+	 * @param locale The locale to be used when setting up special pages such
+	 *  as the left menu and default stylesheet.  This parameter will affect
+	 *  the language used when setting up these pages.
+	 * @param user The admin user to use when creating the special pages.
+	 * @param virtualWiki The VirtualWiki for which special pages are being
+	 *  created.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if a setup failure occurs.
 	 */
 	public void setupSpecialPages(Locale locale, WikiUser user, VirtualWiki virtualWiki) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -1607,7 +2078,18 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Undelete a previously deleted topic by setting its delete date to a
+	 * null value.  Prior to calling this method the topic content should be
+	 * restored to its previous value.  A new TopicVersion should be supplied
+	 * reflecting the topic undeletion event.
 	 *
+	 * @param topic The Topic object that is being undeleted.
+	 * @param topicVersion A TopicVersion object that indicates the undelete
+	 *  date, author, and other parameters for the topic.  If this value is
+	 *  <code>null</code> then no version is saved, nor is any recent change
+	 *  entry created.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
 	public void undeleteTopic(Topic topic, TopicVersion topicVersion) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -1636,7 +2118,20 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Update a special page used on the wiki, such as the left menu or
+	 * default stylesheet.
 	 *
+	 * @param locale The locale to be used when updating a special page such
+	 *  as the left menu and default stylesheet.  This parameter will affect
+	 *  the language used when updating up the page.
+	 * @param virtualWiki The VirtualWiki for which the special page are being
+	 *  updated.
+	 * @param topicName The name of the special page topic that is being
+	 *  updated.
+	 * @param userDisplay A display name for the user updating special pages,
+	 *  typically the IP address.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
 	public void updateSpecialPage(Locale locale, String virtualWiki, String topicName, String userDisplay) throws DataAccessException, WikiException {
 		logger.info("Updating special page " + virtualWiki + " / " + topicName);
@@ -1676,7 +2171,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void updateTopic(Topic topic, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(topic.getVirtualWiki());
-		this.validateTopic(topic);
+		this.dataValidator.validateTopic(topic);
 		try {
 			this.queryHandler().updateTopic(topic, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -1688,7 +2183,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateUserBlock(UserBlock userBlock, Connection conn) throws DataAccessException, WikiException {
-		this.validateUserBlock(userBlock);
+		this.dataValidator.validateUserBlock(userBlock);
 		try {
 			this.queryHandler().updateUserBlock(userBlock, conn);
 		} catch (SQLException e) {
@@ -1700,7 +2195,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateUserDetails(WikiUserDetails userDetails, Connection conn) throws DataAccessException, WikiException {
-		this.validateUserDetails(userDetails);
+		this.dataValidator.validateUserDetails(userDetails);
 		try {
 			this.queryHandler().updateUserDetails(userDetails, conn);
 		} catch (SQLException e) {
@@ -1712,7 +2207,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateVirtualWiki(VirtualWiki virtualWiki, Connection conn) throws DataAccessException, WikiException {
-		this.validateVirtualWiki(virtualWiki);
+		this.dataValidator.validateVirtualWiki(virtualWiki);
 		try {
 			this.queryHandler().updateVirtualWiki(virtualWiki, conn);
 		} catch (SQLException e) {
@@ -1725,7 +2220,7 @@ public class AnsiDataHandler implements DataHandler {
 	 */
 	private void updateWikiFile(WikiFile wikiFile, Connection conn) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(wikiFile.getVirtualWiki());
-		this.validateWikiFile(wikiFile);
+		this.dataValidator.validateWikiFile(wikiFile);
 		try {
 			this.queryHandler().updateWikiFile(wikiFile, virtualWikiId, conn);
 		} catch (SQLException e) {
@@ -1737,7 +2232,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateWikiGroup(WikiGroup group, Connection conn) throws DataAccessException, WikiException {
-		this.validateWikiGroup(group);
+		this.dataValidator.validateWikiGroup(group);
 		try {
 			this.queryHandler().updateWikiGroup(group, conn);
 		} catch (SQLException e) {
@@ -1749,7 +2244,7 @@ public class AnsiDataHandler implements DataHandler {
 	 *
 	 */
 	private void updateWikiUser(WikiUser user, Connection conn) throws DataAccessException, WikiException {
-		this.validateWikiUser(user);
+		this.dataValidator.validateWikiUser(user);
 		try {
 			this.queryHandler().updateWikiUser(user, conn);
 		} catch (SQLException e) {
@@ -1773,172 +2268,18 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Replace the existing configuration records with a new set of values.  This
+	 * method will delete all existing records and replace them with the records
+	 * specified.
 	 *
-	 */
-	protected void validateAuthority(String role) throws WikiException {
-		checkLength(role, 30);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateCategory(Category category) throws WikiException {
-		checkLength(category.getName(), 200);
-		checkLength(category.getSortKey(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateConfiguration(Map<String, String> configuration) throws WikiException {
-		for (Map.Entry<String, String> entry : configuration.entrySet()) {
-			checkLength(entry.getKey(), 50);
-			checkLength(entry.getValue(), 500);
-		}
-	}
-
-	/**
-	 *
-	 */
-	protected void validateLogItem(LogItem logItem) throws WikiException {
-		checkLength(logItem.getUserDisplayName(), 200);
-		checkLength(logItem.getLogParamString(), 500);
-		logItem.setLogComment(StringUtils.substring(logItem.getLogComment(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateNamespace(Namespace namespace) throws WikiException {
-		checkLength(namespace.getDefaultLabel(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateNamespaceTranslation(Namespace namespace, String virtualWiki) throws WikiException {
-		checkLength(namespace.getLabel(virtualWiki), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateRecentChange(RecentChange change) throws WikiException {
-		checkLength(change.getTopicName(), 200);
-		checkLength(change.getAuthorName(), 200);
-		checkLength(change.getVirtualWiki(), 100);
-		change.setChangeComment(StringUtils.substring(change.getChangeComment(), 0, 200));
-		checkLength(change.getParamString(), 500);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateRole(Role role) throws WikiException {
-		checkLength(role.getAuthority(), 30);
-		role.setDescription(StringUtils.substring(role.getDescription(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateTopic(Topic topic) throws WikiException {
-		checkLength(topic.getName(), 200);
-		checkLength(topic.getRedirectTo(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateTopicVersion(TopicVersion topicVersion) throws WikiException {
-		checkLength(topicVersion.getAuthorDisplay(), 100);
-		checkLength(topicVersion.getVersionParamString(), 500);
-		topicVersion.setEditComment(StringUtils.substring(topicVersion.getEditComment(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateUserBlock(UserBlock userBlock) throws WikiException {
-		checkLength(userBlock.getBlockReason(), 200);
-		checkLength(userBlock.getUnblockReason(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateUserDetails(WikiUserDetails userDetails) throws WikiException {
-		checkLength(userDetails.getUsername(), 100);
-		// do not throw exception containing password info
-		if (userDetails.getPassword() != null && userDetails.getPassword().length() > 100) {
-			throw new WikiException(new WikiMessage("error.fieldlength", "-", "100"));
-		}
-	}
-
-	/**
-	 *
-	 */
-	protected void validateVirtualWiki(VirtualWiki virtualWiki) throws WikiException {
-		checkLength(virtualWiki.getName(), 100);
-		checkLength(virtualWiki.getRootTopicName(), 200);
-		checkLength(virtualWiki.getLogoImageUrl(), 200);
-		checkLength(virtualWiki.getMetaDescription(), 500);
-		checkLength(virtualWiki.getSiteName(), 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWatchlistEntry(String topicName) throws WikiException {
-		checkLength(topicName, 200);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiFile(WikiFile wikiFile) throws WikiException {
-		checkLength(wikiFile.getFileName(), 200);
-		checkLength(wikiFile.getUrl(), 200);
-		checkLength(wikiFile.getMimeType(), 100);
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiFileVersion(WikiFileVersion wikiFileVersion) throws WikiException {
-		checkLength(wikiFileVersion.getUrl(), 200);
-		checkLength(wikiFileVersion.getMimeType(), 100);
-		checkLength(wikiFileVersion.getAuthorDisplay(), 100);
-		wikiFileVersion.setUploadComment(StringUtils.substring(wikiFileVersion.getUploadComment(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiGroup(WikiGroup group) throws WikiException {
-		checkLength(group.getName(), 30);
-		group.setDescription(StringUtils.substring(group.getDescription(), 0, 200));
-	}
-
-	/**
-	 *
-	 */
-	protected void validateWikiUser(WikiUser user) throws WikiException {
-		checkLength(user.getUsername(), 100);
-		checkLength(user.getDisplayName(), 100);
-		checkLength(user.getCreateIpAddress(), 39);
-		checkLength(user.getLastLoginIpAddress(), 39);
-		checkLength(user.getDefaultLocale(), 8);
-		checkLength(user.getEmail(), 100);
-		checkLength(user.getEditor(), 50);
-		checkLength(user.getSignature(), 255);
-	}
-
-	/**
-	 *
+	 * @param configuration A map of key-value pairs corresponding to the new
+	 *  configuration information.  These values will replace all existing
+	 *  configuration values in the system.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the configuration information is invalid.
 	 */
 	public void writeConfiguration(Map<String, String> configuration) throws DataAccessException, WikiException {
-		this.validateConfiguration(configuration);
+		this.dataValidator.validateConfiguration(configuration);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -1952,7 +2293,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update a WikiFile object.  This method will add a new record if
+	 * the WikiFile does not have a file ID, otherwise it will perform an update.
+	 * A WikiFileVersion object will also be created to capture the author, date,
+	 * and other parameters for the file.
 	 *
+	 * @param wikiFile The WikiFile to add or update.  If the WikiFile does not
+	 *  have a file ID then a new record is created, otherwise an update is
+	 *  performed.
+	 * @param wikiFileVersion A WikiFileVersion containing the author, date, and
+	 *  other information about the version being added.
+	 * @param imageData Image data or null
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the file information is invalid.
 	 */
 	public void writeFile(WikiFile wikiFile, WikiFileVersion wikiFileVersion, ImageData imageData) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -1969,7 +2322,7 @@ public class AnsiDataHandler implements DataHandler {
 			// write version
 			addWikiFileVersion(wikiFileVersion, conn);
 			if (imageData != null) {
-				// No more needs of old resized images 
+				// No more needs of old resized images
 				this.queryHandler().deleteResizedImages(wikiFile.getFileId(), conn);
 				imageData.fileVersionId = wikiFileVersion.getFileVersionId();
 				this.queryHandler().insertImage(imageData, false, conn);
@@ -1988,7 +2341,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update an Interwiki record.  This method will first delete any
+	 * existing method with the same prefix and then add the new record.
 	 *
+	 * @param interwiki The Interwiki record to add or update.  If a record
+	 *  already exists with the same prefix then that record will be deleted.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the interwiki information is invalid.
 	 */
 	public void writeInterwiki(Interwiki interwiki) throws DataAccessException, WikiException {
 		interwiki.validate();
@@ -2007,10 +2366,16 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update a namespace.  This method will add a new record if the
+	 * namespace does not already exist, otherwise it will update the existing
+	 * record.
 	 *
+	 * @param namespace The namespace object to add to the database.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the namespace information is invalid.
 	 */
 	public void writeNamespace(Namespace namespace) throws DataAccessException, WikiException {
-		this.validateNamespace(namespace);
+		this.dataValidator.validateNamespace(namespace);
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
@@ -2025,12 +2390,19 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update virtual-wiki specific labels for a namespace.  This method will
+	 * remove existing records for the virtual wiki and add the new ones.
 	 *
+	 * @param namespaces The namespace translation records to add/update.
+	 * @param virtualWiki The virtual wiki for which namespace translations are
+	 *  being added or updated.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the namespace information is invalid.
 	 */
 	public void writeNamespaceTranslations(List<Namespace> namespaces, String virtualWiki) throws DataAccessException, WikiException {
 		int virtualWikiId = this.lookupVirtualWikiId(virtualWiki);
 		for (Namespace namespace : namespaces) {
-			this.validateNamespaceTranslation(namespace, virtualWiki);
+			this.dataValidator.validateNamespaceTranslation(namespace, virtualWiki);
 		}
 		TransactionStatus status = null;
 		try {
@@ -2046,14 +2418,23 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update a Role object.  This method will add a new record if
+	 * the role does not yet exist, otherwise the role will be updated.
 	 *
+	 * @param role The Role to add or update.  If the Role does not yet
+	 *  exist then a new record is created, otherwise an update is
+	 *  performed.
+	 * @param update A boolean value indicating whether this transaction is
+	 *  updating an existing role or not.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the role information is invalid.
 	 */
 	public void writeRole(Role role, boolean update) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
 		try {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
-			this.validateRole(role);
+			this.dataValidator.validateRole(role);
 			if (update) {
 				this.queryHandler().updateRole(role, conn);
 			} else {
@@ -2071,7 +2452,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add a set of group role mappings.  This method will first delete all
+	 * existing role mappings for the specified group, and will then create
+	 * a mapping for each specified role.
 	 *
+	 * @param groupId The group id for whom role mappings are being modified.
+	 * @param roles A List of String role names for all roles that are
+	 *  to be assigned to this group.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the role information is invalid.
 	 */
 	public void writeRoleMapGroup(int groupId, List<String> roles) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -2080,7 +2469,7 @@ public class AnsiDataHandler implements DataHandler {
 			Connection conn = DatabaseConnection.getConnection();
 			this.queryHandler().deleteGroupAuthorities(groupId, conn);
 			for (String authority : roles) {
-				this.validateAuthority(authority);
+				this.dataValidator.validateAuthority(authority);
 				this.queryHandler().insertGroupAuthority(groupId, authority, conn);
 			}
 			// flush the cache
@@ -2096,7 +2485,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add a set of user role mappings.  This method will first delete all
+	 * existing role mappings for the specified user, and will then create
+	 * a mapping for each specified role.
 	 *
+	 * @param username The username for whom role mappings are being modified.
+	 * @param roles A List of String role names for all roles that are
+	 *  to be assigned to this user.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the role information is invalid.
 	 */
 	public void writeRoleMapUser(String username, List<String> roles) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -2105,7 +2502,7 @@ public class AnsiDataHandler implements DataHandler {
 			Connection conn = DatabaseConnection.getConnection();
 			this.queryHandler().deleteUserAuthorities(username, conn);
 			for (String authority : roles) {
-				this.validateAuthority(authority);
+				this.dataValidator.validateAuthority(authority);
 				this.queryHandler().insertUserAuthority(username, authority, conn);
 			}
 			// flush the cache
@@ -2121,22 +2518,26 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * Commit changes to a topic (and its version) to the database or
-	 * filesystem.
+	 * Add or update a Topic object.  This method will add a new record if
+	 * the Topic does not have a topic ID, otherwise it will perform an update.
+	 * A TopicVersion object will also be created to capture the author, date,
+	 * and other parameters for the topic.
 	 *
-	 * @param topic The topic object that is to be committed.  If the topic
-	 *  id is empty or less than zero then the topic is added, otherwise an
-	 *  update is performed.
-	 * @param topicVersion The version associated with the topic that is
-	 *  being added.  This parameter should never be null UNLESS the change is
-	 *  not user visible, such as when deleting a topic temporarily during
-	 *  page moves.
+	 * @param topic The Topic to add or update.  If the Topic does not have
+	 *  a topic ID then a new record is created, otherwise an update is
+	 *  performed.
+	 * @param topicVersion A TopicVersion containing the author, date, and
+	 *  other information about the version being added.  If this value is <code>null</code>
+	 *  then no version is saved and no recent change record is created.
 	 * @param categories A mapping of categories and their associated sort keys (if any)
 	 *  for all categories that are associated with the current topic.
 	 * @param links A List of all topic names that are linked to from the
-	 *  current topic.
+	 *  current topic.  These will be passed to the search engine to create
+	 *  searchable metadata.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the topic information is invalid.
 	 */
-	public void writeTopic(Topic topic, TopicVersion topicVersion, LinkedHashMap<String, String> categories, List<String> links) throws DataAccessException, WikiException {
+	public void writeTopic(Topic topic, TopicVersion topicVersion, Map<String, String> categories, List<String> links) throws DataAccessException, WikiException {
 		long start = System.currentTimeMillis();
 		LinkUtil.validateTopicName(topic.getVirtualWiki(), topic.getName(), false);
 		TransactionStatus status = null;
@@ -2221,7 +2622,17 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * This method exists for performance reasons for scenarios such as topic
+	 * imports where many versions may be added without the need to update the
+	 * topic record.  In general {@link #writeTopic} should be used instead.
 	 *
+	 * @param topic The Topic for the versions being added.  The topic must already
+	 *  exist.
+	 * @param topicVersions A list of TopicVersion objects, each containing the
+	 *  author, date, and other information about the version being added.  If
+	 *  this value is <code>null</code> or empty then no versions are saved.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the topic version information is invalid.
 	 */
 	public void writeTopicVersions(Topic topic, List<TopicVersion> topicVersions) throws DataAccessException, WikiException {
 		if (topic == null || topicVersions == null) {
@@ -2240,7 +2651,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update a user block.  This method will add a new record if the
+	 * UserBlock object does not have an ID, otherwise it will perform an
+	 * update.
 	 *
+	 * @param userBlock The UserBlock record to add or update.  If the
+	 *  UserBlock does not have an ID then a new record is created, otherwise
+	 *  an update is performed.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the user block information is invalid.
 	 */
 	public void writeUserBlock(UserBlock userBlock) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -2276,7 +2695,15 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update a VirtualWiki object.  This method will add a new record
+	 * if the VirtualWiki does not have a virtual wiki ID, otherwise it will
+	 * perform an update.
 	 *
+	 * @param virtualWiki The VirtualWiki to add or update.  If the
+	 *  VirtualWiki does not have a virtual wiki ID then a new record is
+	 *  created, otherwise an update is performed.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the virtual wiki information is invalid.
 	 */
 	public void writeVirtualWiki(VirtualWiki virtualWiki) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -2305,7 +2732,17 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or delete an item from a user's watchlist.  If the topic is
+	 * already in the user's watchlist it will be deleted, otherwise it will
+	 * be added.
 	 *
+	 * @param watchlist The user's current Watchlist.
+	 * @param virtualWiki The virtual wiki name for the current virtual wiki.
+	 * @param topicName The name of the topic being added or removed from
+	 *  the watchlist.
+	 * @param userId The ID of the user whose watchlist is being updated.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the watchlist information is invalid.
 	 */
 	public void writeWatchlistEntry(Watchlist watchlist, String virtualWiki, String topicName, int userId) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -2342,7 +2779,14 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Add or update a WikiGroup object.  This method will add a new record if
+	 * the group does not have a group ID, otherwise it will perform an update.
 	 *
+	 * @param group The WikiGroup to add or update.  If the group does not have
+	 *  a group ID then a new record is created, otherwise an update is
+	 *  performed.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the group information is invalid.
 	 */
 	public void writeWikiGroup(WikiGroup group) throws DataAccessException, WikiException {
 		TransactionStatus status = null;
@@ -2368,7 +2812,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * 
+	 * Write the groupMap to the database. Notice that the method will first delete all entries
+	 * referring to the group or the user (depending on groupMapType) and will then add an
+	 * entry for each group membership.
+	 *
+	 * @param groupMap The GroupMap to store
+	 * @throws DataAccessException
 	 */
 	public void writeGroupMap(GroupMap groupMap) throws DataAccessException {
 		TransactionStatus status = null;
@@ -2393,7 +2842,7 @@ public class AnsiDataHandler implements DataHandler {
 					}
 					break;
 				}
-				default: throw new SQLException("writeGroupMap - Group type invalid"); 
+				default: throw new SQLException("writeGroupMap - Group type invalid");
 			}
 		} catch (SQLException e) {
 			DatabaseConnection.rollbackOnException(status, e);
@@ -2401,16 +2850,28 @@ public class AnsiDataHandler implements DataHandler {
 		}
 		DatabaseConnection.commit(status);
 	}
-	
+
 	/**
+	 * Add or update a WikiUser object.  This method will add a new record
+	 * if the WikiUser does not have a user ID, otherwise it will perform an
+	 * update.
 	 *
+	 * @param user The WikiUser being added or updated.  If the WikiUser does
+	 *  not have a user ID then a new record is created, otherwise an update
+	 *  is performed.
+	 * @param username The user's username (login).
+	 * @param encryptedPassword The user's encrypted password.  Required only when the
+	 *  password is being updated.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the user information is invalid.
 	 */
 	public void writeWikiUser(WikiUser user, String username, String encryptedPassword) throws DataAccessException, WikiException {
 		WikiUtil.validateUserName(user.getUsername());
 		TransactionStatus status = null;
+		Connection conn = null;
 		try {
 			status = DatabaseConnection.startTransaction();
-			Connection conn = DatabaseConnection.getConnection();
+			conn = DatabaseConnection.getConnection();
 			if (user.getUserId() <= 0) {
 				WikiUserDetails userDetails = new WikiUserDetails(username, encryptedPassword);
 				this.addUserDetails(userDetails, conn);
@@ -2432,6 +2893,10 @@ public class AnsiDataHandler implements DataHandler {
 				}
 				this.updateWikiUser(user, conn);
 			}
+			DatabaseConnection.commit(status);
+			// update the cache AFTER the commit
+			CACHE_USER_BY_USER_ID.addToCache(user.getUserId(), user);
+			CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
@@ -2442,14 +2907,37 @@ public class AnsiDataHandler implements DataHandler {
 			DatabaseConnection.rollbackOnException(status, e);
 			throw e;
 		}
-		DatabaseConnection.commit(status);
-		// update the cache AFTER the commit
-		CACHE_USER_BY_USER_ID.addToCache(user.getUserId(), user);
-		CACHE_USER_BY_USER_NAME.addToCache(user.getUsername(), user);
 	}
 
 	/**
+	 * Insert or update a user preference default value.
 	 *
+	 * @param userPreferenceKey The key (or name) of the preference 
+	 * @param userPreferenceDefaultValue The default value for this preference
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
+	 * @throws WikiException Thrown if the parameter information is invalid.
+	 */
+	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr) throws DataAccessException {
+		try {
+			Connection conn = DatabaseConnection.getConnection();
+			if (this.queryHandler().existsUserPreferenceDefault(userPreferenceKey)) {
+				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
+			}
+			else {
+				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
+			}
+
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+
+	/**
+	 * Add new image or other data to database.
+	 *
+	 * @param imageData The image and it's arrtibutes to store.
+	 * @param resized Must be true when inserting resized version of image and false otherwise.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public void insertImage(ImageData imageData, boolean resized) throws DataAccessException {
 		TransactionStatus status = null;
@@ -2465,7 +2953,13 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Get info of latest version of image.
 	 *
+	 * @param fileId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image info or null if image not found. Result's width and height components must
+	 * be negative when data are not an image. Result's data component may be null.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public ImageData getImageInfo(int fileId, int resized) throws DataAccessException {
 		try {
@@ -2476,7 +2970,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
+	 * Get latest version of image.
 	 *
+	 * @param fileId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image data or null if image not found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public ImageData getImageData(int fileId, int resized) throws DataAccessException {
 		try {
@@ -2487,7 +2986,12 @@ public class AnsiDataHandler implements DataHandler {
 	}
 
 	/**
-	 * @see org.jamwiki.DataHandler#getImageVersionData(int, int)
+	 * Get desired version of image.
+	 *
+	 * @param fileVersionId File identifier.
+	 * @param resized Image width or zero for original.
+	 * @return The image data or null if image version not found.
+	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
 	public ImageData getImageVersionData(int fileVersionId, int resized) throws DataAccessException {
 		try {

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-
-<configuration>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="jamwiki-configuration-1.3.xsd">
 
 <!--
    ====================================================================
@@ -77,56 +77,56 @@
 
    ======================================================================
 -->
-<data-handlers>
-	<data-handler>
+<query-handlers>
+	<query-handler>
 		<name>ansi</name>
-		<class>org.jamwiki.db.AnsiDataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.AnsiQueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>h2</name>
-		<class>org.jamwiki.db.H2DataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.H2QueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>hsql</name>
-		<class>org.jamwiki.db.HSqlDataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.HSqlQueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>mssql</name>
-		<class>org.jamwiki.db.MSSqlDataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.MSSqlQueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>mysql</name>
-		<class>org.jamwiki.db.MySqlDataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.MySqlQueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>oracle</name>
-		<class>org.jamwiki.db.OracleDataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.OracleQueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>postgres</name>
-		<class>org.jamwiki.db.PostgresDataHandler</class>
-	</data-handler>
-	<data-handler>
+		<class>org.jamwiki.db.PostgresQueryHandler</class>
+	</query-handler>
+	<query-handler>
 		<name>asa</name>
-		<class>org.jamwiki.db.SybaseASADataHandler</class>
+		<class>org.jamwiki.db.SybaseASAQueryHandler</class>
 		<state>experimental</state>
-	</data-handler>
-	<data-handler>
+	</query-handler>
+	<query-handler>
 		<name>db2</name>
-		<class>org.jamwiki.db.DB2DataHandler</class>
+		<class>org.jamwiki.db.DB2QueryHandler</class>
 		<state>experimental</state>
-	</data-handler>
-	<data-handler>
+	</query-handler>
+	<query-handler>
 		<name>db2/400</name>
-		<class>org.jamwiki.db.DB2400DataHandler</class>
+		<class>org.jamwiki.db.DB2400QueryHandler</class>
 		<state>experimental</state>
-	</data-handler>
-	<data-handler>
+	</query-handler>
+	<query-handler>
 		<name>Cache</name>
-		<class>org.jamwiki.db.CacheDataHandler</class>
+		<class>org.jamwiki.db.CacheQueryHandler</class>
 		<state>experimental</state>
-	</data-handler>
-</data-handlers>
+	</query-handler>
+</query-handlers>
 
 <!--
    ====================================================================

@@ -497,10 +497,10 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         endState();
         if (!allowJavascript() && yytext().indexOf("javascript") != -1) {
             // potential XSS attack, drop this attribute
-            this.getAttributes().remove(this.currentAttributeKey);
+            this.removeAttribute(this.currentAttributeKey);
         } else {
             // strip the quotation marks (they will be re-added later)
-            this.getAttributes().put(this.currentAttributeKey, yytext().substring(1, yytext().length() - 1));
+            this.addAttribute(this.currentAttributeKey, yytext().substring(1, yytext().length() - 1));
         }
         this.currentAttributeKey = null;
         return "";
@@ -509,10 +509,10 @@ tagScriptClose     = "<" ({whitespace})* "/" ({whitespace})* "script" ({whitespa
         endState();
         if (!allowJavascript() && yytext().indexOf("javascript") != -1) {
             // potential XSS attack, drop this attribute
-            this.getAttributes().remove(this.currentAttributeKey);
+            this.removeAttribute(this.currentAttributeKey);
         } else {
             // add quotes
-            this.getAttributes().put(this.currentAttributeKey, yytext());
+            this.addAttribute(this.currentAttributeKey, yytext());
         }
         this.currentAttributeKey = null;
         return "";

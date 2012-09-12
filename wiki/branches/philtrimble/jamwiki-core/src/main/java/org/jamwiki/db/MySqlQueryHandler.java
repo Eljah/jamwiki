@@ -33,7 +33,7 @@ public class MySqlQueryHandler extends AnsiQueryHandler {
 	/**
 	 *
 	 */
-	protected MySqlQueryHandler() {
+	public MySqlQueryHandler() {
 		Properties defaults = Environment.loadProperties(AnsiQueryHandler.SQL_PROPERTY_FILE_NAME);
 		Properties props = Environment.loadProperties(SQL_PROPERTY_FILE_NAME, defaults);
 		super.init(props);

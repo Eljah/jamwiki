@@ -16,7 +16,6 @@
  */
 package org.jamwiki.servlets;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -181,15 +180,12 @@ public class SetupServlet extends JAMWikiServlet {
 		// read the old configuration from the database
 		boolean result = false;
 		try {
-			// do not use WikiBase.getDataHandler() since the instance is not initialized
-			Map<String, String> configuration = WikiUtil.dataHandlerInstance().lookupConfiguration();
+			Map<String, String> configuration = WikiBase.getDataHandler().lookupConfiguration();
 			for (Map.Entry<String, String> entry : configuration.entrySet()) {
 				Environment.setValue(entry.getKey(), entry.getValue());
 			}
 			Environment.saveConfiguration();
 			result = true;
-		} catch (IOException e) {
-			pageInfo.addError(new WikiMessage("error.unknown", e.getMessage()));
 		} catch (DataAccessException e) {
 			pageInfo.addError(new WikiMessage("error.unknown", e.getMessage()));
 		} catch (WikiException e) {
@@ -259,8 +255,8 @@ public class SetupServlet extends JAMWikiServlet {
 		pageInfo.setContentJsp(JSP_SETUP);
 		pageInfo.setSpecial(true);
 		pageInfo.setPageTitle(new WikiMessage("setup.title", WikiVersion.CURRENT_WIKI_VERSION));
-		List<WikiConfigurationObject> dataHandlers = WikiConfiguration.getInstance().getDataHandlers();
-		next.addObject("dataHandlers", dataHandlers);
+		List<WikiConfigurationObject> queryHandlers = WikiConfiguration.getInstance().getQueryHandlers();
+		next.addObject("queryHandlers", queryHandlers);
 		WikiMessage logMessage = new WikiMessage("setup.help.logfile", WikiLogger.LOGGING_CONFIGURATION_FILE_PATH);
 		next.addObject("logMessage", logMessage);
 	}

@@ -20,8 +20,8 @@
 <table border="0">
 <caption><i>A table in a table</i></caption>
 <tr>
-<td align="center" width="150px"><a class="wikiimg" href="/wiki/en/Image:Test_Image.jpg"><img class="wikiimg" src="/files/test_image.jpg" width="400" height="267" alt="Test Image.jpg" /></a></td>
-<td align="center" width="150px"><a class="wikiimg" href="/wiki/en/Image:Test_Image.jpg"><img class="wikiimg" src="/files/test_image.jpg" width="400" height="267" alt="Test Image.jpg" /></a></td>
+<td align="center" width="150px"><a class="wikiimg" href="/wiki/en/File:Test_Image.jpg"><img class="wikiimg" src="/files/test_image.jpg" width="400" height="267" alt="Test Image.jpg" /></a></td>
+<td align="center" width="150px"><a class="wikiimg" href="/wiki/en/File:Test_Image.jpg"><img class="wikiimg" src="/files/test_image.jpg" width="400" height="267" alt="Test Image.jpg" /></a></td>
 </tr>
 <tr>
 <td align="center" colspan="2" style="border-top:1px solid red; border-right:1px solid red; border-bottom:2px solid red; border-left:1px solid red;">

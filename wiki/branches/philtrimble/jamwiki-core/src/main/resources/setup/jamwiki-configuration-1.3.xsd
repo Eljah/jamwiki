@@ -5,7 +5,7 @@
 			<xs:sequence>
 				<xs:element ref="parsers" maxOccurs="1" minOccurs="1" />
 				<xs:element ref="jflex-parser-custom-tags" maxOccurs="1" minOccurs="0" />
-				<xs:element ref="data-handlers" maxOccurs="1" minOccurs="1" />
+				<xs:element ref="query-handlers" maxOccurs="1" minOccurs="1" />
 				<xs:element ref="search-engines" maxOccurs="1" minOccurs="1" />
 				<xs:element ref="translations" maxOccurs="1" minOccurs="0" />
 			</xs:sequence>
@@ -44,14 +44,14 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="data-handlers">
+	<xs:element name="query-handlers">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="data-handler" maxOccurs="unbounded" minOccurs="1" />
+				<xs:element ref="query-handler" maxOccurs="unbounded" minOccurs="1" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="data-handler">
+	<xs:element name="query-handler">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="name" type="xs:string" maxOccurs="1" minOccurs="1" />

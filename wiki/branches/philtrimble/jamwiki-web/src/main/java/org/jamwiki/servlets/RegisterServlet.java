@@ -16,18 +16,14 @@
  */
 package org.jamwiki.servlets;
 
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiBase;
-import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.authentication.JAMWikiAuthenticationConfiguration;
@@ -35,10 +31,20 @@ import org.jamwiki.authentication.WikiUserDetailsImpl;
 import org.jamwiki.model.Role;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
+import org.jamwiki.parser.ParserException;
+import org.jamwiki.parser.ParserInput;
+import org.jamwiki.parser.ParserOutput;
+import org.jamwiki.parser.jflex.JFlexParser;
+import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.jamwiki.validator.ReCaptchaUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil.UserPreferenceItem;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -77,22 +83,13 @@ public class RegisterServlet extends JAMWikiServlet {
 		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
 			user.setDefaultLocale(request.getLocale().toString());
 		}
-		TreeMap<String, String> locales = new TreeMap<String, String>();
-		Map<String, String> translations = WikiConfiguration.getInstance().getTranslations();
-		for (Map.Entry<String, String> entry : translations.entrySet()) {
-			String value = entry.getKey() + " - " + entry.getValue();
-			locales.put(value, entry.getKey());
-		}
-		Locale[] localeArray = Locale.getAvailableLocales();
-		for (int i = 0; i < localeArray.length; i++) {
-			String key = localeArray[i].toString();
-			String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
-			locales.put(value, key);
-		}
-		next.addObject("locales", locales);
-		Map editors = WikiConfiguration.getInstance().getEditors();
-		next.addObject("editors", editors);
 		next.addObject("newuser", user);
+		// Note: adding the signature preview this way is a workaround. Better would be
+		// if the preview can be generated in UserPreferencesUtil inner class
+		// UserPreferenceItem directly...
+		UserPreferencesUtil userPreferences = new UserPreferencesUtil(user);
+		userPreferences.setSignaturePreview(this.signaturePreview(request, pageInfo, user));
+		next.addObject("userPreferences", userPreferences);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isRegistrationEnabled());
 		pageInfo.setSpecial(true);
 		pageInfo.setContentJsp(JSP_REGISTER);
@@ -173,15 +170,41 @@ public class RegisterServlet extends JAMWikiServlet {
 				user = WikiBase.getDataHandler().lookupWikiUser(userId);
 			}
 		}
-		user.setDisplayName(request.getParameter("displayName"));
-		user.setDefaultLocale(request.getParameter("defaultLocale"));
 		user.setEmail(request.getParameter("email"));
-		user.setEditor(request.getParameter("editor"));
-		user.setSignature(request.getParameter("signature"));
 		// FIXME - need to distinguish between add & update
 		user.setCreateIpAddress(ServletUtil.getIpAddress(request));
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
+		user.setDisplayName(request.getParameter("displayName"));
+		LinkedHashMap<String, Map<String, UserPreferenceItem>> preferences = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)new UserPreferencesUtil(user).getGroups();
+		for(String group : preferences.keySet()) {
+			for(String key : preferences.get(group).keySet()) {
+				user.setPreference(key, request.getParameter(key));
+			}
+		}
 		return user;
+	}
+
+	/**
+	 *
+	 */
+	private String signaturePreview(HttpServletRequest request, WikiPageInfo pageInfo, WikiUser user) {
+		String signature = request.getParameter("signature");
+		if (StringUtils.isBlank(signature)) {
+			signature = user.getSignature();
+		}
+		ParserInput parserInput = new ParserInput(pageInfo.getVirtualWikiName(), "");
+		parserInput.setContext(request.getContextPath());
+		parserInput.setLocale(request.getLocale());
+		parserInput.setWikiUser(user);
+		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
+		ParserOutput parserOutput = new ParserOutput();
+		try {
+			// FIXME - should not need to specify mode
+			return WikiBase.getParserInstance().parseFragment(parserInput, parserOutput, signature, JFlexParser.MODE_PROCESS);
+		} catch (ParserException e) {
+			logger.error("Failure while parsing user signature " + signature, e);
+		}
+		return "";
 	}
 
 	/**
@@ -221,6 +244,12 @@ public class RegisterServlet extends JAMWikiServlet {
 		String result = ServletUtil.checkForSpam(request, user.getUsername());
 		if (result != null) {
 			pageInfo.addError(new WikiMessage("edit.exception.spam", result));
+		}
+		String dateFormat = request.getParameter("datetimeFormat");
+		try {
+			DateUtil.getUserLocalTime(null, dateFormat, null);
+		} catch (IllegalArgumentException e) {
+			pageInfo.addError(new WikiMessage("register.error.dateinvalid", dateFormat));
 		}
 	}
 

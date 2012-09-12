@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.DataHandler;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
@@ -103,15 +103,10 @@ public class WikiDatabase {
 	/**
 	 *
 	 */
-	private static DataHandler findNewDataHandler(Properties props) {
-		// find the DataHandler appropriate to the NEW database
+	private static QueryHandler findNewQueryHandler(Properties props) {
+		// find the QueryHandler appropriate to the NEW database
 		String handlerClassName = props.getProperty(Environment.PROP_DB_TYPE);
-		if (handlerClassName.equals(Environment.getValue(Environment.PROP_DB_TYPE))) {
-			// use existing DataHandler
-			return WikiBase.getDataHandler();
-		}
-		logger.debug("Using NEW data handler: " + handlerClassName);
-		return (DataHandler)ResourceUtil.instantiateClass(handlerClassName);
+		return (QueryHandler) ResourceUtil.instantiateClass(handlerClassName);
 	}
 
 	/**
@@ -130,7 +125,7 @@ public class WikiDatabase {
 		try {
 			conn = DatabaseConnection.getConnection();
 			for (VirtualWiki virtualWiki : virtualWikis) {
-				topicNames = WikiDatabase.queryHandler().lookupTopicNames(virtualWiki.getVirtualWikiId(), true, conn);
+				topicNames = WikiBase.getDataHandler().queryHandler().lookupTopicNames(virtualWiki.getVirtualWikiId(), true, conn);
 				if (topicNames.isEmpty()) {
 					continue;
 				}
@@ -141,7 +136,7 @@ public class WikiDatabase {
 					topic.setTopicId(entry.getKey());
 					topics.add(topic);
 				}
-				WikiDatabase.queryHandler().updateTopicNamespaces(topics, conn);
+				WikiBase.getDataHandler().queryHandler().updateTopicNamespaces(topics, conn);
 				count += topicNames.size();
 			}
 		} catch (SQLException e) {
@@ -166,18 +161,9 @@ public class WikiDatabase {
 			errors.add(new WikiMessage("error.databaseconnection", "Cannot migrate to the same database"));
 			return;
 		}
-		// find the DataHandler appropriate to the NEW database
-		DataHandler newDataHandler = WikiDatabase.findNewDataHandler(props);
-		// the QueryHandler appropriate for the NEW database
-		QueryHandler newQueryHandler = null;
-		// FIXME - this is ugly
-		if (newDataHandler instanceof AnsiDataHandler) {
-			AnsiDataHandler dataHandler = (AnsiDataHandler)newDataHandler;
-			newQueryHandler = dataHandler.queryHandler();
-			logger.debug("Using NEW query handler: " + newQueryHandler.getClass().getName());
-		} else {
-			newQueryHandler = queryHandler();
-		}
+		// find the QueryHandler appropriate to the NEW database
+		QueryHandler newQueryHandler = WikiDatabase.findNewQueryHandler(props);
+		logger.debug("Using NEW query handler: " + newQueryHandler.getClass().getName());
 		Connection conn = null;
 		Connection from = null;
 		Statement stmt = null;
@@ -332,7 +318,7 @@ public class WikiDatabase {
 	 */
 	public synchronized static void initialize() {
 		try {
-			WikiDatabase.CONNECTION_VALIDATION_QUERY = WikiDatabase.queryHandler().connectionValidationQuery();
+			WikiDatabase.CONNECTION_VALIDATION_QUERY = WikiBase.getDataHandler().queryHandler().connectionValidationQuery();
 			// initialize connection pool in its own try-catch to avoid an error
 			// causing property values not to be saved.
 			// this clears out any existing connection pool, so that a new one will be created on first access
@@ -416,26 +402,14 @@ public class WikiDatabase {
 	 */
 	protected static void purgeData(Connection conn) throws DataAccessException {
 		// BOOM!  Everything gone...
-		WikiDatabase.queryHandler().dropTables(conn);
+		WikiBase.getDataHandler().queryHandler().dropTables(conn);
 		try {
 			// re-create empty tables
-			WikiDatabase.queryHandler().createTables(conn);
+			WikiBase.getDataHandler().queryHandler().createTables(conn);
 		} catch (Exception e) {
 			// creation failure, don't leave tables half-committed
-			WikiDatabase.queryHandler().dropTables(conn);
+			WikiBase.getDataHandler().queryHandler().dropTables(conn);
 		}
-	}
-
-	/**
-	 *
-	 */
-	protected static QueryHandler queryHandler() throws DataAccessException {
-		// FIXME - this is ugly
-		if (WikiBase.getDataHandler() instanceof AnsiDataHandler) {
-			AnsiDataHandler dataHandler = (AnsiDataHandler)WikiBase.getDataHandler();
-			return dataHandler.queryHandler();
-		}
-		throw new DataAccessException("Unable to determine query handler");
 	}
 
 	/**
@@ -590,12 +564,13 @@ public class WikiDatabase {
 			status = DatabaseConnection.startTransaction();
 			Connection conn = DatabaseConnection.getConnection();
 			// set up tables
-			WikiDatabase.queryHandler().createTables(conn);
+			WikiBase.getDataHandler().queryHandler().createTables(conn);
 			WikiDatabase.setupDefaultVirtualWiki();
 			WikiDatabase.setupDefaultNamespaces();
 			WikiDatabase.setupDefaultInterwikis();
 			WikiDatabase.setupRoles();
 			WikiDatabase.setupGroups();
+			WikiDatabase.setupUserPreferencesDefaults();
 			WikiDatabase.setupAdminUser(user, username, encryptedPassword);
 			WikiDatabase.setupSpecialPages(locale, user);
 		} catch (SQLException e) {
@@ -604,7 +579,7 @@ public class WikiDatabase {
 			// clean up anything that might have been created
 			try {
 				Connection conn = DatabaseConnection.getConnection();
-				WikiDatabase.queryHandler().dropTables(conn);
+				WikiBase.getDataHandler().queryHandler().dropTables(conn);
 			} catch (Exception e2) {}
 			throw new DataAccessException(e);
 		} catch (DataAccessException e) {
@@ -613,7 +588,7 @@ public class WikiDatabase {
 			// clean up anything that might have been created
 			try {
 				Connection conn = DatabaseConnection.getConnection();
-				WikiDatabase.queryHandler().dropTables(conn);
+				WikiBase.getDataHandler().queryHandler().dropTables(conn);
 			} catch (Exception e2) {}
 			throw e;
 		} catch (WikiException e) {
@@ -622,7 +597,7 @@ public class WikiDatabase {
 			// clean up anything that might have been created
 			try {
 				Connection conn = DatabaseConnection.getConnection();
-				WikiDatabase.queryHandler().dropTables(conn);
+				WikiBase.getDataHandler().queryHandler().dropTables(conn);
 			} catch (Exception e2) {}
 			throw e;
 		}
@@ -654,7 +629,7 @@ public class WikiDatabase {
 	 */
 	public static void setupDefaultDatabase(Properties props) {
 		props.setProperty(Environment.PROP_DB_DRIVER, "org.hsqldb.jdbcDriver");
-		props.setProperty(Environment.PROP_DB_TYPE, DataHandler.DATA_HANDLER_HSQL);
+		props.setProperty(Environment.PROP_DB_TYPE, QueryHandler.QUERY_HANDLER_HSQL);
 		props.setProperty(Environment.PROP_DB_USERNAME, "sa");
 		props.setProperty(Environment.PROP_DB_PASSWORD, "");
 		File file = new File(props.getProperty(Environment.PROP_BASE_FILE_DIR), "database");
@@ -838,5 +813,13 @@ public class WikiDatabase {
 			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_SYSTEM_CSS, user, true, true);
 			setupSpecialPage(locale, virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, user, true, false);
 		}
+	}
+	
+	private static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage(),WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,1);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID(),WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,2);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null,WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,3);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar",WikiUser.USER_PREFERENCES_GROUP_EDITING,1);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null,WikiUser.USER_PREFERENCES_GROUP_EDITING,2);
 	}
 }
