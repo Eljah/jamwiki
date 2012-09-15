@@ -3,7 +3,7 @@
 
 New Features:
 
-  * None.
+  * Upgrade to Ehcache 2.5.4.
 
 Bugfixes:
 
