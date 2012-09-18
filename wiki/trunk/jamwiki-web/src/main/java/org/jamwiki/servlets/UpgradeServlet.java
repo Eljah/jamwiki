@@ -107,25 +107,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			// upgrade the search index if required & possible
 			this.upgradeSearchIndex(true, pageInfo.getMessages());
-			// refresh topic metadata if needed
-			try {
-				if (oldVersion.before(1, 1, 0)) {
-					int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
-					if (topicCount < MAX_TOPICS_FOR_AUTOMATIC_UPDATE) {
-						int[] resultArray = WikiDatabase.rebuildTopicMetadata();
-						pageInfo.addMessage(new WikiMessage("admin.maintenance.message.metadata", Integer.toString(resultArray[0])));
-						if (resultArray[1] != 0) {
-							pageInfo.addMessage(new WikiMessage("admin.maintenance.error.metadata", Integer.toString(resultArray[1])));
-						}
-					} else {
-						// print a message telling the user to do this step manually
-						pageInfo.addMessage(new WikiMessage("upgrade.message.110.topic.links"));
-					}
-				}
-			} catch (DataAccessException e) {
-				logger.warn("Failure during upgrade while generating topic link records.  Please use the tools on the Special:Maintenance page to complete this step.", e);
-				pageInfo.addMessage(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
-			}
 			// upgrade stylesheet
 			if (this.upgradeStyleSheetRequired()) {
 				this.upgradeStyleSheet(request, pageInfo.getMessages());
@@ -239,16 +220,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private boolean upgradeDatabase(boolean performUpgrade, List<WikiMessage> messages) throws WikiException {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		if (oldVersion.before(1, 1, 0) && performUpgrade && StringUtils.equals(Environment.getValue(Environment.PROP_BASE_PERSISTENCE_TYPE), WikiBase.PERSISTENCE_INTERNAL)) {
-			// per HSQL guidelines, execute a shutdown compact to upgrade on-disk format
-			DatabaseUpgrades.upgradeHsql22(messages);
-		}
-		if (oldVersion.before(1, 1, 0)) {
-			upgradeRequired = true;
-			if (performUpgrade) {
-				DatabaseUpgrades.upgrade110(messages);
-			}
-		}
 		if (oldVersion.before(1, 2, 0)) {
 			upgradeRequired = true;
 			if (performUpgrade) {
