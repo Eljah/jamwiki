@@ -47,8 +47,6 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 public class DatabaseConnection {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(DatabaseConnection.class.getName());
-	/** Any queries that take longer than this value (specified in milliseconds) will print a warning to the log. */
-	protected static final int SLOW_QUERY_LIMIT = 250;
 	private static DataSource dataSource = null;
 	private static DataSourceTransactionManager transactionManager = null;
 
@@ -191,21 +189,6 @@ public class DatabaseConnection {
 	/**
 	 *
 	 */
-	protected static void executeUpdate(String sql) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = DatabaseConnection.getConnection();
-			executeUpdate(sql, conn);
-		} finally {
-			if (conn != null) {
-				DatabaseConnection.closeConnection(conn);
-			}
-		}
-	}
-
-	/**
-	 *
-	 */
 	protected static int executeUpdate(String sql, Connection conn) throws SQLException {
 		Statement stmt = null;
 		try {
@@ -215,11 +198,8 @@ public class DatabaseConnection {
 				logger.info("Executing SQL: " + sql);
 			}
 			int result = stmt.executeUpdate(sql);
-			long execution = System.currentTimeMillis() - start;
-			if (execution > DatabaseConnection.SLOW_QUERY_LIMIT && logger.isWarnEnabled()) {
-				logger.warn("Slow query: " + sql + " (" + (execution / 1000.000) + " s.)");
-			}
 			if (logger.isDebugEnabled()) {
+				long execution = System.currentTimeMillis() - start;
 				logger.debug("Executed " + sql + " (" + (execution / 1000.000) + " s.)");
 			}
 			return result;
