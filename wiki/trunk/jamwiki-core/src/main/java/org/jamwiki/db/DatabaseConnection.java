@@ -212,6 +212,17 @@ public class DatabaseConnection {
 	}
 
 	/**
+	 * Execute a string representing a SQL statement, suppressing any exceptions.
+	 */
+	protected static void executeUpdateNoException(String sql, Connection conn) {
+		try {
+			DatabaseConnection.executeUpdate(sql, conn);
+		} catch (SQLException e) {
+			// suppress
+		}
+	}
+
+	/**
 	 *
 	 */
 	protected static Connection getConnection() throws SQLException {

@@ -537,82 +537,32 @@ public class AnsiQueryHandler implements QueryHandler {
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
 		if (!StringUtils.isBlank(STATEMENT_DROP_SEQUENCES)) {
-			try {
-				DatabaseConnection.executeUpdate(STATEMENT_DROP_SEQUENCES, conn);
-			} catch (SQLException e) { logger.error(e.getMessage()); }
+			DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_SEQUENCES, conn);
 		}
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_FILE_DATA_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_CONFIGURATION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_INTERWIKI_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WATCHLIST_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_RECENT_CHANGE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_LOG_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_AUTHORITIES_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_AUTHORITIES_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_ROLE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_MEMBERS_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_CATEGORY_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_VERSION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_LINKS_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_VERSION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_NAMESPACE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_USER_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_USERS_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_VIRTUAL_WIKI_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_FILE_DATA_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_CONFIGURATION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_INTERWIKI_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WATCHLIST_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_RECENT_CHANGE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_LOG_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_GROUP_AUTHORITIES_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_AUTHORITIES_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_ROLE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_GROUP_MEMBERS_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_GROUP_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_CATEGORY_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WIKI_FILE_VERSION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WIKI_FILE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_LINKS_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_VERSION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_NAMESPACE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WIKI_USER_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_USERS_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_VIRTUAL_WIKI_TABLE, conn);
 	}
 
 	/**
