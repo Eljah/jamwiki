@@ -64,8 +64,7 @@ public class ParserUtil {
 		if (content == null) {
 			return null;
 		}
-		ParserOutput parserOutput = new ParserOutput();
-		return WikiBase.getParserInstance().parseEditComment(parserInput, parserOutput, content);
+		return WikiBase.getParserInstance().parseEditComment(parserInput, ParserOutput.IMMUTABLE_PARSER_OUTPUT, content);
 	}
 
 	/**

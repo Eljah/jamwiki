@@ -29,10 +29,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.jamwiki.db.QueryHandler;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.WikiLogger;
-import org.jamwiki.utils.WikiUtil;
 
 /**
  * The <code>Environment</code> class is instantiated as a singleton to
@@ -209,7 +209,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_DATE_PATTERN_TIME_ONLY, "HH:mm");
 		this.defaults.setProperty(PROP_DB_DRIVER, "");
 		this.defaults.setProperty(PROP_DB_PASSWORD, "");
-		this.defaults.setProperty(PROP_DB_TYPE, "");
+		this.defaults.setProperty(PROP_DB_TYPE, QueryHandler.QUERY_HANDLER_HSQL);
 		this.defaults.setProperty(PROP_DB_URL, "");
 		this.defaults.setProperty(PROP_DB_USERNAME, "");
 		this.defaults.setProperty(PROP_DBCP_MAX_ACTIVE, "15");
@@ -491,7 +491,7 @@ public class Environment {
 			Environment.saveProperties(PROPERTY_FILE_NAME, getInstance(), null);
 			// do not use WikiBase.getDataHandler() directly since properties are
 			// being changed
-			WikiUtil.dataHandlerInstance().writeConfiguration(propertiesToMap(getInstance()));
+			WikiBase.getDataHandler().writeConfiguration(propertiesToMap(getInstance()));
 		} catch (IOException e) {
 			throw new WikiException(new WikiMessage("error.unknown", e.getMessage()));
 		} catch (DataAccessException e) {

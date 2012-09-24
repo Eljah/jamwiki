@@ -16,6 +16,8 @@
  */
 package org.jamwiki.servlets;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.WikiVersion;
@@ -104,25 +107,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			// upgrade the search index if required & possible
 			this.upgradeSearchIndex(true, pageInfo.getMessages());
-			// refresh topic metadata if needed
-			try {
-				if (oldVersion.before(1, 1, 0)) {
-					int topicCount = WikiBase.getDataHandler().lookupTopicCount(VirtualWiki.defaultVirtualWiki().getName(), null);
-					if (topicCount < MAX_TOPICS_FOR_AUTOMATIC_UPDATE) {
-						int[] resultArray = WikiDatabase.rebuildTopicMetadata();
-						pageInfo.addMessage(new WikiMessage("admin.maintenance.message.metadata", Integer.toString(resultArray[0])));
-						if (resultArray[1] != 0) {
-							pageInfo.addMessage(new WikiMessage("admin.maintenance.error.metadata", Integer.toString(resultArray[1])));
-						}
-					} else {
-						// print a message telling the user to do this step manually
-						pageInfo.addMessage(new WikiMessage("upgrade.message.110.topic.links"));
-					}
-				}
-			} catch (DataAccessException e) {
-				logger.warn("Failure during upgrade while generating topic link records.  Please use the tools on the Special:Maintenance page to complete this step.", e);
-				pageInfo.addMessage(new WikiMessage("upgrade.error.nonfatal", e.getMessage()));
-			}
 			// upgrade stylesheet
 			if (this.upgradeStyleSheetRequired()) {
 				this.upgradeStyleSheet(request, pageInfo.getMessages());
@@ -225,19 +209,17 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private boolean upgradeConfigXmlRequired() {
+		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
+		return (oldVersion.before(1, 3, 0));
+	}
+
+	/**
+	 *
+	 */
 	private boolean upgradeDatabase(boolean performUpgrade, List<WikiMessage> messages) throws WikiException {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		if (oldVersion.before(1, 1, 0) && performUpgrade && StringUtils.equals(Environment.getValue(Environment.PROP_BASE_PERSISTENCE_TYPE), WikiBase.PERSISTENCE_INTERNAL)) {
-			// per HSQL guidelines, execute a shutdown compact to upgrade on-disk format
-			DatabaseUpgrades.upgradeHsql22(messages);
-		}
-		if (oldVersion.before(1, 1, 0)) {
-			upgradeRequired = true;
-			if (performUpgrade) {
-				DatabaseUpgrades.upgrade110(messages);
-			}
-		}
 		if (oldVersion.before(1, 2, 0)) {
 			upgradeRequired = true;
 			if (performUpgrade) {
@@ -250,6 +232,9 @@ public class UpgradeServlet extends JAMWikiServlet {
 				DatabaseUpgrades.upgrade130(messages);
 			}
 		}
+		// Flush connection pool to manage database schema change
+		WikiDatabase.initialize();
+		WikiCache.initialize();
 		return upgradeRequired;
 	}
 
@@ -313,7 +298,7 @@ public class UpgradeServlet extends JAMWikiServlet {
 	 */
 	private boolean upgradeStyleSheetRequired() {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		return (oldVersion.before(1, 2, 0));
+		return (oldVersion.before(1, 3, 0));
 	}
 
 	/**
@@ -328,9 +313,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 		try {
 			if (this.upgradeDatabase(false, null)) {
 				upgradeDetails.add(new WikiMessage("upgrade.caption.database"));
-				// Flush connection pool to manage database schema change
-				WikiDatabase.initialize();
-				WikiCache.initialize();
 			}
 		} catch (Exception e) {
 			// never thrown when the first parameter is false
@@ -343,6 +325,15 @@ public class UpgradeServlet extends JAMWikiServlet {
 		}
 		if (this.upgradeStyleSheetRequired()) {
 			upgradeDetails.add(new WikiMessage("upgrade.caption.stylesheet"));
+		}
+		if (this.upgradeConfigXmlRequired()) {
+			File file = null;
+			try {
+				file = WikiConfiguration.getInstance().retrieveConfigFile();
+				upgradeDetails.add(new WikiMessage("upgrade.caption.config", file.getAbsolutePath()));
+			} catch (IOException e) {
+				logger.warn("Unable to retrieve configuration file location", e);
+			}
 		}
 		upgradeDetails.add(new WikiMessage("upgrade.caption.releasenotes"));
 		upgradeDetails.add(new WikiMessage("upgrade.caption.manual"));

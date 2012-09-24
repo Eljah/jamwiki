@@ -19,9 +19,7 @@ package org.jamwiki.web.utils;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiConfiguration;

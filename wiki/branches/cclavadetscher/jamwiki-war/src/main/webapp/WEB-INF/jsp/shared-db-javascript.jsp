@@ -17,7 +17,7 @@
 
 --%>
 <%@ page import="
-        org.jamwiki.DataHandler,
+        org.jamwiki.db.QueryHandler,
         org.jamwiki.Environment
     "
     contentType="text/html; charset=utf-8"
@@ -32,28 +32,28 @@ var DATABASE_ELEMENT_IDS = [
 	"<%= Environment.PROP_DB_PASSWORD %>"
 ];
 var DATABASE_SAMPLE_VALUES = new Array();
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_DB2 %>"] ={
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_DB2 %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "com.ibm.db2.jdbc.app.DB2Driver", <%= Environment.PROP_DB_URL %>: "jdbc:db2j:net://localhost:1527/database"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_DB2400 %>"] ={
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_DB2400 %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "com.ibm.db2.jdbc.app.DB2Driver", <%= Environment.PROP_DB_URL %>: "jdbc:db2j:net://localhost:1527/database"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_HSQL %>"] ={
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_HSQL %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "org.hsqldb.jdbcDriver", <%= Environment.PROP_DB_URL %>: "jdbc:hsqldb:file:\database\path;shutdown=true"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_MSSQL %>"] ={
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_MSSQL %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "com.microsoft.sqlserver.jdbc.SQLServerDriver", <%= Environment.PROP_DB_URL %>: "jdbc:sqlserver://localhost:1433;DatabaseName=database"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_MYSQL %>"] ={
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_MYSQL %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "com.mysql.jdbc.Driver", <%= Environment.PROP_DB_URL %>: "jdbc:mysql://localhost:3306/database"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_ORACLE %>"] ={
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_ORACLE %>"] ={
 	<%= Environment.PROP_DB_DRIVER %>: "oracle.jdbc.driver.OracleDriver", <%= Environment.PROP_DB_URL %>: "jdbc:oracle:thin:@localhost:1521:sid"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_POSTGRES %>"] = {
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_POSTGRES %>"] = {
 	<%= Environment.PROP_DB_DRIVER %>: "org.postgresql.Driver", <%= Environment.PROP_DB_URL %>: "jdbc:postgresql://localhost:5432/database"
 };
-DATABASE_SAMPLE_VALUES["<%= DataHandler.DATA_HANDLER_ASA %>"] = {
+DATABASE_SAMPLE_VALUES["<%= QueryHandler.QUERY_HANDLER_SYBASE %>"] = {
 	<%= Environment.PROP_DB_DRIVER %>: "com.sybase.jdbc2.jdbc.SybDriver", <%= Environment.PROP_DB_URL %>: "jdbc:sybase:Tds:localhost:2048/database"
 };
 var UPLOAD_ELEMENT_IDS = [

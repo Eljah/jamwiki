@@ -18,8 +18,10 @@ package org.jamwiki.parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents the output from the JAMWiki parser.  It holds parsed
@@ -27,20 +29,35 @@ import java.util.List;
  */
 public class ParserOutput implements Serializable {
 
+	/**
+	 * For performance reasons provide a static ParserOutput object that cannot
+	 * be modified, changed, and thus has no memory impacts.
+	 */
+	public static final ParserOutput IMMUTABLE_PARSER_OUTPUT = new ParserOutput(true);
+
 	private boolean cacheable = true;
-	private LinkedHashMap<String, String> categories;
-	private List<String> interwikiLinks;
-	private List<String> links;
-	private List<String> virtualWikiLinks;
+	private Map<String, String> categories = Collections.emptyMap();
+	private final boolean immutable;
+	private List<String> interwikiLinks = Collections.emptyList();
+	private List<String> links = Collections.emptyList();
+	private List<String> virtualWikiLinks = Collections.emptyList();
 	private String pageTitle;
 	private String redirect;
 	private String sectionName;
-	private List<String> templates;
+	private List<String> templates = Collections.emptyList();
 
 	/**
 	 *
 	 */
 	public ParserOutput() {
+		this.immutable = false;
+	}
+
+	/**
+	 *
+	 */
+	private ParserOutput(boolean immutable) {
+		this.immutable = true;
 	}
 
 	/**
@@ -48,14 +65,14 @@ public class ParserOutput implements Serializable {
 	 */
 	public void reset() {
 		this.cacheable = true;
-		this.categories = null;
-		this.interwikiLinks = null;
-		this.links = null;
-		this.virtualWikiLinks = null;
+		this.categories = Collections.emptyMap();
+		this.interwikiLinks = Collections.emptyList();
+		this.links = Collections.emptyList();
+		this.virtualWikiLinks = Collections.emptyList();
 		this.pageTitle = null;
 		this.redirect = null;
 		this.sectionName = null;
-		this.templates = null;
+		this.templates = Collections.emptyList();
 	}
 
 	/**
@@ -71,7 +88,15 @@ public class ParserOutput implements Serializable {
 	 *  "John Doe" might be given a sort key of "Doe, John".
 	 */
 	public void addCategory(String categoryName, String sortKey) {
-		this.getCategories().put(categoryName, sortKey);
+		if (this.immutable) {
+			return;
+		}
+		if (this.categories.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.categories = new LinkedHashMap<String, String>();
+		}
+		this.categories.put(categoryName, sortKey);
 	}
 
 	/**
@@ -83,8 +108,16 @@ public class ParserOutput implements Serializable {
 	 * @param interwikiLink The fully-formatted HTML interwiki link.
 	 */
 	public void addInterwikiLink(String interwikiLink) {
-		if (!this.getInterwikiLinks().contains(interwikiLink)) {
-			this.getInterwikiLinks().add(interwikiLink);
+		if (this.immutable) {
+			return;
+		}
+		if (this.interwikiLinks.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.interwikiLinks = new ArrayList<String>();
+		}
+		if (!this.interwikiLinks.contains(interwikiLink)) {
+			this.interwikiLinks.add(interwikiLink);
 		}
 	}
 
@@ -96,7 +129,15 @@ public class ParserOutput implements Serializable {
 	 * @param topicName The name of the topic that is linked to.
 	 */
 	public void addLink(String topicName) {
-		this.getLinks().add(topicName);
+		if (this.immutable) {
+			return;
+		}
+		if (this.links.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.links = new ArrayList<String>();
+		}
+		this.links.add(topicName);
 	}
 
 	/**
@@ -107,7 +148,15 @@ public class ParserOutput implements Serializable {
 	 * @param template The name of the template that is being included.
 	 */
 	public void addTemplate(String template) {
-		this.getTemplates().add(template);
+		if (this.immutable) {
+			return;
+		}
+		if (this.templates.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.templates = new ArrayList<String>();
+		}
+		this.templates.add(template);
 	}
 
 	/**
@@ -119,8 +168,16 @@ public class ParserOutput implements Serializable {
 	 * @param virtualWikiLink The fully-formatted HTML interwiki link.
 	 */
 	public void addVirtualWikiLink(String virtualWikiLink) {
-		if (!this.getVirtualWikiLinks().contains(virtualWikiLink)) {
-			this.getVirtualWikiLinks().add(virtualWikiLink);
+		if (this.immutable) {
+			return;
+		}
+		if (this.virtualWikiLinks.isEmpty()) {
+			// this field is initialized to an immutable map, so if it is empty
+			// reset it to a mutable map.
+			this.virtualWikiLinks = new ArrayList<String>();
+		}
+		if (!this.virtualWikiLinks.contains(virtualWikiLink)) {
+			this.virtualWikiLinks.add(virtualWikiLink);
 		}
 	}
 
@@ -134,6 +191,9 @@ public class ParserOutput implements Serializable {
 	 *  <code>false</code> if it contains any non-cacheable content.
 	 */
 	public boolean getCacheable() {
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getCacheable() on an immutable ParserOutput");
+		}
 		return this.cacheable;
 	}
 
@@ -148,6 +208,9 @@ public class ParserOutput implements Serializable {
 	 *  content.
 	 */
 	public void setCacheable(boolean cacheable) {
+		if (this.immutable) {
+			return;
+		}
 		this.cacheable = cacheable;
 	}
 
@@ -159,9 +222,9 @@ public class ParserOutput implements Serializable {
 	 * @return A mapping of categories and their associated sort keys (if any)
 	 *  for all categories that are associated with the document being parsed.
 	 */
-	public LinkedHashMap<String, String> getCategories() {
-		if (this.categories == null) {
-			this.categories = new LinkedHashMap<String, String>();
+	public Map<String, String> getCategories() {
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getCategories() on an immutable ParserOutput");
 		}
 		return this.categories;
 	}
@@ -174,8 +237,8 @@ public class ParserOutput implements Serializable {
 	 *  specified for the current document.
 	 */
 	public List<String> getInterwikiLinks() {
-		if (this.interwikiLinks == null) {
-			this.interwikiLinks = new ArrayList<String>();
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getInterwikiLinks() on an immutable ParserOutput");
 		}
 		return this.interwikiLinks;
 	}
@@ -188,8 +251,8 @@ public class ParserOutput implements Serializable {
 	 *  current document.
 	 */
 	public List<String> getLinks() {
-		if (this.links == null) {
-			this.links = new ArrayList<String>();
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getLinks() on an immutable ParserOutput");
 		}
 		return this.links;
 	}
@@ -203,6 +266,9 @@ public class ParserOutput implements Serializable {
 	 *  <code>null</code> if no alternate page title is specified.
 	 */
 	public String getPageTitle() {
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getPageTitle() on an immutable ParserOutput");
+		}
 		return this.pageTitle;
 	}
 
@@ -215,6 +281,9 @@ public class ParserOutput implements Serializable {
 	 *  element, or <code>null</code> if no alternate page title is in use.
 	 */
 	public void setPageTitle(String pageTitle) {
+		if (this.immutable) {
+			return;
+		}
 		this.pageTitle = pageTitle;
 	}
 
@@ -228,6 +297,9 @@ public class ParserOutput implements Serializable {
 	 *  URL.
 	 */
 	public String getSectionName() {
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getSectionName() on an immutable ParserOutput");
+		}
 		return this.sectionName;
 	}
 
@@ -241,6 +313,9 @@ public class ParserOutput implements Serializable {
 	 *  use in a URL.
 	 */
 	public void setSectionName(String sectionName) {
+		if (this.immutable) {
+			return;
+		}
 		this.sectionName = sectionName;
 	}
 
@@ -253,8 +328,8 @@ public class ParserOutput implements Serializable {
 	 *  current document.
 	 */
 	public List<String> getTemplates() {
-		if (this.templates == null) {
-			this.templates = new ArrayList<String>();
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getTemplates() on an immutable ParserOutput");
 		}
 		return this.templates;
 	}
@@ -267,6 +342,9 @@ public class ParserOutput implements Serializable {
 	 *  <code>null</code> if the document does not represent a redirect.
 	 */
 	public String getRedirect() {
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getRedirect() on an immutable ParserOutput");
+		}
 		return this.redirect;
 	}
 
@@ -278,6 +356,9 @@ public class ParserOutput implements Serializable {
 	 *  or <code>null</code> if the document does not represent a redirect.
 	 */
 	public void setRedirect(String redirect) {
+		if (this.immutable) {
+			return;
+		}
 		this.redirect = redirect;
 	}
 
@@ -289,8 +370,8 @@ public class ParserOutput implements Serializable {
 	 *  specified for the current document.
 	 */
 	public List<String> getVirtualWikiLinks() {
-		if (this.virtualWikiLinks == null) {
-			this.virtualWikiLinks = new ArrayList<String>();
+		if (this.immutable) {
+			throw new IllegalStateException("Cannot call getVirtualWikiLinks() on an immutable ParserOutput");
 		}
 		return this.virtualWikiLinks;
 	}

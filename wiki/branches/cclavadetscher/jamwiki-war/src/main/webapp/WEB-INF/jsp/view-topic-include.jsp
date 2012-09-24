@@ -25,7 +25,7 @@
 				<div id="shared-image-message"><fmt:message key="topic.sharedImage"><fmt:param><jamwiki:link value="${sharedImageTopicObject.name}" virtualWiki="${sharedImageTopicObject.virtualWiki}" text="${sharedImageTopicObject.name}" style="interwikilink" /></fmt:param></fmt:message></div>
 			</c:if>
 			<c:if test="${topicImage}"><a href="<jamwiki:imageUrl topicName="${topicObject.name}" fileVersion="${fileVersions[0]}" />" class="wikiimg"><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" maxWidth="800" maxHeight="600" allowEnlarge="false" /></a></c:if>
-			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<c:out value="${fileVersions[0].url}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
+			<c:if test="${topicFile}"><div id="topic-file-download"><fmt:message key="topic.file.download" />:&#160;<a href="<jamwiki:imageUrl topicName="${topicObject.name}" fileVersion="${fileVersions[0]}" />"><c:out value="${topicObject.name}" /></a></div></c:if>
 			<c:out value="${topicObject.topicContent}" escapeXml="false" />
 			</div>
 			<div class="clear"></div>

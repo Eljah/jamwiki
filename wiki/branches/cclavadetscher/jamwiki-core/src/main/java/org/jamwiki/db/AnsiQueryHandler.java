@@ -32,9 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
-import org.jamwiki.WikiBase;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
@@ -56,7 +54,6 @@ import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserDetails;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
-import org.springframework.transaction.TransactionStatus;
 
 /**
  * Default implementation of the QueryHandler implementation for retrieving, inserting,
@@ -540,86 +537,41 @@ public class AnsiQueryHandler implements QueryHandler {
 		// note that the coding style violation here is intentional since it makes the
 		// actual work of the method more obvious.
 		if (!StringUtils.isBlank(STATEMENT_DROP_SEQUENCES)) {
-			try {
-				DatabaseConnection.executeUpdate(STATEMENT_DROP_SEQUENCES, conn);
-			} catch (SQLException e) { logger.error(e.getMessage()); }
+			DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_SEQUENCES, conn);
 		}
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_FILE_DATA_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_CONFIGURATION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_INTERWIKI_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WATCHLIST_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_RECENT_CHANGE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_LOG_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_AUTHORITIES_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_AUTHORITIES_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_ROLE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_MEMBERS_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_GROUP_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_CATEGORY_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_VERSION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_FILE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_LINKS_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_VERSION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_TOPIC_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_NAMESPACE_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_WIKI_USER_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_USERS_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
-		try {
-			DatabaseConnection.executeUpdate(STATEMENT_DROP_VIRTUAL_WIKI_TABLE, conn);
-		} catch (SQLException e) { logger.error(e.getMessage()); }
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_FILE_DATA_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_USER_BLOCK_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_CONFIGURATION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_INTERWIKI_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WATCHLIST_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_RECENT_CHANGE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_LOG_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_GROUP_AUTHORITIES_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_AUTHORITIES_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_ROLE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_GROUP_MEMBERS_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_GROUP_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_CATEGORY_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WIKI_FILE_VERSION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WIKI_FILE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_LINKS_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_CURRENT_VERSION_CONSTRAINT, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_VERSION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_TOPIC_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_NAMESPACE_TRANSLATION_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_NAMESPACE_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_WIKI_USER_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_USERS_TABLE, conn);
+		DatabaseConnection.executeUpdateNoException(STATEMENT_DROP_VIRTUAL_WIKI_TABLE, conn);
 	}
 
 	/**
+	 * This method should be called only during upgrades and provides the capability
+	 * to execute a SQL query from a QueryHandler-specific property file.
 	 *
+	 * @param prop The name of the SQL property file value to execute.
+	 * @param conn The SQL connection to use when executing the SQL.
+	 * @throws SQLException Thrown if any error occurs during execution.
 	 */
 	public void executeUpgradeQuery(String prop, Connection conn) throws SQLException {
 		String sql = this.props.getProperty(prop);
@@ -636,7 +588,14 @@ public class AnsiQueryHandler implements QueryHandler {
 	}
 
 	/**
+	 * This method should be called only during upgrades and provides the capability
+	 * to execute update SQL from a QueryHandler-specific property file.
 	 *
+	 * @param prop The name of the SQL property file value to execute.
+	 * @param conn The SQL connection to use when executing the SQL.
+	 * @throws SQLException Thrown if any error occurs during execution.
+	 *
+	 * @return true if action actually performed and false otherwise.
 	 */
 	public boolean executeUpgradeUpdate(String prop, Connection conn) throws SQLException {
 		String sql = this.props.getProperty(prop);

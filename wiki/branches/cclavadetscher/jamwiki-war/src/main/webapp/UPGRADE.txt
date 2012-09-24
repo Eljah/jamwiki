@@ -85,6 +85,10 @@ followed by 1.0.1.
 
   SPECIAL NOTES:
 
+  * This release updates the default JAMWiki:System.css topic.  See below for
+    instructions on manually updating this topic with the new styles.
+  * The jamwiki-configuration.xml file has been renamed to
+    jamwiki-configuration-1.3.xml.  See below for further details.
   * The migration from user properties in the jam_wiki_user table to a dedicated
     table requires the creation of two new tables (one for the default values,
     holding at the same time the list of valid preference keys and a second with
@@ -96,62 +100,77 @@ followed by 1.0.1.
 
   1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
      "wiki-version" property to "1.3.0".
-  2. Update the database schema by executing the following SQL statements.
-    a.  Create the new tables jam_user_preferences_defaults and jam_user_preferences.
-        CREATE TABLE jam_user_preferences_defaults (
-            pref_key VARCHAR(100),
-            pref_value VARCHAR(250),
-            pref_group_key VARCHAR(100),
-            seq_nr INTEGER,
-            CONSTRAINT jam_p_uprefdef PRIMARY KEY (pref_key)
-        )
+  2. CSS styles have changed during this release.  An up-to-date version of
+     the JAMWiki:System.css topic can be found in the
+     /WEB-INF/classes/pages/JAMWiki%3ASystem.css.txt file.  Note that the
+     JAMWiki:System.css topic should only be edited AFTER all other upgrade
+     steps have been completed.
+  3. Any customizations that were made to the jamwiki-configuration.xml file
+     (found in the "resources" sub-directory within the JAMWiki system folder)
+     should be copied to the new jamwiki-configuration-1.3.xml file in the same
+     directory.
+  4. Update the database schema by executing the following SQL statements.
+       a) Create the new tables jam_user_preferences_defaults and jam_user_preferences:
+              CREATE TABLE jam_user_preferences_defaults (
+                pref_key VARCHAR(100),
+                pref_value VARCHAR(250),
+                pref_group_key VARCHAR(100),
+                seq_nr INTEGER,
+                CONSTRAINT jam_p_uprefdef PRIMARY KEY (pref_key)
+              );
+              CREATE TABLE jam_user_preferences (
+                wiki_user_id INTEGER,
+                pref_key VARCHAR(100),
+                pref_value VARCHAR(250),
+                CONSTRAINT jam_p_upref PRIMARY KEY (wiki_user_id, pref_key),
+                CONSTRAINT jam_f_upref_uwiki FOREIGN KEY (wiki_user_id) REFERENCES jam_wiki_user (wiki_user_id),
+                CONSTRAINT jam_f_upref_uprefdef FOREIGN KEY (pref_key) REFERENCES jam_user_preferences_defaults
+              );
+       b) Create an index on wiki_user_id for jam_user_preferences:
+              CREATE INDEX jam_u_upref ON jam_user_preferences(wiki_user_id);
+       c) Create default values. Note that you may want to use local values for
+          the user.default.locale and the user.timezone, e.g. "de", "CET" for
+          German and Central Europe. The format of the locale must be an ISO 2
+          character value for the language. Optionally you may also specify the
+          country code, which is also an ISO 2 character country code. In this
+          case the two values are concatenated to a single string with an
+          underscore between them: e.g. de_DE or de_CH or en_US.  If you use a 
+          short form for the timezone you should use the version without
+          daylight saving, i.e. for the example given use "CET" and not
+          "CEST", even if it is Summer time or, as shown below "PST" instead of
+          "PDT". The java classes take care of using and displaying daylight
+          saving time information if necessary.  Setting default values to null
+          is the same as instructing the application to use system defaults as
+          for example the signature_date property for user.datetime.format.
+              INSERT INTO jam_user_preferences_defaults VALUES('user.preferred.editor', 'toolbar', 'user.preferences.group.editing', 1);
+              INSERT INTO jam_user_preferences_defaults VALUES('user.signature', NULL, 'user.preferences.group.editing', 2);
+              INSERT INTO jam_user_preferences_defaults VALUES('user.default.locale', 'en', 'user.preferences.group.internationalization', 1);
+              INSERT INTO jam_user_preferences_defaults VALUES('user.datetime.format', NULL, 'user.preferences.group.internationalization', 2);
+              INSERT INTO jam_user_preferences_defaults VALUES('user.timezone', 'PST', 'user.preferences.group.internationalization', 3);
+       d) Migrate existing user preference values:
+              INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
+                SELECT wiki_user_id, 'user.default.locale', default_locale
+                FROM jam_wiki_user
+                WHERE default_locale IS NOT NULL;
+              INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
+                SELECT wiki_user_id, 'user.signature', signature
+                FROM jam_wiki_user
+                WHERE signature IS NOT NULL;
+              INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
+                SELECT wiki_user_id, 'user.preferred.editor', editor
+                FROM jam_wiki_user
+                WHERE editor IS NOT NULL;
+       e) Remove unnecessary fields from jam_wiki_user:
+              ALTER TABLE jam_wiki_user DROP COLUMN default_locale;
+              ALTER TABLE jam_wiki_user DROP COLUMN signature;
+              ALTER TABLE jam_wiki_user DROP COLUMN editor;
 
-        CREATE TABLE jam_user_preferences (
-            wiki_user_id INTEGER,
-            pref_key VARCHAR(100),
-            pref_value VARCHAR(250),
-            CONSTRAINT jam_p_upref PRIMARY KEY (wiki_user_id, pref_key),
-            CONSTRAINT jam_f_upref_uwiki FOREIGN KEY (wiki_user_id) REFERENCES jam_wiki_user (wiki_user_id),
-            CONSTRAINT jam_f_upref_uprefdef FOREIGN KEY (pref_key) REFERENCES jam_user_preferences_defaults
-        )
-    b.  Create an index on wiki_user_id for jam_user_preferences.
-        CREATE INDEX jam_u_upref ON jam_user_preferences(wiki_user_id);
-    c.  Create default values. Note that you may want to use local values for the user.default.locale
-        and the user.timezone, e.g. "de", "CET" for German and Central Europe. The format of the locale
-        must be an ISO 2 character value for the language. Optionally you may also specify the country
-        code, which is also an ISO 2 character country code. In this case the two values are concatenated
-        to a single string with an underscore between them: e.g. de_DE or de_CH or en_US. 
-        If you use a short form for the timezone you should use the version without daylight saving, i.e.
-        for the example given use "CET" and not "CEST", even if it is Summer time or, as shown below "PST"
-        instead of "PDT". The java classes take care of using and displaying daylight saving time information
-        if necessary.
-        Setting default values to null is the same as instructing the application to use system defaults as
-        for example the signature_date property for user.datetime.format.
-        INSERT INTO jam_user_preferences_defaults VALUES('user.preferred.editor','toolbar','user.preferences.group.editing',1)
-        INSERT INTO jam_user_preferences_defaults VALUES('user.signature',NULL,'user.preferences.group.editing',2)
-        INSERT INTO jam_user_preferences_defaults VALUES('user.default.locale','en','user.preferences.group.internationalization',1)
-        INSERT INTO jam_user_preferences_defaults VALUES('user.datetime.format',NULL,'user.preferences.group.internationalization',2)
-        INSERT INTO jam_user_preferences_defaults VALUES('user.timezone',"PST",'user.preferences.group.internationalization',3)
-    d.  Migrate existing user preference values.
-        INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
-        SELECT wiki_user_id, 'user.default.locale', default_locale
-        FROM jam_wiki_user
-        WHERE default_locale IS NOT NULL
-        
-        INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
-        SELECT wiki_user_id, 'user.signature', signature
-        FROM jam_wiki_user
-        WHERE signature IS NOT NULL
-        
-        INSERT INTO jam_user_preferences (wiki_user_id, pref_key, pref_value)
-        SELECT wiki_user_id, 'user.preferred.editor', editor
-        FROM jam_wiki_user
-        WHERE editor IS NOT NULL
 
-    e.  Remove unnecessary fields from jam_wiki_user.
-        ALTER TABLE jam_wiki_user DROP COLUMN default_locale
-        ALTER TABLE jam_wiki_user DROP COLUMN signature
-        ALTER TABLE jam_wiki_user DROP COLUMN editor
+  JAMWiki 1.2.3
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "1.2.3".
 
 
   JAMWiki 1.2.2

@@ -87,8 +87,7 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 		// since the TOC isn't part of the editable content use a copy of the parser input/
 		// and an empty output.
 		ParserInput tmpParserInput = new ParserInput(lexer.getParserInput());
-		ParserOutput parserOutput = new ParserOutput();
-		String tocText = this.processTocText(tmpParserInput, parserOutput, tagText, JFlexParser.MODE_PROCESS);
+		String tocText = this.processTocText(tmpParserInput, ParserOutput.IMMUTABLE_PARSER_OUTPUT, tagText, JFlexParser.MODE_PROCESS);
 		return Utilities.stripMarkup(tocText);
 	}
 

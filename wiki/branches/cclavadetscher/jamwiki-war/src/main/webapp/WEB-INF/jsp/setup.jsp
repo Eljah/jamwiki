@@ -17,7 +17,6 @@
 
 --%>
 <%@ page import="
-        org.jamwiki.DataHandler,
         org.jamwiki.Environment,
         org.jamwiki.WikiBase
     "
@@ -127,9 +126,9 @@ body, input, select {
 			<div class="formelement">
 				<select name="<%= Environment.PROP_DB_TYPE %>" id="<%= Environment.PROP_DB_TYPE %>">
 				<option value=""></option>
-				<c:set var="selectedDataHandler"><%= Environment.getValue(Environment.PROP_DB_TYPE) %></c:set>
-				<c:forEach items="${dataHandlers}" var="dataHandler">
-				<option value="<c:out value="${dataHandler.clazz}" />"<c:if test="${selectedDataHandler == dataHandler.clazz}"> selected</c:if>><c:if test="${!empty dataHandler.key}"><fmt:message key="${dataHandler.key}" /></c:if><c:if test="${empty dataHandler.key}"><c:out value="${dataHandler.name}" /></c:if><c:if test="${dataHandler.experimental}"> (<fmt:message key="common.caption.experimental" />)</c:if></option>
+				<c:set var="selectedQueryHandler"><%= Environment.getValue(Environment.PROP_DB_TYPE) %></c:set>
+				<c:forEach items="${queryHandlers}" var="queryHandler">
+				<option value="<c:out value="${queryHandler.clazz}" />"<c:if test="${selectedQueryHandler == queryHandler.clazz}"> selected</c:if>><c:if test="${!empty queryHandler.key}"><fmt:message key="${queryHandler.key}" /></c:if><c:if test="${empty queryHandler.key}"><c:out value="${queryHandler.name}" /></c:if><c:if test="${queryHandler.experimental}"> (<fmt:message key="common.caption.experimental" />)</c:if></option>
 				</c:forEach>
 				</select>
 			</div>

@@ -17,7 +17,6 @@
 package org.jamwiki.validator;
 
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.Role;
 import org.jamwiki.servlets.ServletUtil;

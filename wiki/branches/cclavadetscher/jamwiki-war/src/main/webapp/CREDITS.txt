@@ -26,6 +26,7 @@ JAMWiki Contributors
      Chinese (traditional): Jiading (ewen0930)
                             Pei-Tang Huang (tang)
      Croatian:              Marija Susovic
+     Czech:                 Pavel Vrecion (vrecion)
      Danish:                Anders Monrad (g9adm)
      Dutch:                 Tarik Menbhi & Wim Borghs (Angel)
      French:                Henri Gomez (hgomez)

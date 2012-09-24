@@ -18,11 +18,8 @@ package org.jamwiki.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.jamwiki.DataAccessException;
 import org.jamwiki.model.Category;
 import org.jamwiki.model.GroupMap;
 import org.jamwiki.model.ImageData;
@@ -49,6 +46,27 @@ import org.jamwiki.utils.Pagination;
  * data from the database.
  */
 public interface QueryHandler {
+
+	/** Ansi query handler class */
+	public static final String QUERY_HANDLER_ANSI = "org.jamwiki.db.AnsiQueryHandler";
+	/** DB2 query handler class */
+	public static final String QUERY_HANDLER_DB2 = "org.jamwiki.db.DB2QueryHandler";
+	/** DB2/400 query handler class */
+	public static final String QUERY_HANDLER_DB2400 = "org.jamwiki.db.DB2400QueryHandler";
+	/** HSql query handler class */
+	public static final String QUERY_HANDLER_HSQL = "org.jamwiki.db.HSqlQueryHandler";
+	/** MSSql query handler class */
+	public static final String QUERY_HANDLER_MSSQL = "org.jamwiki.db.MSSqlQueryHandler";
+	/** MySql query handler class */
+	public static final String QUERY_HANDLER_MYSQL = "org.jamwiki.db.MySqlQueryHandler";
+	/** Oracle query handler class */
+	public static final String QUERY_HANDLER_ORACLE = "org.jamwiki.db.OracleQueryHandler";
+	/** Postgres query handler class */
+	public static final String QUERY_HANDLER_POSTGRES = "org.jamwiki.db.PostgresQueryHandler";
+	/** Sybase ASA query handler class */
+	public static final String QUERY_HANDLER_SYBASE = "org.jamwiki.db.SybaseASAQueryHandler";
+	/** Intersystems Cache query handler class */
+	public static final String QUERY_HANDLER_CACHE = "org.jamwiki.db.CacheQueryHandler";
 
 	/**
 	 * Retrieve a result set containing all user information for a given WikiUser.
@@ -462,7 +480,7 @@ public interface QueryHandler {
 	List<RecentChange> getUserContributionsByUserDisplay(String virtualWiki, String userDisplay, Pagination pagination, boolean descending) throws SQLException;
 
 	/**
-	 * Return a hashmap of key/value pairs containing the definde user preferences
+	 * Return a map of key/value pairs containing the definde user preferences
 	 * defaults.
 	 * @return
 	 */

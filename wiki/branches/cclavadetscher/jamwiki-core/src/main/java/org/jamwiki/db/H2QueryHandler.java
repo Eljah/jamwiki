@@ -33,7 +33,7 @@ public class H2QueryHandler extends AnsiQueryHandler {
 	/**
 	 *
 	 */
-	protected H2QueryHandler() {
+	public H2QueryHandler() {
 		Properties defaults = Environment.loadProperties(AnsiQueryHandler.SQL_PROPERTY_FILE_NAME);
 		Properties props = Environment.loadProperties(SQL_PROPERTY_FILE_NAME, defaults);
 		super.init(props);
