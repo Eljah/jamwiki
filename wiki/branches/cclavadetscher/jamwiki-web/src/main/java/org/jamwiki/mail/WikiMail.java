@@ -14,28 +14,7 @@ import java.util.*;
  * used as a mail client.
  * 
  * The configuration of the class is done using a set of properties that are stored in
- * the database (and in jamwiki.properties). The table below shows the initial standard configuration. Notice that
- * all bluewin values are real and can be used for initial testing (only works with authentication).
- *
- * You can override some of these values using one of the methods that allow you to
- * set their value. Calling a method with an overridden property will not change the
- * configuration in the database.
- *
- * <pre>
- *        property_name      |   property_value     |        
- * --------------------------+----------------------+
- * smtp_auth_host            | smtpauths.bluewin.ch |
- * smtp_auth_port            | 465                  |
- * smtp_auth_from            | jamwiki@bluewin.ch   |
- * smtp_auth_user            | jamwiki@bluewin.ch   |
- * smtp_auth_pass            | j2tppp77             |
- * smtp_port                 | 25                   |
- * smtp_user                 | jamwiki@bluewin.ch   |
- * smtp_host                 | smtp.vptt.ch         |
- * smtp_addr_separator       | ;                    |
- * smtp_authentication       | true                 |
- * smtp_default_content_type | text/html            |
- * </pre>
+ * the database (and in jamwiki.properties).
  * @author cclavadetscher
  *
  */
