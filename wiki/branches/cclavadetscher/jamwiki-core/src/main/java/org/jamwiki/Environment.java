@@ -30,6 +30,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.jamwiki.db.QueryHandler;
+//import org.jamwiki.mail.MailUtil;
 import org.jamwiki.utils.ResourceUtil;
 import org.jamwiki.utils.SortedProperties;
 import org.jamwiki.utils.WikiLogger;
@@ -70,10 +71,16 @@ public class Environment {
 	public static final String PROP_DBCP_TEST_WHILE_IDLE = "dbcp-test-while-idle";
 	public static final String PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS = "dbcp-time-between-eviction-runs";
 	public static final String PROP_DBCP_WHEN_EXHAUSTED_ACTION = "dbcp-when-exhausted-action";
-	public static final String PROP_EMAIL_REPLY_ADDRESS = "reply-address";
-	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
-	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-password";
+	public static final String PROP_EMAIL_SMTP_REQUIRES_AUTH = "smtp-authentication";
+	public static final String PROP_EMAIL_SMTP_AUTH_HOST = "smtp-auth-host";
+	public static final String PROP_EMAIL_SMTP_AUTH_PORT = "smtp-auth-port";
 	public static final String PROP_EMAIL_SMTP_USERNAME = "smtp-username";
+	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-userpass";
+	public static final String PROP_EMAIL_REPLY_ADDRESS = "smtp-reply-to";
+	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
+	public static final String PROP_EMAIL_SMTP_PORT = "smtp-port";
+	public static final String PROP_EMAIL_ADDRESS_SEPARATOR = "smtp-address-separator";
+	public static final String PROP_EMAIL_DEFAULT_CONTENT_TYPE = "smtp-content-type";
 	public static final String PROP_ENCRYPTION_ALGORITHM = "encryption-algorithm";
 	public static final String PROP_EXTERNAL_LINK_NEW_WINDOW = "external-link-new-window";
 	public static final String PROP_FILE_BLACKLIST = "file-blacklist";
@@ -223,10 +230,16 @@ public class Environment {
 		this.defaults.setProperty(PROP_DBCP_TEST_WHILE_IDLE, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, "120");
 		this.defaults.setProperty(PROP_DBCP_WHEN_EXHAUSTED_ACTION, String.valueOf(GenericObjectPool.WHEN_EXHAUSTED_GROW));
-		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS, "");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST, "");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD, "");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME, "");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,"true");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_AUTH_HOST,"smtpauth.bluewin.ch");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_AUTH_PORT,"465"); // 587
+		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME,"jamwiki@bluewin.ch");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD,"j2tppp77");
+		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS,"jamwiki@bluewin.ch");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST,"smtp.vptt.ch");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_PORT,"25");
+		this.defaults.setProperty(PROP_EMAIL_ADDRESS_SEPARATOR,";");
+		this.defaults.setProperty(PROP_EMAIL_DEFAULT_CONTENT_TYPE,"text/plain");
 		this.defaults.setProperty(PROP_ENCRYPTION_ALGORITHM, "SHA-512");
 		this.defaults.setProperty(PROP_EXTERNAL_LINK_NEW_WINDOW, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_FILE_BLACKLIST, "bat,bin,exe,htm,html,js,jsp,php,sh");
