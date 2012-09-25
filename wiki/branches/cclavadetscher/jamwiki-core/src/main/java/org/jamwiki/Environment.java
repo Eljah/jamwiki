@@ -230,13 +230,13 @@ public class Environment {
 		this.defaults.setProperty(PROP_DBCP_TEST_WHILE_IDLE, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, "120");
 		this.defaults.setProperty(PROP_DBCP_WHEN_EXHAUSTED_ACTION, String.valueOf(GenericObjectPool.WHEN_EXHAUSTED_GROW));
-		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,"true");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_AUTH_HOST,"smtpauth.bluewin.ch");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_AUTH_PORT,"465"); // 587
-		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME,"jamwiki@bluewin.ch");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD,"j2tppp77");
-		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS,"jamwiki@bluewin.ch");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST,"smtp.vptt.ch");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_AUTH_HOST,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_AUTH_PORT,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD,"");
+		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST,"");
 		this.defaults.setProperty(PROP_EMAIL_SMTP_PORT,"25");
 		this.defaults.setProperty(PROP_EMAIL_ADDRESS_SEPARATOR,";");
 		this.defaults.setProperty(PROP_EMAIL_DEFAULT_CONTENT_TYPE,"text/plain");
