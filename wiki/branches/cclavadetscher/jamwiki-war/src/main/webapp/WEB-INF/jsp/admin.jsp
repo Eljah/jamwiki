@@ -39,6 +39,7 @@
 <ul class="tab-menu" id="tab_submenu">
 <li><a href="#general"><fmt:message key="admin.header.general" /></a></li>
 <li><a href="#parser"><fmt:message key="admin.header.parser" /></a></li>
+<li><a href="#email"><fmt:message key="admin.header.email" /></a></li>
 <li><a href="#database"><fmt:message key="admin.header.persistence" /></a></li>
 <li><a href="#upload"><fmt:message key="admin.header.upload" /></a></li>
 <li><a href="#spam"><fmt:message key="admin.header.spam" /></a></li>
@@ -46,6 +47,7 @@
 </ul>
 <div class="submenu-tab-content">
 
+<%--
 <form name="form1" method="post" action="<jamwiki:link value="Special:Admin" />">
 
 <div class="callout">
@@ -56,9 +58,20 @@
 	</tr>
 	</table>
 </div>
+--%>
 
 <%-- BEGIN GENERAL SETTINGS --%>
 <div id="general" class="submenu-tab-item">
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#general" />">
+<input type="hidden" name="section" value="general">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	</table>
+</div>
 <fieldset>
 <legend><fmt:message key="admin.header.general" /></legend>
 <div class="row">
@@ -162,10 +175,31 @@
 	<div class="formhelp"><fmt:message key="admin.help.date.timeonly" /> <fmt:message key="admin.help.date.common" /></div>
 </div>
 </fieldset>
+<input type="hidden" name="function" value="properties" />
+
+<%--
+  Include a hidden (display:none) password field to prevent Firefox from trying to change the
+  admin password.  There is currently (version 1.5 and before) an issue with Firefox where
+  anytime two or more password fields are in a form it assumes the password is being
+  changed if the last password is different from the saved password.
+--%>
+
+<input type="password" name="fakePassword" value="" style="display:none" />
+</form>
 </div>
 
 <%-- BEGIN PARSER --%>
 <div id="parser" class="submenu-tab-item">
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#parser" />">
+<input type="hidden" name="section" value="parser">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	</table>
+</div>
 <fieldset>
 <legend><fmt:message key="admin.header.parser" /></legend>
 <div class="row">
@@ -264,40 +298,106 @@
 	<div class="formhelp"><fmt:message key="admin.parser.help.signaturedate" /> <fmt:message key="admin.help.date.common" /></div>
 </div>
 </fieldset>
-</div>
+<input type="hidden" name="function" value="properties" />
 
-<%-- BEGIN EMAIL
-FIXME - Email not supported right now, comment this out
-
-<div id="email" class="submenu-tab-item">
-<fieldset>
-<legend><fmt:message key="admin.smtp.caption" /></legend>
-<div class="row">
-	<label for="<%= Environment.PROP_EMAIL_SMTP_HOST %>"><fmt:message key="admin.smtp.caption.host" /></label>
-	<c:set var="PROP_EMAIL_SMTP_HOST"><%= Environment.PROP_EMAIL_SMTP_HOST %></c:set>
-	<span><jamwiki:text name="${PROP_EMAIL_SMTP_HOST}" value="${props[PROP_EMAIL_SMTP_HOST]}" size="30" id="${PROP_EMAIL_SMTP_HOST}" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_EMAIL_SMTP_USERNAME %>"><fmt:message key="admin.smtp.caption.user" /></label>
-	<c:set var="PROP_EMAIL_SMTP_USERNAME"><%= Environment.PROP_EMAIL_SMTP_USERNAME %></c:set>
-	<span><jamwiki:text name="${PROP_EMAIL_SMTP_USERNAME}" value="${props[PROP_EMAIL_SMTP_USERNAME]}" size="30" id="${PROP_EMAIL_SMTP_USERNAME}" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>"><fmt:message key="admin.smtp.caption.pass" /></label>
-	<span><input type="password" name="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" value="<c:out value="${smtpPassword}" />" size="30" id="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" /></span>
-</div>
-<div class="row">
-	<label for="<%= Environment.PROP_EMAIL_REPLY_ADDRESS %>"><fmt:message key="admin.smtp.caption.reply" /></label>
-	<c:set var="PROP_EMAIL_REPLY_ADDRESS"><%= Environment.PROP_EMAIL_REPLY_ADDRESS %></c:set>
-	<span><jamwiki:text name="${PROP_EMAIL_REPLY_ADDRESS}" value="${props[PROP_EMAIL_REPLY_ADDRESS]}" size="50" id="${PROP_EMAIL_REPLY_ADDRESS}" /></span>
-</div>
-</fieldset>
-</div>
-
+<%--
+  Include a hidden (display:none) password field to prevent Firefox from trying to change the
+  admin password.  There is currently (version 1.5 and before) an issue with Firefox where
+  anytime two or more password fields are in a form it assumes the password is being
+  changed if the last password is different from the saved password.
 --%>
+
+<input type="password" name="fakePassword" value="" style="display:none" />
+</form>
+</div>
+
+<%-- BEGIN EMAIL --%>
+<div id="email" class="submenu-tab-item">
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#email" />">
+<input type="hidden" name="section" value="email">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.smtp.action.check.settings" />" /></td>
+	</tr>
+	</table>
+</div>
+	<fieldset>
+		<legend><fmt:message key="admin.smtp.caption" /></legend>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH %>"><fmt:message key="admin.smtp.caption.requires.auth" /></label>
+			<c:set var="PROP_EMAIL_SMTP_REQUIRES_AUTH"><%= Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH %></c:set>
+			<span><jamwiki:checkbox name="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" value="true" checked="${props[PROP_EMAIL_SMTP_REQUIRES_AUTH]}" id="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SMTP_HOST %>"><fmt:message key="admin.smtp.caption.host" /></label>
+			<c:set var="PROP_EMAIL_SMTP_HOST"><%= Environment.PROP_EMAIL_SMTP_HOST %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_SMTP_HOST}" value="${props[PROP_EMAIL_SMTP_HOST]}" size="30" id="${PROP_EMAIL_SMTP_HOST}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SMTP_PORT %>"><fmt:message key="admin.smtp.caption.port" /></label>
+			<c:set var="PROP_EMAIL_SMTP_PORT"><%= Environment.PROP_EMAIL_SMTP_PORT %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_SMTP_PORT}" value="${props[PROP_EMAIL_SMTP_PORT]}" size="30" id="${PROP_EMAIL_SMTP_PORT}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SMTP_USERNAME %>"><fmt:message key="admin.smtp.caption.user" /></label>
+			<c:set var="PROP_EMAIL_SMTP_USERNAME"><%= Environment.PROP_EMAIL_SMTP_USERNAME %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_SMTP_USERNAME}" value="${props[PROP_EMAIL_SMTP_USERNAME]}" size="30" id="${PROP_EMAIL_SMTP_USERNAME}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>"><fmt:message key="admin.smtp.caption.pass" /></label>
+			<span><input type="password" name="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" value="<c:out value="${smtpPassword}" />" size="30" id="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_REPLY_ADDRESS %>"><fmt:message key="admin.smtp.caption.reply" /></label>
+			<c:set var="PROP_EMAIL_REPLY_ADDRESS"><%= Environment.PROP_EMAIL_REPLY_ADDRESS %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_REPLY_ADDRESS}" value="${props[PROP_EMAIL_REPLY_ADDRESS]}" size="50" id="${PROP_EMAIL_REPLY_ADDRESS}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>"><fmt:message key="admin.smtp.caption.default.content.type" /></label>
+			<span>
+				<select name="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>" id="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>">
+				<c:forEach items="${smptContentTypes}" var="contentType">
+				<option value="<c:out value="${contentType}" />"<c:if test="${props[PROP_EMAIL_DEFAULT_CONTENT_TYPE] == contentType}"> selected="selected"</c:if>><c:out value="${contentType}" /></option>
+				</c:forEach>
+				</select>
+			</span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %>"><fmt:message key="admin.smtp.caption.address.separator" /></label>
+			<c:set var="PROP_EMAIL_ADDRESS_SEPARATOR"><%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_ADDRESS_SEPARATOR}" value="${props[PROP_EMAIL_ADDRESS_SEPARATOR]}" size="50" id="${PROP_EMAIL_ADDRESS_SEPARATOR}" /></span>
+		</div>
+	</fieldset>
+	<input type="hidden" name="function" value="properties" />
+
+	<%--
+	  Include a hidden (display:none) password field to prevent Firefox from trying to change the
+	  admin password.  There is currently (version 1.5 and before) an issue with Firefox where
+	  anytime two or more password fields are in a form it assumes the password is being
+	  changed if the last password is different from the saved password.
+	--%>
+
+	<input type="password" name="fakePassword" value="" style="display:none" />
+	</form>
+</div>
 
 <%-- BEGIN DATABASE PERSISTENCE --%>
 <div id="database" class="submenu-tab-item">
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#database" />">
+<input type="hidden" name="section" value="database">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	</table>
+</div>
 <fieldset>
 <legend><fmt:message key="admin.header.persistence" /></legend>
 <div class="row">
@@ -410,10 +510,31 @@ FIXME - Email not supported right now, comment this out
 	<div class="formhelp"><fmt:message key="admin.persistence.help.maxopenpreparedstatements" /></div>
 </div>
 </fieldset>
+<input type="hidden" name="function" value="properties" />
+
+<%--
+  Include a hidden (display:none) password field to prevent Firefox from trying to change the
+  admin password.  There is currently (version 1.5 and before) an issue with Firefox where
+  anytime two or more password fields are in a form it assumes the password is being
+  changed if the last password is different from the saved password.
+--%>
+
+<input type="password" name="fakePassword" value="" style="display:none" />
+</form>
 </div>
 
 <%-- BEGIN FILE UPLOAD --%>
 <div id="upload" class="submenu-tab-item">
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#upload" />">
+<input type="hidden" name="section" value="upload">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	</table>
+</div>
 <fieldset>
 <legend><fmt:message key="admin.header.upload" /></legend>
 <div class="row">
@@ -489,10 +610,31 @@ FIXME - Email not supported right now, comment this out
 	<div class="formhelp"><fmt:message key="admin.upload.help.whitelist" /></div>
 </div>
 </fieldset>
+<input type="hidden" name="function" value="properties" />
+
+<%--
+  Include a hidden (display:none) password field to prevent Firefox from trying to change the
+  admin password.  There is currently (version 1.5 and before) an issue with Firefox where
+  anytime two or more password fields are in a form it assumes the password is being
+  changed if the last password is different from the saved password.
+--%>
+
+<input type="password" name="fakePassword" value="" style="display:none" />
+</form>
 </div>
 
 <%-- BEGIN SPAM --%>
 <div id="spam" class="submenu-tab-item">
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#spam" />">
+<input type="hidden" name="section" value="spam">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	</table>
+</div>
 <fieldset>
 <legend><fmt:message key="admin.header.spam" /></legend>
 <div class="row">
@@ -551,10 +693,31 @@ FIXME - Email not supported right now, comment this out
 	<div class="formhelp"><fmt:message key="admin.spam.help.recaptchakey" /></div>
 </div>
 </fieldset>
+<input type="hidden" name="function" value="properties" />
+
+<%--
+  Include a hidden (display:none) password field to prevent Firefox from trying to change the
+  admin password.  There is currently (version 1.5 and before) an issue with Firefox where
+  anytime two or more password fields are in a form it assumes the password is being
+  changed if the last password is different from the saved password.
+--%>
+
+<input type="password" name="fakePassword" value="" style="display:none" />
+</form>
 </div>
 
 <div id="other" class="submenu-tab-item">
 <%-- BEGIN RSS --%>
+<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#other" />">
+<input type="hidden" name="section" value="other">
+<div class="callout">
+	<table>
+	<tr>
+		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
+		<td><fmt:message key="admin.message.savechanges" /></td>
+	</tr>
+	</table>
+</div>
 <fieldset>
 <legend><fmt:message key="admin.header.rss" /></legend>
 <div class="row">
@@ -568,8 +731,6 @@ FIXME - Email not supported right now, comment this out
 	<span><jamwiki:text name="${PROP_RSS_TITLE}" id="${PROP_RSS_TITLE}" value="${props[PROP_RSS_TITLE]}" size="50" /></span>
 </div>
 </fieldset>
-</div>
-
 <input type="hidden" name="function" value="properties" />
 
 <%--
@@ -581,6 +742,7 @@ FIXME - Email not supported right now, comment this out
 
 <input type="password" name="fakePassword" value="" style="display:none" />
 </form>
+</div>
 
 </div>
 

@@ -5,6 +5,7 @@ import javax.mail.internet.*;
 import javax.activation.*;
 
 import org.jamwiki.Environment;
+import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 
 import java.util.*;
@@ -14,7 +15,25 @@ import java.util.*;
  * used as a mail client.
  * 
  * The configuration of the class is done using a set of properties that are stored in
- * the database (and in jamwiki.properties).
+ * the database (and in jamwiki.properties). The table below shows the initial standard configuration. Notice that
+ * all bluewin values are real and can be used for initial testing (only works with authentication).
+ *
+ * You can override some of these values using one of the methods that allow you to
+ * set their value. Calling a method with an overridden property will not change the
+ * configuration in the database.
+ *
+ * <pre>
+ * smtp-authentication    : Indicates if the SMTP server requires authentication. If set to true then
+ *                          the values of smtp-username and smtp-userpass must be set as well. If set
+ *                          to false those properties are ignored.
+ * smtp-reply-to          : The FROM address of the mail.  
+ * smtp-host              : The host name of the SMTP server.
+ * smtp-content-type      : text/plain or text/html (default at installation: text/plain).
+ * smtp-address-separator : The character used to separate TO mail addresses in a String (default: ";").
+ * smtp-userpass          : The password of the user sending the mail.
+ * smtp-username          : The username of the user sending the mail (often the same as smtp-reply-to).
+ * smtp-port              : The port of the SMTP server (default: 25).
+ * </pre>
  * @author cclavadetscher
  *
  */
@@ -194,27 +213,23 @@ public class WikiMail
     	{
 	        //boolean debug = Boolean.valueOf(Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 	        // Get the properties
-	        String SMTP_HOST      = Environment.getValue(Environment.PROP_EMAIL_SMTP_HOST);
-	        int    SMTP_PORT      = Environment.getIntValue(Environment.PROP_EMAIL_SMTP_PORT);
-	        String SMTP_USER      = Environment.getValue(Environment.PROP_EMAIL_SMTP_USERNAME);
-	        // the data necessary if the smtp server requires smtp authentication.
-	        String SMTP_AUTH_HOST = Environment.getValue(Environment.PROP_EMAIL_SMTP_AUTH_HOST);
-	        int    SMTP_AUTH_PORT = Environment.getIntValue(Environment.PROP_EMAIL_SMTP_AUTH_PORT);
-	        String SMTP_AUTH_USER = Environment.getValue(Environment.PROP_EMAIL_SMTP_USERNAME);
-	        String SMTP_AUTH_PASS = Environment.getValue(Environment.PROP_EMAIL_SMTP_PASSWORD);
-	        String SMTP_AUTH_FROM = Environment.getValue(Environment.PROP_EMAIL_REPLY_ADDRESS);
+	        String SMTP_HOST = Environment.getValue(Environment.PROP_EMAIL_SMTP_HOST);
+	        int    SMTP_PORT = Environment.getIntValue(Environment.PROP_EMAIL_SMTP_PORT);
+	        String SMTP_USER = Environment.getValue(Environment.PROP_EMAIL_SMTP_USERNAME);
+	        String SMTP_PASS = Encryption.getEncryptedProperty(Environment.PROP_EMAIL_SMTP_PASSWORD, Environment.getInstance());
+	        String SMTP_FROM = Environment.getValue(Environment.PROP_EMAIL_REPLY_ADDRESS);
 	        boolean smtpAuthentication = Environment.getBooleanValue(Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 
-	        // Add some logging. Notice that this will only be logged if the log level is at least
-	        // FINE
+	        // Add some logging. Notice that this will only be logged if the log level is at least info
         	StringBuffer sb = new StringBuffer();
 	        if(smtpAuthentication)
 	        {
 		        sb.append("Trying to send mail using smtp authentication:\n");
-		        sb.append("host: " + SMTP_AUTH_HOST + "\n");
-		        sb.append("port: " + SMTP_AUTH_PORT + "\n");
-		        sb.append("user: " + SMTP_AUTH_USER + "\n");
-		        sb.append("from: " + SMTP_AUTH_FROM + "\n");
+		        sb.append("host: " + SMTP_HOST + "\n");
+		        sb.append("port: " + SMTP_PORT + "\n");
+		        sb.append("user: " + SMTP_USER + "\n");
+		        sb.append("from: " + SMTP_FROM + "\n");
+		        sb.append("pass: " + SMTP_PASS + "\n");
 		        sb.append("type: " + contentType);
 	        }
 	        else
@@ -222,34 +237,32 @@ public class WikiMail
 		        sb.append("Trying to send mail without smtp authentication:\n");
 		        sb.append("host: " + SMTP_HOST + "\n");
 		        sb.append("port: " + SMTP_PORT + "\n");
-		        sb.append("from: " + SMTP_AUTH_FROM + "\n");
+		        sb.append("from: " + SMTP_FROM + "\n");
 		        sb.append("type: " + contentType);
 	        }
-	        logger.error(sb.toString());
+	        logger.info(sb.toString());
 	
 	        //Set the host smtp address
 	        Properties props = new Properties();
+	        props.put("mail.smtp.host",SMTP_HOST);
+	        props.put("mail.smtp.port",SMTP_PORT);
 	        if(smtpAuthentication)
 	        {
-		        props.put("mail.smtp.host",SMTP_AUTH_HOST);
-		        props.put("mail.smtp.port",SMTP_AUTH_PORT);
 		        props.put("mail.smtp.auth","true");
 	        }
 	        else
 	        {
-		        props.put("mail.smtp.host",SMTP_HOST);
-		        props.put("mail.smtp.port",SMTP_PORT);
 		        props.put("mail.smtp.auth","false");
 	        }
 	        
-	        Authenticator auth = new SMTPAuthenticator(SMTP_AUTH_USER,SMTP_AUTH_PASS);
+	        Authenticator auth = new SMTPAuthenticator(SMTP_USER,SMTP_PASS);
 	        Session session = Session.getDefaultInstance(props,auth);
 	
 	        // create a message
 	        Message msg = new MimeMessage(session);
 	
 	        // set the from and to address
-	        InternetAddress addressFrom = new InternetAddress(SMTP_AUTH_FROM);
+	        InternetAddress addressFrom = new InternetAddress(SMTP_FROM);
 	        msg.setFrom(addressFrom);
 	
 	        InternetAddress[] addressTo = new InternetAddress[toRecipients.length];
