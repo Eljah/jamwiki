@@ -355,7 +355,7 @@
 		<div class="row">
 			<label for="<%= Environment.PROP_EMAIL_REPLY_ADDRESS %>"><fmt:message key="admin.smtp.caption.reply" /></label>
 			<c:set var="PROP_EMAIL_REPLY_ADDRESS"><%= Environment.PROP_EMAIL_REPLY_ADDRESS %></c:set>
-			<span><jamwiki:text name="${PROP_EMAIL_REPLY_ADDRESS}" value="${props[PROP_EMAIL_REPLY_ADDRESS]}" size="50" id="${PROP_EMAIL_REPLY_ADDRESS}" /></span>
+			<span><jamwiki:text name="${PROP_EMAIL_REPLY_ADDRESS}" value="${props[PROP_EMAIL_REPLY_ADDRESS]}" size="30" id="${PROP_EMAIL_REPLY_ADDRESS}" /></span>
 		</div>
 		<div class="row">
 			<label for="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>"><fmt:message key="admin.smtp.caption.default.content.type" /></label>

@@ -50,9 +50,50 @@ public class WikiMail
 	 */
 	public static final String HTML = "text/html";
 
+	private boolean smtpAuth       = false;
+	private String  host           = null;
+	private String  port           = null;
+	private String  replyTo        = null;
+	private String  user           = null;
+	private String  pass           = null;
+	private String  separator      = null;
+	private String  defContentType = null;
+	
 	//-------------------------------------------------------------------------
 	// Public interface
 	//-------------------------------------------------------------------------
+
+	public WikiMail() {
+		init(Environment.getInstance());
+	}
+	
+	public WikiMail(Properties props) {
+		init(props);
+	}
+	
+	private void init(Properties props) {
+		this.smtpAuth       = "true".equals(props.getProperty(Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH));
+		this.host           = props.getProperty(Environment.PROP_EMAIL_SMTP_HOST);
+		this.port           = props.getProperty(Environment.PROP_EMAIL_SMTP_PORT);
+		this.replyTo        = props.getProperty(Environment.PROP_EMAIL_REPLY_ADDRESS);
+		this.user           = props.getProperty(Environment.PROP_EMAIL_SMTP_USERNAME);
+		this.pass           = Encryption.getEncryptedProperty(Environment.PROP_EMAIL_SMTP_PASSWORD, props);
+		this.separator      = props.getProperty(Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
+		this.defContentType = props.getProperty(Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
+	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer(this.getClass().getName());
+		sb.append("\nE-Mail settings: \n");
+		sb.append("Authentication: " + this.smtpAuth + "\n");
+		sb.append("Host          : " + this.host + "\n");
+		sb.append("Port          : " + this.port + "\n");
+		sb.append("Username      : " + this.user + "\n");
+		sb.append("Password      : " + this.pass + "\n");
+		sb.append("Separator     : " + this.separator + "\n");
+		sb.append("Content type  : " + this.defContentType);
+		return sb.toString();
+	}
 	
 	/**
 	 * @param recipients The list of recipients as a String[].
@@ -121,12 +162,11 @@ public class WikiMail
                          String[] attachments)
 	throws MessagingException
 	{
-		String SMTP_ADDR_SEPARATOR = Environment.getValue(Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
-		String[] toList = toRecipients.split(SMTP_ADDR_SEPARATOR);
+		String[] toList = toRecipients.split(this.separator);
 		String[] ccList = null;
-		if(ccRecipients != null) ccList = ccRecipients.split(SMTP_ADDR_SEPARATOR);
+		if(ccRecipients != null) ccList = ccRecipients.split(this.separator);
 		String[] bccList = null;
-		if(bccRecipients != null) bccList = bccRecipients.split(SMTP_ADDR_SEPARATOR);
+		if(bccRecipients != null) bccList = bccRecipients.split(this.separator);
 		postMail(toList,ccList,bccList,subject,message,contentType,attachments);
 	}
 	
@@ -207,46 +247,18 @@ public class WikiMail
     {
     	if(contentType == null || !contentType.equals(WikiMail.TEXT) || !contentType.equals(WikiMail.HTML))
     	{
-    		contentType = Environment.getValue(Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
+    		contentType = defContentType;
     	}
     	try
     	{
-	        //boolean debug = Boolean.valueOf(Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
-	        // Get the properties
-	        String SMTP_HOST = Environment.getValue(Environment.PROP_EMAIL_SMTP_HOST);
-	        int    SMTP_PORT = Environment.getIntValue(Environment.PROP_EMAIL_SMTP_PORT);
-	        String SMTP_USER = Environment.getValue(Environment.PROP_EMAIL_SMTP_USERNAME);
-	        String SMTP_PASS = Encryption.getEncryptedProperty(Environment.PROP_EMAIL_SMTP_PASSWORD, Environment.getInstance());
-	        String SMTP_FROM = Environment.getValue(Environment.PROP_EMAIL_REPLY_ADDRESS);
-	        boolean smtpAuthentication = Environment.getBooleanValue(Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
-
-	        // Add some logging. Notice that this will only be logged if the log level is at least info
-        	StringBuffer sb = new StringBuffer();
-	        if(smtpAuthentication)
-	        {
-		        sb.append("Trying to send mail using smtp authentication:\n");
-		        sb.append("host: " + SMTP_HOST + "\n");
-		        sb.append("port: " + SMTP_PORT + "\n");
-		        sb.append("user: " + SMTP_USER + "\n");
-		        sb.append("from: " + SMTP_FROM + "\n");
-		        sb.append("pass: " + SMTP_PASS + "\n");
-		        sb.append("type: " + contentType);
-	        }
-	        else
-	        {
-		        sb.append("Trying to send mail without smtp authentication:\n");
-		        sb.append("host: " + SMTP_HOST + "\n");
-		        sb.append("port: " + SMTP_PORT + "\n");
-		        sb.append("from: " + SMTP_FROM + "\n");
-		        sb.append("type: " + contentType);
-	        }
-	        logger.info(sb.toString());
-	
+    		logger.info(toString());
 	        //Set the host smtp address
 	        Properties props = new Properties();
-	        props.put("mail.smtp.host",SMTP_HOST);
-	        props.put("mail.smtp.port",SMTP_PORT);
-	        if(smtpAuthentication)
+	        props.put("mail.transport.protocol","smtp");
+	        props.put("mail.smtp.host",this.host);
+	        props.put("mail.smtp.port",this.port);
+	        props.put("mail.from",this.replyTo);
+	        if(this.smtpAuth)
 	        {
 		        props.put("mail.smtp.auth","true");
 	        }
@@ -254,15 +266,15 @@ public class WikiMail
 	        {
 		        props.put("mail.smtp.auth","false");
 	        }
-	        
-	        Authenticator auth = new SMTPAuthenticator(SMTP_USER,SMTP_PASS);
-	        Session session = Session.getDefaultInstance(props,auth);
-	
+
+	        Authenticator auth = new SMTPAuthenticator(this.user,this.pass);
+	        Session session = Session.getInstance(props,auth);
+
 	        // create a message
 	        Message msg = new MimeMessage(session);
 	
 	        // set the from and to address
-	        InternetAddress addressFrom = new InternetAddress(SMTP_FROM);
+	        InternetAddress addressFrom = new InternetAddress(this.replyTo);
 	        msg.setFrom(addressFrom);
 	
 	        InternetAddress[] addressTo = new InternetAddress[toRecipients.length];
@@ -356,6 +368,6 @@ public class WikiMail
      */
     public String getAddressSeparator()
     {
-    	return Environment.getValue(Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
+    	return this.separator;
     }
 }

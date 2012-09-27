@@ -337,7 +337,6 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_FILE_WHITELIST);
 			}
 			else if (section.equals("email")) {
-				// Check if we have to save or test configuration
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 				setProperty(props, request, Environment.PROP_EMAIL_SMTP_USERNAME);
 				setPassword(props, request, next, Environment.PROP_EMAIL_SMTP_PASSWORD, "smtpPassword");
@@ -346,17 +345,25 @@ public class AdminServlet extends JAMWikiServlet {
 				setNumericProperty(props, request, Environment.PROP_EMAIL_SMTP_PORT, pageInfo.getErrors());
 				setProperty(props, request, Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
 				setProperty(props, request, Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
+				// Check if we have to test the configuration
 				String command = request.getParameter("Submit");
 				if (!StringUtils.isBlank(command) && command.equalsIgnoreCase("send test mail")) {
+					String mailAddress = null;
 					try {
 						// logger.error("Testing mail configuration");
-						WikiMail sender = new WikiMail();
-						String mailAddress = ServletUtil.currentWikiUser().getEmail();
-						sender.postMail(mailAddress,"JAMWiki mail test","The configuration of your mail is correct");
-						pageInfo.addMessage(new WikiMessage("E-Mail sent to " + mailAddress));
+						WikiMail sender = new WikiMail(props);
+						logger.error(sender.toString());
+						mailAddress = ServletUtil.currentWikiUser().getEmail();
+						if(StringUtils.isBlank(mailAddress)) {
+							pageInfo.addError(new WikiMessage("admin.smtp.error.nomailaddress"));
+						}
+						else {
+							sender.postMail(mailAddress,"JAMWiki mail test","The configuration of your mail is correct");
+							pageInfo.addMessage(new WikiMessage("admin.smtp.message.sentmail",mailAddress));
+						}
 					}
 					catch(Exception e) {
-						pageInfo.addError(new WikiMessage("Error sending E-Mail: " + e.getMessage()));
+						pageInfo.addError(new WikiMessage("admin.smtp.error.couldnotsend", mailAddress, e.getMessage()));
 					}
 				}
 			}
