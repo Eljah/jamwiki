@@ -313,7 +313,7 @@
 
 <%-- BEGIN EMAIL --%>
 <div id="email" class="submenu-tab-item">
-<form name="form1" method="post" action="<jamwiki:link value="Special:Admin#email" />">
+<form name="emailForm" method="post" action="<jamwiki:link value="Special:Admin#email" />">
 <input type="hidden" name="section" value="email">
 <div class="callout">
 	<table>
@@ -321,57 +321,68 @@
 		<td><input type="submit" name="Submit" value="<fmt:message key="admin.action.save" />" /></td>
 		<td><fmt:message key="admin.message.savechanges" /></td>
 	</tr>
-	<tr>
-		<td><input type="submit" name="Submit" value="<fmt:message key="admin.smtp.action.check.settings" />" /></td>
-	</tr>
 	</table>
 </div>
 	<fieldset>
 		<legend><fmt:message key="admin.smtp.caption" /></legend>
 		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH %>"><fmt:message key="admin.smtp.caption.requires.auth" /></label>
-			<c:set var="PROP_EMAIL_SMTP_REQUIRES_AUTH"><%= Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH %></c:set>
-			<span><jamwiki:checkbox name="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" value="true" checked="${props[PROP_EMAIL_SMTP_REQUIRES_AUTH]}" id="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" /></span>
+			<label for="<%= Environment.PROP_EMAIL_SMTP_ENABLE %>"><fmt:message key="admin.smtp.caption.enable" /></label>
+			<c:set var="PROP_EMAIL_SMTP_ENABLE"><%= Environment.PROP_EMAIL_SMTP_ENABLE %></c:set>
+			<span><jamwiki:checkbox name="${PROP_EMAIL_SMTP_ENABLE}" onchange="document.emailForm.submit()" value="true" checked="${props[PROP_EMAIL_SMTP_ENABLE]}" id="${PROP_EMAIL_SMTP_ENABLE}" /></span>
 		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_SMTP_HOST %>"><fmt:message key="admin.smtp.caption.host" /></label>
-			<c:set var="PROP_EMAIL_SMTP_HOST"><%= Environment.PROP_EMAIL_SMTP_HOST %></c:set>
-			<span><jamwiki:text name="${PROP_EMAIL_SMTP_HOST}" value="${props[PROP_EMAIL_SMTP_HOST]}" size="30" id="${PROP_EMAIL_SMTP_HOST}" /></span>
-		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_SMTP_PORT %>"><fmt:message key="admin.smtp.caption.port" /></label>
-			<c:set var="PROP_EMAIL_SMTP_PORT"><%= Environment.PROP_EMAIL_SMTP_PORT %></c:set>
-			<span><jamwiki:text name="${PROP_EMAIL_SMTP_PORT}" value="${props[PROP_EMAIL_SMTP_PORT]}" size="30" id="${PROP_EMAIL_SMTP_PORT}" /></span>
-		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_SMTP_USERNAME %>"><fmt:message key="admin.smtp.caption.user" /></label>
-			<c:set var="PROP_EMAIL_SMTP_USERNAME"><%= Environment.PROP_EMAIL_SMTP_USERNAME %></c:set>
-			<span><jamwiki:text name="${PROP_EMAIL_SMTP_USERNAME}" value="${props[PROP_EMAIL_SMTP_USERNAME]}" size="30" id="${PROP_EMAIL_SMTP_USERNAME}" /></span>
-		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>"><fmt:message key="admin.smtp.caption.pass" /></label>
-			<span><input type="password" name="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" value="<c:out value="${smtpPassword}" />" size="30" id="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" /></span>
-		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_REPLY_ADDRESS %>"><fmt:message key="admin.smtp.caption.reply" /></label>
-			<c:set var="PROP_EMAIL_REPLY_ADDRESS"><%= Environment.PROP_EMAIL_REPLY_ADDRESS %></c:set>
-			<span><jamwiki:text name="${PROP_EMAIL_REPLY_ADDRESS}" value="${props[PROP_EMAIL_REPLY_ADDRESS]}" size="30" id="${PROP_EMAIL_REPLY_ADDRESS}" /></span>
-		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>"><fmt:message key="admin.smtp.caption.default.content.type" /></label>
-			<span>
-				<select name="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>" id="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>">
-				<c:forEach items="${smptContentTypes}" var="contentType">
-				<option value="<c:out value="${contentType}" />"<c:if test="${props[PROP_EMAIL_DEFAULT_CONTENT_TYPE] == contentType}"> selected="selected"</c:if>><c:out value="${contentType}" /></option>
-				</c:forEach>
-				</select>
-			</span>
-		</div>
-		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %>"><fmt:message key="admin.smtp.caption.address.separator" /></label>
-			<c:set var="PROP_EMAIL_ADDRESS_SEPARATOR"><%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %></c:set>
-			<span><jamwiki:text name="${PROP_EMAIL_ADDRESS_SEPARATOR}" value="${props[PROP_EMAIL_ADDRESS_SEPARATOR]}" size="50" id="${PROP_EMAIL_ADDRESS_SEPARATOR}" /></span>
-		</div>
+		<c:if test="${not props[PROP_EMAIL_SMTP_ENABLE]}">
+			<div style="display:none;">
+		</c:if>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH %>"><fmt:message key="admin.smtp.caption.requires.auth" /></label>
+				<c:set var="PROP_EMAIL_SMTP_REQUIRES_AUTH"><%= Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH %></c:set>
+				<span><jamwiki:checkbox name="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" value="true" checked="${props[PROP_EMAIL_SMTP_REQUIRES_AUTH]}" id="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" /></span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_SMTP_HOST %>"><fmt:message key="admin.smtp.caption.host" /></label>
+				<c:set var="PROP_EMAIL_SMTP_HOST"><%= Environment.PROP_EMAIL_SMTP_HOST %></c:set>
+				<span><jamwiki:text name="${PROP_EMAIL_SMTP_HOST}" value="${props[PROP_EMAIL_SMTP_HOST]}" size="30" id="${PROP_EMAIL_SMTP_HOST}" /></span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_SMTP_PORT %>"><fmt:message key="admin.smtp.caption.port" /></label>
+				<c:set var="PROP_EMAIL_SMTP_PORT"><%= Environment.PROP_EMAIL_SMTP_PORT %></c:set>
+				<span><jamwiki:text name="${PROP_EMAIL_SMTP_PORT}" value="${props[PROP_EMAIL_SMTP_PORT]}" size="30" id="${PROP_EMAIL_SMTP_PORT}" /></span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_SMTP_USERNAME %>"><fmt:message key="admin.smtp.caption.user" /></label>
+				<c:set var="PROP_EMAIL_SMTP_USERNAME"><%= Environment.PROP_EMAIL_SMTP_USERNAME %></c:set>
+				<span><jamwiki:text name="${PROP_EMAIL_SMTP_USERNAME}" value="${props[PROP_EMAIL_SMTP_USERNAME]}" size="30" id="${PROP_EMAIL_SMTP_USERNAME}" /></span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>"><fmt:message key="admin.smtp.caption.pass" /></label>
+				<span><input type="password" name="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" value="<c:out value="${smtpPassword}" />" size="30" id="<%= Environment.PROP_EMAIL_SMTP_PASSWORD %>" /></span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_REPLY_ADDRESS %>"><fmt:message key="admin.smtp.caption.reply" /></label>
+				<c:set var="PROP_EMAIL_REPLY_ADDRESS"><%= Environment.PROP_EMAIL_REPLY_ADDRESS %></c:set>
+				<span><jamwiki:text name="${PROP_EMAIL_REPLY_ADDRESS}" value="${props[PROP_EMAIL_REPLY_ADDRESS]}" size="30" id="${PROP_EMAIL_REPLY_ADDRESS}" /></span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>"><fmt:message key="admin.smtp.caption.default.content.type" /></label>
+				<span>
+					<select name="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>" id="<%= Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE %>">
+					<c:forEach items="${smptContentTypes}" var="contentType">
+					<option value="<c:out value="${contentType}" />"<c:if test="${props[PROP_EMAIL_DEFAULT_CONTENT_TYPE] == contentType}"> selected="selected"</c:if>><c:out value="${contentType}" /></option>
+					</c:forEach>
+					</select>
+				</span>
+			</div>
+			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %>"><fmt:message key="admin.smtp.caption.address.separator" /></label>
+				<c:set var="PROP_EMAIL_ADDRESS_SEPARATOR"><%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %></c:set>
+				<span><jamwiki:text name="${PROP_EMAIL_ADDRESS_SEPARATOR}" value="${props[PROP_EMAIL_ADDRESS_SEPARATOR]}" size="50" id="${PROP_EMAIL_ADDRESS_SEPARATOR}" /></span>
+			</div>
+			<div class="row">
+				<input type="submit" name="testMail" value="<fmt:message key="admin.smtp.action.check.settings" />" />
+			</div>
+		<c:if test="${not props[PROP_EMAIL_SMTP_ENABLE]}">
+			</div>
+		</c:if>
 	</fieldset>
 	<input type="hidden" name="function" value="properties" />
 

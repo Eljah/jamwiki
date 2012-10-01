@@ -337,6 +337,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_FILE_WHITELIST);
 			}
 			else if (section.equals("email")) {
+				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_ENABLE);
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 				setProperty(props, request, Environment.PROP_EMAIL_SMTP_USERNAME);
 				setPassword(props, request, next, Environment.PROP_EMAIL_SMTP_PASSWORD, "smtpPassword");
@@ -346,7 +347,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
 				setProperty(props, request, Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
 				// Check if we have to test the configuration
-				String command = request.getParameter("Submit");
+				String command = request.getParameter("testMail");
 				if (!StringUtils.isBlank(command) && command.equalsIgnoreCase("send test mail")) {
 					String mailAddress = null;
 					try {

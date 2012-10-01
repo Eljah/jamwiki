@@ -71,6 +71,7 @@ public class Environment {
 	public static final String PROP_DBCP_TEST_WHILE_IDLE = "dbcp-test-while-idle";
 	public static final String PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS = "dbcp-time-between-eviction-runs";
 	public static final String PROP_DBCP_WHEN_EXHAUSTED_ACTION = "dbcp-when-exhausted-action";
+	public static final String PROP_EMAIL_SMTP_ENABLE = "smtp-enable";
 	public static final String PROP_EMAIL_SMTP_REQUIRES_AUTH = "smtp-authentication";
 	public static final String PROP_EMAIL_SMTP_USERNAME = "smtp-username";
 	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-userpass";
@@ -228,7 +229,8 @@ public class Environment {
 		this.defaults.setProperty(PROP_DBCP_TEST_WHILE_IDLE, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, "120");
 		this.defaults.setProperty(PROP_DBCP_WHEN_EXHAUSTED_ACTION, String.valueOf(GenericObjectPool.WHEN_EXHAUSTED_GROW));
-		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,"false");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_ENABLE,Boolean.FALSE.toString());
+		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME,"");
 		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD,"");
 		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS,"");
