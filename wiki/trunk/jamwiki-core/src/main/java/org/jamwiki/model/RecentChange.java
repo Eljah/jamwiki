@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +26,7 @@ import org.jamwiki.utils.Utilities;
 /**
  * Provides an object representing a Wiki recent change.
  */
-public class RecentChange {
+public class RecentChange implements Serializable {
 
 	private Integer authorId;
 	private String authorName;
@@ -42,12 +43,6 @@ public class RecentChange {
 	private String topicName;
 	private Integer topicVersionId;
 	private String virtualWiki;
-
-	/**
-	 *
-	 */
-	public RecentChange() {
-	}
 
 	/**
 	 *

@@ -16,10 +16,12 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
+
 /**
  * Model representing user login details.
  */
-public class WikiUserDetails {
+public class WikiUserDetails implements Serializable {
 
 	private final String username;
 	private final String password;

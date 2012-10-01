@@ -16,10 +16,12 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
+
 /**
  * Class for image and other data storing and loading.
  */
-public class ImageData {
+public class ImageData implements Serializable {
 
 	public int fileVersionId;
 	public String mimeType;

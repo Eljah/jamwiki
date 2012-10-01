@@ -16,13 +16,14 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provides an object representing a file uploaded to the Wiki.
  */
-public class WikiFile {
+public class WikiFile implements Serializable {
 
 	public static final String UNKNOWN_MIME_TYPE = "application/unknown";
 	// FIXME - consider making this an ACL (more flexible)
