@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,7 +29,7 @@ import org.jamwiki.utils.Utilities;
 /**
  * Provides an object representing a Wiki log entry.
  */
-public class LogItem {
+public class LogItem implements Serializable {
 
 	public static final int LOG_TYPE_ALL = -1;
 	public static final int LOG_TYPE_BLOCK = 13;
@@ -65,12 +66,6 @@ public class LogItem {
 	private String userDisplayName;
 	private Integer userId;
 	private String virtualWiki;
-
-	/**
-	 *
-	 */
-	public LogItem() {
-	}
 
 	/**
 	 * Create a log item from a topic, topic version and author name.  If the topic

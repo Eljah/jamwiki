@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.utils.Utilities;
 
@@ -23,7 +24,7 @@ import org.jamwiki.utils.Utilities;
  * Provides an object representing a Wiki reference, which is a citation
  * appearing within a Wiki topic.
  */
-public class WikiReference {
+public class WikiReference implements Serializable {
 
 	private final int citation;
 	private String content;

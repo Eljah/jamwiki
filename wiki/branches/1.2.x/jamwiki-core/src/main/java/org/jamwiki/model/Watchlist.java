@@ -16,6 +16,7 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * Provides an object representing a watchlist object consisting of a virtual
  * wiki and a collection of topics being watched.
  */
-public class Watchlist {
+public class Watchlist implements Serializable {
 
 	private String virtualWiki;
 	private List<String> topics;

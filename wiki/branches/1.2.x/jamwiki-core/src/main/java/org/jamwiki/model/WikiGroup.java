@@ -16,10 +16,12 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
+
 /**
  * Provides an object representing a Wiki group.
  */
-public class WikiGroup {
+public class WikiGroup implements Serializable {
 
 	private String description;
 	private int groupId = -1;
