@@ -375,7 +375,7 @@
 			<div class="row">
 				<label for="<%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %>"><fmt:message key="admin.smtp.caption.address.separator" /></label>
 				<c:set var="PROP_EMAIL_ADDRESS_SEPARATOR"><%= Environment.PROP_EMAIL_ADDRESS_SEPARATOR %></c:set>
-				<span><jamwiki:text name="${PROP_EMAIL_ADDRESS_SEPARATOR}" value="${props[PROP_EMAIL_ADDRESS_SEPARATOR]}" size="50" id="${PROP_EMAIL_ADDRESS_SEPARATOR}" /></span>
+				<span><jamwiki:text name="${PROP_EMAIL_ADDRESS_SEPARATOR}" value="${props[PROP_EMAIL_ADDRESS_SEPARATOR]}" size="30" id="${PROP_EMAIL_ADDRESS_SEPARATOR}" /></span>
 			</div>
 			<div class="row">
 				<input type="submit" name="testMail" value="<fmt:message key="admin.smtp.action.check.settings" />" />
