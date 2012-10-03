@@ -39,7 +39,7 @@ Translation Updates:
 
 New Features:
 
-  * Upgrade to Ehcache 2.5.5.
+  * None.
 
 Bugfixes:
 
