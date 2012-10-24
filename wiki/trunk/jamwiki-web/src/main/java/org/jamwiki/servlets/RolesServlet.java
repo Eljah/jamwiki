@@ -107,9 +107,9 @@ public class RolesServlet extends JAMWikiServlet {
 	private GroupMap buildGroupMap(String userLogin,String[] groupIds) {
 		GroupMap groupMap = new GroupMap(userLogin);
 		List<Integer> groupIdsList = new ArrayList<Integer>();
-		for(int i=0;i<groupIds.length;i++) {
+		for (int i=0;i<groupIds.length;i++) {
 			String[] tokens = groupIds[i].split("\\|");
-			if(tokens[0].equals(userLogin)) {
+			if (tokens[0].equals(userLogin)) {
 				groupIdsList.add(new Integer(tokens[1]));
 			}
 		}
@@ -155,7 +155,7 @@ public class RolesServlet extends JAMWikiServlet {
 					WikiBase.getDataHandler().writeRoleMapUser(username, roles);
 					// handle group assignments
 					GroupMap groupMap = null;
-					if(userGroups != null) {
+					if (userGroups != null) {
 						groupMap = buildGroupMap(username,userGroups);
 						// We must delete the groups GROUP_ANONYMOUS and GROUP_REGISTERED_USER
 						// if available to avoid duplicates in the datase
@@ -241,14 +241,14 @@ public class RolesServlet extends JAMWikiServlet {
 			if (!StringUtils.isBlank(searchLogin)) {
 				roleMapUsers = WikiBase.getDataHandler().getRoleMapByLogin(searchLogin);
 				next.addObject("searchLogin", searchLogin);
-			} else if(!StringUtils.isBlank(searchRole)) {
+			} else if (!StringUtils.isBlank(searchRole)) {
 				roleMapUsers = WikiBase.getDataHandler().getRoleMapByRole(searchRole,test.booleanValue());
 				next.addObject("searchRole", searchRole);
-			} else if(!StringUtils.isBlank(searchGroup)) {
+			} else if (!StringUtils.isBlank(searchGroup)) {
 				GroupMap groupMap = WikiBase.getDataHandler().getGroupMapGroup(Integer.valueOf(searchGroup));
 				roleMapUsers = new ArrayList<RoleMap>();
 				List<String> groupMembers = groupMap.getGroupMembers();
-				for(String userLogin : groupMembers) {
+				for (String userLogin : groupMembers) {
 					List<RoleMap> roleMapUser = WikiBase.getDataHandler().getRoleMapByLogin(userLogin);
 					// The userLogin is unique. We can assume that there is only one item in the list.
 					roleMapUsers.add(roleMapUser.get(0));
@@ -256,8 +256,8 @@ public class RolesServlet extends JAMWikiServlet {
 				next.addObject("searchGroup",searchGroup);
 			}
 			// Add group lists of users
-			if(roleMapUsers != null) {
-				for(RoleMap roleMap : roleMapUsers) {
+			if (roleMapUsers != null) {
+				for (RoleMap roleMap : roleMapUsers) {
 					groupMaps.put(roleMap.getUserLogin(),WikiBase.getDataHandler().getGroupMapUser(roleMap.getUserLogin()));
 				}
 			}
@@ -282,8 +282,12 @@ public class RolesServlet extends JAMWikiServlet {
 				// will be disabled in the form.
 				boolean update = StringUtils.isBlank(request.getParameter("groupName"));
 				String groupName = (update) ? updateGroup : request.getParameter("groupName");
-				if(!StringUtils.isBlank(groupName)) group = WikiBase.getDataHandler().lookupWikiGroup(groupName);
-				if(group == null) group = new WikiGroup(groupName);
+				if (!StringUtils.isBlank(groupName)) {
+					group = WikiBase.getDataHandler().lookupWikiGroup(groupName);
+				}
+				if (group == null) {
+					group = new WikiGroup(groupName);
+				}
 				group.setDescription(request.getParameter("groupDescription"));
 				WikiUtil.validateWikiGroup(group);
 				WikiBase.getDataHandler().writeWikiGroup(group);

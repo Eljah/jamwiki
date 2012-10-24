@@ -40,7 +40,7 @@ public class DateUtil {
 															  "LONG",
 															  "FULL",
 															  "dd.MM.yyyy HH:mm z" };
-	
+
 	/**
 	 * The method returns the current date and/or time for a specific time zone.
 	 * The value is returned as a date formatted String, based on the formatting
@@ -55,7 +55,7 @@ public class DateUtil {
 	 * @param localeString a String representation of a Locale. This can be the ISO 2 digit code for
 	 * the language (e.g. "en") or the combination of language and ISO 2 digit country code (e.g. "en_US").
 	 * A value of null or of a non existing locale will force the method to use the default locale of
-	 * the server. 
+	 * the server.
 	 * @throws IllegalArgumentException Thrown if the dateFormat or localeString is invalid.
 	 * @return
 	 */
@@ -101,33 +101,37 @@ public class DateUtil {
 			style = DateFormat.DEFAULT;
 		}
 		if (style != -1) {
-			SimpleDateFormat sdf = (SimpleDateFormat)DateFormat.getDateTimeInstance(style, style, locale); 
+			SimpleDateFormat sdf = (SimpleDateFormat)DateFormat.getDateTimeInstance(style, style, locale);
 			String pattern = sdf.toPattern();
-			if(pattern.indexOf("z") < 0) sdf = new SimpleDateFormat(pattern + " z",locale);
+			if (pattern.indexOf('z') < 0) {
+				sdf = new SimpleDateFormat(pattern + " z",locale);
+			}
 			return sdf;
 		} else {
 			return new SimpleDateFormat(dateFormatString, locale);
 		}
 	}
-	
+
 	/**
 	 * Returns a list of available time zones. The list is used to get the time zone
 	 * of a user in the user preferences dialog.
-	 * 
+	 *
 	 * @return List of time zones
 	 */
 	public static String[] getTimeZoneIDs() {
 		return TimeZone.getAvailableIDs();
 	}
-	
+
+	/**
+	 *
+	 */
 	public static Map<String, String> getDatetimeFormats(WikiUser user) {
 		String timezone   = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
 		String locale     = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		String sysDefault = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
-		
 		HashMap<String, String> formats = new HashMap<String, String>();
 		formats.put("", getUserLocalTime(timezone,sysDefault,locale));
-		for(String format : dateFormats) {
+		for (String format : dateFormats) {
 			formats.put(format, getUserLocalTime(timezone,format,locale));
 		}
 		return formats;

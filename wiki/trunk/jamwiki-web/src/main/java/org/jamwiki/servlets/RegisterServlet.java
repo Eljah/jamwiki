@@ -176,8 +176,8 @@ public class RegisterServlet extends JAMWikiServlet {
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
 		user.setDisplayName(request.getParameter("displayName"));
 		LinkedHashMap<String, Map<String, UserPreferenceItem>> preferences = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)new UserPreferencesUtil(user).getGroups();
-		for(String group : preferences.keySet()) {
-			for(String key : preferences.get(group).keySet()) {
+		for (String group : preferences.keySet()) {
+			for (String key : preferences.get(group).keySet()) {
 				user.setPreference(key, request.getParameter(key));
 			}
 		}

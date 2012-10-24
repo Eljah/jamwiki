@@ -108,7 +108,7 @@ public class WikiUser implements Serializable {
 	public void setCreateIpAddress(String createIpAddress) {
 		this.createIpAddress = createIpAddress;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -195,18 +195,21 @@ public class WikiUser implements Serializable {
 	public String getSignature() {
 		return this.getPreferences().get(USER_PREFERENCE_SIGNATURE);
 	}
-	
+
+	/**
+	 *
+	 */
 	public void setSignature(String signature) {
 		this.getPreferences().put(USER_PREFERENCE_SIGNATURE, signature);
 	}
-	
+
 	/**
 	 * Helper method to get a specific preference
 	 */
 	public String getPreference(String preferenceKey) {
 		return this.getPreferences().get(preferenceKey);
 	}
-	
+
 	/**
 	 * Helper method to set a specific preference
 	 */
