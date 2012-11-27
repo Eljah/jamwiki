@@ -19,10 +19,11 @@ package org.jamwiki.utils;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
@@ -118,8 +119,12 @@ public class DateUtil {
 	 *
 	 * @return List of time zones
 	 */
-	public static String[] getTimeZoneIDs() {
-		return TimeZone.getAvailableIDs();
+	public static Map<String, String> getTimeZoneMap() {
+		Map<String, String> timeZoneMap = new TreeMap<String, String>();
+		for (String timeZoneId : TimeZone.getAvailableIDs()) {
+			timeZoneMap.put(timeZoneId, timeZoneId);
+		}
+		return timeZoneMap;
 	}
 
 	/**
@@ -129,7 +134,7 @@ public class DateUtil {
 		String timezone   = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
 		String locale     = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		String sysDefault = Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true);
-		HashMap<String, String> formats = new HashMap<String, String>();
+		Map<String, String> formats = new LinkedHashMap<String, String>();
 		formats.put("", getUserLocalTime(timezone,sysDefault,locale));
 		for (String format : dateFormats) {
 			formats.put(format, getUserLocalTime(timezone,format,locale));

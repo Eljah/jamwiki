@@ -144,19 +144,13 @@ public class UserPreferencesUtil {
 
 		/**
 		 * Add an if statement if a new property must fill a drop down box with
-		 * a list of values.
-		 */
-		public String[] getList() {
-			return (prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) ? DateUtil.getTimeZoneIDs() : null;
-		}
-
-		/**
-		 * Add an if statement if a new property must fill a drop down box with
 		 * a list of key/value pairs. The key is the value stored in the database for
 		 * the user, while value is used to display the content in the dropdown box.
 		 */
 		public Map getMap() {
-			if (prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
+			if (prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
+				return DateUtil.getTimeZoneMap();
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
 				LinkedHashMap<String, String> locales = new LinkedHashMap<String, String>();
 				Locale[] localeArray = Locale.getAvailableLocales();
 				for (int i = 0; i < localeArray.length; i++) {

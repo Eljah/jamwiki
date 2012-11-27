@@ -117,13 +117,6 @@
 				<!-- handle content type -->
 				<span>
 					<c:choose>
-						<c:when test="${!empty preference.value.list}">
-							<select name="${preference.key}" id="${preference.key}">
-								<c:forEach var="item" items="${preference.value.list}">
-								<option value="<c:out value="${item}" />"<c:if test="${newuser.preferences[preference.key] == item}"> selected="selected"</c:if>><c:out value="${item}" /></option>
-								</c:forEach>
-							</select>
-						</c:when>
 						<c:when test="${!empty preference.value.map}">
 							<select name="${preference.key}" id="${preference.key}">
 								<c:forEach var="item" items="${preference.value.map}">
