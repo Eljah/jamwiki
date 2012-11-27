@@ -46,7 +46,7 @@
 				</tr>
 				<c:forEach items="${fileVersions}" var="fileVersion">
 					<tr>
-						<td class="nowrap"><a href="<jamwiki:imageUrl topicName="${topicObject.name}" fileVersion="${fileVersion}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></a></td>
+						<td class="nowrap"><a href="<jamwiki:imageUrl topicName="${topicObject.name}" fileVersion="${fileVersion}" />"><fmt:formatDate value="${fileVersion.uploadDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /></a></td>
 						<c:if test="${topicImage}">
 							<td><jamwiki:image value="${topicObject.name}" virtualWiki="${topicObject.virtualWiki}" fileVersion="${fileVersion}" maxWidth="120" maxHeight="120" /></td>
 						</c:if>

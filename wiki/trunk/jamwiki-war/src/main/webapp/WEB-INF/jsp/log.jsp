@@ -40,18 +40,18 @@
 <fmt:message key="common.caption.view" />: <jamwiki:pagination total="${numLogs}" rootUrl="Special:Log" />
 </div>
 
-<c:set var="previousDate"><fmt:formatDate value="${logItems[0].logDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" /></c:set>
+<c:set var="previousDate"><fmt:formatDate value="${logItems[0].logDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" timeZone="${pageInfo.timeZoneId}" /></c:set>
 <h4><c:out value="${previousDate}" /></h4>
 <ul>
 <c:forEach items="${logItems}" var="logItem">
-<c:set var="currentDate"><fmt:formatDate value="${logItem.logDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" /></c:set>
+<c:set var="currentDate"><fmt:formatDate value="${logItem.logDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" timeZone="${pageInfo.timeZoneId}" /></c:set>
 <c:if test="${currentDate != previousDate}">
 </ul>
 <h4><c:out value="${currentDate}" /></h4>
 <ul>
 </c:if>
 <li>
-	<fmt:formatDate value="${logItem.logDate}" type="both" pattern="${pageInfo.datePatternTimeOnly}" />
+	<fmt:formatDate value="${logItem.logDate}" type="both" pattern="${pageInfo.datePatternTimeOnly}" timeZone="${pageInfo.timeZoneId}" />
 	&#160;
 	(<jamwiki:link value="Special:Log"><jamwiki:linkParam key="logType" value="${logItem.logType}" /><fmt:message key="${logItem.logWikiLinkCaption}" /></jamwiki:link>)
 	&#160;.&#160;.&#160;

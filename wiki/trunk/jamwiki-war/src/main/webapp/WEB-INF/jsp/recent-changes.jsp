@@ -27,16 +27,16 @@
 <div class="message">
 <fmt:message key="common.caption.view" />: <jamwiki:pagination total="${numChanges}" rootUrl="Special:RecentChanges" />
 <br /><br />
-<fmt:message key="recentchanges.caption.time"><fmt:param><jsp:useBean id="now" class="java.util.Date" /><fmt:formatDate value="${now}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></fmt:param></fmt:message> <jamwiki:enabled property="PROP_RSS_ALLOWED">(<jamwiki:link value="Special:RecentChangesFeed"><fmt:message key="recentchanges.caption.rss" /></jamwiki:link>)</jamwiki:enabled>
+<fmt:message key="recentchanges.caption.time"><fmt:param><jsp:useBean id="now" class="java.util.Date" /><fmt:formatDate value="${now}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /></fmt:param></fmt:message> <jamwiki:enabled property="PROP_RSS_ALLOWED">(<jamwiki:link value="Special:RecentChangesFeed"><fmt:message key="recentchanges.caption.rss" /></jamwiki:link>)</jamwiki:enabled>
 </div>
 
 <form name="num-changes" method="get" action="<jamwiki:link value="Special:RecentChanges" />">
 
-<c:set var="previousDate"><fmt:formatDate value="${changes[0].changeDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" /></c:set>
+<c:set var="previousDate"><fmt:formatDate value="${changes[0].changeDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" timeZone="${pageInfo.timeZoneId}" /></c:set>
 <h4><c:out value="${previousDate}" /></h4>
 <ul>
 <c:forEach items="${changes}" var="change">
-<c:set var="currentDate"><fmt:formatDate value="${change.changeDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" /></c:set>
+<c:set var="currentDate"><fmt:formatDate value="${change.changeDate}" type="both" pattern="${pageInfo.datePatternDateOnly}" timeZone="${pageInfo.timeZoneId}" /></c:set>
 <c:if test="${currentDate != previousDate}">
 </ul>
 <h4><c:out value="${currentDate}" /></h4>
@@ -52,7 +52,7 @@
 		(<jamwiki:link value="Special:Log"><jamwiki:linkParam key="logType" value="${change.logType}" /><fmt:message key="${change.logWikiLinkCaption}" /></jamwiki:link>)
 	</c:if>
 	&#160;
-	<fmt:formatDate value="${change.changeDate}" type="both" pattern="${pageInfo.datePatternTimeOnly}" />
+	<fmt:formatDate value="${change.changeDate}" type="both" pattern="${pageInfo.datePatternTimeOnly}" timeZone="${pageInfo.timeZoneId}" />
 	&#160;
 	<c:if test="${!empty change.topicName}">
 		<jamwiki:watchlist topic="${change.topicName}">

@@ -317,7 +317,7 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 	public ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
 		long start = System.currentTimeMillis();
 		ModelAndView next = new ModelAndView(this.displayJSP);
-		WikiPageInfo pageInfo = new WikiPageInfo(request);
+		WikiPageInfo pageInfo = new WikiPageInfo(request, ServletUtil.currentWikiUser());
 		ModelAndView blockedUserModelAndView = null;
 		try {
 			if (!this.handleRedirect(request, next, pageInfo)) {
@@ -447,7 +447,7 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 		}
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		ModelAndView next = new ModelAndView("wiki");
-		WikiPageInfo pageInfo = new WikiPageInfo(request);
+		WikiPageInfo pageInfo = new WikiPageInfo(request, ServletUtil.currentWikiUser());
 		pageInfo.setPageTitle(new WikiMessage("error.title"));
 		pageInfo.setContentJsp(JSP_ERROR);
 		pageInfo.setSpecial(true);

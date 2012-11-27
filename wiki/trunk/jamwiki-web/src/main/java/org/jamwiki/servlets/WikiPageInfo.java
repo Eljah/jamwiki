@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -32,6 +33,7 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
@@ -61,6 +63,7 @@ public class WikiPageInfo {
 	private boolean special = false;
 	private LinkedHashMap<String, WikiMessage> tabMenu = new LinkedHashMap<String, WikiMessage>();
 	private String topicName = "";
+	private final WikiUser user;
 	private LinkedHashMap<String, WikiMessage> userMenu = new LinkedHashMap<String, WikiMessage>();
 	private List<String> virtualWikiLinks = new ArrayList<String>();
 	private String virtualWikiName = null;
@@ -68,12 +71,13 @@ public class WikiPageInfo {
 	/**
 	 *
 	 */
-	protected WikiPageInfo(HttpServletRequest request) {
+	protected WikiPageInfo(HttpServletRequest request, WikiUser user) {
 		this.virtualWikiName = WikiUtil.getVirtualWikiFromURI(request);
 		if (this.virtualWikiName == null) {
 			logger.error("No virtual wiki available for page request " + request.getRequestURI());
 			this.virtualWikiName = VirtualWiki.defaultVirtualWiki().getName();
 		}
+		this.user = user;
 	}
 
 	/**
@@ -473,6 +477,17 @@ public class WikiPageInfo {
 	 */
 	public void setTabMenu(LinkedHashMap<String, WikiMessage> tabMenu) {
 		this.tabMenu = tabMenu;
+	}
+
+	/**
+	 * Return the user's preferred timezone, or the system default timezone if
+	 * the user has not set a preference.
+	 */
+	public String getTimeZoneId() {
+		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE) != null) {
+			return user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
+		}
+		return TimeZone.getDefault().getID();
 	}
 
 	/**

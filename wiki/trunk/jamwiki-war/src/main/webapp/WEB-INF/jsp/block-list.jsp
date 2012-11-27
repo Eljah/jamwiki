@@ -33,7 +33,7 @@
 		<ul>
 		<c:forEach items="${items}" var="userBlock">
 		<li>
-			<fmt:formatDate value="${userBlock.blockDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" />
+			<fmt:formatDate value="${userBlock.blockDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" />
 			&#160;.&#160;.&#160;
 			<fmt:message key="blocklist.caption.blocked">
 				<fmt:param><jamwiki:link value="User:jerry">${userBlock.blockedUsernameOrIpAddress}</jamwiki:link></fmt:param>
@@ -45,7 +45,7 @@
 					<fmt:message key="blocklist.caption.end"><fmt:param><fmt:message key="common.interval.infinite" /></fmt:param></fmt:message>
 				</c:when>
 				<c:otherwise>
-					<fmt:message key="blocklist.caption.end"><fmt:param><fmt:formatDate value="${userBlock.blockEndDate}" type="both" dateStyle="long" timeStyle="long" /></fmt:param></fmt:message>
+					<fmt:message key="blocklist.caption.end"><fmt:param><fmt:formatDate value="${userBlock.blockEndDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /></fmt:param></fmt:message>
 				</c:otherwise>
 			</c:choose>
 			<c:if test="${!empty userBlock.blockReason}">&#160;(<i><c:out value="${userBlock.blockReason}" /></i>)</c:if>
