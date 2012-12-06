@@ -144,12 +144,6 @@
 	<div class="formhelp"><fmt:message key="admin.help.maxversionexport" /></div>
 </div>
 <div class="row">
-	<label for="<%= Environment.PROP_DATE_PATTERN_DATE_AND_TIME %>"><fmt:message key="admin.caption.date.dateandtime" /></label>
-	<c:set var="PROP_DATE_PATTERN_DATE_AND_TIME"><%= Environment.PROP_DATE_PATTERN_DATE_AND_TIME %></c:set>
-	<span><jamwiki:text name="${PROP_DATE_PATTERN_DATE_AND_TIME}" size="30" value="${props[PROP_DATE_PATTERN_DATE_AND_TIME]}" id="${PROP_DATE_PATTERN_DATE_AND_TIME}" /></span>
-	<div class="formhelp"><fmt:message key="admin.help.date.dateandtime" /> <fmt:message key="admin.help.date.common" /></div>
-</div>
-<div class="row">
 	<label for="<%= Environment.PROP_DATE_PATTERN_DATE_ONLY %>"><fmt:message key="admin.caption.date.dateonly" /></label>
 	<c:set var="PROP_DATE_PATTERN_DATE_ONLY"><%= Environment.PROP_DATE_PATTERN_DATE_ONLY %></c:set>
 	<span><jamwiki:text name="${PROP_DATE_PATTERN_DATE_ONLY}" size="30" value="${props[PROP_DATE_PATTERN_DATE_ONLY]}" id="${PROP_DATE_PATTERN_DATE_ONLY}" /></span>

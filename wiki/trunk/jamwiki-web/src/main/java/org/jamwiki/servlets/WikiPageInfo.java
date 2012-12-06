@@ -178,7 +178,7 @@ public class WikiPageInfo {
 	 * that include date and time.
 	 */
 	public String getDatePatternDateAndTime() {
-		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_AND_TIME, true, true);
+		return this.getDatePatternDateOnly() + ' ' + this.getDatePatternTimeOnly();
 	}
 
 	/**

@@ -28,7 +28,7 @@ public class EnvironmentTest extends JAMWikiUnitTest {
 	 */
 	@Test
 	public void testGetDatePatternValue1() throws Throwable {
-		String result = Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_AND_TIME, true, true);
+		String result = Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_ONLY, true, true);
 		assertNotNull("Full date pattern expected", result);
 	}
 }
