@@ -189,6 +189,9 @@ public class WikiPageInfo {
 	 * dates.
 	 */
 	public String getDatePatternDateOnly() {
+		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT) != null) {
+			return user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT);
+		}
 		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_ONLY, true, false);
 	}
 
@@ -200,6 +203,9 @@ public class WikiPageInfo {
 	 * dates.
 	 */
 	public String getDatePatternTimeOnly() {
+		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT) != null) {
+			return user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT);
+		}
 		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_TIME_ONLY, false, true);
 	}
 

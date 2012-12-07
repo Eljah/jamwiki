@@ -246,7 +246,8 @@ public class RegisterServlet extends JAMWikiServlet {
 			pageInfo.addError(new WikiMessage("edit.exception.spam", result));
 		}
 		try {
-			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_DATETIME_FORMAT));
+			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_DATE_FORMAT));
+			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_TIME_FORMAT));
 		} catch (IllegalArgumentException e) {
 			// the format will never be null in a properly configured wiki, so this
 			// test is mostly for administrators

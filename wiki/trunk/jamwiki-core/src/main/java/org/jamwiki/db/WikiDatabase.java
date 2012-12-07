@@ -822,7 +822,8 @@ public class WikiDatabase {
 	protected static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage(), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 1);
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID(), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 2);
-		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 3);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATE_FORMAT, null, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 3);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIME_FORMAT, null, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 4);
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar", WikiUser.USER_PREFERENCES_GROUP_EDITING, 1);
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null, WikiUser.USER_PREFERENCES_GROUP_EDITING, 2);
 	}

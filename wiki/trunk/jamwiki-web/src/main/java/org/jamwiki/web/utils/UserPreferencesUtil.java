@@ -161,8 +161,10 @@ public class UserPreferencesUtil {
 				return locales;
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {
 				return WikiConfiguration.getInstance().getEditors();
-			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATETIME_FORMAT)) {
-				return DateUtil.getDatetimeFormats(user);
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATE_FORMAT)) {
+				return DateUtil.getDateFormats(user);
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_TIME_FORMAT)) {
+				return DateUtil.getTimeFormats(user);
 			}
 			return null;
 		}

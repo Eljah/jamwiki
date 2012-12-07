@@ -44,7 +44,8 @@ public class WikiUser implements Serializable {
 	public static final String USER_PREFERENCES_GROUP_INTERNATIONALIZATION = "user.preferences.group.internationalization";
 	public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
 	public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
-	public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
+	public static final String USER_PREFERENCE_DATE_FORMAT = "user.date.format";
+	public static final String USER_PREFERENCE_TIME_FORMAT = "user.time.format";
 
 	/**
 	 *
