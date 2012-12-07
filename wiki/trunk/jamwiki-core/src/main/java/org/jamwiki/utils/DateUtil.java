@@ -114,6 +114,22 @@ public class DateUtil {
 	}
 
 	/**
+	 * Convert a string to a time zone.  Return the default time zone if the
+	 * conversion fails.
+	 */
+	public static TimeZone stringToTimeZone(String timeZoneString) {
+		TimeZone tz = TimeZone.getDefault();
+		if (!StringUtils.isBlank(timeZoneString)) {
+			try {
+				tz = TimeZone.getTimeZone(timeZoneString);
+			} catch (IllegalArgumentException e) {
+				logger.warn("Failure while converting string to time zone: " + timeZoneString);
+			}
+		}
+		return tz;
+	}
+
+	/**
 	 * Returns a list of available time zones. The list is used to get the time zone
 	 * of a user in the user preferences dialog.
 	 *

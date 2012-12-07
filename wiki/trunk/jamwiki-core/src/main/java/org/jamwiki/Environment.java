@@ -267,7 +267,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_PARSER_MAXIMUM_INFINITE_LOOP_LIMIT, "5");
 		this.defaults.setProperty(PROP_PARSER_MAX_PARSER_ITERATIONS, "100");
 		this.defaults.setProperty(PROP_PARSER_MAX_TEMPLATE_DEPTH, "100");
-		this.defaults.setProperty(PROP_PARSER_SIGNATURE_DATE_PATTERN, "dd-MMM-yyyy HH:mm zzz");
+		this.defaults.setProperty(PROP_PARSER_SIGNATURE_DATE_PATTERN, "HH:mm, dd MMMM yyyy (z)");
 		this.defaults.setProperty(PROP_PARSER_SIGNATURE_USER_PATTERN, "[[{0}|{4}]]");
 		this.defaults.setProperty(PROP_PARSER_TOC, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_PARSER_TOC_DEPTH, "5");
