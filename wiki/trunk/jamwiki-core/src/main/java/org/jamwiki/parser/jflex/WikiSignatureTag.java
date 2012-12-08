@@ -17,9 +17,7 @@
 package org.jamwiki.parser.jflex;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.Namespace;
@@ -60,14 +58,9 @@ public class WikiSignatureTag implements JFlexParserTag {
 		}
 		if (includeDate) {
 			// dates in signatures will be the same for all users to match Mediawiki
-			SimpleDateFormat sdf = new SimpleDateFormat();
-			sdf.applyPattern(Environment.getDatePatternValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, true, true));
-			WikiUser user = lexer.getParserInput().getWikiUser();
-			if (user != null) {
-				TimeZone tz = DateUtil.stringToTimeZone(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE));
-				sdf.setTimeZone(tz);
-			}
-			signature += sdf.format(new java.util.Date());
+			Date now = new Date();
+			String pattern = Environment.getValue(Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN);
+			signature += DateUtil.formatDate(now, pattern, null, null, DateUtil.DateFormatType.DATE_AND_TIME);
 		}
 		return signature;
 	}

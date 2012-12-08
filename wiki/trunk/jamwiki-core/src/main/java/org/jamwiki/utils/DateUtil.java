@@ -26,7 +26,6 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.Environment;
 import org.jamwiki.model.WikiUser;
 
 /**
@@ -47,13 +46,15 @@ public class DateUtil {
 			"HH:mm",
 			"h:mm a",
 	};
-	private enum DateFormatType { DATE_ONLY, TIME_ONLY, DATE_AND_TIME };
+	public enum DateFormatType { DATE_ONLY, TIME_ONLY, DATE_AND_TIME };
 
 	/**
 	 * Format the given date using the given pattern to return the date
 	 * as a formatted string.
 	 */
-	private static String formatDate(Date date, String pattern, Locale locale, TimeZone tz, DateFormatType dateFormatType) {
+	public static String formatDate(Date date, String pattern, String localeString, String timeZoneString, DateFormatType dateFormatType) {
+		Locale locale = DateUtil.stringToLocale(localeString);
+		TimeZone tz = DateUtil.stringToTimeZone(timeZoneString);
 		SimpleDateFormat sdf = null;
 		int style = DateUtil.stringToDateFormatStyle(pattern);
 		if (style != -1 && dateFormatType == DateFormatType.DATE_ONLY) {
@@ -73,7 +74,7 @@ public class DateUtil {
 	 * Given a string, return the matching DateFormat style (SHORT, LONG, etc)
 	 * or -1 if there is no corresponding style.
 	 */
-	private static int stringToDateFormatStyle(String format) {
+	public static int stringToDateFormatStyle(String format) {
 		if (StringUtils.equalsIgnoreCase(format, "SHORT")) {
 			return DateFormat.SHORT;
 		} else if (StringUtils.equalsIgnoreCase(format, "MEDIUM")) {
@@ -138,13 +139,12 @@ public class DateUtil {
 	 * the current date formatted using the pattern.
 	 */
 	public static Map<String, String> getDateFormats(WikiUser user) {
-		TimeZone tz = DateUtil.stringToTimeZone(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE));
+		String timeZoneString = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
 		String localeString = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
-		Locale locale = DateUtil.stringToLocale(localeString);
 		Date now = new Date();
 		Map<String, String> formats = new LinkedHashMap<String, String>();
 		for (String format : DATE_FORMATS) {
-			formats.put(format, DateUtil.formatDate(now, format, locale, tz, DateFormatType.DATE_ONLY));
+			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, DateFormatType.DATE_ONLY));
 		}
 		return formats;
 	}
@@ -154,13 +154,12 @@ public class DateUtil {
 	 * the current time formatted using the pattern.
 	 */
 	public static Map<String, String> getTimeFormats(WikiUser user) {
-		TimeZone tz = DateUtil.stringToTimeZone(user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE));
+		String timeZoneString = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
 		String localeString = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
-		Locale locale = DateUtil.stringToLocale(localeString);
 		Date now = new Date();
 		Map<String, String> formats = new LinkedHashMap<String, String>();
 		for (String format : TIME_FORMATS) {
-			formats.put(format, DateUtil.formatDate(now, format, locale, tz, DateFormatType.TIME_ONLY));
+			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, DateFormatType.TIME_ONLY));
 		}
 		return formats;
 	}

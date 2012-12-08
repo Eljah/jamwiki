@@ -19,6 +19,7 @@ package org.jamwiki.servlets;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.WikiLink;
+import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -192,7 +194,12 @@ public class WikiPageInfo {
 		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT) != null) {
 			return user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT);
 		}
-		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_ONLY, true, false);
+		String pattern = Environment.getValue(Environment.PROP_DATE_PATTERN_DATE_ONLY);
+		int style = DateUtil.stringToDateFormatStyle(pattern);
+		if (style != -1) {
+			pattern = ((SimpleDateFormat)SimpleDateFormat.getDateInstance(style)).toPattern();
+		}
+		return pattern;
 	}
 
 	/**
@@ -206,7 +213,12 @@ public class WikiPageInfo {
 		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT) != null) {
 			return user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT);
 		}
-		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_TIME_ONLY, false, true);
+		String pattern = Environment.getValue(Environment.PROP_DATE_PATTERN_TIME_ONLY);
+		int style = DateUtil.stringToDateFormatStyle(pattern);
+		if (style != -1) {
+			pattern = ((SimpleDateFormat)SimpleDateFormat.getTimeInstance(style)).toPattern();
+		}
+		return pattern;
 	}
 
 	/**
