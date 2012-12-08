@@ -228,7 +228,7 @@ public class AnsiDataValidator {
 		checkLength(user.getDefaultLocale(), 8);
 		checkLength(user.getEmail(), 100);
 		// loop through preferences and check length
-		for(String preference : user.getPreferences().values()) {
+		for (String preference : user.getPreferences().values()) {
 			checkLength(preference, 250);
 		}
 	}

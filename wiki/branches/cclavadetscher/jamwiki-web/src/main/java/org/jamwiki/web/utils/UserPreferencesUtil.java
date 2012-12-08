@@ -33,11 +33,14 @@ public class UserPreferencesUtil {
 	private WikiUser user = null;
 	private static LinkedHashMap<String, Map<String, String>> defaults = null;
 	private static LinkedHashMap<String, Map<String, UserPreferenceItem>> groups = null;
-	
+
 	// This is a workaround. It should be possible to get the signature preview directly
 	// from a method...
 	public static String signaturePreview = null;
-	
+
+	/**
+	 *
+	 */
 	public UserPreferencesUtil(WikiUser user) {
 		this.user = user;
 		try {
@@ -48,20 +51,22 @@ public class UserPreferencesUtil {
 	}
 
 	/**
-	 * Convenience method to retrieve the UserPreferenceItem for a single preference. 
+	 * Convenience method to retrieve the UserPreferenceItem for a single preference.
 	 * @param preferenceKey
 	 * @return
 	 */
 	public UserPreferenceItem getPreference(String preferenceKey) {
 		LinkedHashMap<String, Map<String, UserPreferenceItem>> map = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)getGroups();
-		for(String group : map.keySet()) {
-			for(String key : map.get(group).keySet()) {
-				if(preferenceKey.equals(key)) return map.get(group).get(key);
+		for (String group : map.keySet()) {
+			for (String key : map.get(group).keySet()) {
+				if (preferenceKey.equals(key)) {
+					return map.get(group).get(key);
+				}
 			}
 		}
 		return null;
 	}
-	
+
 	/**
 	 * The method return a map with the following structure:
 	 * pref_group_key -> Map(pref_key -> Instance of UserPreferenceItem for pref_key)
@@ -70,54 +75,66 @@ public class UserPreferencesUtil {
 	 * @return
 	 */
 	public Map<String, Map<String, UserPreferenceItem>> getGroups() {
-		if(defaults == null) {
+		if (defaults == null) {
 			try {
 				defaults = (LinkedHashMap<String, Map<String, String>>)WikiBase.getDataHandler().getUserPreferencesDefaults();
 			} catch(DataAccessException e) {
 				logger.error(e.toString());
 			}
 		}
-		if(groups == null) {
+		if (groups == null) {
 			groups = new LinkedHashMap<String, Map<String, UserPreferenceItem>>();
 		}
 		String lastKey = null;
 		LinkedHashMap<String, UserPreferenceItem> items = null;
-		for(String group : defaults.keySet()) {
-			if(lastKey == null || !lastKey.equals(group)) {
+		for (String group : defaults.keySet()) {
+			if (lastKey == null || !lastKey.equals(group)) {
 				items = new LinkedHashMap<String, UserPreferenceItem>();
 			}
-			for(String item : defaults.get(group).keySet()) {
+			for (String item : defaults.get(group).keySet()) {
 				items.put(item, new UserPreferenceItem(item));
 			}
 			groups.put(group, items);
 		}
 		return groups;
 	}
-	
-	// This is a workaround. It should be possible to get the signature preview directly
-	// from a method...
+
+	/**
+	 *
+	 */
 	public void setSignaturePreview(String signature) {
+		// This is a workaround. It should be possible to get the signature preview directly
+		// from a method...
 		signaturePreview = signature;
 	}
-	
+
+	/**
+	 *
+	 */
 	public class UserPreferenceItem {
 		String prefName = null;
-		
+
+		/**
+		 *
+		 */
 		public UserPreferenceItem(String prefName) {
 			this.prefName = prefName;
 		}
-		
+
+		/**
+		 *
+		 */
 		public String getKey() {
 			return this.prefName;
 		}
-		
+
 		/**
 		 * This must match an entry in the ApplicationResources language file.
 		 */
 		public String getLabel() {
 			return prefName + ".label";
 		}
-		
+
 		/**
 		 * This must match an entry in the ApplicationResources language file.
 		 */
@@ -127,22 +144,13 @@ public class UserPreferencesUtil {
 
 		/**
 		 * Add an if statement if a new property must fill a drop down box with
-		 * a list of values. 
-		 */
-		public String[] getList() {
-			if(prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
-				return DateUtil.getTimeZoneIDs();
-			}
-			else return null;
-		}
-		
-		/**
-		 * Add an if statement if a new property must fill a drop down box with
 		 * a list of key/value pairs. The key is the value stored in the database for
-		 * the user, while value is used to display the content in the dropdown box. 
+		 * the user, while value is used to display the content in the dropdown box.
 		 */
 		public Map getMap() {
-			if(prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
+			if (prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
+				return DateUtil.getTimeZoneMap();
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
 				LinkedHashMap<String, String> locales = new LinkedHashMap<String, String>();
 				Locale[] localeArray = Locale.getAvailableLocales();
 				for (int i = 0; i < localeArray.length; i++) {
@@ -153,27 +161,26 @@ public class UserPreferencesUtil {
 				return locales;
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {
 				return WikiConfiguration.getInstance().getEditors();
-			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATETIME_FORMAT)) {
-				return DateUtil.getDatetimeFormats(user);
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATE_FORMAT)) {
+				return DateUtil.getDateFormats(user);
+			} else if (prefName.equals(WikiUser.USER_PREFERENCE_TIME_FORMAT)) {
+				return DateUtil.getTimeFormats(user);
 			}
-			else return null;
+			return null;
 		}
-		
+
 		/**
-		 * Add an if statement if a property must display a checkbox. 
+		 * Add an if statement if a property must display a checkbox.
 		 */
 		public boolean getCheckbox() {
 			return false;
 		}
-		
+
 		/**
-		 * Add an if statement if a property has a preview to display on screen. 
+		 * Add an if statement if a property has a preview to display on screen.
 		 */
 		public String getPreview() {
-			if(prefName.equals(WikiUser.USER_PREFERENCE_SIGNATURE)) {
-				return UserPreferencesUtil.signaturePreview;
-			}
-			else return null;
+			return (prefName.equals(WikiUser.USER_PREFERENCE_SIGNATURE)) ? UserPreferencesUtil.signaturePreview : null;
 		}
 	}
 }

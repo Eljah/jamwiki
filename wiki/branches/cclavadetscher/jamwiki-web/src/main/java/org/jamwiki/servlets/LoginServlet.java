@@ -27,6 +27,8 @@ import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.jamwiki.Environment;
+
 /**
  * Used to handle requests or redirects to the login page, as well as requests to logout.
  */
@@ -51,6 +53,8 @@ public class LoginServlet extends JAMWikiServlet {
 		// use a minimal page during upgrades since underlying data structures may
 		// not yet be in sync with the database
 		this.layout = !WikiUtil.isUpgrade();
+		// Addition for test
+		next.addObject("mailEnabled", Environment.getBooleanValue(Environment.PROP_EMAIL_SMTP_ENABLE) && Environment.getBooleanValue(Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD));
 		return next;
 	}
 

@@ -2829,7 +2829,7 @@ public class AnsiDataHandler {
 				case GroupMap.GROUP_MAP_GROUP: {
 					int groupId = groupMap.getGroupId();
 					List<String> groupMembers = groupMap.getGroupMembers();
-					for(String groupMember : groupMembers) {
+					for (String groupMember : groupMembers) {
 						this.queryHandler().insertGroupMember(groupMember, groupId, conn);
 					}
 					break;
@@ -2837,7 +2837,7 @@ public class AnsiDataHandler {
 				case GroupMap.GROUP_MAP_USER: {
 					String userLogin = groupMap.getUserLogin();
 					List<Integer> groupIds = groupMap.getGroupIds();
-					for(Integer groupId : groupIds) {
+					for (Integer groupId : groupIds) {
 						this.queryHandler().insertGroupMember(userLogin, groupId.intValue(), conn);
 					}
 					break;

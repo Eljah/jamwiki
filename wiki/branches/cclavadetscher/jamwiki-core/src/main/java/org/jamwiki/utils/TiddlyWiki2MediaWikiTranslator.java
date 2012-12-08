@@ -36,6 +36,9 @@ public class TiddlyWiki2MediaWikiTranslator {
 
 	public static String newline = System.getProperty("line.separator");
 
+	/**
+	 *
+	 */
 	public String translate(String wikicode) throws IOException {
 		String replaced = wikicode.replaceAll("\\\\n", "\n");
 		replaced = insertBreaks(replaced);
@@ -44,6 +47,9 @@ public class TiddlyWiki2MediaWikiTranslator {
 		return replaced;
 	}
 
+	/**
+	 *
+	 */
 	private String tables(String wikicode) throws IOException {
 		BufferedReader reader = new BufferedReader(new StringReader(wikicode));
 		StringBuilder output = new StringBuilder();
@@ -83,6 +89,9 @@ public class TiddlyWiki2MediaWikiTranslator {
 		return output.toString();
 	}
 
+	/**
+	 *
+	 */
 	private String translateTableLine(String line) {
 		String[] tokens = line.split("\\|");
 		StringBuilder output = new StringBuilder();
@@ -103,6 +112,9 @@ public class TiddlyWiki2MediaWikiTranslator {
 		return output.toString();
 	}
 
+	/**
+	 *
+	 */
 	private String headers(String wikicode) throws IOException {
 		BufferedReader reader = new BufferedReader(new StringReader(wikicode));
 		String line = null;
@@ -122,6 +134,9 @@ public class TiddlyWiki2MediaWikiTranslator {
 		return output.toString();
 	}
 
+	/**
+	 *
+	 */
 	public String wikiLinks(String wikicode) {
 		StringBuilder output = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer(wikicode, " \t\n\r\f<>", true);
@@ -143,6 +158,9 @@ public class TiddlyWiki2MediaWikiTranslator {
 		return output.toString();
 	}
 
+	/**
+	 *
+	 */
 	public String insertBreaks(String wikicode) throws IOException {
 		BufferedReader reader = new BufferedReader(new StringReader(wikicode));
 		StringBuilder output = new StringBuilder();
@@ -152,7 +170,7 @@ public class TiddlyWiki2MediaWikiTranslator {
 		String lastLine = null;
 		while (line != null) {
 			isLetterLast = isLetterNow;
-			if (line !=null && line.length()>0 && Character.isLetterOrDigit(line.charAt(0))){
+			if (line != null && line.length() > 0 && Character.isLetterOrDigit(line.charAt(0))) {
 				isLetterNow = true;
 			} else {
 				isLetterNow = false;

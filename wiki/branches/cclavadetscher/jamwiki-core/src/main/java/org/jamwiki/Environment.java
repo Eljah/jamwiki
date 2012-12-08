@@ -20,12 +20,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 // FIXME - remove this import
 import org.apache.commons.pool.impl.GenericObjectPool;
@@ -52,7 +50,6 @@ public class Environment {
 	public static final String PROP_BASE_PERSISTENCE_TYPE = "persistenceType";
 	public static final String PROP_BASE_SEARCH_ENGINE = "search-engine";
 	public static final String PROP_BASE_WIKI_VERSION = "wiki-version";
-	public static final String PROP_DATE_PATTERN_DATE_AND_TIME = "date-pattern-date-and-time";
 	public static final String PROP_DATE_PATTERN_DATE_ONLY = "date-pattern-date-only";
 	public static final String PROP_DATE_PATTERN_TIME_ONLY = "date-pattern-time-only";
 	public static final String PROP_DB_DRIVER = "driver";
@@ -80,6 +77,7 @@ public class Environment {
 	public static final String PROP_EMAIL_SMTP_PORT = "smtp-port";
 	public static final String PROP_EMAIL_ADDRESS_SEPARATOR = "smtp-address-separator";
 	public static final String PROP_EMAIL_DEFAULT_CONTENT_TYPE = "smtp-content-type";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD = "smtp-service-forgot-password";
 	public static final String PROP_ENCRYPTION_ALGORITHM = "encryption-algorithm";
 	public static final String PROP_EXTERNAL_LINK_NEW_WINDOW = "external-link-new-window";
 	public static final String PROP_FILE_BLACKLIST = "file-blacklist";
@@ -210,7 +208,6 @@ public class Environment {
 		this.defaults.setProperty(PROP_BASE_PERSISTENCE_TYPE, WikiBase.PERSISTENCE_INTERNAL);
 		this.defaults.setProperty(PROP_BASE_SEARCH_ENGINE, SearchEngine.SEARCH_ENGINE_LUCENE);
 		this.defaults.setProperty(PROP_BASE_WIKI_VERSION, "0.0.0");
-		this.defaults.setProperty(PROP_DATE_PATTERN_DATE_AND_TIME, "dd MMMM yyyy HH:mm");
 		this.defaults.setProperty(PROP_DATE_PATTERN_DATE_ONLY, "dd MMMM yyyy");
 		this.defaults.setProperty(PROP_DATE_PATTERN_TIME_ONLY, "HH:mm");
 		this.defaults.setProperty(PROP_DB_DRIVER, "");
@@ -238,6 +235,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_EMAIL_SMTP_PORT,"25");
 		this.defaults.setProperty(PROP_EMAIL_ADDRESS_SEPARATOR,";");
 		this.defaults.setProperty(PROP_EMAIL_DEFAULT_CONTENT_TYPE,"text/plain");
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_ENCRYPTION_ALGORITHM, "SHA-512");
 		this.defaults.setProperty(PROP_EXTERNAL_LINK_NEW_WINDOW, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_FILE_BLACKLIST, "bat,bin,exe,htm,html,js,jsp,php,sh");
@@ -266,7 +264,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_PARSER_MAXIMUM_INFINITE_LOOP_LIMIT, "5");
 		this.defaults.setProperty(PROP_PARSER_MAX_PARSER_ITERATIONS, "100");
 		this.defaults.setProperty(PROP_PARSER_MAX_TEMPLATE_DEPTH, "100");
-		this.defaults.setProperty(PROP_PARSER_SIGNATURE_DATE_PATTERN, "dd-MMM-yyyy HH:mm zzz");
+		this.defaults.setProperty(PROP_PARSER_SIGNATURE_DATE_PATTERN, "HH:mm, dd MMMM yyyy (z)");
 		this.defaults.setProperty(PROP_PARSER_SIGNATURE_USER_PATTERN, "[[{0}|{4}]]");
 		this.defaults.setProperty(PROP_PARSER_TOC, Boolean.TRUE.toString());
 		this.defaults.setProperty(PROP_PARSER_TOC_DEPTH, "5");
@@ -306,44 +304,6 @@ public class Environment {
 	 */
 	public static boolean getBooleanValue(String name) {
 		return Boolean.valueOf(getValue(name));
-	}
-
-	/**
-	 * Utility method for processing a SimpleDateFormatPattern property value.
-	 *
-	 * @param name The name of the property whose value is to be retrieved.
-	 * @param date Boolean value indicating whether or not to include the date
-	 *  pattern for SHORT, MEDIUM, LONG or FULL pattern values.  This parameter
-	 *  is ignored if the property value is an actual pattern rather than the
-	 *  constant name.
-	 * @param time Boolean value indicating whether or not to include the time
-	 *  pattern for SHORT, MEDIUM, LONG or FULL pattern values.  This parameter
-	 *  is ignored if the property value is an actual pattern rather than the
-	 *  constant name.
-	 * @return The value of the property.
-	 */
-	public static String getDatePatternValue(String name, boolean date, boolean time) {
-		String result = getValue(name);
-		int style = -1;
-		if (StringUtils.equalsIgnoreCase(result, "SHORT")) {
-			style = SimpleDateFormat.SHORT;
-		} else if (StringUtils.equalsIgnoreCase(result, "MEDIUM")) {
-			style = SimpleDateFormat.MEDIUM;
-		} else if (StringUtils.equalsIgnoreCase(result, "LONG")) {
-			style = SimpleDateFormat.LONG;
-		} else if (StringUtils.equalsIgnoreCase(result, "FULL")) {
-			style = SimpleDateFormat.FULL;
-		}
-		if (style != -1) {
-			if (date && time) {
-				result = ((SimpleDateFormat)SimpleDateFormat.getDateTimeInstance(style, style)).toPattern();
-			} else if (date) {
-				result = ((SimpleDateFormat)SimpleDateFormat.getDateInstance(style)).toPattern();
-			} else if (time) {
-				result = ((SimpleDateFormat)SimpleDateFormat.getTimeInstance(style)).toPattern();
-			}
-		}
-		return result;
 	}
 
 	/**

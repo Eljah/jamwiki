@@ -47,6 +47,10 @@
 </div>
 </form>
 
+<c:if test="${mailEnabled}">
+	<p><a href="<jamwiki:link value="Special:LoginReset" />">Forgot your password?</a></p>
+</c:if>
+
 </fieldset>
 
 </div>

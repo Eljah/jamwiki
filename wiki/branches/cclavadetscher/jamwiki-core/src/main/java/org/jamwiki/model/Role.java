@@ -16,13 +16,16 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
+import org.jamwiki.Environment;
+
 /**
  * Provides an object representing a Wiki role that can be extended by the specific security
  * implementation.
  *
  * @see org.springframework.security.core.authority.GrantedAuthorityImpl#getAuthority
  */
-public class Role {
+public class Role implements Serializable {
 
 	/**
 	 * ROLE_ADMIN gives permission to perform wiki maintenance tasks not

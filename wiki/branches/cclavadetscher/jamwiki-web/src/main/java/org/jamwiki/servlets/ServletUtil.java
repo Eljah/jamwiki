@@ -235,9 +235,16 @@ public class ServletUtil {
 	 * @return The current logged-in <code>WikiUser</code>, or an empty WikiUser if
 	 *  there is no user currently logged in.
 	 */
-	public static WikiUser currentWikiUser() throws AuthenticationCredentialsNotFoundException {
-		WikiUserDetailsImpl userDetails = ServletUtil.currentUserDetails();
+	public static WikiUser currentWikiUser() {
+		WikiUserDetailsImpl userDetails = null;
 		WikiUser user = new WikiUser(null);
+		try {
+			userDetails = ServletUtil.currentUserDetails();
+		} catch (AuthenticationCredentialsNotFoundException e) {
+			// TODO - occurs from the CSS page, figure out why.
+			logger.debug("Unable to find authentication credentials for current user");
+			return user;
+		}
 		String username = userDetails.getUsername();
 		if (username.equals(WikiUserDetailsImpl.ANONYMOUS_USER_USERNAME)) {
 			return user;

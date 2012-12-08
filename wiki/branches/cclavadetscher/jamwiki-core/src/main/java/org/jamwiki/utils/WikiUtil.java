@@ -582,7 +582,7 @@ public class WikiUtil {
 	 */
 	public static void validateWikiGroup(WikiGroup group) throws WikiException {
 		String groupName = group.getName();
-		if(groupName == null || groupName.length() == 0 || groupName.length() > 30) {
+		if (groupName == null || groupName.length() == 0 || groupName.length() > 30) {
 			throw new WikiException(new WikiMessage("group.error.name", groupName));
 		}
 		Matcher m = WikiUtil.INVALID_ROLE_NAME_PATTERN.matcher(groupName);

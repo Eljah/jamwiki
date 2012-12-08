@@ -19,11 +19,13 @@ package org.jamwiki.servlets;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -32,7 +34,9 @@ import org.jamwiki.WikiBase;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.VirtualWiki;
+import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.WikiLink;
+import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -61,6 +65,7 @@ public class WikiPageInfo {
 	private boolean special = false;
 	private LinkedHashMap<String, WikiMessage> tabMenu = new LinkedHashMap<String, WikiMessage>();
 	private String topicName = "";
+	private final WikiUser user;
 	private LinkedHashMap<String, WikiMessage> userMenu = new LinkedHashMap<String, WikiMessage>();
 	private List<String> virtualWikiLinks = new ArrayList<String>();
 	private String virtualWikiName = null;
@@ -68,12 +73,13 @@ public class WikiPageInfo {
 	/**
 	 *
 	 */
-	protected WikiPageInfo(HttpServletRequest request) {
+	protected WikiPageInfo(HttpServletRequest request, WikiUser user) {
 		this.virtualWikiName = WikiUtil.getVirtualWikiFromURI(request);
 		if (this.virtualWikiName == null) {
 			logger.error("No virtual wiki available for page request " + request.getRequestURI());
 			this.virtualWikiName = VirtualWiki.defaultVirtualWiki().getName();
 		}
+		this.user = user;
 	}
 
 	/**
@@ -174,7 +180,7 @@ public class WikiPageInfo {
 	 * that include date and time.
 	 */
 	public String getDatePatternDateAndTime() {
-		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_AND_TIME, true, true);
+		return this.getDatePatternDateOnly() + ' ' + this.getDatePatternTimeOnly();
 	}
 
 	/**
@@ -185,7 +191,15 @@ public class WikiPageInfo {
 	 * dates.
 	 */
 	public String getDatePatternDateOnly() {
-		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_DATE_ONLY, true, false);
+		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT) != null) {
+			return user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT);
+		}
+		String pattern = Environment.getValue(Environment.PROP_DATE_PATTERN_DATE_ONLY);
+		int style = DateUtil.stringToDateFormatStyle(pattern);
+		if (style != -1) {
+			pattern = ((SimpleDateFormat)SimpleDateFormat.getDateInstance(style)).toPattern();
+		}
+		return pattern;
 	}
 
 	/**
@@ -196,7 +210,15 @@ public class WikiPageInfo {
 	 * dates.
 	 */
 	public String getDatePatternTimeOnly() {
-		return Environment.getDatePatternValue(Environment.PROP_DATE_PATTERN_TIME_ONLY, false, true);
+		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT) != null) {
+			return user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT);
+		}
+		String pattern = Environment.getValue(Environment.PROP_DATE_PATTERN_TIME_ONLY);
+		int style = DateUtil.stringToDateFormatStyle(pattern);
+		if (style != -1) {
+			pattern = ((SimpleDateFormat)SimpleDateFormat.getTimeInstance(style)).toPattern();
+		}
+		return pattern;
 	}
 
 	/**
@@ -473,6 +495,17 @@ public class WikiPageInfo {
 	 */
 	public void setTabMenu(LinkedHashMap<String, WikiMessage> tabMenu) {
 		this.tabMenu = tabMenu;
+	}
+
+	/**
+	 * Return the user's preferred timezone, or the system default timezone if
+	 * the user has not set a preference.
+	 */
+	public String getTimeZoneId() {
+		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE) != null) {
+			return user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
+		}
+		return TimeZone.getDefault().getID();
 	}
 
 	/**

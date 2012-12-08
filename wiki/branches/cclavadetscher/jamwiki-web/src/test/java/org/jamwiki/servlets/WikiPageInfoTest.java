@@ -33,12 +33,12 @@ public class WikiPageInfoTest extends JAMWikiUnitTest {
 	@Test
 	public void testGetVirtualWiki() {
 		MockHttpServletRequest mockRequest = this.getMockHttpServletRequest("/virtual/Topic");
-		WikiPageInfo p = new WikiPageInfo(mockRequest);
+		WikiPageInfo p = new WikiPageInfo(mockRequest, null);
 		assertEquals(p.getVirtualWikiName(), "virtual", p.getVirtualWikiName());
 		p.setVirtualWikiName("en");
 		assertEquals(p.getVirtualWikiName(), "en", p.getVirtualWikiName());
 		mockRequest = this.getMockHttpServletRequest("/");
-		p = new WikiPageInfo(mockRequest);
+		p = new WikiPageInfo(mockRequest, null);
 		assertEquals(p.getVirtualWikiName(), VirtualWiki.defaultVirtualWiki().getName(), p.getVirtualWikiName());
 	}
 

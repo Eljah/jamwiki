@@ -35,14 +35,14 @@
 	<c:if test="${!empty userBlock.blockReason}"><fmt:message key="userblock.caption.reason"><fmt:param value="${userBlock.blockReason}" /></fmt:message></c:if>
 </p>
 <ul>
-<li><fmt:message key="userblock.caption.start"><fmt:param><fmt:formatDate value="${userBlock.blockDate}" type="both" dateStyle="long" timeStyle="long" /></fmt:param></fmt:message></li>
+<li><fmt:message key="userblock.caption.start"><fmt:param><fmt:formatDate value="${userBlock.blockDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /></fmt:param></fmt:message></li>
 <li>
 	<c:choose>
 		<c:when test="${empty userBlock.blockEndDate}">
 			<fmt:message key="userblock.caption.end"><fmt:param><fmt:message key="common.interval.infinite" /></fmt:param></fmt:message>
 		</c:when>
 		<c:otherwise>
-			<fmt:message key="userblock.caption.end"><fmt:param><fmt:formatDate value="${userBlock.blockEndDate}" type="both" dateStyle="long" timeStyle="long" /></fmt:param></fmt:message>
+			<fmt:message key="userblock.caption.end"><fmt:param><fmt:formatDate value="${userBlock.blockEndDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /></fmt:param></fmt:message>
 		</c:otherwise>
 	</c:choose>
 </li>

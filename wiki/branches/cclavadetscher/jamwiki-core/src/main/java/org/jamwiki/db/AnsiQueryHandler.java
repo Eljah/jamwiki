@@ -837,7 +837,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		ResultSet rs = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			if(includeInheritedRoles) {
+			if (includeInheritedRoles) {
 				stmt = conn.prepareStatement(STATEMENT_SELECT_AUTHORITIES_AUTHORITY_ALL);
 				stmt.setString(1, authority);
 				stmt.setString(2, authority);
@@ -3736,8 +3736,10 @@ public class AnsiQueryHandler implements QueryHandler {
 	
 	public boolean existsUserPreferenceDefault(String userPreferenceKey) throws SQLException {
 		HashMap<String, Map<String, String>> defaultPrefs = this.getUserPreferencesDefaults();
-		for(Map<String, String> group: defaultPrefs.values()) {
-			if(group.containsKey(userPreferenceKey)) return true;
+		for (Map<String, String> group: defaultPrefs.values()) {
+			if (group.containsKey(userPreferenceKey)) {
+				return true;
+			}
 		}
 		return false;
 	}

@@ -53,7 +53,7 @@
 			<ul>
 			<c:forEach items="${versions}" var="version" varStatus="status">
 			<li>
-				<jamwiki:link value="Special:History"><jamwiki:linkParam key="topicVersionId" value="${version.topicVersionId}" /><jamwiki:linkParam key="topic" value="${pageInfo.topicName}" /><fmt:formatDate value="${version.changeDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /></jamwiki:link>
+				<jamwiki:link value="Special:History"><jamwiki:linkParam key="topicVersionId" value="${version.topicVersionId}" /><jamwiki:linkParam key="topic" value="${pageInfo.topicName}" /><fmt:formatDate value="${version.changeDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /></jamwiki:link>
 				&#160;.&#160;.&#160;
 				<%-- the "+" symbol could be added using a pattern attribute, but there does not seem to be a way to avoid having "+0" show up when that approach is used. --%>
 				(<c:if test="${version.charactersChanged > 0}">+</c:if><fmt:formatNumber value="${version.charactersChanged}" />)
@@ -128,7 +128,7 @@
 			<span>
 				<select name="topicVersionId" id="topicVersionId" size="8" multiple="multiple">
 				<c:forEach items="${versions}" var="version">
-				<option value="${version.topicVersionId}"><fmt:formatDate value="${version.changeDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" /> - ${version.authorName}</option>
+				<option value="${version.topicVersionId}"><fmt:formatDate value="${version.changeDate}" type="both" pattern="${pageInfo.datePatternDateAndTime}" timeZone="${pageInfo.timeZoneId}" /> - ${version.authorName}</option>
 				</c:forEach>
 				</select>
 				<p><fmt:message key="common.caption.view" />: <jamwiki:pagination total="${numChanges}" rootUrl="Special:Manage?topic=${pageInfo.topicNameUrlEncoded}" /></p>

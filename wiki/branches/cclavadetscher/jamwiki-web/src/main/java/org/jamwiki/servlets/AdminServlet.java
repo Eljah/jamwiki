@@ -274,7 +274,6 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_BASE_SEARCH_ENGINE);
 				setProperty(props, request, Environment.PROP_TOPIC_EDITOR);
 				setNumericProperty(props, request, Environment.PROP_MAX_TOPIC_VERSION_EXPORT, pageInfo.getErrors());
-				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_DATE_AND_TIME, pageInfo.getErrors());
 				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_DATE_ONLY, pageInfo.getErrors());
 				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_TIME_ONLY, pageInfo.getErrors());
 			}
@@ -346,12 +345,12 @@ public class AdminServlet extends JAMWikiServlet {
 				setNumericProperty(props, request, Environment.PROP_EMAIL_SMTP_PORT, pageInfo.getErrors());
 				setProperty(props, request, Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
 				setProperty(props, request, Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
+				setBooleanProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD);
 				// Check if we have to test the configuration
 				String command = request.getParameter("testMail");
 				if (!StringUtils.isBlank(command) && command.equalsIgnoreCase("send test mail")) {
 					String mailAddress = null;
 					try {
-						// logger.error("Testing mail configuration");
 						WikiMail sender = new WikiMail(props);
 						logger.error(sender.toString());
 						mailAddress = ServletUtil.currentWikiUser().getEmail();

@@ -16,6 +16,7 @@
  */
 package org.jamwiki.servlets;
 
+import java.text.SimpleDateFormat;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -35,7 +36,6 @@ import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.jflex.JFlexParser;
-import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
@@ -176,8 +176,8 @@ public class RegisterServlet extends JAMWikiServlet {
 		user.setLastLoginIpAddress(ServletUtil.getIpAddress(request));
 		user.setDisplayName(request.getParameter("displayName"));
 		LinkedHashMap<String, Map<String, UserPreferenceItem>> preferences = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)new UserPreferencesUtil(user).getGroups();
-		for(String group : preferences.keySet()) {
-			for(String key : preferences.get(group).keySet()) {
+		for (String group : preferences.keySet()) {
+			for (String key : preferences.get(group).keySet()) {
 				user.setPreference(key, request.getParameter(key));
 			}
 		}
@@ -245,11 +245,13 @@ public class RegisterServlet extends JAMWikiServlet {
 		if (result != null) {
 			pageInfo.addError(new WikiMessage("edit.exception.spam", result));
 		}
-		String dateFormat = request.getParameter("datetimeFormat");
 		try {
-			DateUtil.getUserLocalTime(null, dateFormat, null);
+			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_DATE_FORMAT));
+			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_TIME_FORMAT));
 		} catch (IllegalArgumentException e) {
-			pageInfo.addError(new WikiMessage("register.error.dateinvalid", dateFormat));
+			// the format will never be null in a properly configured wiki, so this
+			// test is mostly for administrators
+			logger.error("Invalid date format configured, please check wiki configuration", e);
 		}
 	}
 

@@ -19,14 +19,10 @@ package org.jamwiki.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
-import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -108,11 +104,7 @@ public class DatabaseUpgrades {
 			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences_defaults"));
 			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("STATEMENT_CREATE_USER_PREFERENCES_TABLE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences"));
-			WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage(),WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,1);
-			WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID(),WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,2);
-			WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATETIME_FORMAT, null,WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION,3);
-			WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar",WikiUser.USER_PREFERENCES_GROUP_EDITING,1);
-			WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null,WikiUser.USER_PREFERENCES_GROUP_EDITING,2);
+			WikiDatabase.setupUserPreferencesDefaults();
 			// Create default values for user preferences.
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_user_preferences_defaults"));
 			// Migrate existing user preferences to new tables

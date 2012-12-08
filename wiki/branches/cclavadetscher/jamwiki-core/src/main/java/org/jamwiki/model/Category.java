@@ -16,22 +16,18 @@
  */
 package org.jamwiki.model;
 
+import java.io.Serializable;
+
 /**
  * Provides an object representing a Wiki category.
  */
-public class Category {
+public class Category implements Serializable {
 
 	private String childTopicName;
 	private String name;
 	private String sortKey;
 	private TopicType topicType;
 	private String virtualWiki;
-
-	/**
-	 *
-	 */
-	public Category() {
-	}
 
 	/**
 	 *

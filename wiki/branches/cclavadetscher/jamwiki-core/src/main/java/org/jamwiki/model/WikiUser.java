@@ -44,7 +44,8 @@ public class WikiUser implements Serializable {
 	public static final String USER_PREFERENCES_GROUP_INTERNATIONALIZATION = "user.preferences.group.internationalization";
 	public static final String USER_PREFERENCE_DEFAULT_LOCALE = "user.default.locale";
 	public static final String USER_PREFERENCE_TIMEZONE = "user.timezone";
-	public static final String USER_PREFERENCE_DATETIME_FORMAT = "user.datetime.format";
+	public static final String USER_PREFERENCE_DATE_FORMAT = "user.date.format";
+	public static final String USER_PREFERENCE_TIME_FORMAT = "user.time.format";
 
 	/**
 	 *
@@ -108,7 +109,7 @@ public class WikiUser implements Serializable {
 	public void setCreateIpAddress(String createIpAddress) {
 		this.createIpAddress = createIpAddress;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -195,18 +196,21 @@ public class WikiUser implements Serializable {
 	public String getSignature() {
 		return this.getPreferences().get(USER_PREFERENCE_SIGNATURE);
 	}
-	
+
+	/**
+	 *
+	 */
 	public void setSignature(String signature) {
 		this.getPreferences().put(USER_PREFERENCE_SIGNATURE, signature);
 	}
-	
+
 	/**
 	 * Helper method to get a specific preference
 	 */
 	public String getPreference(String preferenceKey) {
 		return this.getPreferences().get(preferenceKey);
 	}
-	
+
 	/**
 	 * Helper method to set a specific preference
 	 */
