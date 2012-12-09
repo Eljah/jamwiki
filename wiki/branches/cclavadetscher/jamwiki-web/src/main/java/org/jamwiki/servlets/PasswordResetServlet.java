@@ -34,15 +34,15 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Used to handle requests or redirects to the login page, as well as requests to logout.
  */
-public class LoginResetServlet extends JAMWikiServlet {
+public class PasswordResetServlet extends JAMWikiServlet {
 
 	// Remove after testing
 	// challenge: ?loginUsername=charles&rcode=VWY3HyfcgLNTOoOVy3EyV6uLaAkkf73BvFC82mNURQpHKiD8NJCtkMYXfOrQHpN8dJde5HPXpvLX3LjehWu1bDdEvUzqWnQo
 	
 	/** Logger */
-	private static final WikiLogger logger = WikiLogger.getLogger(LoginResetServlet.class.getName());
+	private static final WikiLogger logger = WikiLogger.getLogger(PasswordResetServlet.class.getName());
 	/** The name of the JSP file used to render the servlet output when searching. */
-	protected static final String JSP_LOGIN_RESET = "login-reset.jsp";
+	protected static final String JSP_LOGIN_RESET = "password-reset.jsp";
 
 	/**
 	 *
@@ -50,7 +50,7 @@ public class LoginResetServlet extends JAMWikiServlet {
 	public ModelAndView handleJAMWikiRequest(HttpServletRequest request, HttpServletResponse response, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		pageInfo.setSpecial(true);
 		pageInfo.setContentJsp(JSP_LOGIN_RESET);
-		pageInfo.setPageTitle(new WikiMessage("login.reset.password"));
+		pageInfo.setPageTitle(new WikiMessage("password.reset.password"));
 		boolean mailEnabled = Environment.getBooleanValue(Environment.PROP_EMAIL_SMTP_ENABLE) && Environment.getBooleanValue(Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD);
 		String function = request.getParameter("function");
 		String challenge = request.getParameter("rcode");
@@ -73,7 +73,7 @@ public class LoginResetServlet extends JAMWikiServlet {
 			}
 		}
 		else {
-			pageInfo.addError(new WikiMessage("login.reset.password.error.noservice"));
+			pageInfo.addError(new WikiMessage("password.reset.password.error.noservice"));
 		}
 		next.addObject("mailEnabled", mailEnabled);
 		next.addObject("function", function);
@@ -88,7 +88,7 @@ public class LoginResetServlet extends JAMWikiServlet {
 		boolean success = false;
 		// If second call, function is not null
 		if(StringUtils.isBlank(username) && !StringUtils.isBlank(function)) {
-			pageInfo.addError(new WikiMessage("login.reset.password.error.nousername"));
+			pageInfo.addError(new WikiMessage("password.reset.password.error.nousername"));
 			success = true;
 		}
 		else {
@@ -97,13 +97,13 @@ public class LoginResetServlet extends JAMWikiServlet {
 				mailAddress = user.getEmail();
 				if(StringUtils.isBlank(mailAddress)) {
 					mailAddress = null;
-					pageInfo.addError(new WikiMessage("login.reset.password.error.noemail"));
+					pageInfo.addError(new WikiMessage("password.reset.password.error.noemail"));
 				}
 				else {
 					challenge = getChallenge(username);
 					try {
 						// Note: add toString to WikiMessage to retrieve text...
-						// new WikiMessage("login.reset.password.email");
+						// new WikiMessage("password.reset.password.email");
 						StringBuffer mailMessage = request.getRequestURL();
 						mailMessage.append("?loginUsername=");
 						mailMessage.append(username);
@@ -111,10 +111,10 @@ public class LoginResetServlet extends JAMWikiServlet {
 						mailMessage.append(challenge);
 						WikiMail sender = new WikiMail();
 						sender.postMail(mailAddress, mailMessage.toString());
-						pageInfo.addMessage(new WikiMessage("login.reset.password.message.sendmail.success"));
+						pageInfo.addMessage(new WikiMessage("password.reset.password.message.sendmail.success"));
 					}
 					catch(Exception ex) {
-						pageInfo.addError(new WikiMessage("login.reset.password.message.sendmail.failed"));
+						pageInfo.addError(new WikiMessage("password.reset.password.message.sendmail.failed"));
 						logger.error("Unable to send E-Mail", ex);
 					}
 				}
@@ -122,7 +122,7 @@ public class LoginResetServlet extends JAMWikiServlet {
 			}
 			else {
 				if(!StringUtils.isBlank(function)) {
-					pageInfo.addError(new WikiMessage("login.reset.password.error.notregistered"));
+					pageInfo.addError(new WikiMessage("password.reset.password.error.notregistered"));
 					success = true;
 				}
 			}
@@ -138,7 +138,7 @@ public class LoginResetServlet extends JAMWikiServlet {
 		try {
 			challengeOk = isChallengeOk(username, challenge);
 			if(!challengeOk) {
-				pageInfo.addError(new WikiMessage("login.reset.password.error.challengenok"));
+				pageInfo.addError(new WikiMessage("password.reset.password.error.challengenok"));
 				challengeOk = false;
 				/** The only possible cause of this to happen is that somebody entered fake
 				    data to try to access the page. Returning success will disable the display
@@ -147,7 +147,7 @@ public class LoginResetServlet extends JAMWikiServlet {
 			}
 		}
 		catch(Exception ex) {
-			pageInfo.addError(new WikiMessage("login.reset.password.error.novalidation"));
+			pageInfo.addError(new WikiMessage("password.reset.password.error.novalidation"));
 			challengeOk = false;
 		}
 		next.addObject("username", username);
@@ -164,20 +164,20 @@ public class LoginResetServlet extends JAMWikiServlet {
 		String newPassword = request.getParameter("newPassword");
 		String confirmPassword = request.getParameter("confirmPassword");
 		if(StringUtils.isBlank(newPassword) || StringUtils.isBlank(confirmPassword)) {
-			pageInfo.addError(new WikiMessage("login.reset.password.error.nullpassword"));
+			pageInfo.addError(new WikiMessage("password.reset.password.error.nullpassword"));
 		}
 		else if((!newPassword.equals(confirmPassword))) {
-			pageInfo.addError(new WikiMessage("login.reset.password.error.nomatch"));
+			pageInfo.addError(new WikiMessage("password.reset.password.error.nomatch"));
 		}
 		else {
 			// store new password
 			WikiUser user = WikiBase.getDataHandler().lookupWikiUser(username);
 			try {
 				WikiBase.getDataHandler().writeWikiUser(user, username, Encryption.encrypt(newPassword));
-				pageInfo.addMessage(new WikiMessage("login.reset.password.success"));
+				pageInfo.addMessage(new WikiMessage("password.reset.password.success"));
 				result = true; 
 			} catch(Exception ex) {
-				pageInfo.addError(new WikiMessage("login.reset.password.failed"));
+				pageInfo.addError(new WikiMessage("password.reset.password.failed"));
 			}
 		}
 		next.addObject("username", username);

@@ -22,7 +22,7 @@
 
 <%@ include file="page-init.jsp" %>
 
-<div id="loginReset">
+<div id="passwordReset">
 
 <c:if test="${!empty pageInfo.messages}">
 <div class="message green"><c:forEach items="${pageInfo.messages}" var="message"><jamwiki_t:wikiMessage message="${message}" /><br /></c:forEach></div>
@@ -34,25 +34,25 @@
 <div>
 	<!-- usually first case, when a user should enter his username -->
 	<c:if test="${mailEnabled && empty rcode && !success && (empty function || function == 'sendMail')}">
-		<form action="<jamwiki:link value="Special:LoginReset" />" method="post">
+		<form action="<jamwiki:link value="Special:PasswordReset" />" method="post">
 		<fieldset>
-			<legend><fmt:message key="login.reset.password" /></legend>
+			<legend><fmt:message key="password.reset.password" /></legend>
 			<div class="row">
 				<label for="loginUsername"><fmt:message key="login.username"/></label>
 				<span><input type="text" name="loginUsername" /></span>
-				<div class="formhelp"><fmt:message key="login.reset.password.help" /></div>
+				<div class="formhelp"><fmt:message key="password.reset.password.help" /></div>
 			</div>
 			<div class="row">
-				<span class="form-button"><input type="submit" value="<fmt:message key="login.reset.password.submit" />" /></span>
+				<span class="form-button"><input type="submit" value="<fmt:message key="password.reset.password.submit" />" /></span>
 			</div>
 			<input type="hidden" name="function" value="sendEmail" />
 		</fieldset>
 		</form>
 	</c:if>
 	<c:if test="${mailEnabled && !empty username && (challengeOk || !success)}">
-		<form action="<jamwiki:link value="Special:LoginReset" />" method="post">
+		<form action="<jamwiki:link value="Special:PasswordReset" />" method="post">
 		<fieldset>
-			<legend><fmt:message key="login.reset.password" /></legend>
+			<legend><fmt:message key="password.reset.password" /></legend>
 			<div class="row">
 				<label for="registerNewPassword"><fmt:message key="register.caption.newpassword" /></label>
 				<span><input type="password" name="newPassword" value="<c:out value="${newPassword}" />" id="registerNewPassword" size="50" /></span>
@@ -62,7 +62,7 @@
 				<span><input type="password" name="confirmPassword" value="<c:out value="${confirmPassword}" />" id="registerConfirmPassword" size="50" /></span>
 			</div>
 			<div class="row">
-				<span class="form-button"><input type="submit" value="<fmt:message key="login.reset.password" />" /></span>
+				<span class="form-button"><input type="submit" value="<fmt:message key="password.reset.password" />" /></span>
 			</div>
 			<input type="hidden" name="loginUsername" value="${username}" />
 			<input type="hidden" name="function" value="resetPassword" />
