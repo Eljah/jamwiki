@@ -215,7 +215,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_BASE_PERSISTENCE_TYPE, WikiBase.PERSISTENCE_INTERNAL);
 		this.defaults.setProperty(PROP_BASE_SEARCH_ENGINE, SearchEngine.SEARCH_ENGINE_LUCENE);
 		this.defaults.setProperty(PROP_BASE_WIKI_VERSION, "0.0.0");
-		this.defaults.setProperty(PROP_DATE_PATTERN_DATE_ONLY, "dd MMMM yyyy");
+		this.defaults.setProperty(PROP_DATE_PATTERN_DATE_ONLY, "d MMMM yyyy");
 		this.defaults.setProperty(PROP_DATE_PATTERN_TIME_ONLY, "HH:mm");
 		this.defaults.setProperty(PROP_DB_DRIVER, "");
 		this.defaults.setProperty(PROP_DB_PASSWORD, "");

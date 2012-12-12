@@ -245,13 +245,16 @@ public class RegisterServlet extends JAMWikiServlet {
 		if (result != null) {
 			pageInfo.addError(new WikiMessage("edit.exception.spam", result));
 		}
-		try {
-			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_DATE_FORMAT));
-			new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_TIME_FORMAT));
-		} catch (IllegalArgumentException e) {
-			// the format will never be null in a properly configured wiki, so this
-			// test is mostly for administrators
-			logger.error("Invalid date format configured, please check wiki configuration", e);
+		// These fields are only available for update
+		if(user.getUserId() != -1) {
+			try {
+				new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_DATE_FORMAT));
+				new SimpleDateFormat(request.getParameter(WikiUser.USER_PREFERENCE_TIME_FORMAT));
+			} catch (IllegalArgumentException e) {
+				// the format will never be null in a properly configured wiki, so this
+				// test is mostly for administrators
+				logger.error("Invalid date format configured, please check wiki configuration", e);
+			}
 		}
 	}
 
