@@ -16,7 +16,9 @@
  */
 package org.jamwiki.servlets;
 
-import java.net.URLEncoder;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,7 +94,7 @@ public class PasswordResetServlet extends JAMWikiServlet {
 			success = true;
 		}
 		else {
-			WikiUser user = WikiBase.getDataHandler().lookupWikiUser(username);
+			WikiUser user = WikiBase.getDataHandler().lookupPwResetChallengeData(username);
 			if(user != null) {
 				mailAddress = user.getEmail();
 				if(StringUtils.isBlank(mailAddress)) {
@@ -100,22 +102,30 @@ public class PasswordResetServlet extends JAMWikiServlet {
 					pageInfo.addError(new WikiMessage("password.reset.password.error.noemail"));
 				}
 				else {
-					challenge = getChallenge(username);
-					try {
-						// Note: add toString to WikiMessage to retrieve text...
-						// new WikiMessage("password.reset.password.email");
-						StringBuffer mailMessage = request.getRequestURL();
-						mailMessage.append("?loginUsername=");
-						mailMessage.append(username);
-						mailMessage.append("&rcode=");
-						mailMessage.append(challenge);
-						WikiMail sender = new WikiMail();
-						sender.postMail(mailAddress, mailMessage.toString());
-						pageInfo.addMessage(new WikiMessage("password.reset.password.message.sendmail.success"));
-					}
-					catch(Exception ex) {
-						pageInfo.addError(new WikiMessage("password.reset.password.message.sendmail.failed"));
-						logger.error("Unable to send E-Mail", ex);
+					challenge = getChallenge(request, pageInfo, user);
+					if(challenge != null) {
+						user.setChallengeValue(challenge);
+						int requests = user.getChallengeTries();
+						user.setChallengeDate(new Timestamp(new GregorianCalendar().getTimeInMillis()));
+						user.setChallengeIp(request.getRemoteAddr());
+						user.setChallengeTries(++requests);
+						WikiBase.getDataHandler().updatePwResetChallengeData(user);
+						try {
+							// Note: add toString to WikiMessage to retrieve text...
+							// new WikiMessage("password.reset.password.email");
+							StringBuffer mailMessage = request.getRequestURL();
+							mailMessage.append("?loginUsername=");
+							mailMessage.append(username);
+							mailMessage.append("&rcode=");
+							mailMessage.append(challenge);
+							WikiMail sender = new WikiMail();
+							sender.postMail(mailAddress, mailMessage.toString());
+							pageInfo.addMessage(new WikiMessage("password.reset.password.message.sendmail.success"));
+						}
+						catch(Exception ex) {
+							pageInfo.addError(new WikiMessage("password.reset.password.message.sendmail.failed"));
+							logger.error("Unable to send E-Mail", ex);
+						}
 					}
 				}
 				success = true;
@@ -135,20 +145,30 @@ public class PasswordResetServlet extends JAMWikiServlet {
 		String username = request.getParameter("loginUsername");
 		String challenge = request.getParameter("rcode");
 		boolean challengeOk = true;
-		try {
-			challengeOk = isChallengeOk(username, challenge);
-			if(!challengeOk) {
-				pageInfo.addError(new WikiMessage("password.reset.password.error.challengenok"));
-				challengeOk = false;
-				/** The only possible cause of this to happen is that somebody entered fake
-				    data to try to access the page. Returning success will disable the display
-				    of the password reset entry fields */
-				next.addObject("success", Boolean.TRUE);
-			}
-		}
-		catch(Exception ex) {
-			pageInfo.addError(new WikiMessage("password.reset.password.error.novalidation"));
+		WikiUser user = WikiBase.getDataHandler().lookupPwResetChallengeData(username);
+		if(user == null) {
+			pageInfo.addError(new WikiMessage("password.reset.password.error.notregistered"));
 			challengeOk = false;
+			/** The only possible cause of this to happen is that somebody entered fake
+			    data to try to access the page. Returning success will disable the display
+			    of the password reset entry fields */
+			next.addObject("success", Boolean.TRUE);
+		}
+		else {
+			try {
+				challengeOk = isChallengeOk(request, pageInfo, user, challenge);
+				if(!challengeOk) {
+					challengeOk = false;
+					/** The only possible cause of this to happen is that somebody entered fake
+					    data to try to access the page. Returning success will disable the display
+					    of the password reset entry fields */
+					next.addObject("success", Boolean.TRUE);
+				}
+			}
+			catch(Exception ex) {
+				pageInfo.addError(new WikiMessage("password.reset.password.error.novalidation"));
+				challengeOk = false;
+			}
 		}
 		next.addObject("username", username);
 		next.addObject("challengeOk", challengeOk);
@@ -160,7 +180,6 @@ public class PasswordResetServlet extends JAMWikiServlet {
 		boolean result = false;
 		
 		String username = request.getParameter("loginUsername");
-		// String challenge = request.getParameter("rcode");
 		String newPassword = request.getParameter("newPassword");
 		String confirmPassword = request.getParameter("confirmPassword");
 		if(StringUtils.isBlank(newPassword) || StringUtils.isBlank(confirmPassword)) {
@@ -184,18 +203,63 @@ public class PasswordResetServlet extends JAMWikiServlet {
 		next.addObject("success", result);
 	}
 	
-	private String getChallenge(String username) throws Exception {
-		String seed = username + WikiBase.getDataHandler().lookupWikiUserEncryptedPassword(username);
-		String challenge = Encryption.encrypt(seed);
-		return challenge;
+	private String getChallenge(HttpServletRequest request, WikiPageInfo pageInfo, WikiUser user) throws Exception {
+		int numOfTries = Environment.getIntValue(Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES);
+		int lockDuration = Environment.getIntValue(Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION);
+		if(user.getChallengeDate() != null && user.getChallengeIp() != null) {
+			// compute some deadlines
+			GregorianCalendar currentDate = new GregorianCalendar();
+			GregorianCalendar lockExpires = new GregorianCalendar();
+			lockExpires.setTimeInMillis(user.getChallengeDate().getTime());
+			lockExpires.add(Calendar.MINUTE, lockDuration);
+
+			if(request.getRemoteAddr().equals(user.getChallengeIp()) && 
+			   user.getChallengeTries() >= numOfTries &&
+			   currentDate.before(lockExpires)) {
+				pageInfo.addError(new WikiMessage("password.reset.password.error.ip.locked"));
+				return null;
+			}
+			// reset retries after lock timeout
+			if(user.getChallengeTries() >= numOfTries &&
+			   currentDate.after(lockExpires)) {
+				user.setChallengeTries(0);
+				WikiBase.getDataHandler().updatePwResetChallengeData(user);
+			}
+		}
+		return new Integer((int)(Math.random() * Integer.MAX_VALUE)).toString();
 	}
 	
-	private boolean isChallengeOk(String username, String challenge) throws Exception {
-		String challengeComputed = getChallenge(username);
-		/** Replace empty spaces in request parameter with "+". This is character 63 in
-		    a base 64 string and in a url is interpreted as a space. So we need to revert
-		    the transformation. */
-		challenge = challenge.replace(" ", "+");
-		return challenge.equals(challengeComputed);
+	private boolean isChallengeOk(HttpServletRequest request, WikiPageInfo pageInfo, WikiUser user, String challenge) throws Exception {
+		int timeout = Environment.getIntValue(Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT);
+		if(user.getChallengeValue() != null && user.getChallengeDate() != null && user.getChallengeIp() != null) {
+			// compute some deadlines
+			GregorianCalendar currentDate = new GregorianCalendar();
+			GregorianCalendar challengeExpires = new GregorianCalendar();
+			challengeExpires.setTimeInMillis(user.getChallengeDate().getTime());
+			challengeExpires.add(Calendar.MINUTE, timeout);
+			if(!user.getChallengeValue().equals(challenge)) {
+				pageInfo.addError(new WikiMessage("password.reset.password.error.challenge.nok"));
+			}
+			else if(currentDate.after(challengeExpires)) {
+				pageInfo.addError(new WikiMessage("password.reset.password.error.challenge.expired"));
+				resetChallengeData(user);
+			}
+			else {
+				resetChallengeData(user);
+				return true;
+			}
+		}
+		else {
+			pageInfo.addError(new WikiMessage("password.reset.password.error.challenge.nok"));
+		}
+		return false;
+	}
+	
+	private void resetChallengeData(WikiUser user) throws Exception {
+		user.setChallengeValue(null);
+		user.setChallengeDate(null);
+		user.setChallengeIp(null);
+		user.setChallengeTries(0);
+		WikiBase.getDataHandler().updatePwResetChallengeData(user);
 	}
 }
