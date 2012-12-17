@@ -119,6 +119,14 @@ public class DatabaseUpgrades {
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_wiki_user"));
 			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_130_REMOVE_WIKI_USER_TABLE_COLUMN_SIGNATURE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_wiki_user"));
+			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_130_ADD_USER_TABLE_COLUMN_CHALLENGE_VALUE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_users"));
+			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_130_ADD_USER_TABLE_COLUMN_CHALLENGE_DATE", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_users"));
+			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_130_ADD_USER_TABLE_COLUMN_CHALLENGE_IP", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_users"));
+			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_130_ADD_USER_TABLE_COLUMN_CHALLENGE_TRIES", conn);
+			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_users"));
 		} catch (DataAccessException e) {
 			DatabaseConnection.rollbackOnException(status, e);
 			logger.error("Database failure during upgrade", e);

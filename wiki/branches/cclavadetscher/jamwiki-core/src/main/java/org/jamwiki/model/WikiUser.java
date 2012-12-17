@@ -36,6 +36,10 @@ public class WikiUser implements Serializable {
 	private int userId = -1;
 	private String displayName = null;
 	private Map<String, String> preferences;
+	private String challengeValue = null;
+	private Timestamp challengeDate = null;
+	private String challengeIp = null;
+	private int challengeTries = 0;
 
 	// Constants for user preference groups and preferences
 	public static final String USER_PREFERENCES_GROUP_EDITING = "user.preferences.group.editing";
@@ -218,11 +222,44 @@ public class WikiUser implements Serializable {
 		this.getPreferences().put(preferenceKey, preferenceValue);
 	}
 
+	public String getChallengeValue() {
+		return challengeValue;
+	}
+
+	public void setChallengeValue(String challengeValue) {
+		this.challengeValue = challengeValue;
+	}
+
+	public Timestamp getChallengeDate() {
+		return challengeDate;
+	}
+
+	public void setChallengeDate(Timestamp challengeDate) {
+		this.challengeDate = challengeDate;
+	}
+
+	public String getChallengeIp() {
+		return challengeIp;
+	}
+
+	public void setChallengeIp(String challengeIp) {
+		this.challengeIp = challengeIp;
+	}
+
+	public int getChallengeTries() {
+		return challengeTries;
+	}
+
+	public void setChallengeTries(int challengeTries) {
+		this.challengeTries = challengeTries;
+	}
+
 	/**
 	 *
 	 */
 	public String toString() {
 		StringBuffer sb = new StringBuffer("WikiUser ID " + userId  + ": " + username + "; displayName: " + displayName);
+		sb.append("; Password reset challenge Data: challenge=" + challengeValue + "; challenge date=" + challengeDate + "; challenge IP=" + challengeIp + "; challenge request count=" + challengeTries);
 		sb.append("; preferences: ");
 		for (String key : preferences.keySet()) {
 			sb.append(key + "=" + this.getPreferences().get(key) + "; ");

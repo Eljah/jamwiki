@@ -1025,6 +1025,16 @@ public interface QueryHandler {
 	int lookupWikiUser(String login, Connection conn) throws SQLException;
 
 	/**
+	 * Get the data related to a password reset request in WikiUser container.
+	 * This method is always called first when performing any operation with
+	 * password change requests.
+	 * @param username The name of the user to retrieve
+	 * @return The WikiUser matching the username or null if it does not exist
+	 * @throws SQLException
+	 */
+	public WikiUser lookupPwResetChallengeData(String username) throws SQLException;
+	
+	/**
 	 * Return a count of all wiki users.
 	 *
 	 * @return a count of the total number of wiki users.
@@ -1060,6 +1070,14 @@ public interface QueryHandler {
 	 */
 	boolean existsUserPreferenceDefault(String userPreferenceKey) throws SQLException;
 	
+	/**
+	 * Retrieve the values associated with a password reset request. These are the
+	 * challenge value, its creation date, the IP where it originated and the number of
+	 * submitted requests from the same IP.
+	 * @param user The user to update
+	 * @throws SQLException
+	 */
+	public void updatePwResetChallengeData(WikiUser user) throws SQLException;
 	
 	/**
 	 * Utility method used when importing to updating the previous topic version ID field
