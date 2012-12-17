@@ -80,6 +80,7 @@ public class Environment {
 	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD = "smtp-service-forgot-password";
 	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT = "smtp-service-forgot-password-challenge-timeout";
 	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES = "smtp-service-forgot-password-challenge-retries";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION = "smtp-service-forgot-password-ip-lock-duration";
 	public static final String PROP_ENCRYPTION_ALGORITHM = "encryption-algorithm";
 	public static final String PROP_EXTERNAL_LINK_NEW_WINDOW = "external-link-new-window";
 	public static final String PROP_FILE_BLACKLIST = "file-blacklist";
@@ -238,8 +239,9 @@ public class Environment {
 		this.defaults.setProperty(PROP_EMAIL_ADDRESS_SEPARATOR,";");
 		this.defaults.setProperty(PROP_EMAIL_DEFAULT_CONTENT_TYPE,"text/plain");
 		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD, Boolean.FALSE.toString());
-		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT, "60");
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT, "60"); // minutes
 		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES, "3");
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION, "1440"); // minutes = 24h
 		this.defaults.setProperty(PROP_ENCRYPTION_ALGORITHM, "SHA-512");
 		this.defaults.setProperty(PROP_EXTERNAL_LINK_NEW_WINDOW, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_FILE_BLACKLIST, "bat,bin,exe,htm,html,js,jsp,php,sh");
