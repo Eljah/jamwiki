@@ -3008,7 +3008,7 @@ public class AnsiQueryHandler implements QueryHandler {
 				if(rs != null)
 				user.setChallengeValue(rs.getString("challenge_value"));
 				user.setChallengeDate(rs.getTimestamp("challenge_date"));
-				user.setChallengeIp(rs.getString("challenge_date"));
+				user.setChallengeIp(rs.getString("challenge_ip"));
 				user.setChallengeTries(rs.getInt("challenge_tries"));
 			}
 			return user;
