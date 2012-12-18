@@ -77,7 +77,7 @@ public class Environment {
 	public static final String PROP_EMAIL_SMTP_PORT = "smtp-port";
 	public static final String PROP_EMAIL_ADDRESS_SEPARATOR = "smtp-address-separator";
 	public static final String PROP_EMAIL_DEFAULT_CONTENT_TYPE = "smtp-content-type";
-	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD = "smtp-service-forgot-password";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD = "smtp-service-forgot-password-enable";
 	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT = "smtp-service-forgot-password-challenge-timeout";
 	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES = "smtp-service-forgot-password-challenge-retries";
 	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION = "smtp-service-forgot-password-ip-lock-duration";

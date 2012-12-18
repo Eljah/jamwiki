@@ -346,6 +346,9 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
 				setProperty(props, request, Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD);
+				setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT, pageInfo.getErrors());
+				setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES, pageInfo.getErrors());
+				setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION, pageInfo.getErrors());
 				// Check if we have to test the configuration
 				String command = request.getParameter("testMail");
 				if (!StringUtils.isBlank(command) && command.equalsIgnoreCase("send test mail")) {

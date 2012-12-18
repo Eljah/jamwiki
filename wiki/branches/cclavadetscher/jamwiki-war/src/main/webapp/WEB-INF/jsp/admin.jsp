@@ -383,11 +383,35 @@
 	</c:if>
 	<fieldset>
 	<legend><fmt:message key="admin.smtp.service.caption" /></legend>
+		<fieldset>
+		<legend><fmt:message key="admin.smtp.service.forgot.password" /></legend>
 		<div class="row">
-			<label for="<%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD %>"><fmt:message key="admin.smtp.service.forgot.password" /></label>
+			<label for="<%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD %>"><fmt:message key="admin.smtp.service.forgot.password.enable" /></label>
 			<c:set var="PROP_EMAIL_SERVICE_FORGOT_PASSWORD"><%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD %></c:set>
-			<span><jamwiki:checkbox name="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD}" value="true" checked="${props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD]}" id="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD}" /></span>
+			<span><jamwiki:checkbox name="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD}" onchange="document.emailForm.submit()" value="true" checked="${props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD]}" id="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD}" /></span>
 		</div>
+		<c:if test="${not props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD]}">
+			<div style="display:none;">
+		</c:if>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT %>"><fmt:message key="admin.smtp.service.forgot.password.timeout" /></label>
+			<c:set var="PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT"><%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT}" value="${props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT]}" size="30" id="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES %>"><fmt:message key="admin.smtp.service.forgot.password.retries" /></label>
+			<c:set var="PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES"><%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES}" value="${props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES]}" size="30" id="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES}" /></span>
+		</div>
+		<div class="row">
+			<label for="<%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION %>"><fmt:message key="admin.smtp.service.forgot.password.ip.lock.duration" /></label>
+			<c:set var="PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION"><%= Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION %></c:set>
+			<span><jamwiki:text name="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION}" value="${props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION]}" size="30" id="${PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION}" /></span>
+		</div>
+		<c:if test="${not props[PROP_EMAIL_SERVICE_FORGOT_PASSWORD]}">
+			</div>
+		</c:if>
+		</fieldset>
 	</fieldset>
 	<c:if test="${not props[PROP_EMAIL_SMTP_ENABLE]}">
 		</div>
