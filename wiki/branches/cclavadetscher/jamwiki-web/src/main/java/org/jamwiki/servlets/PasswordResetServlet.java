@@ -198,6 +198,7 @@ public class PasswordResetServlet extends JAMWikiServlet {
 			} catch(Exception ex) {
 				pageInfo.addError(new WikiMessage("password.reset.password.failed"));
 			}
+			next.addObject("showLoginLink", Boolean.TRUE);
 		}
 		next.addObject("username", username);
 		next.addObject("success", result);

@@ -69,4 +69,7 @@
 		</fieldset>
 		</form>
 	</c:if>
+	<c:if test="${showLoginLink}">
+		<p><a href="<jamwiki:link value="Special:Login" />"><fmt:message key="common.login" /></a></p>
+	</c:if>
 </div>
