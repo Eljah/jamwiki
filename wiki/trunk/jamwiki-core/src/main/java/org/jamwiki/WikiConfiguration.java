@@ -53,6 +53,7 @@ public class WikiConfiguration {
 	private List<WikiConfigurationObject> searchEngines = null;
 	private List<String> timeFormats = null;
 	private Map<String, String> translations = null;
+	private List<String> smtpContentTypes = null;
 
 	/** Name of the configuration file. */
 	private static final String JAMWIKI_CONFIGURATION_FILE = "jamwiki-configuration-1.3.xml";
@@ -160,6 +161,13 @@ public class WikiConfiguration {
 	public Map<String, String> getTranslations() {
 		return this.translations;
 	}
+	
+	/**
+	 * 
+	 */
+	public List<String> getSmtpContentTypes() {
+		return this.smtpContentTypes;
+	}
 
 	/**
 	 *
@@ -172,6 +180,10 @@ public class WikiConfiguration {
 		this.parsers = new ArrayList<WikiConfigurationObject>();
 		this.searchEngines = new ArrayList<WikiConfigurationObject>();
 		this.translations = new LinkedHashMap<String, String>();
+		this.smtpContentTypes = new ArrayList<String>();
+		// content types hard coded. This is not likely to change.
+		this.smtpContentTypes.add("text/plain");
+		this.smtpContentTypes.add("text/html");
 		this.timeFormats = new ArrayList<String>();
 		File file = null;
 		Document document = null;

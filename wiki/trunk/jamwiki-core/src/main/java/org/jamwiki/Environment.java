@@ -67,10 +67,19 @@ public class Environment {
 	public static final String PROP_DBCP_TEST_WHILE_IDLE = "dbcp-test-while-idle";
 	public static final String PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS = "dbcp-time-between-eviction-runs";
 	public static final String PROP_DBCP_WHEN_EXHAUSTED_ACTION = "dbcp-when-exhausted-action";
-	public static final String PROP_EMAIL_REPLY_ADDRESS = "reply-address";
-	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
-	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-password";
+	public static final String PROP_EMAIL_SMTP_ENABLE = "smtp-enable";
+	public static final String PROP_EMAIL_SMTP_REQUIRES_AUTH = "smtp-authentication";
 	public static final String PROP_EMAIL_SMTP_USERNAME = "smtp-username";
+	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-userpass";
+	public static final String PROP_EMAIL_REPLY_ADDRESS = "smtp-reply-to";
+	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
+	public static final String PROP_EMAIL_SMTP_PORT = "smtp-port";
+	public static final String PROP_EMAIL_ADDRESS_SEPARATOR = "smtp-address-separator";
+	public static final String PROP_EMAIL_DEFAULT_CONTENT_TYPE = "smtp-content-type";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD = "smtp-service-forgot-password-enable";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT = "smtp-service-forgot-password-challenge-timeout";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES = "smtp-service-forgot-password-challenge-retries";
+	public static final String PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION = "smtp-service-forgot-password-ip-lock-duration";
 	public static final String PROP_ENCRYPTION_ALGORITHM = "encryption-algorithm";
 	public static final String PROP_EXTERNAL_LINK_NEW_WINDOW = "external-link-new-window";
 	public static final String PROP_FILE_BLACKLIST = "file-blacklist";
@@ -233,10 +242,19 @@ public class Environment {
 		this.defaults.setProperty(PROP_DBCP_TEST_WHILE_IDLE, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, "120");
 		this.defaults.setProperty(PROP_DBCP_WHEN_EXHAUSTED_ACTION, String.valueOf(GenericObjectPool.WHEN_EXHAUSTED_GROW));
-		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS, "");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST, "");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD, "");
-		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME, "");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_ENABLE,Boolean.FALSE.toString());
+		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,Boolean.FALSE.toString());
+		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD,"");
+		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_PORT,"25");
+		this.defaults.setProperty(PROP_EMAIL_ADDRESS_SEPARATOR,";");
+		this.defaults.setProperty(PROP_EMAIL_DEFAULT_CONTENT_TYPE,"text/plain");
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD, Boolean.FALSE.toString());
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT, "60"); // minutes
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES, "3");
+		this.defaults.setProperty(PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION, "1440"); // minutes = 24h
 		this.defaults.setProperty(PROP_ENCRYPTION_ALGORITHM, "SHA-512");
 		this.defaults.setProperty(PROP_EXTERNAL_LINK_NEW_WINDOW, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_FILE_BLACKLIST, "bat,bin,exe,htm,html,js,jsp,php,sh");

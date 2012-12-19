@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Properties;
+
+// import org.apache.commons.lang.ObjectUtils.Null;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
 import org.jamwiki.model.Category;
@@ -208,6 +210,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_LOG_ITEMS_BY_TYPE = null;
 	protected static String STATEMENT_SELECT_NAMESPACE_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_NAMESPACES = null;
+	protected static String STATEMENT_SELECT_PW_RESET_CHALLENGE_DATA = null;
 	protected static String STATEMENT_SELECT_RECENT_CHANGES = null;
 	protected static String STATEMENT_SELECT_ROLES = null;
 	protected static String STATEMENT_SELECT_TOPIC_BY_ID = null;
@@ -251,6 +254,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_UPDATE_GROUP = null;
 	protected static String STATEMENT_UPDATE_ROLE = null;
 	protected static String STATEMENT_UPDATE_NAMESPACE = null;
+	protected static String STATEMENT_UPDATE_PW_RESET_CHALLENGE_DATA = null;
 	protected static String STATEMENT_UPDATE_RECENT_CHANGES_PREVIOUS_VERSION_ID = null;
 	protected static String STATEMENT_UPDATE_TOPIC = null;
 	protected static String STATEMENT_UPDATE_TOPIC_NAMESPACE = null;
@@ -1425,6 +1429,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_LOG_ITEMS_BY_TYPE       = props.getProperty("STATEMENT_SELECT_LOG_ITEMS_BY_TYPE");
 		STATEMENT_SELECT_NAMESPACE_SEQUENCE      = props.getProperty("STATEMENT_SELECT_NAMESPACE_SEQUENCE");
 		STATEMENT_SELECT_NAMESPACES              = props.getProperty("STATEMENT_SELECT_NAMESPACES");
+		STATEMENT_SELECT_PW_RESET_CHALLENGE_DATA = props.getProperty("STATEMENT_SELECT_PW_RESET_CHALLENGE_DATA");
 		STATEMENT_SELECT_RECENT_CHANGES          = props.getProperty("STATEMENT_SELECT_RECENT_CHANGES");
 		STATEMENT_SELECT_ROLES                   = props.getProperty("STATEMENT_SELECT_ROLES");
 		STATEMENT_SELECT_TOPIC_BY_ID             = props.getProperty("STATEMENT_SELECT_TOPIC_BY_ID");
@@ -1467,6 +1472,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_USER_PREFERENCES        = props.getProperty("STATEMENT_SELECT_USER_PREFERENCES");
 		STATEMENT_UPDATE_GROUP                   = props.getProperty("STATEMENT_UPDATE_GROUP");
 		STATEMENT_UPDATE_NAMESPACE               = props.getProperty("STATEMENT_UPDATE_NAMESPACE");
+		STATEMENT_UPDATE_PW_RESET_CHALLENGE_DATA = props.getProperty("STATEMENT_UPDATE_PW_RESET_CHALLENGE_DATA");
 		STATEMENT_UPDATE_RECENT_CHANGES_PREVIOUS_VERSION_ID = props.getProperty("STATEMENT_UPDATE_RECENT_CHANGES_PREVIOUS_VERSION_ID");
 		STATEMENT_UPDATE_TOPIC_NAMESPACE         = props.getProperty("STATEMENT_UPDATE_TOPIC_NAMESPACE");
 		STATEMENT_UPDATE_ROLE                    = props.getProperty("STATEMENT_UPDATE_ROLE");
@@ -2966,7 +2972,7 @@ public class AnsiQueryHandler implements QueryHandler {
 			DatabaseConnection.closeConnection(conn, stmt2, rs);
 		}
 	}
-
+	
 	/**
 	 *
 	 */
@@ -2984,6 +2990,33 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 	}
 
+	public WikiUser lookupPwResetChallengeData(String username) throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		WikiUser user = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			user = lookupWikiUser(lookupWikiUser(username, conn));
+			if(user == null) {
+				return null;
+			}
+			stmt = conn.prepareStatement(STATEMENT_SELECT_PW_RESET_CHALLENGE_DATA);
+			stmt.setString(1, user.getUsername());
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				if(rs != null)
+				user.setChallengeValue(rs.getString("challenge_value"));
+				user.setChallengeDate(rs.getTimestamp("challenge_date"));
+				user.setChallengeIp(rs.getString("challenge_ip"));
+				user.setChallengeTries(rs.getInt("challenge_tries"));
+			}
+			return user;
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt, rs);
+		}
+	}
+	
 	/**
 	 * Return a count of all wiki users.
 	 */
@@ -3743,7 +3776,23 @@ public class AnsiQueryHandler implements QueryHandler {
 		}
 		return false;
 	}
-	
+
+	public void updatePwResetChallengeData(WikiUser user) throws SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			stmt = conn.prepareStatement(STATEMENT_UPDATE_PW_RESET_CHALLENGE_DATA);
+			stmt.setString(1, user.getChallengeValue());
+			stmt.setTimestamp(2, user.getChallengeDate());
+			stmt.setString(3, user.getChallengeIp());
+			stmt.setInt(4, user.getChallengeTries());
+			stmt.setString(5, user.getUsername());
+			stmt.executeUpdate();
+		} finally {
+			DatabaseConnection.closeConnection(conn, stmt);
+		}
+	}
 	/**
 	 *
 	 */

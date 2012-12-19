@@ -41,6 +41,7 @@
 				<prop key="/**/Special:Manage">Manage</prop>
 				<prop key="/**/Special:Move">Move</prop>
 				<prop key="/**/Special:OrphanedPages">Items</prop>
+				<prop key="/**/Special:PasswordReset">PasswordReset</prop>
 				<prop key="/**/Special:Print">Printable</prop>
 				<prop key="/**/Special:RecentChanges">RecentChanges</prop>
 				<prop key="/**/Special:RecentChangesFeed">RecentChangesFeed</prop>
@@ -95,6 +96,7 @@
 	<bean id="Log" class="org.jamwiki.servlets.LogServlet" />
 	<bean id="Manage" class="org.jamwiki.servlets.ManageServlet" />
 	<bean id="Move" class="org.jamwiki.servlets.MoveServlet" />
+	<bean id="PasswordReset" class="org.jamwiki.servlets.PasswordResetServlet" />
 	<bean id="Printable" class="org.jamwiki.servlets.PrintableServlet" />
 	<bean id="RecentChanges" class="org.jamwiki.servlets.RecentChangesServlet" />
 	<bean id="RecentChangesFeed" class="org.jamwiki.servlets.RecentChangesFeedServlet">

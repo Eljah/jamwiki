@@ -95,6 +95,12 @@ public class JAMWikiAuthenticationProcessingFilter extends UsernamePasswordAuthe
 				if (wikiUser != null) {
 					wikiUser.setLastLoginDate(new Timestamp(System.currentTimeMillis()));
 					WikiBase.getDataHandler().writeWikiUser(wikiUser, wikiUser.getUsername(), "");
+					// update password reset challenge fields, just in case
+					wikiUser.setChallengeValue(null);
+					wikiUser.setChallengeDate(null);
+					wikiUser.setChallengeIp(null);
+					wikiUser.setChallengeTries(0);
+					WikiBase.getDataHandler().updatePwResetChallengeData(wikiUser);
 				}
 			} catch (DataAccessException e) {
 				// log but do not throw - failure to update last login date is non-fatal

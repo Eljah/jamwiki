@@ -67,6 +67,8 @@ public abstract class JAMWikiServlet extends AbstractController implements JAMWi
 	protected static final String JSP_ERROR = "error-display.jsp";
 	/** The name of the JSP file used to render the servlet output for logins. */
 	protected static final String JSP_LOGIN = "login.jsp";
+	/** The name of the JSP file used to render the servlet output for login reset */
+	protected static final String JSP_LOGIN_RESET = "login-reset.jsp";
 	/** The name of the JSP file used to render the servlet output. */
 	protected static final String JSP_VIEW_SOURCE = "view-source.jsp";
 	/** Any page that take longer than this value (specified in milliseconds) will print a warning to the log. */

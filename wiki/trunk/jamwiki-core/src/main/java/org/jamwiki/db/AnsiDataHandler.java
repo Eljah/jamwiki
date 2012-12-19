@@ -1719,6 +1719,14 @@ public class AnsiDataHandler {
 		}
 	}
 
+	public WikiUser lookupPwResetChallengeData(String username) throws DataAccessException {
+		try {
+			return this.queryHandler().lookupPwResetChallengeData(username);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+	
 	/**
 	 * Return a count of all wiki users.
 	 *
@@ -2252,6 +2260,15 @@ public class AnsiDataHandler {
 		}
 	}
 
+	public void updatePwResetChallengeData(WikiUser user) throws DataAccessException {
+		try {
+			this.queryHandler().updatePwResetChallengeData(user);
+		}
+		catch (SQLException e) {
+			throw new DataAccessException(e);
+		}
+	}
+	
 	/**
 	 * Utility method to determine whether to check a shared virtual wiki when
 	 * performing a topic lookup.
