@@ -26,6 +26,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jamwiki.WikiConfiguration;
 import org.jamwiki.model.WikiUser;
 
 /**
@@ -34,18 +35,6 @@ import org.jamwiki.model.WikiUser;
 public class DateUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(DateUtil.class.getName());
-
-	private static final String[] DATE_FORMATS = new String[] {
-			"d MMMM yyyy",
-			"LONG",
-			"MEDIUM",
-			"yyyy-MM-dd",
-			"dd.MM.yyyy"
-	};
-	private static final String[] TIME_FORMATS = new String[] {
-			"HH:mm",
-			"h:mm a",
-	};
 	public enum DateFormatType { DATE_ONLY, TIME_ONLY, DATE_AND_TIME };
 
 	/**
@@ -143,7 +132,7 @@ public class DateUtil {
 		String localeString = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		Date now = new Date();
 		Map<String, String> formats = new LinkedHashMap<String, String>();
-		for (String format : DATE_FORMATS) {
+		for (String format : WikiConfiguration.getInstance().getDateFormats()) {
 			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, DateFormatType.DATE_ONLY));
 		}
 		return formats;
@@ -158,7 +147,7 @@ public class DateUtil {
 		String localeString = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		Date now = new Date();
 		Map<String, String> formats = new LinkedHashMap<String, String>();
-		for (String format : TIME_FORMATS) {
+		for (String format : WikiConfiguration.getInstance().getTimeFormats()) {
 			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, DateFormatType.TIME_ONLY));
 		}
 		return formats;

@@ -267,4 +267,26 @@
 	</translation>
 </translations>
 
+<!--
+   ====================================================================
+
+   Date and time formats that users can select from user preferences
+   for viewing dates/times.  At least one value must be specified for
+   each type, and formats much be valid java.text.SimpleDateFormat
+   formats.
+
+   ======================================================================
+-->
+<date-formats>
+	<date-format>d MMMM yyyy</date-format>
+	<date-format>LONG</date-format>
+	<date-format>MEDIUM</date-format>
+	<date-format>yyyy-MM-dd</date-format>
+	<date-format>dd.MM.yyyy</date-format>
+</date-formats>
+<time-formats>
+	<time-format>HH:mm</time-format>
+	<time-format>h:mm a</time-format>
+</time-formats>
+
 </configuration>
