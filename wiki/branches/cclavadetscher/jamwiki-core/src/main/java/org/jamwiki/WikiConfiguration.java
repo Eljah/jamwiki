@@ -46,10 +46,12 @@ public class WikiConfiguration {
 	private static WikiConfiguration instance = null;
 
 	private List<WikiConfigurationObject> queryHandlers = null;
+	private List<String> dateFormats = null;
 	private Map<String, String> editors = null;
 	private List<WikiConfigurationObject> parsers = null;
 	private List<WikiConfigurationObject> jflexParserCustomTags = null;
 	private List<WikiConfigurationObject> searchEngines = null;
+	private List<String> timeFormats = null;
 	private Map<String, String> translations = null;
 	private List<String> smtpContentTypes = null;
 
@@ -60,6 +62,8 @@ public class WikiConfiguration {
 	private static final String XML_CONFIGURATION_ROOT = "configuration";
 	private static final String XML_QUERY_HANDLER = "query-handler";
 	private static final String XML_QUERY_HANDLER_ROOT = "query-handlers";
+	private static final String XML_DATE_FORMAT = "date-format";
+	private static final String XML_DATE_FORMAT_ROOT = "date-formats";
 	private static final String XML_EDITOR = "editor";
 	private static final String XML_EDITOR_ROOT = "editors";
 	private static final String XML_INIT_PARAM = "init-param";
@@ -76,6 +80,8 @@ public class WikiConfiguration {
 	private static final String XML_PARSER_CUSTOM_TAG_ROOT = "jflex-parser-custom-tags";
 	private static final String XML_SEARCH_ENGINE = "search-engine";
 	private static final String XML_SEARCH_ENGINE_ROOT = "search-engines";
+	private static final String XML_TIME_FORMAT = "time-format";
+	private static final String XML_TIME_FORMAT_ROOT = "time-formats";
 	private static final String XML_TRANSLATION = "translation";
 	private static final String XML_TRANSLATION_ROOT = "translations";
 
@@ -94,6 +100,15 @@ public class WikiConfiguration {
 			WikiConfiguration.instance = new WikiConfiguration();
 		}
 		return WikiConfiguration.instance;
+	}
+
+	/**
+	 * Return a list of strings corresponding to the date formats (in
+	 * java.text.SimpleDateFormat format) that a user can select from her
+	 * preferences for displaying dates.
+	 */
+	public List<String> getDateFormats() {
+		return this.dateFormats;
 	}
 
 	/**
@@ -132,6 +147,15 @@ public class WikiConfiguration {
 	}
 
 	/**
+	 * Return a list of strings corresponding to the time formats (in
+	 * java.text.SimpleDateFormat format) that a user can select from her
+	 * preferences for displaying times.
+	 */
+	public List<String> getTimeFormats() {
+		return this.timeFormats;
+	}
+
+	/**
 	 *
 	 */
 	public Map<String, String> getTranslations() {
@@ -150,6 +174,7 @@ public class WikiConfiguration {
 	 */
 	private void initialize() {
 		this.queryHandlers = new ArrayList<WikiConfigurationObject>();
+		this.dateFormats = new ArrayList<String>();
 		this.editors = new LinkedHashMap<String, String>();
 		this.jflexParserCustomTags = new ArrayList<WikiConfigurationObject>();
 		this.parsers = new ArrayList<WikiConfigurationObject>();
@@ -159,6 +184,7 @@ public class WikiConfiguration {
 		// content types hard coded. This is not likely to change.
 		this.smtpContentTypes.add("text/plain");
 		this.smtpContentTypes.add("text/html");
+		this.timeFormats = new ArrayList<String>();
 		File file = null;
 		Document document = null;
 		try {
@@ -190,6 +216,10 @@ public class WikiConfiguration {
 				this.searchEngines = this.parseConfigurationObjects(child, XML_SEARCH_ENGINE);
 			} else if (child.getNodeName().equals(XML_TRANSLATION_ROOT)) {
 				this.parseMapNodes(child, this.translations, XML_TRANSLATION);
+			} else if (child.getNodeName().equals(XML_DATE_FORMAT_ROOT)) {
+				this.parseListNodes(child, this.dateFormats, XML_DATE_FORMAT);
+			} else if (child.getNodeName().equals(XML_TIME_FORMAT_ROOT)) {
+				this.parseListNodes(child, this.timeFormats, XML_TIME_FORMAT);
 			} else {
 				logUnknownChild(node, child);
 			}
@@ -252,6 +282,21 @@ public class WikiConfiguration {
 			}
 		}
 		return results;
+	}
+
+	/**
+	 * Utility method for parsing nodes that are simply lists of values.
+	 */
+	private void parseListNodes(Node node, List<String> resultsList, String childNodeName) {
+		NodeList children = node.getChildNodes();
+		for (int j = 0; j < children.getLength(); j++) {
+			Node child = children.item(j);
+			if (child.getNodeName().equals(childNodeName)) {
+				resultsList.add(XMLUtil.getTextContent(child));
+			} else {
+				logUnknownChild(node, child);
+			}
+		}
 	}
 
 	/**
