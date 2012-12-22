@@ -19,6 +19,7 @@ package org.jamwiki.servlets;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ import org.jamwiki.WikiMessage;
 import org.jamwiki.mail.WikiMail;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Encryption;
+import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -113,13 +115,21 @@ public class PasswordResetServlet extends JAMWikiServlet {
 						try {
 							// Note: add toString to WikiMessage to retrieve text...
 							// new WikiMessage("password.reset.password.email");
-							StringBuffer mailMessage = request.getRequestURL();
-							mailMessage.append("?loginUsername=");
-							mailMessage.append(username);
-							mailMessage.append("&rcode=");
-							mailMessage.append(challenge);
+							StringBuffer mailLink = request.getRequestURL();
+							mailLink.append("?loginUsername=");
+							mailLink.append(username);
+							mailLink.append("&rcode=");
+							mailLink.append(challenge);
 							WikiMail sender = new WikiMail();
-							sender.postMail(mailAddress, mailMessage.toString());
+							Locale language = Locale.getDefault();
+							String[] localeData = user.getDefaultLocale().split("_");
+							if(localeData.length > 0) {
+								language = new Locale(localeData[0]);
+							}
+							String mailSubject = Utilities.formatMessage("password.reset.password.email.subject", language);
+							String mailBody = null;
+							mailBody = Utilities.formatMessage("password.reset.password.email.body", language, new Object[]{mailLink});
+							sender.postMail(mailAddress,mailSubject, mailBody);
 							pageInfo.addMessage(new WikiMessage("password.reset.password.message.sendmail.success"));
 						}
 						catch(Exception ex) {
