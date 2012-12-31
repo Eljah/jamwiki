@@ -151,7 +151,6 @@ public class UserPreferencesUtil {
 			if (prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
 				return DateUtil.getTimeZoneMap();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
-				/*
 				LinkedHashMap<String, String> locales = new LinkedHashMap<String, String>();
 				Locale[] localeArray = Locale.getAvailableLocales();
 				for (int i = 0; i < localeArray.length; i++) {
@@ -160,8 +159,6 @@ public class UserPreferencesUtil {
 					locales.put(key, value);
 				}
 				return locales;
-				*/
-				return WikiConfiguration.getInstance().getTranslations();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {
 				return WikiConfiguration.getInstance().getEditors();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATE_FORMAT)) {
