@@ -95,6 +95,8 @@ followed by 1.0.1.
     the actual preference values for each user). Additionally, existing preferences
     defined by users must be moved into the new table. Finally the "old"
     preference fields in jam_wiki_user must be removed.
+  * The E-Mail based user password reset feature requires the addition of new
+    columns in table jam_users.
 
   UPGRADE STEPS:
 
@@ -109,7 +111,8 @@ followed by 1.0.1.
      (found in the "resources" sub-directory within the JAMWiki system folder)
      should be copied to the new jamwiki-configuration-1.3.xml file in the same
      directory.
-  4. Update the database schema by executing the following SQL statements.
+  4. User preferences: Update the database schema by executing the following SQL
+     statements.
        a) Create the new tables jam_user_preferences_defaults and jam_user_preferences:
               CREATE TABLE jam_user_preferences_defaults (
                 pref_key VARCHAR(100),
@@ -165,7 +168,12 @@ followed by 1.0.1.
               ALTER TABLE jam_wiki_user DROP COLUMN default_locale;
               ALTER TABLE jam_wiki_user DROP COLUMN signature;
               ALTER TABLE jam_wiki_user DROP COLUMN editor;
-
+  5. E-Mail based user password reset. Update table jam_users using the following
+     SQL statements.
+              ALTER TABLE jam_users ADD COLUMN challenge_value VARCHAR(100);
+              ALTER TABLE jam_users ADD COLUMN challenge_date TIMESTAMP;
+              ALTER TABLE jam_users ADD COLUMN challenge_ip VARCHAR(39);
+              ALTER TABLE jam_users ADD COLUMN  challenge_tries INTEGER DEFAULT 0 NOT NULL;
 
   JAMWiki 1.2.3
   =============
