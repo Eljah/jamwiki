@@ -71,7 +71,7 @@
 					</c:forEach>
 					</select>
 				</span>
-				<div class="formhelp"><fmt:message key="locale.help" /></div>
+				<div class="formhelp"><fmt:message key="user.default.locale.help" /></div>
 			</div>
 		</c:if>
 		<c:if test="${recaptchaEnabled}">
