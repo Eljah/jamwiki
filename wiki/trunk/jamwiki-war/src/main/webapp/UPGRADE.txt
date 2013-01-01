@@ -89,14 +89,6 @@ followed by 1.0.1.
     instructions on manually updating this topic with the new styles.
   * The jamwiki-configuration.xml file has been renamed to
     jamwiki-configuration-1.3.xml.  See below for further details.
-  * The migration from user properties in the jam_wiki_user table to a dedicated
-    table requires the creation of two new tables (one for the default values,
-    holding at the same time the list of valid preference keys and a second with
-    the actual preference values for each user). Additionally, existing preferences
-    defined by users must be moved into the new table. Finally the "old"
-    preference fields in jam_wiki_user must be removed.
-  * The E-Mail based user password reset feature requires the addition of new
-    columns in table jam_users.
 
   UPGRADE STEPS:
 
@@ -111,8 +103,7 @@ followed by 1.0.1.
      (found in the "resources" sub-directory within the JAMWiki system folder)
      should be copied to the new jamwiki-configuration-1.3.xml file in the same
      directory.
-  4. User preferences: Update the database schema by executing the following SQL
-     statements.
+  4. Update the database schema by executing the following SQL statements:
        a) Create the new tables jam_user_preferences_defaults and jam_user_preferences:
               CREATE TABLE jam_user_preferences_defaults (
                 pref_key VARCHAR(100),
@@ -131,20 +122,8 @@ followed by 1.0.1.
               );
        b) Create an index on wiki_user_id for jam_user_preferences:
               CREATE INDEX jam_u_upref ON jam_user_preferences(wiki_user_id);
-       c) Create default values. Note that you may want to use local values for
-          the user.default.locale and the user.timezone, e.g. "de", "CET" for
-          German and Central Europe. The format of the locale must be an ISO 2
-          character value for the language. Optionally you may also specify the
-          country code, which is also an ISO 2 character country code. In this
-          case the two values are concatenated to a single string with an
-          underscore between them: e.g. de_DE or de_CH or en_US.  If you use a 
-          short form for the timezone you should use the version without
-          daylight saving, i.e. for the example given use "CET" and not
-          "CEST", even if it is Summer time or, as shown below "PST" instead of
-          "PDT". The java classes take care of using and displaying daylight
-          saving time information if necessary.  Setting default values to null
-          is the same as instructing the application to use system defaults as
-          for example the signature_date property for user.date.format.
+       c) Create default user preferences. Note that the date and time defaults
+          can be changed to local values once the upgrade is complete.
               INSERT INTO jam_user_preferences_defaults VALUES('user.preferred.editor', 'toolbar', 'user.preferences.group.editing', 1);
               INSERT INTO jam_user_preferences_defaults VALUES('user.signature', NULL, 'user.preferences.group.editing', 2);
               INSERT INTO jam_user_preferences_defaults VALUES('user.default.locale', 'en', 'user.preferences.group.internationalization', 1);
@@ -168,12 +147,23 @@ followed by 1.0.1.
               ALTER TABLE jam_wiki_user DROP COLUMN default_locale;
               ALTER TABLE jam_wiki_user DROP COLUMN signature;
               ALTER TABLE jam_wiki_user DROP COLUMN editor;
-  5. E-Mail based user password reset. Update table jam_users using the following
-     SQL statements.
+       f) Add new fields required to support e-mail user password reset.
+            MS SQL:
+              ALTER TABLE jam_users ADD challenge_value VARCHAR(100);
+              ALTER TABLE jam_users ADD challenge_date DATETIME;
+              ALTER TABLE jam_users ADD challenge_ip VARCHAR(39);
+              ALTER TABLE jam_users ADD challenge_tries INTEGER DEFAULT 0 NOT NULL;
+            Oracle:
+              ALTER TABLE jam_users ADD challenge_value VARCHAR(100);
+              ALTER TABLE jam_users ADD challenge_date TIMESTAMP;
+              ALTER TABLE jam_users ADD challenge_ip VARCHAR(39);
+              ALTER TABLE jam_users ADD challenge_tries INTEGER DEFAULT 0 NOT NULL;
+            Other Databases:
               ALTER TABLE jam_users ADD COLUMN challenge_value VARCHAR(100);
               ALTER TABLE jam_users ADD COLUMN challenge_date TIMESTAMP;
               ALTER TABLE jam_users ADD COLUMN challenge_ip VARCHAR(39);
-              ALTER TABLE jam_users ADD COLUMN  challenge_tries INTEGER DEFAULT 0 NOT NULL;
+              ALTER TABLE jam_users ADD COLUMN challenge_tries INTEGER DEFAULT 0 NOT NULL;
+
 
   JAMWiki 1.2.3
   =============
