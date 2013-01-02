@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -40,6 +39,7 @@ import org.jamwiki.utils.DateUtil;
 import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil;
 
 /**
  * The <code>WikiPageInfo</code> class provides an object containing common
@@ -67,6 +67,7 @@ public class WikiPageInfo {
 	private String topicName = "";
 	private final WikiUser user;
 	private LinkedHashMap<String, WikiMessage> userMenu = new LinkedHashMap<String, WikiMessage>();
+	private final UserPreferencesUtil userPreferencesUtil;
 	private List<String> virtualWikiLinks = new ArrayList<String>();
 	private String virtualWikiName = null;
 
@@ -80,6 +81,7 @@ public class WikiPageInfo {
 			this.virtualWikiName = VirtualWiki.defaultVirtualWiki().getName();
 		}
 		this.user = user;
+		this.userPreferencesUtil = new UserPreferencesUtil(null);
 	}
 
 	/**
@@ -505,7 +507,7 @@ public class WikiPageInfo {
 		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE) != null) {
 			return user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
 		}
-		return TimeZone.getDefault().getID();
+		return this.userPreferencesUtil.getDefaultTimeZone();
 	}
 
 	/**
