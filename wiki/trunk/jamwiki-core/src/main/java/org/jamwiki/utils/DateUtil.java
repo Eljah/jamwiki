@@ -40,7 +40,8 @@ public class DateUtil {
 
 	/**
 	 * Format the given date using the given pattern to return the date
-	 * as a formatted string.
+	 * as a formatted string.  If the pattern is invalid this method will
+	 * return <code>null</code>.
 	 */
 	public static String formatDate(Date date, String pattern, String localeString, String timeZoneString, DateFormatType dateFormatType) {
 		Locale locale = DateUtil.stringToLocale(localeString);
@@ -54,7 +55,16 @@ public class DateUtil {
 		} else if (style != -1 && dateFormatType == DateFormatType.DATE_AND_TIME) {
 			sdf = (SimpleDateFormat) DateFormat.getDateTimeInstance(style, style, locale);
 		} else {
-			sdf = new SimpleDateFormat(pattern, locale);
+			try {
+				sdf = new SimpleDateFormat(pattern, locale);
+			} catch (IllegalArgumentException e) {
+				String msg = "Attempt to format date with invalid pattern " + pattern
+						+ ". If you have customized date or time formats in your "
+						+ "jamwiki-configuration.xml file please verify that they are "
+						+ "valid java.text.SimpleDateFormat patterns.";
+				logger.warn(msg, e);
+				return null;
+			}
 		}
 		sdf.setTimeZone(tz);
 		return sdf.format(date);
@@ -153,7 +163,11 @@ public class DateUtil {
 		Date now = new Date();
 		Map<String, String> formats = new LinkedHashMap<String, String>();
 		for (String format : formatPatterns) {
-			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, dateFormatType));
+			String formattedDate = DateUtil.formatDate(now, format, localeString, timeZoneString, dateFormatType);
+			if (formattedDate != null) {
+				// date can be null if the pattern is invalid
+				formats.put(format, formattedDate);
+			}
 		}
 		return formats;
 	}
