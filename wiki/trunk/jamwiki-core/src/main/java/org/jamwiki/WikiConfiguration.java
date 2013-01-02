@@ -156,7 +156,7 @@ public class WikiConfiguration {
 	}
 
 	/**
-	 *
+	 * Return a list of all translations available to JAMWiki.
 	 */
 	public Map<String, String> getTranslations() {
 		return this.translations;

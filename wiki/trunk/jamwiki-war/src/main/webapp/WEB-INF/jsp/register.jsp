@@ -16,7 +16,8 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 --%>
-<%@ page errorPage="/WEB-INF/jsp/error.jsp"
+<%@ page import="org.jamwiki.model.WikiUser"
+    errorPage="/WEB-INF/jsp/error.jsp"
     contentType="text/html; charset=utf-8"
 %>
 
@@ -60,20 +61,18 @@
 			<span><input type="text" name="email" value="<c:out value="${newuser.email}" />" id="registerEmail" size="50" /></span>
 			<div class="formhelp"><fmt:message key="register.help.email" /></div>
 		</div>
-		<c:if test="${!empty userPreferences.groups['user.preferences.group.internationalization']['user.default.locale']}">
-			<c:set var="locale" value="${userPreferences.groups['user.preferences.group.internationalization']['user.default.locale']}" />
-			<div class="row">
-				<label for="${locale.key}"><fmt:message key="${locale.label}" /></label>
-				<span>
-					<select name="${locale.key}" id="${locale.key}">
-					<c:forEach items="${locale.map}" var="defaultLocale">
-						<option value="<c:out value="${defaultLocale.key}" />"<c:if test="${newuser.preferences['user.default.locale'] == defaultLocale.key}"> selected="selected"</c:if>><c:out value="${defaultLocale.value}" /></option>
-					</c:forEach>
-					</select>
-				</span>
-				<div class="formhelp"><fmt:message key="user.default.locale.help" /></div>
-			</div>
-		</c:if>
+		<div class="row">
+			<c:set var="USER_PREFERENCE_DEFAULT_LOCALE"><%= WikiUser.USER_PREFERENCE_DEFAULT_LOCALE %></c:set>
+			<label for="${USER_PREFERENCE_DEFAULT_LOCALE}"><fmt:message key="user.default.locale.label" /></label>
+			<span>
+				<select name="${USER_PREFERENCE_DEFAULT_LOCALE}" id="${USER_PREFERENCE_DEFAULT_LOCALE}">
+				<c:forEach items="${userPreferences.availableLocales}" var="availableLocale">
+					<option value="<c:out value="${availableLocale.key}" />"<c:if test="${newuser.defaultLocale == availableLocale.key}"> selected="selected"</c:if>><c:out value="${availableLocale.value}" /></option>
+				</c:forEach>
+				</select>
+			</span>
+			<div class="formhelp"><fmt:message key="user.default.locale.help" /></div>
+		</div>
 		<c:if test="${recaptchaEnabled}">
 			<div class="row">
 				<div class="captcha"><div class="captcha-label"><fmt:message key="common.caption.captcha" /></div><jamwiki:recaptcha /></div>

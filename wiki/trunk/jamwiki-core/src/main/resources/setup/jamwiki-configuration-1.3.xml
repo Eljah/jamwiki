@@ -190,79 +190,79 @@
 -->
 <translations>
 	<translation>
-		<name>English</name>
+		<name>en - English</name>
 		<key>en</key>
 	</translation>
 	<translation>
-		<name>dansk</name>
+		<name>da - dansk</name>
 		<key>da</key>
 	</translation>
 	<translation>
-		<name>Deutsch</name>
+		<name>de - Deutsch</name>
 		<key>de</key>
 	</translation>
 	<translation>
-		<name>español</name>
+		<name>es - español</name>
 		<key>es</key>
 	</translation>
 	<translation>
-		<name>français</name>
+		<name>fr - français</name>
 		<key>fr</key>
 	</translation>
 	<translation>
-		<name>galego</name>
+		<name>gl - galego</name>
 		<key>gl</key>
 	</translation>
 	<translation>
-		<name>hrvatski</name>
+		<name>hr - hrvatski</name>
 		<key>hr</key>
 	</translation>
 	<translation>
-		<name>magyar</name>
+		<name>hu - magyar</name>
 		<key>hu</key>
 	</translation>
 	<translation>
-		<name>italiano</name>
+		<name>it - italiano</name>
 		<key>it</key>
 	</translation>
 	<translation>
-		<name>日本語</name>
+		<name>ja - 日本語</name>
 		<key>ja</key>
 	</translation>
 	<translation>
-		<name>Nederlands</name>
+		<name>nl - Nederlands</name>
 		<key>nl</key>
 	</translation>
 	<translation>
-		<name>norsk</name>
+		<name>no - norsk</name>
 		<key>no</key>
 	</translation>
 	<translation>
-		<name>polski</name>
+		<name>pl - polski</name>
 		<key>pl</key>
 	</translation>
 	<translation>
-		<name>português</name>
+		<name>pt - ptportuguês</name>
 		<key>pt</key>
 	</translation>
 	<translation>
-		<name>sinhala</name>
+		<name>si_LK - sinhala</name>
 		<key>si_LK</key>
 	</translation>
 	<translation>
-		<name>svenska</name>
+		<name>sv - svenska</name>
 		<key>sv</key>
 	</translation>
 	<translation>
-		<name>українська</name>
+		<name>uk - українська</name>
 		<key>uk</key>
 	</translation>
 	<translation>
-		<name>中文 (中国)</name>
+		<name>zh_CN - 中文 (中国)</name>
 		<key>zh_CN</key>
 	</translation>
 	<translation>
-		<name>中文 (台灣)</name>
+		<name>zh_TW - 中文 (台灣)</name>
 		<key>zh_TW</key>
 	</translation>
 </translations>

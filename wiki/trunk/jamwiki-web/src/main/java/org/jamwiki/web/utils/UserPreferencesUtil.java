@@ -20,6 +20,7 @@ package org.jamwiki.web.utils;
 import java.util.Locale;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.TreeMap;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.WikiBase;
 import org.jamwiki.WikiConfiguration;
@@ -30,24 +31,21 @@ import org.jamwiki.utils.WikiLogger;
 public class UserPreferencesUtil {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(UserPreferencesUtil.class.getName());
-	private WikiUser user = null;
-	private static LinkedHashMap<String, Map<String, String>> defaults = null;
-	private static LinkedHashMap<String, Map<String, UserPreferenceItem>> groups = null;
-
+	private final WikiUser user;
+	/** List of default preferences organized by group. */
+	private Map<String, Map<String, String>> defaults;
 	// This is a workaround. It should be possible to get the signature preview directly
 	// from a method...
 	public static String signaturePreview = null;
 
 	/**
+	 * Initialize an instance of this utility class for a given user.
 	 *
+	 * @param user The user whose preferences will be retrieved, or
+	 *  <code>null</code> if default preferences should be retrieved.
 	 */
 	public UserPreferencesUtil(WikiUser user) {
 		this.user = user;
-		try {
-			defaults = (LinkedHashMap<String, Map<String, String>>)WikiBase.getDataHandler().getUserPreferencesDefaults();
-		} catch(DataAccessException e) {
-			logger.error(e.toString());
-		}
 	}
 
 	/**
@@ -56,7 +54,7 @@ public class UserPreferencesUtil {
 	 * @return
 	 */
 	public UserPreferenceItem getPreference(String preferenceKey) {
-		LinkedHashMap<String, Map<String, UserPreferenceItem>> map = (LinkedHashMap<String, Map<String, UserPreferenceItem>>)getGroups();
+		Map<String, Map<String, UserPreferenceItem>> map = this.getGroups();
 		for (String group : map.keySet()) {
 			for (String key : map.get(group).keySet()) {
 				if (preferenceKey.equals(key)) {
@@ -75,28 +73,62 @@ public class UserPreferencesUtil {
 	 * @return
 	 */
 	public Map<String, Map<String, UserPreferenceItem>> getGroups() {
-		if (defaults == null) {
-			try {
-				defaults = (LinkedHashMap<String, Map<String, String>>)WikiBase.getDataHandler().getUserPreferencesDefaults();
-			} catch(DataAccessException e) {
-				logger.error(e.toString());
-			}
-		}
-		if (groups == null) {
-			groups = new LinkedHashMap<String, Map<String, UserPreferenceItem>>();
-		}
+		Map<String, Map<String, UserPreferenceItem>> groups = new LinkedHashMap<String, Map<String, UserPreferenceItem>>();
 		String lastKey = null;
 		LinkedHashMap<String, UserPreferenceItem> items = null;
-		for (String group : defaults.keySet()) {
+		for (String group : this.getDefaults().keySet()) {
 			if (lastKey == null || !lastKey.equals(group)) {
 				items = new LinkedHashMap<String, UserPreferenceItem>();
 			}
-			for (String item : defaults.get(group).keySet()) {
+			for (String item : this.getDefaults().get(group).keySet()) {
 				items.put(item, new UserPreferenceItem(item));
 			}
 			groups.put(group, items);
 		}
 		return groups;
+	}
+
+	/**
+	 * Return a map of locale ID-name for all locales available for user selection.
+	 */
+	public Map<String, String> getAvailableLocales() {
+		Map<String, String> locales = new TreeMap<String, String>();
+		// first get any locales with explicit JAMWiki configuration
+		locales.putAll(WikiConfiguration.getInstance().getTranslations());
+		// now get the system locales
+		Locale[] localeArray = Locale.getAvailableLocales();
+		for (Locale locale : Locale.getAvailableLocales()) {
+			String key = locale.toString();
+			String value = key + " - " + locale.getDisplayName(locale);
+			locales.put(key, value);
+		}
+		return locales;
+	}
+
+	/**
+	 * Return the ID for the default locale.
+	 */
+	public String getDefaultLocale() {
+		Map<String, String> groupMap = this.getDefaults().get(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION);
+		String localeString = null;
+		if (groupMap != null) {
+			localeString = groupMap.get(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
+		}
+		return (localeString != null) ? localeString : Locale.getDefault().getLanguage();
+	}
+
+	/**
+	 * Return a list of default preferences organized by group.
+	 */
+	private Map<String, Map<String, String>> getDefaults() {
+		if (this.defaults == null) {
+			try {
+				this.defaults = (Map<String, Map<String, String>>) WikiBase.getDataHandler().getUserPreferencesDefaults();
+			} catch (DataAccessException e) {
+				throw new IllegalStateException("Failure while retrieving default user preferences", e);
+			}
+		}
+		return this.defaults;
 	}
 
 	/**
@@ -151,14 +183,7 @@ public class UserPreferencesUtil {
 			if (prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
 				return DateUtil.getTimeZoneMap();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
-				LinkedHashMap<String, String> locales = new LinkedHashMap<String, String>();
-				Locale[] localeArray = Locale.getAvailableLocales();
-				for (int i = 0; i < localeArray.length; i++) {
-					String key = localeArray[i].toString();
-					String value = key + " - " + localeArray[i].getDisplayName(localeArray[i]);
-					locales.put(key, value);
-				}
-				return locales;
+				return getAvailableLocales();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {
 				return WikiConfiguration.getInstance().getEditors();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATE_FORMAT)) {

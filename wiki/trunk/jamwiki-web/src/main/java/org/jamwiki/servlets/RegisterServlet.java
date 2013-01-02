@@ -80,14 +80,14 @@ public class RegisterServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void loadDefaults(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo, WikiUser user) throws Exception {
-		if (StringUtils.isBlank(user.getDefaultLocale()) && request.getLocale() != null) {
-			user.setDefaultLocale(request.getLocale().toString());
+		UserPreferencesUtil userPreferences = new UserPreferencesUtil(user);
+		if (StringUtils.isBlank(user.getDefaultLocale())) {
+			user.setDefaultLocale(userPreferences.getDefaultLocale());
 		}
 		next.addObject("newuser", user);
 		// Note: adding the signature preview this way is a workaround. Better would be
 		// if the preview can be generated in UserPreferencesUtil inner class
 		// UserPreferenceItem directly...
-		UserPreferencesUtil userPreferences = new UserPreferencesUtil(user);
 		userPreferences.setSignaturePreview(this.signaturePreview(request, pageInfo, user));
 		next.addObject("userPreferences", userPreferences);
 		next.addObject("recaptchaEnabled", ReCaptchaUtil.isRegistrationEnabled());
