@@ -2935,17 +2935,18 @@ public class AnsiDataHandler {
 	 * @throws WikiException Thrown if the parameter information is invalid.
 	 */
 	public void writeUserPreferenceDefault(String userPreferenceKey, String userPreferenceDefaultValue, String userPreferenceGroupKey, int sequenceNr) throws DataAccessException {
+		Connection conn = null;
 		try {
-			Connection conn = DatabaseConnection.getConnection();
+			conn = DatabaseConnection.getConnection();
 			if (this.queryHandler().existsUserPreferenceDefault(userPreferenceKey)) {
 				this.queryHandler().updateUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
-			}
-			else {
+			} else {
 				this.queryHandler().insertUserPreferenceDefault(userPreferenceKey, userPreferenceDefaultValue, userPreferenceGroupKey, sequenceNr, conn);
 			}
-
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
 		}
 	}
 
