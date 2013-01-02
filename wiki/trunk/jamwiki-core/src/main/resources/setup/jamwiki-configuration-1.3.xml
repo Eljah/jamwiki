@@ -273,7 +273,8 @@
    Date and time formats that users can select from user preferences
    for viewing dates/times.  At least one value must be specified for
    each type, and formats much be valid java.text.SimpleDateFormat
-   formats.
+   formats.  The first value specified will be the default for the
+   site until it is changed using the Special:Admin tools.
 
    ======================================================================
 -->

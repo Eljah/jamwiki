@@ -89,6 +89,13 @@ public class UserPreferencesUtil {
 	}
 
 	/**
+	 * Return a map of date pattern-name for all date formats available for user selection.
+	 */
+	public Map<String, String> getAvailableDateFormats() {
+		return DateUtil.getDateFormats(user);
+	}
+
+	/**
 	 * Return a map of locale ID-name for all locales available for user selection.
 	 */
 	public Map<String, String> getAvailableLocales() {
@@ -106,6 +113,13 @@ public class UserPreferencesUtil {
 	}
 
 	/**
+	 * Return a map of time pattern-name for all time formats available for user selection.
+	 */
+	public Map<String, String> getAvailableTimeFormats() {
+		return DateUtil.getTimeFormats(user);
+	}
+
+	/**
 	 * Return a map of time zone ID-name for all time zones available for user selection.
 	 */
 	public Map<String, String> getAvailableTimeZones() {
@@ -113,26 +127,43 @@ public class UserPreferencesUtil {
 	}
 
 	/**
+	 * Return the default date format pattern
+	 */
+	public String getDefaultDatePattern() {
+		String pattern = this.retrieveDefaultValue(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, WikiUser.USER_PREFERENCE_DATE_FORMAT);
+		return (pattern != null) ? pattern : WikiConfiguration.getInstance().getDateFormats().get(0);
+	}
+
+	/**
 	 * Return the ID for the default locale.
 	 */
 	public String getDefaultLocale() {
-		Map<String, String> groupMap = this.getDefaults().get(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION);
-		String localeString = null;
-		if (groupMap != null) {
-			localeString = groupMap.get(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
-		}
+		String localeString = this.retrieveDefaultValue(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		return DateUtil.stringToLocale(localeString).toString();
 	}
+
+	/**
+	 * Return the default time format pattern
+	 */
+	public String getDefaultTimePattern() {
+		String pattern = this.retrieveDefaultValue(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, WikiUser.USER_PREFERENCE_TIME_FORMAT);
+		return (pattern != null) ? pattern : WikiConfiguration.getInstance().getTimeFormats().get(0);
+	}
+
 	/**
 	 * Return the ID for the default time zone.
 	 */
 	public String getDefaultTimeZone() {
-		Map<String, String> groupMap = this.getDefaults().get(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION);
-		String timeZoneString = null;
-		if (groupMap != null) {
-			timeZoneString = groupMap.get(WikiUser.USER_PREFERENCE_TIMEZONE);
-		}
+		String timeZoneString = this.retrieveDefaultValue(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, WikiUser.USER_PREFERENCE_TIMEZONE);
 		return DateUtil.stringToTimeZone(timeZoneString).getID();
+	}
+
+	/**
+	 * Retrieve a default value given its group and preference key.
+	 */
+	private String retrieveDefaultValue(String groupKey, String preferenceKey) {
+		Map<String, String> groupMap = this.getDefaults().get(groupKey);
+		return (groupMap != null) ? groupMap.get(preferenceKey) : null;
 	}
 
 	/**
@@ -205,9 +236,9 @@ public class UserPreferencesUtil {
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {
 				return WikiConfiguration.getInstance().getEditors();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DATE_FORMAT)) {
-				return DateUtil.getDateFormats(user);
+				return getAvailableDateFormats();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_TIME_FORMAT)) {
-				return DateUtil.getTimeFormats(user);
+				return getAvailableTimeFormats();
 			}
 			return null;
 		}

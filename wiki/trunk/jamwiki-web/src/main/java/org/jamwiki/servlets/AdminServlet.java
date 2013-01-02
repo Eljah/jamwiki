@@ -275,8 +275,6 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_BASE_SEARCH_ENGINE);
 				setProperty(props, request, Environment.PROP_TOPIC_EDITOR);
 				setNumericProperty(props, request, Environment.PROP_MAX_TOPIC_VERSION_EXPORT, pageInfo.getErrors());
-				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_DATE_ONLY, pageInfo.getErrors());
-				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_TIME_ONLY, pageInfo.getErrors());
 			} else if (section.equals("parser")) {
 				setProperty(props, request, Environment.PROP_PARSER_CLASS);
 				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_HTML);

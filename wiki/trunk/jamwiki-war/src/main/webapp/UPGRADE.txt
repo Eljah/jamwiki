@@ -89,6 +89,8 @@ followed by 1.0.1.
     instructions on manually updating this topic with the new styles.
   * The jamwiki-configuration.xml file has been renamed to
     jamwiki-configuration-1.3.xml.  See below for further details.
+  * Default date and time patterns have changed and may need to be updated
+    using the Special:Admin tools once the upgrade is complete.
 
   UPGRADE STEPS:
 

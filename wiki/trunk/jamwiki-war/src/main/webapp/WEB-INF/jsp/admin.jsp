@@ -182,15 +182,27 @@
 	<div class="formhelp"><fmt:message key="admin.help.maxversionexport" /></div>
 </div>
 <div class="row">
-	<label for="<%= Environment.PROP_DATE_PATTERN_DATE_ONLY %>"><fmt:message key="admin.caption.date.dateonly" /></label>
-	<c:set var="PROP_DATE_PATTERN_DATE_ONLY"><%= Environment.PROP_DATE_PATTERN_DATE_ONLY %></c:set>
-	<span><jamwiki:text name="${PROP_DATE_PATTERN_DATE_ONLY}" size="30" value="${props[PROP_DATE_PATTERN_DATE_ONLY]}" id="${PROP_DATE_PATTERN_DATE_ONLY}" /></span>
+	<c:set var="USER_PREFERENCE_DATE_FORMAT"><%= WikiUser.USER_PREFERENCE_DATE_FORMAT %></c:set>
+	<label for="${USER_PREFERENCE_DATE_FORMAT}"><fmt:message key="admin.caption.date.dateonly" /></label>
+	<span>
+		<select name="${USER_PREFERENCE_DATE_FORMAT}" id="${USER_PREFERENCE_DATE_FORMAT}">
+		<c:forEach items="${userPreferences.availableDateFormats}" var="availableDateFormat">
+			<option value="<c:out value="${availableDateFormat.key}" />"<c:if test="${userPreferences.defaultDatePattern == availableDateFormat.key}"> selected="selected"</c:if>><c:out value="${availableDateFormat.value}" /></option>
+		</c:forEach>
+		</select>
+	</span>
 	<div class="formhelp"><fmt:message key="admin.help.date.dateonly" /> <fmt:message key="admin.help.date.common" /></div>
 </div>
 <div class="row">
-	<label for="<%= Environment.PROP_DATE_PATTERN_TIME_ONLY %>"><fmt:message key="admin.caption.date.timeonly" /></label>
-	<c:set var="PROP_DATE_PATTERN_TIME_ONLY"><%= Environment.PROP_DATE_PATTERN_TIME_ONLY %></c:set>
-	<span><jamwiki:text name="${PROP_DATE_PATTERN_TIME_ONLY}" size="30" value="${props[PROP_DATE_PATTERN_TIME_ONLY]}" id="${PROP_DATE_PATTERN_TIME_ONLY}" /></span>
+	<c:set var="USER_PREFERENCE_TIME_FORMAT"><%= WikiUser.USER_PREFERENCE_TIME_FORMAT %></c:set>
+	<label for="${USER_PREFERENCE_TIME_FORMAT}"><fmt:message key="admin.caption.date.timeonly" /></label>
+	<span>
+		<select name="${USER_PREFERENCE_TIME_FORMAT}" id="${USER_PREFERENCE_TIME_FORMAT}">
+		<c:forEach items="${userPreferences.availableTimeFormats}" var="availableTimeFormat">
+			<option value="<c:out value="${availableTimeFormat.key}" />"<c:if test="${userPreferences.defaultTimePattern == availableTimeFormat.key}"> selected="selected"</c:if>><c:out value="${availableTimeFormat.value}" /></option>
+		</c:forEach>
+		</select>
+	</span>
 	<div class="formhelp"><fmt:message key="admin.help.date.timeonly" /> <fmt:message key="admin.help.date.common" /></div>
 </div>
 </fieldset>

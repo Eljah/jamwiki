@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
 import org.jamwiki.WikiBase;
+import org.jamwiki.WikiConfiguration;
 import org.jamwiki.WikiException;
 import org.jamwiki.WikiMessage;
 import org.jamwiki.model.Interwiki;
@@ -820,10 +821,10 @@ public class WikiDatabase {
 	 */
 	// TODO - make this method private once the ability to upgrade to 1.3.0 has been removed.
 	protected static void setupUserPreferencesDefaults() throws DataAccessException, WikiException {
-		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().getLanguage(), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 1);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, Locale.getDefault().toString(), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 1);
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIMEZONE, TimeZone.getDefault().getID(), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 2);
-		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATE_FORMAT, "d MMMM yyyy", WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 3);
-		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIME_FORMAT, "HH:mm", WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 4);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_DATE_FORMAT, WikiConfiguration.getInstance().getDateFormats().get(0), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 3);
+		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_TIME_FORMAT, WikiConfiguration.getInstance().getTimeFormats().get(0), WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 4);
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, "toolbar", WikiUser.USER_PREFERENCES_GROUP_EDITING, 1);
 		WikiBase.getDataHandler().writeUserPreferenceDefault(WikiUser.USER_PREFERENCE_SIGNATURE, null, WikiUser.USER_PREFERENCES_GROUP_EDITING, 2);
 	}

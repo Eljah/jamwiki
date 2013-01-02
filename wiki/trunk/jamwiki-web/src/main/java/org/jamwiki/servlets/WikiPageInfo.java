@@ -196,7 +196,7 @@ public class WikiPageInfo {
 		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT) != null) {
 			return user.getPreference(WikiUser.USER_PREFERENCE_DATE_FORMAT);
 		}
-		String pattern = Environment.getValue(Environment.PROP_DATE_PATTERN_DATE_ONLY);
+		String pattern = this.userPreferencesUtil.getDefaultDatePattern();
 		int style = DateUtil.stringToDateFormatStyle(pattern);
 		if (style != -1) {
 			pattern = ((SimpleDateFormat)SimpleDateFormat.getDateInstance(style)).toPattern();
@@ -215,7 +215,7 @@ public class WikiPageInfo {
 		if (this.user != null && user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT) != null) {
 			return user.getPreference(WikiUser.USER_PREFERENCE_TIME_FORMAT);
 		}
-		String pattern = Environment.getValue(Environment.PROP_DATE_PATTERN_TIME_ONLY);
+		String pattern = this.userPreferencesUtil.getDefaultTimePattern();
 		int style = DateUtil.stringToDateFormatStyle(pattern);
 		if (style != -1) {
 			pattern = ((SimpleDateFormat)SimpleDateFormat.getTimeInstance(style)).toPattern();
