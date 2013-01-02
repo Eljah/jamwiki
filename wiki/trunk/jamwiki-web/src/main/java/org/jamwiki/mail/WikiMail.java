@@ -26,6 +26,8 @@ import java.util.*;
  * smtp-authentication    : Indicates if the SMTP server requires authentication. If set to true then
  *                          the values of smtp-username and smtp-userpass must be set as well. If set
  *                          to false those properties are ignored.
+ * smtp-use-ssl           : Indicates that the SMTP server requires SSL. A well known server using SSL
+ *                          is gmail.com.
  * smtp-reply-to          : The FROM address of the mail.  
  * smtp-host              : The host name of the SMTP server.
  * smtp-content-type      : text/plain or text/html (default at installation: text/plain).
