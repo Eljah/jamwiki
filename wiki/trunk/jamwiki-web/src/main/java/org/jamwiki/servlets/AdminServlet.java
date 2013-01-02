@@ -335,6 +335,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 				setProperty(props, request, Environment.PROP_EMAIL_SMTP_USERNAME);
 				setPassword(props, request, next, Environment.PROP_EMAIL_SMTP_PASSWORD, "smtpPassword");
+				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_USE_SSL);
 				setProperty(props, request, Environment.PROP_EMAIL_REPLY_ADDRESS);
 				setProperty(props, request, Environment.PROP_EMAIL_SMTP_HOST);
 				setNumericProperty(props, request, Environment.PROP_EMAIL_SMTP_PORT, pageInfo.getErrors());

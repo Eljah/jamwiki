@@ -69,6 +69,7 @@ public class Environment {
 	public static final String PROP_EMAIL_SMTP_REQUIRES_AUTH = "smtp-authentication";
 	public static final String PROP_EMAIL_SMTP_USERNAME = "smtp-username";
 	public static final String PROP_EMAIL_SMTP_PASSWORD = "smtp-userpass";
+	public static final String PROP_EMAIL_SMTP_USE_SSL = "smtp-use-ssl";
 	public static final String PROP_EMAIL_REPLY_ADDRESS = "smtp-reply-to";
 	public static final String PROP_EMAIL_SMTP_HOST = "smtp-host";
 	public static final String PROP_EMAIL_SMTP_PORT = "smtp-port";
@@ -242,6 +243,7 @@ public class Environment {
 		this.defaults.setProperty(PROP_EMAIL_SMTP_REQUIRES_AUTH,Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_EMAIL_SMTP_USERNAME,"");
 		this.defaults.setProperty(PROP_EMAIL_SMTP_PASSWORD,"");
+		this.defaults.setProperty(PROP_EMAIL_SMTP_USE_SSL, Boolean.FALSE.toString());
 		this.defaults.setProperty(PROP_EMAIL_REPLY_ADDRESS,"");
 		this.defaults.setProperty(PROP_EMAIL_SMTP_HOST,"");
 		this.defaults.setProperty(PROP_EMAIL_SMTP_PORT,"25");

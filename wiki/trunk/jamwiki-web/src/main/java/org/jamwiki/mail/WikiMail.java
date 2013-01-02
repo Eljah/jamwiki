@@ -56,6 +56,7 @@ public class WikiMail
 	private String  replyTo        = null;
 	private String  user           = null;
 	private String  pass           = null;
+	private boolean useSSL         = false;
 	private String  separator      = null;
 	private String  defContentType = null;
 	
@@ -78,8 +79,10 @@ public class WikiMail
 		this.replyTo        = props.getProperty(Environment.PROP_EMAIL_REPLY_ADDRESS);
 		this.user           = props.getProperty(Environment.PROP_EMAIL_SMTP_USERNAME);
 		this.pass           = Encryption.getEncryptedProperty(Environment.PROP_EMAIL_SMTP_PASSWORD, props);
+		this.useSSL         = "true".equals(props.getProperty(Environment.PROP_EMAIL_SMTP_USE_SSL));
 		this.separator      = props.getProperty(Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
 		this.defContentType = props.getProperty(Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
+		this.useSSL         = "true".equals(props.getProperty(Environment.PROP_EMAIL_SMTP_USE_SSL));
 	}
 	
 	public String toString() {
@@ -266,7 +269,12 @@ public class WikiMail
 	        {
 		        props.put("mail.smtp.auth","false");
 	        }
-
+	        
+	        if (this.useSSL) {
+		        props.put("mail.smtp.socketFactory.port", this.port);
+		        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+	        }
+	        
 	        Authenticator auth = new SMTPAuthenticator(this.user,this.pass);
 	        Session session = Session.getInstance(props,auth);
 

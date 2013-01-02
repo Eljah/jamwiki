@@ -370,6 +370,11 @@
 				<span><jamwiki:checkbox name="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" value="true" checked="${props[PROP_EMAIL_SMTP_REQUIRES_AUTH]}" id="${PROP_EMAIL_SMTP_REQUIRES_AUTH}" /></span>
 			</div>
 			<div class="row">
+				<label for="<%= Environment.PROP_EMAIL_SMTP_USE_SSL %>"><fmt:message key="admin.smtp.caption.use.ssl" /></label>
+				<c:set var="PROP_EMAIL_SMTP_USE_SSL"><%= Environment.PROP_EMAIL_SMTP_USE_SSL %></c:set>
+				<span><jamwiki:checkbox name="${PROP_EMAIL_SMTP_USE_SSL}" value="true" checked="${props[PROP_EMAIL_SMTP_USE_SSL]}" id="${PROP_EMAIL_SMTP_USE_SSL}" /></span>
+			</div>
+			<div class="row">
 				<label for="<%= Environment.PROP_EMAIL_SMTP_HOST %>"><fmt:message key="admin.smtp.caption.host" /></label>
 				<c:set var="PROP_EMAIL_SMTP_HOST"><%= Environment.PROP_EMAIL_SMTP_HOST %></c:set>
 				<span><jamwiki:text name="${PROP_EMAIL_SMTP_HOST}" value="${props[PROP_EMAIL_SMTP_HOST]}" size="30" id="${PROP_EMAIL_SMTP_HOST}" /></span>
