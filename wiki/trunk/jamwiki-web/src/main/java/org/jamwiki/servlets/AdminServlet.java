@@ -44,6 +44,7 @@ import org.jamwiki.utils.SpamFilter;
 import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
+import org.jamwiki.web.utils.UserPreferencesUtil;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -261,7 +262,7 @@ public class AdminServlet extends JAMWikiServlet {
 		Properties props = Environment.getInstance();
 		String section = request.getParameter("section");
 		try {
-			if(section.equals("general")) {
+			if (section.equals("general")) {
 				setProperty(props, request, Environment.PROP_BASE_FILE_DIR);
 				setProperty(props, request, Environment.PROP_SERVER_URL);
 				setProperty(props, request, Environment.PROP_SITE_NAME);
@@ -276,8 +277,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setNumericProperty(props, request, Environment.PROP_MAX_TOPIC_VERSION_EXPORT, pageInfo.getErrors());
 				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_DATE_ONLY, pageInfo.getErrors());
 				setDatePatternProperty(props, request, Environment.PROP_DATE_PATTERN_TIME_ONLY, pageInfo.getErrors());
-			}
-			else if (section.equals("parser")) {
+			} else if (section.equals("parser")) {
 				setProperty(props, request, Environment.PROP_PARSER_CLASS);
 				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_HTML);
 				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_JAVASCRIPT);
@@ -294,8 +294,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setNumericProperty(props, request, Environment.PROP_IMAGE_RESIZE_INCREMENT, pageInfo.getErrors());
 				setProperty(props, request, Environment.PROP_PARSER_SIGNATURE_USER_PATTERN);
 				setDatePatternProperty(props, request, Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, pageInfo.getErrors());
-			}
-			else if (section.equals("database")) {
+			} else if (section.equals("database")) {
 				setProperty(props, request, Environment.PROP_BASE_PERSISTENCE_TYPE);
 				if (props.getProperty(Environment.PROP_BASE_PERSISTENCE_TYPE).equals(WikiBase.PERSISTENCE_EXTERNAL)) {
 					setProperty(props, request, Environment.PROP_DB_DRIVER);
@@ -317,8 +316,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setNumericProperty(props, request, Environment.PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, pageInfo.getErrors());
 				setNumericProperty(props, request, Environment.PROP_DBCP_NUM_TESTS_PER_EVICTION_RUN, pageInfo.getErrors());
 				setProperty(props, request, Environment.PROP_DBCP_WHEN_EXHAUSTED_ACTION);
-			}
-			else if (section.equals("upload")) {
+			} else if (section.equals("upload")) {
 				setProperty(props, request, Environment.PROP_FILE_UPLOAD_STORAGE);
 				String maxFileSizeString = request.getParameter(Environment.PROP_FILE_MAX_FILE_SIZE);
 				if (StringUtils.isBlank(maxFileSizeString) || !StringUtils.isNumeric(maxFileSizeString)) {
@@ -334,8 +332,7 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_FILE_BLACKLIST_TYPE);
 				setProperty(props, request, Environment.PROP_FILE_BLACKLIST);
 				setProperty(props, request, Environment.PROP_FILE_WHITELIST);
-			}
-			else if (section.equals("email")) {
+			} else if (section.equals("email")) {
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_ENABLE);
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 				setProperty(props, request, Environment.PROP_EMAIL_SMTP_USERNAME);
@@ -369,8 +366,7 @@ public class AdminServlet extends JAMWikiServlet {
 						pageInfo.addError(new WikiMessage("admin.smtp.error.couldnotsend", mailAddress, e.getMessage()));
 					}
 				}
-			}
-			else if (section.equals("spam")) {
+			} else if (section.equals("spam")) {
 				setBooleanProperty(props, request, Environment.PROP_TOPIC_SPAM_FILTER);
 				setNumericProperty(props, request, Environment.PROP_RECAPTCHA_EDIT, pageInfo.getErrors());
 				setNumericProperty(props, request, Environment.PROP_RECAPTCHA_REGISTER, pageInfo.getErrors());
@@ -386,12 +382,14 @@ public class AdminServlet extends JAMWikiServlet {
 				if (Boolean.parseBoolean(props.getProperty(Environment.PROP_HONEYPOT_FILTER_ENABLED)) && StringUtils.isBlank(props.getProperty(Environment.PROP_HONEYPOT_ACCESS_KEY))) {
 					pageInfo.addError(new WikiMessage("admin.spam.message.invalidhoneypotkey"));
 				}
-			}
-			else if (section.equals("other")) {
+			} else if (section.equals("other")) {
 				setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
 				setProperty(props, request, Environment.PROP_RSS_TITLE);
 			}
 			pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(props));
+			if (pageInfo.getErrors().isEmpty()) {
+				this.saveUserPreferenceDefaults(request, pageInfo);
+			}
 			if (this.saveProperties(request, next, pageInfo, props)) {
 				pageInfo.addMessage(new WikiMessage("admin.message.changessaved"));
 			}
@@ -452,6 +450,25 @@ public class AdminServlet extends JAMWikiServlet {
 		WikiUser user = ServletUtil.currentWikiUser();
 		WikiBase.reset(request.getLocale(), user, user.getUsername(), null);
 		return true;
+	}
+
+	/**
+	 * Default user preferences are stored in the database rather than a
+	 * properties file and must be handled differently.  Only call this method
+	 * when preferences should actually be processed and saved.
+	 */
+	private static void saveUserPreferenceDefaults(HttpServletRequest request, WikiPageInfo pageInfo) {
+		try {
+			setUserPreferenceDefault(request, WikiUser.USER_PREFERENCE_DEFAULT_LOCALE, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 1);
+			setUserPreferenceDefault(request, WikiUser.USER_PREFERENCE_TIMEZONE, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 2);
+			setUserPreferenceDefault(request, WikiUser.USER_PREFERENCE_DATE_FORMAT, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 3);
+			setUserPreferenceDefault(request, WikiUser.USER_PREFERENCE_TIME_FORMAT, WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION, 4);
+			setUserPreferenceDefault(request, WikiUser.USER_PREFERENCE_PREFERRED_EDITOR, WikiUser.USER_PREFERENCES_GROUP_EDITING, 1);
+			setUserPreferenceDefault(request, WikiUser.USER_PREFERENCE_SIGNATURE, WikiUser.USER_PREFERENCES_GROUP_EDITING, 2);
+		} catch (DataAccessException e) {
+			logger.error("Failure while updating default user preferences", e);
+			pageInfo.addError(new WikiMessage("error.unknown", e.getMessage()));
+		}
 	}
 
 	/**
@@ -516,6 +533,16 @@ public class AdminServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
+	private static void setUserPreferenceDefault(HttpServletRequest request, String parameter, String group, int sequence) throws DataAccessException {
+		String value = request.getParameter(parameter);
+		if (!StringUtils.isBlank(value)) {
+			WikiBase.getDataHandler().writeUserPreferenceDefault(parameter, value, group, sequence);
+		}
+	}
+
+	/**
+	 *
+	 */
 	private void spam(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		try {
 			SpamFilter.reload();
@@ -534,6 +561,8 @@ public class AdminServlet extends JAMWikiServlet {
 		pageInfo.setContentJsp(JSP_ADMIN);
 		pageInfo.setAdmin(true);
 		pageInfo.setPageTitle(new WikiMessage("admin.title"));
+		UserPreferencesUtil userPreferences = new UserPreferencesUtil(null);
+		next.addObject("userPreferences", userPreferences);
 		Map<String, String> editors = WikiConfiguration.getInstance().getEditors();
 		next.addObject("editors", editors);
 		List<WikiConfigurationObject> queryHandlers = WikiConfiguration.getInstance().getQueryHandlers();

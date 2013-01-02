@@ -106,6 +106,13 @@ public class UserPreferencesUtil {
 	}
 
 	/**
+	 * Return a map of time zone ID-name for all time zones available for user selection.
+	 */
+	public Map<String, String> getAvailableTimeZones() {
+		return DateUtil.getTimeZoneMap();
+	}
+
+	/**
 	 * Return the ID for the default locale.
 	 */
 	public String getDefaultLocale() {
@@ -114,7 +121,18 @@ public class UserPreferencesUtil {
 		if (groupMap != null) {
 			localeString = groupMap.get(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
 		}
-		return (localeString != null) ? localeString : Locale.getDefault().getLanguage();
+		return DateUtil.stringToLocale(localeString).toString();
+	}
+	/**
+	 * Return the ID for the default time zone.
+	 */
+	public String getDefaultTimeZone() {
+		Map<String, String> groupMap = this.getDefaults().get(WikiUser.USER_PREFERENCES_GROUP_INTERNATIONALIZATION);
+		String timeZoneString = null;
+		if (groupMap != null) {
+			timeZoneString = groupMap.get(WikiUser.USER_PREFERENCE_TIMEZONE);
+		}
+		return DateUtil.stringToTimeZone(timeZoneString).getID();
 	}
 
 	/**
@@ -181,7 +199,7 @@ public class UserPreferencesUtil {
 		 */
 		public Map getMap() {
 			if (prefName.equals(WikiUser.USER_PREFERENCE_TIMEZONE)) {
-				return DateUtil.getTimeZoneMap();
+				return getAvailableTimeZones();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE)) {
 				return getAvailableLocales();
 			} else if (prefName.equals(WikiUser.USER_PREFERENCE_PREFERRED_EDITOR)) {

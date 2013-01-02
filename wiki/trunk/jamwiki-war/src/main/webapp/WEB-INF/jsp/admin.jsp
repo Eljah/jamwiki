@@ -18,6 +18,7 @@
 --%>
 <%@ page import="
         org.jamwiki.Environment,
+        org.jamwiki.model.WikiUser,
         org.jamwiki.WikiBase
     "
     errorPage="/WEB-INF/jsp/error.jsp"
@@ -91,6 +92,30 @@
 	<c:set var="PROP_SITE_NAME"><%= Environment.PROP_SITE_NAME %></c:set>
 	<span><jamwiki:text name="${PROP_SITE_NAME}" value="${props[PROP_SITE_NAME]}" size="50" id="${PROP_SITE_NAME}" /></span>
 	<div class="formhelp"><fmt:message key="admin.help.sitename" /></div>
+</div>
+<div class="row">
+	<c:set var="USER_PREFERENCE_DEFAULT_LOCALE"><%= WikiUser.USER_PREFERENCE_DEFAULT_LOCALE %></c:set>
+	<label for="${USER_PREFERENCE_DEFAULT_LOCALE}"><fmt:message key="admin.caption.defaultlocale" /></label>
+	<span>
+		<select name="${USER_PREFERENCE_DEFAULT_LOCALE}" id="${USER_PREFERENCE_DEFAULT_LOCALE}">
+		<c:forEach items="${userPreferences.availableLocales}" var="availableLocale">
+			<option value="<c:out value="${availableLocale.key}" />"<c:if test="${userPreferences.defaultLocale == availableLocale.key}"> selected="selected"</c:if>><c:out value="${availableLocale.value}" /></option>
+		</c:forEach>
+		</select>
+	</span>
+	<div class="formhelp"><fmt:message key="admin.help.defaultlocale" /></div>
+</div>
+<div class="row">
+	<c:set var="USER_PREFERENCE_TIMEZONE"><%= WikiUser.USER_PREFERENCE_TIMEZONE %></c:set>
+	<label for="${USER_PREFERENCE_TIMEZONE}"><fmt:message key="admin.caption.defaulttimezone" /></label>
+	<span>
+		<select name="${USER_PREFERENCE_TIMEZONE}" id="${USER_PREFERENCE_TIMEZONE}">
+		<c:forEach items="${userPreferences.availableTimeZones}" var="availableTimeZone">
+			<option value="<c:out value="${availableTimeZone.key}" />"<c:if test="${userPreferences.defaultTimeZone == availableTimeZone.key}"> selected="selected"</c:if>><c:out value="${availableTimeZone.value}" /></option>
+		</c:forEach>
+		</select>
+	</span>
+	<div class="formhelp"><fmt:message key="admin.help.defaulttimezone" /></div>
 </div>
 <div class="row">
 	<label for="<%= Environment.PROP_BASE_LOGO_IMAGE %>"><fmt:message key="admin.caption.logoimage" /></label>
