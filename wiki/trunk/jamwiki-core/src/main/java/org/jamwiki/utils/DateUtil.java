@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -128,14 +129,7 @@ public class DateUtil {
 	 * the current date formatted using the pattern.
 	 */
 	public static Map<String, String> getDateFormats(WikiUser user) {
-		String timeZoneString = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
-		String localeString = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
-		Date now = new Date();
-		Map<String, String> formats = new LinkedHashMap<String, String>();
-		for (String format : WikiConfiguration.getInstance().getDateFormats()) {
-			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, DateFormatType.DATE_ONLY));
-		}
-		return formats;
+		return DateUtil.getDateTimeFormats(user, WikiConfiguration.getInstance().getDateFormats(), DateFormatType.DATE_ONLY);
 	}
 
 	/**
@@ -143,12 +137,23 @@ public class DateUtil {
 	 * the current time formatted using the pattern.
 	 */
 	public static Map<String, String> getTimeFormats(WikiUser user) {
-		String timeZoneString = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
-		String localeString = user.getPreference(WikiUser.USER_PREFERENCE_DEFAULT_LOCALE);
+		return DateUtil.getDateTimeFormats(user, WikiConfiguration.getInstance().getTimeFormats(), DateFormatType.TIME_ONLY);
+	}
+
+	/**
+	 *
+	 */
+	private static Map<String, String> getDateTimeFormats(WikiUser user, List<String> formatPatterns, DateFormatType dateFormatType) {
+		String timeZoneString = null;
+		String localeString = null;
+		if (user != null) {
+			timeZoneString = user.getPreference(WikiUser.USER_PREFERENCE_TIMEZONE);
+			localeString = user.getDefaultLocale();
+		}
 		Date now = new Date();
 		Map<String, String> formats = new LinkedHashMap<String, String>();
-		for (String format : WikiConfiguration.getInstance().getTimeFormats()) {
-			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, DateFormatType.TIME_ONLY));
+		for (String format : formatPatterns) {
+			formats.put(format, DateUtil.formatDate(now, format, localeString, timeZoneString, dateFormatType));
 		}
 		return formats;
 	}
