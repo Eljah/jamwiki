@@ -326,7 +326,7 @@
 	<label for="<%= Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN %>"><fmt:message key="admin.parser.caption.signaturedate" /></label>
 	<c:set var="PROP_PARSER_SIGNATURE_DATE_PATTERN"><%= Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN %></c:set>
 	<span><jamwiki:text name="${PROP_PARSER_SIGNATURE_DATE_PATTERN}" value="${props[PROP_PARSER_SIGNATURE_DATE_PATTERN]}" size="50" id="${PROP_PARSER_SIGNATURE_DATE_PATTERN}" /></span>
-	<div class="formhelp"><fmt:message key="admin.parser.help.signaturedate" /> <fmt:message key="admin.help.date.common" /></div>
+	<div class="formhelp"><fmt:message key="admin.parser.help.signaturedate" /></div>
 </div>
 </fieldset>
 <input type="hidden" name="function" value="properties" />
