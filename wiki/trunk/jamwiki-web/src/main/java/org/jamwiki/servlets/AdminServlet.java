@@ -260,78 +260,78 @@ public class AdminServlet extends JAMWikiServlet {
 	private void properties(HttpServletRequest request, ModelAndView next, WikiPageInfo pageInfo) throws Exception {
 		// Load current properties to avoid losing those that are outside of the specific section being modified
 		Properties props = Environment.getInstance();
-		String section = request.getParameter("section");
 		try {
-			if (section.equals("general")) {
-				setProperty(props, request, Environment.PROP_BASE_FILE_DIR);
-				setProperty(props, request, Environment.PROP_SERVER_URL);
-				setProperty(props, request, Environment.PROP_SITE_NAME);
-				setProperty(props, request, Environment.PROP_BASE_LOGO_IMAGE);
-				setProperty(props, request, Environment.PROP_BASE_DEFAULT_TOPIC);
-				setNumericProperty(props, request, Environment.PROP_RECENT_CHANGES_NUM, pageInfo.getErrors());
-				setBooleanProperty(props, request, Environment.PROP_TOPIC_USE_PREVIEW);
-				setBooleanProperty(props, request, Environment.PROP_TOPIC_USE_SHOW_CHANGES);
-				setProperty(props, request, Environment.PROP_BASE_META_DESCRIPTION);
-				setProperty(props, request, Environment.PROP_BASE_SEARCH_ENGINE);
-				setProperty(props, request, Environment.PROP_TOPIC_EDITOR);
-				setNumericProperty(props, request, Environment.PROP_MAX_TOPIC_VERSION_EXPORT, pageInfo.getErrors());
-			} else if (section.equals("parser")) {
-				setProperty(props, request, Environment.PROP_PARSER_CLASS);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_HTML);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_JAVASCRIPT);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_TEMPLATES);
-				setBooleanProperty(props, request, Environment.PROP_PRINT_NEW_WINDOW);
-				setBooleanProperty(props, request, Environment.PROP_EXTERNAL_LINK_NEW_WINDOW);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_USE_NUMBERED_HTML_LINKS);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_TOC);
-				setNumericProperty(props, request, Environment.PROP_PARSER_TOC_DEPTH, pageInfo.getErrors());
-				setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_CAPITALIZATION);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_DISPLAY_INTERWIKI_LINKS_INLINE);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_DISPLAY_VIRTUALWIKI_LINKS_INLINE);
-				setBooleanProperty(props, request, Environment.PROP_PARSER_DISPLAY_SPECIAL_PAGE_VIRTUAL_WIKI_LINKS);
-				setNumericProperty(props, request, Environment.PROP_IMAGE_RESIZE_INCREMENT, pageInfo.getErrors());
-				setProperty(props, request, Environment.PROP_PARSER_SIGNATURE_USER_PATTERN);
-				setDatePatternProperty(props, request, Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, pageInfo.getErrors());
-			} else if (section.equals("database")) {
-				setProperty(props, request, Environment.PROP_BASE_PERSISTENCE_TYPE);
-				if (props.getProperty(Environment.PROP_BASE_PERSISTENCE_TYPE).equals(WikiBase.PERSISTENCE_EXTERNAL)) {
-					setProperty(props, request, Environment.PROP_DB_DRIVER);
-					setProperty(props, request, Environment.PROP_DB_TYPE);
-					setProperty(props, request, Environment.PROP_DB_URL);
-					setProperty(props, request, Environment.PROP_DB_USERNAME);
-					setPassword(props, request, next, Environment.PROP_DB_PASSWORD, "dbPassword");
-				} else {
-					WikiDatabase.setupDefaultDatabase(props);
-				}
-				setNumericProperty(props, request, Environment.PROP_DBCP_MAX_ACTIVE, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_DBCP_MAX_IDLE, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_DBCP_MAX_OPEN_PREPARED_STATEMENTS, pageInfo.getErrors());
-				setBooleanProperty(props, request, Environment.PROP_DBCP_POOL_PREPARED_STATEMENTS);
-				setBooleanProperty(props, request, Environment.PROP_DBCP_TEST_ON_BORROW);
-				setBooleanProperty(props, request, Environment.PROP_DBCP_TEST_ON_RETURN);
-				setBooleanProperty(props, request, Environment.PROP_DBCP_TEST_WHILE_IDLE);
-				setNumericProperty(props, request, Environment.PROP_DBCP_MIN_EVICTABLE_IDLE_TIME, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_DBCP_NUM_TESTS_PER_EVICTION_RUN, pageInfo.getErrors());
-				setProperty(props, request, Environment.PROP_DBCP_WHEN_EXHAUSTED_ACTION);
-			} else if (section.equals("upload")) {
-				setProperty(props, request, Environment.PROP_FILE_UPLOAD_STORAGE);
-				String maxFileSizeString = request.getParameter(Environment.PROP_FILE_MAX_FILE_SIZE);
-				if (StringUtils.isBlank(maxFileSizeString) || !StringUtils.isNumeric(maxFileSizeString)) {
-					pageInfo.addError(new WikiMessage("admin.message.nonnumeric", Environment.PROP_FILE_MAX_FILE_SIZE, maxFileSizeString));
-				} else {
-					long maxFileSizeInKB = Long.parseLong(maxFileSizeString);
-					props.setProperty(Environment.PROP_FILE_MAX_FILE_SIZE, Long.toString(maxFileSizeInKB * 1000));
-				}
-				setProperty(props, request, Environment.PROP_FILE_DIR_FULL_PATH);
-				setProperty(props, request, Environment.PROP_FILE_DIR_RELATIVE_PATH);
-				setProperty(props, request, Environment.PROP_FILE_SERVER_URL);
-				setProperty(props, request, Environment.PROP_SHARED_UPLOAD_VIRTUAL_WIKI);
-				setProperty(props, request, Environment.PROP_FILE_BLACKLIST_TYPE);
-				setProperty(props, request, Environment.PROP_FILE_BLACKLIST);
-				setProperty(props, request, Environment.PROP_FILE_WHITELIST);
-			} else if (section.equals("email")) {
-				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_ENABLE);
+			// general
+			setProperty(props, request, Environment.PROP_BASE_FILE_DIR);
+			setProperty(props, request, Environment.PROP_SERVER_URL);
+			setProperty(props, request, Environment.PROP_SITE_NAME);
+			setProperty(props, request, Environment.PROP_BASE_LOGO_IMAGE);
+			setProperty(props, request, Environment.PROP_BASE_DEFAULT_TOPIC);
+			setNumericProperty(props, request, Environment.PROP_RECENT_CHANGES_NUM, pageInfo.getErrors());
+			setBooleanProperty(props, request, Environment.PROP_TOPIC_USE_PREVIEW);
+			setBooleanProperty(props, request, Environment.PROP_TOPIC_USE_SHOW_CHANGES);
+			setProperty(props, request, Environment.PROP_BASE_META_DESCRIPTION);
+			setProperty(props, request, Environment.PROP_BASE_SEARCH_ENGINE);
+			setProperty(props, request, Environment.PROP_TOPIC_EDITOR);
+			setNumericProperty(props, request, Environment.PROP_MAX_TOPIC_VERSION_EXPORT, pageInfo.getErrors());
+			// parser
+			setProperty(props, request, Environment.PROP_PARSER_CLASS);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_HTML);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_JAVASCRIPT);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_TEMPLATES);
+			setBooleanProperty(props, request, Environment.PROP_PRINT_NEW_WINDOW);
+			setBooleanProperty(props, request, Environment.PROP_EXTERNAL_LINK_NEW_WINDOW);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_USE_NUMBERED_HTML_LINKS);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_TOC);
+			setNumericProperty(props, request, Environment.PROP_PARSER_TOC_DEPTH, pageInfo.getErrors());
+			setBooleanProperty(props, request, Environment.PROP_PARSER_ALLOW_CAPITALIZATION);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_DISPLAY_INTERWIKI_LINKS_INLINE);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_DISPLAY_VIRTUALWIKI_LINKS_INLINE);
+			setBooleanProperty(props, request, Environment.PROP_PARSER_DISPLAY_SPECIAL_PAGE_VIRTUAL_WIKI_LINKS);
+			setNumericProperty(props, request, Environment.PROP_IMAGE_RESIZE_INCREMENT, pageInfo.getErrors());
+			setProperty(props, request, Environment.PROP_PARSER_SIGNATURE_USER_PATTERN);
+			setDatePatternProperty(props, request, Environment.PROP_PARSER_SIGNATURE_DATE_PATTERN, pageInfo.getErrors());
+			// database
+			setProperty(props, request, Environment.PROP_BASE_PERSISTENCE_TYPE);
+			if (props.getProperty(Environment.PROP_BASE_PERSISTENCE_TYPE).equals(WikiBase.PERSISTENCE_EXTERNAL)) {
+				setProperty(props, request, Environment.PROP_DB_DRIVER);
+				setProperty(props, request, Environment.PROP_DB_TYPE);
+				setProperty(props, request, Environment.PROP_DB_URL);
+				setProperty(props, request, Environment.PROP_DB_USERNAME);
+				setPassword(props, request, next, Environment.PROP_DB_PASSWORD, "dbPassword");
+			} else {
+				WikiDatabase.setupDefaultDatabase(props);
+			}
+			setNumericProperty(props, request, Environment.PROP_DBCP_MAX_ACTIVE, pageInfo.getErrors());
+			setNumericProperty(props, request, Environment.PROP_DBCP_MAX_IDLE, pageInfo.getErrors());
+			setNumericProperty(props, request, Environment.PROP_DBCP_MAX_OPEN_PREPARED_STATEMENTS, pageInfo.getErrors());
+			setBooleanProperty(props, request, Environment.PROP_DBCP_POOL_PREPARED_STATEMENTS);
+			setBooleanProperty(props, request, Environment.PROP_DBCP_TEST_ON_BORROW);
+			setBooleanProperty(props, request, Environment.PROP_DBCP_TEST_ON_RETURN);
+			setBooleanProperty(props, request, Environment.PROP_DBCP_TEST_WHILE_IDLE);
+			setNumericProperty(props, request, Environment.PROP_DBCP_MIN_EVICTABLE_IDLE_TIME, pageInfo.getErrors());
+			setNumericProperty(props, request, Environment.PROP_DBCP_TIME_BETWEEN_EVICTION_RUNS, pageInfo.getErrors());
+			setNumericProperty(props, request, Environment.PROP_DBCP_NUM_TESTS_PER_EVICTION_RUN, pageInfo.getErrors());
+			setProperty(props, request, Environment.PROP_DBCP_WHEN_EXHAUSTED_ACTION);
+			// upload
+			setProperty(props, request, Environment.PROP_FILE_UPLOAD_STORAGE);
+			String maxFileSizeString = request.getParameter(Environment.PROP_FILE_MAX_FILE_SIZE);
+			if (StringUtils.isBlank(maxFileSizeString) || !StringUtils.isNumeric(maxFileSizeString)) {
+				pageInfo.addError(new WikiMessage("admin.message.nonnumeric", Environment.PROP_FILE_MAX_FILE_SIZE, maxFileSizeString));
+			} else {
+				long maxFileSizeInKB = Long.parseLong(maxFileSizeString);
+				props.setProperty(Environment.PROP_FILE_MAX_FILE_SIZE, Long.toString(maxFileSizeInKB * 1000));
+			}
+			setProperty(props, request, Environment.PROP_FILE_DIR_FULL_PATH);
+			setProperty(props, request, Environment.PROP_FILE_DIR_RELATIVE_PATH);
+			setProperty(props, request, Environment.PROP_FILE_SERVER_URL);
+			setProperty(props, request, Environment.PROP_SHARED_UPLOAD_VIRTUAL_WIKI);
+			setProperty(props, request, Environment.PROP_FILE_BLACKLIST_TYPE);
+			setProperty(props, request, Environment.PROP_FILE_BLACKLIST);
+			setProperty(props, request, Environment.PROP_FILE_WHITELIST);
+			// email
+			setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_ENABLE);
+			if (props.getProperty(Environment.PROP_EMAIL_SMTP_ENABLE).equals("true")) {
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SMTP_REQUIRES_AUTH);
 				setProperty(props, request, Environment.PROP_EMAIL_SMTP_USERNAME);
 				setPassword(props, request, next, Environment.PROP_EMAIL_SMTP_PASSWORD, "smtpPassword");
@@ -342,9 +342,11 @@ public class AdminServlet extends JAMWikiServlet {
 				setProperty(props, request, Environment.PROP_EMAIL_ADDRESS_SEPARATOR);
 				setProperty(props, request, Environment.PROP_EMAIL_DEFAULT_CONTENT_TYPE);
 				setBooleanProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD);
-				setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION, pageInfo.getErrors());
+				if (props.getProperty(Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD).equals("true")) {
+					setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_TIMEOUT, pageInfo.getErrors());
+					setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_CHALLENGE_RETRIES, pageInfo.getErrors());
+					setNumericProperty(props, request, Environment.PROP_EMAIL_SERVICE_FORGOT_PASSWORD_IP_LOCK_DURATION, pageInfo.getErrors());
+				}
 				// Check if we have to test the configuration
 				String command = request.getParameter("testMail");
 				if (!StringUtils.isBlank(command) && command.equalsIgnoreCase("send test mail")) {
@@ -353,38 +355,36 @@ public class AdminServlet extends JAMWikiServlet {
 						WikiMail sender = new WikiMail(props);
 						logger.error(sender.toString());
 						mailAddress = ServletUtil.currentWikiUser().getEmail();
-						if(StringUtils.isBlank(mailAddress)) {
+						if (StringUtils.isBlank(mailAddress)) {
 							pageInfo.addError(new WikiMessage("admin.smtp.error.nomailaddress"));
-						}
-						else {
+						} else {
 							sender.postMail(mailAddress,"JAMWiki mail test","The configuration of your mail is correct");
 							pageInfo.addMessage(new WikiMessage("admin.smtp.message.sentmail",mailAddress));
 						}
-					}
-					catch(Exception e) {
+					} catch(Exception e) {
 						pageInfo.addError(new WikiMessage("admin.smtp.error.couldnotsend", mailAddress, e.getMessage()));
 					}
 				}
-			} else if (section.equals("spam")) {
-				setBooleanProperty(props, request, Environment.PROP_TOPIC_SPAM_FILTER);
-				setNumericProperty(props, request, Environment.PROP_RECAPTCHA_EDIT, pageInfo.getErrors());
-				setNumericProperty(props, request, Environment.PROP_RECAPTCHA_REGISTER, pageInfo.getErrors());
-				setProperty(props, request, Environment.PROP_RECAPTCHA_PUBLIC_KEY);
-				setProperty(props, request, Environment.PROP_RECAPTCHA_PRIVATE_KEY);
-				if (StringUtils.isBlank(props.getProperty(Environment.PROP_RECAPTCHA_PUBLIC_KEY)) || StringUtils.isBlank(props.getProperty(Environment.PROP_RECAPTCHA_PRIVATE_KEY))) {
-					if (NumberUtils.toInt(props.getProperty(Environment.PROP_RECAPTCHA_EDIT)) > 0 || NumberUtils.toInt(props.getProperty(Environment.PROP_RECAPTCHA_REGISTER)) > 0) {
-						pageInfo.addError(new WikiMessage("admin.spam.message.invalidkeys"));
-					}
-				}
-				setBooleanProperty(props, request, Environment.PROP_HONEYPOT_FILTER_ENABLED);
-				setProperty(props, request, Environment.PROP_HONEYPOT_ACCESS_KEY);
-				if (Boolean.parseBoolean(props.getProperty(Environment.PROP_HONEYPOT_FILTER_ENABLED)) && StringUtils.isBlank(props.getProperty(Environment.PROP_HONEYPOT_ACCESS_KEY))) {
-					pageInfo.addError(new WikiMessage("admin.spam.message.invalidhoneypotkey"));
-				}
-			} else if (section.equals("other")) {
-				setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
-				setProperty(props, request, Environment.PROP_RSS_TITLE);
 			}
+			// spam
+			setBooleanProperty(props, request, Environment.PROP_TOPIC_SPAM_FILTER);
+			setNumericProperty(props, request, Environment.PROP_RECAPTCHA_EDIT, pageInfo.getErrors());
+			setNumericProperty(props, request, Environment.PROP_RECAPTCHA_REGISTER, pageInfo.getErrors());
+			setProperty(props, request, Environment.PROP_RECAPTCHA_PUBLIC_KEY);
+			setProperty(props, request, Environment.PROP_RECAPTCHA_PRIVATE_KEY);
+			if (StringUtils.isBlank(props.getProperty(Environment.PROP_RECAPTCHA_PUBLIC_KEY)) || StringUtils.isBlank(props.getProperty(Environment.PROP_RECAPTCHA_PRIVATE_KEY))) {
+				if (NumberUtils.toInt(props.getProperty(Environment.PROP_RECAPTCHA_EDIT)) > 0 || NumberUtils.toInt(props.getProperty(Environment.PROP_RECAPTCHA_REGISTER)) > 0) {
+					pageInfo.addError(new WikiMessage("admin.spam.message.invalidkeys"));
+				}
+			}
+			setBooleanProperty(props, request, Environment.PROP_HONEYPOT_FILTER_ENABLED);
+			setProperty(props, request, Environment.PROP_HONEYPOT_ACCESS_KEY);
+			if (Boolean.parseBoolean(props.getProperty(Environment.PROP_HONEYPOT_FILTER_ENABLED)) && StringUtils.isBlank(props.getProperty(Environment.PROP_HONEYPOT_ACCESS_KEY))) {
+				pageInfo.addError(new WikiMessage("admin.spam.message.invalidhoneypotkey"));
+			}
+			// other
+			setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
+			setProperty(props, request, Environment.PROP_RSS_TITLE);
 			pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(props));
 			if (pageInfo.getErrors().isEmpty()) {
 				this.saveUserPreferenceDefaults(request, pageInfo);
