@@ -95,10 +95,6 @@ public class DatabaseUpgrades {
 		try {
 			status = DatabaseConnection.startTransaction(getTransactionDefinition());
 			Connection conn = DatabaseConnection.getConnection();
-			// initialize sequences
-			if (WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("STATEMENT_CREATE_SEQUENCES", conn)) {
-				messages.add(new WikiMessage("upgrade.message.db.object.added", "sequences"));
-			}
 			// New tables as of JAMWiki 1.3
 			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("STATEMENT_CREATE_USER_PREFERENCES_DEFAULTS_TABLE", conn);
 			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_user_preferences_defaults"));
