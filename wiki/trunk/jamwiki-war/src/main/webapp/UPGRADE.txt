@@ -167,6 +167,13 @@ followed by 1.0.1.
               ALTER TABLE jam_users ADD COLUMN challenge_tries INTEGER DEFAULT 0 NOT NULL;
 
 
+  JAMWiki 1.2.4
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "1.2.4".
+
+
   JAMWiki 1.2.3
   =============
 

@@ -35,6 +35,23 @@ Translation Updates:
   * Updated Russian translations (shar).
 
 
+1.2.4
+=====
+
+New Features:
+
+  * None.
+
+Bugfixes:
+
+  * Failure when rendering files with non-ANSI filenames when using JAMWiki to
+    serve images directly.  Reported and fixed by Pongho Lee.
+
+Translation Updates:
+
+  * None.
+
+
 1.2.3
 =====
 
