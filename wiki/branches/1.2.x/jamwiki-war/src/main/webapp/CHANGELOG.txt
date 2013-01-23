@@ -7,7 +7,8 @@ New Features:
 
 Bugfixes:
 
-  * None.
+  * Failure when rendering files with non-ANSI filenames when using JAMWiki to
+    serve images directly.  Reported and fixed by Pongho Lee.
 
 Translation Updates:
 

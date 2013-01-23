@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -74,6 +76,11 @@ public class ImageServlet extends JAMWikiServlet {
 	 */
 	private File retrieveFile(HttpServletRequest request) {
 		String filename = request.getRequestURI().substring(request.getContextPath().length());
+		try {
+			filename = URLDecoder.decode(filename, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// this doesn't happen - UTF-8 is always supported
+		}
 		File file = new File(Environment.getValue(Environment.PROP_BASE_FILE_DIR), filename);
 		return (file.exists()) ? file : null;
 	}
