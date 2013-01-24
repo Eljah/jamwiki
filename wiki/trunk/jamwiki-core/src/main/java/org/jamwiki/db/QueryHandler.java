@@ -53,6 +53,8 @@ public interface QueryHandler {
 	public static final String QUERY_HANDLER_DB2 = "org.jamwiki.db.DB2QueryHandler";
 	/** DB2/400 query handler class */
 	public static final String QUERY_HANDLER_DB2400 = "org.jamwiki.db.DB2400QueryHandler";
+	/** H2 query handler class */
+	public static final String QUERY_HANDLER_H2 = "org.jamwiki.db.H2QueryHandler";
 	/** HSql query handler class */
 	public static final String QUERY_HANDLER_HSQL = "org.jamwiki.db.HSqlQueryHandler";
 	/** MSSql query handler class */
