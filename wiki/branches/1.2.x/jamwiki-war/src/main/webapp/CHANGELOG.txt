@@ -11,6 +11,8 @@ Bugfixes:
     serve images directly.  Reported and fixed by Pongho Lee.
   * Named template parameters whose values were a single character in length
     were ignored during template parsing.  Reported by Timothy Stone.
+  * Template parameters without defaults should parse as an empty string rather
+    than "{{{param}}}" when no parameter value is specified.
 
 Translation Updates:
 
