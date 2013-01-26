@@ -12,7 +12,8 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated Italian translations (cclavadetscher).
+  * Updated Russian translations (shar).
 
 
 1.2.3
