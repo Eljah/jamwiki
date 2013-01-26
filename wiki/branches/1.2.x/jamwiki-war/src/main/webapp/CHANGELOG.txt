@@ -13,6 +13,8 @@ Bugfixes:
     were ignored during template parsing.  Reported by Timothy Stone.
   * Template parameters without defaults should parse as an empty string rather
     than "{{{param}}}" when no parameter value is specified.
+  * When using DB2 as repository, getting -104 when accessing Special:Log.
+    Reported with a fix by Dennis N Brown.
 
 Translation Updates:
 
