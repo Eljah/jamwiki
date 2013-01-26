@@ -63,7 +63,7 @@ public class TemplateTag implements JFlexParserTag {
 			return value;
 		}
 		String defaultValue = this.parseParamDefaultValue(parserInput, parserOutput, content);
-		return (defaultValue == null) ? param : defaultValue;
+		return (defaultValue == null) ? " " : defaultValue;
 	}
 
 	/**
