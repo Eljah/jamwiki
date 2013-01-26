@@ -9,6 +9,8 @@ Bugfixes:
 
   * Failure when rendering files with non-ANSI filenames when using JAMWiki to
     serve images directly.  Reported and fixed by Pongho Lee.
+  * Named template parameters whose values were a single character in length
+    were ignored during template parsing.  Reported by Timothy Stone.
 
 Translation Updates:
 
