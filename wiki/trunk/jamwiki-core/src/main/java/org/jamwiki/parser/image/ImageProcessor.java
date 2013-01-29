@@ -88,13 +88,20 @@ public class ImageProcessor {
 	}
 
 	/**
-	 * Given a fileId, return a
-	 * ImageData object.
+	 * When storing images in the database, given a fileId return a ImageData object.
+	 *
+	 * @param fileId The file identifier for the original image to be loaded.
+	 * @param fileVersionId The ID of the image revision being loaded, or -1 if
+	 *  the current image revision is being loaded.
 	 */
-	private static ImageData loadImage(int fileId) throws IOException {
+	private static ImageData loadImage(int fileId, int fileRevisionId) throws IOException {
 		ImageData imageData = null;
 		try {
-			imageData = WikiBase.getDataHandler().getImageData(fileId, 0);
+			if (fileRevisionId != -1) {
+				imageData = WikiBase.getDataHandler().getImageVersionData(fileRevisionId, 0);
+			} else {
+				imageData = WikiBase.getDataHandler().getImageData(fileId, 0);
+			}
 		} catch (DataAccessException dae) {
 			throw new IOException("Failure while retrieving image data for file " + fileId + ": " + dae.toString());
 		}
@@ -144,13 +151,15 @@ public class ImageProcessor {
 	 * That source is dual licensed: LGPL (Sun and Romain Guy) and BSD (Romain Guy).
 	 *
 	 * @param fileId The file identifier for the original image to be scaled.
+	 * @param fileVersionId The ID of the image revision being resized, or -1 if
+	 *  the current image revision is being resized.
 	 * @param targetWidth the desired width of the scaled instance in pixels.
 	 * @param targetHeight the desired height of the scaled instance in pixels.
 	 * @return a dimensions of scaled image
 	 */
-	public static Dimension resizeImage(int fileId, int targetWidth, int targetHeight) throws IOException {
+	public static Dimension resizeImage(int fileId, int fileVersionId, int targetWidth, int targetHeight) throws IOException {
 		long start = System.currentTimeMillis();
-		ImageData imageData = ImageProcessor.loadImage(fileId);
+		ImageData imageData = ImageProcessor.loadImage(fileId, fileVersionId);
 		BufferedImage tmp = ImageIO.read(new ByteArrayInputStream(imageData.data));
 		if (tmp == null) {
 			throw new IOException("JDK is unable to process image data, possibly indicating data corruption: " + fileId);
@@ -251,12 +260,21 @@ public class ImageProcessor {
 	}
 
 	/**
-	 * Retrieve image dimensions.
+	 * Retrieve image dimensions for an image stored in the database.
+	 *
+	 * @param fileId The image file ID.
+	 * @param fileVersionId The image revision ID, or -1 to retrieve the
+	 *  current image version.
+	 * @param resized The size in pixels of the image to retrieve.
 	 */
-	protected static Dimension retrieveImageDimensions(int fileId, int resized) throws IOException {
+	protected static Dimension retrieveImageDimensions(int fileId, int fileVersionId, int resized) throws IOException {
 		ImageData imageData = null;
 		try {
-			imageData = WikiBase.getDataHandler().getImageInfo(fileId, resized);
+			if (fileVersionId != -1) {
+				imageData = WikiBase.getDataHandler().getImageVersionData(fileVersionId, resized);
+			} else {
+				imageData = WikiBase.getDataHandler().getImageInfo(fileId, resized);
+			}
 		} catch (DataAccessException dae) {
 			throw new IOException("Failure while retrieving image info for file " + fileId + ": " + dae.toString());
 		}

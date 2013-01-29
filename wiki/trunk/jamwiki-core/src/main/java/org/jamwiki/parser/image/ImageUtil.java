@@ -436,7 +436,7 @@ public abstract class ImageUtil {
 	 * given a max width and height.  For example, if the original dimensions are 800x400,
 	 * the max width height are 200, and the increment is 400, the result is 400x200.
 	 */
-	private static Dimension calculateIncrementalDimensions(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions) throws IOException {
+	private static Dimension calculateIncrementalDimensions(WikiImage wikiImage, Dimension originalDimensions, Dimension scaledDimensions, WikiFileVersion fileVersion) throws IOException {
 		int increment = Environment.getIntValue(Environment.PROP_IMAGE_RESIZE_INCREMENT);
 		// use width for incremental resizing
 		int incrementalWidth = calculateImageIncrement(scaledDimensions.getWidth());
@@ -448,7 +448,7 @@ public abstract class ImageUtil {
 		if (isImagesOnFS()) {
 			return calculateIncrementalDimensionsForImageFile(wikiImage, originalDimensions, incrementalWidth, incrementalHeight);
 		} else {
-			return calculateIncrementalDimensionsForImageBlob(wikiImage, incrementalWidth, incrementalHeight);
+			return calculateIncrementalDimensionsForImageBlob(wikiImage, incrementalWidth, incrementalHeight, fileVersion);
 		}
 	}
 
@@ -474,14 +474,15 @@ public abstract class ImageUtil {
 	/**
 	 * Determine scaled dimensions for images stored in the database.
 	 */
-	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, int incrementalWidth, int incrementalHeight) throws IOException {
+	private static Dimension calculateIncrementalDimensionsForImageBlob(WikiImage wikiImage, int incrementalWidth, int incrementalHeight, WikiFileVersion fileVersion) throws IOException {
 		// check to see if an image with the desired dimensions already exists on the filesystem
-		Dimension d1  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), incrementalWidth);
+		int fileVersionId = (fileVersion != null) ? fileVersion.getFileVersionId() : -1;
+		Dimension d1  = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), fileVersionId, incrementalWidth);
 		if (d1 != null) {
 			return d1;
 		}
 		// otherwise generate a scaled instance
-		return ImageProcessor.resizeImage(wikiImage.getFileId(), incrementalWidth, incrementalHeight);
+		return ImageProcessor.resizeImage(wikiImage.getFileId(), fileVersionId, incrementalWidth, incrementalHeight);
 	}
 
 	/**
@@ -603,8 +604,10 @@ public abstract class ImageUtil {
 			if (isImagesOnFS()) {
 				File file = ImageUtil.buildAbsoluteFile(wikiImage.getUrl());
 				originalDimensions = ImageProcessor.retrieveImageDimensions(file);
+			} else if (fileVersion != null) {
+				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), fileVersion.getFileVersionId(), 0);
 			} else {
-				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), 0);
+				originalDimensions = ImageProcessor.retrieveImageDimensions(wikiImage.getFileId(), -1, 0);
 			}
 			if (originalDimensions == null) {
 				logger.info("Unable to determine dimensions for image: " + wikiImage.getUrl());
@@ -621,13 +624,14 @@ public abstract class ImageUtil {
 		wikiImage.setWidth((int)scaledDimensions.getWidth());
 		wikiImage.setHeight((int)scaledDimensions.getHeight());
 		// return an appropriate WikiImage object with URL to the scaled image, proper width, and proper height
-		Dimension incrementalDimensions = calculateIncrementalDimensions(wikiImage, originalDimensions, scaledDimensions);
+		Dimension incrementalDimensions = calculateIncrementalDimensions(wikiImage, originalDimensions, scaledDimensions, fileVersion);
 		if (isImagesOnFS()) {
 			String url = buildImagePath(wikiImage.getUrl(), (int)originalDimensions.getWidth(), (int)incrementalDimensions.getWidth());
 			wikiImage.setUrl(url);
 		} else {
 			Integer resized  = incrementalDimensions.width != originalDimensions.width ? incrementalDimensions.width : null;
-			String url = buildDatabaseRelativeUrl(wikiImage.getFileId(), null, resized, wikiImage.getUrl());
+			Integer fileVersionId = (fileVersion != null) ? fileVersion.getFileVersionId() : null;
+			String url = buildDatabaseRelativeUrl(wikiImage.getFileId(), fileVersionId, resized, wikiImage.getUrl());
 			wikiImage.setUrl(url);
 		}
 		return wikiImage;
@@ -688,7 +692,7 @@ public abstract class ImageUtil {
 	 */
 	public static boolean isImage(int fileId) {
 		try {
-			return (ImageProcessor.retrieveImageDimensions(fileId, 0) != null);
+			return (ImageProcessor.retrieveImageDimensions(fileId, -1, 0) != null);
 		} catch (IOException x) {
 			return false;
 		}
