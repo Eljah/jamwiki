@@ -574,10 +574,10 @@ public class WikiUtil {
 	}
 
 	/**
-	 * Utility method for determining if the parameters of a Role are valid
+	 * Utility method for determining if the parameters of a group are valid
 	 * or not.
 	 *
-	 * @param role The Role to validate.
+	 * @param group The WikiGroup to validate.
 	 * @throws WikiException Thrown if the role is invalid.
 	 */
 	public static void validateWikiGroup(WikiGroup group) throws WikiException {

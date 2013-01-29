@@ -173,7 +173,7 @@ public class WikiCache<K, V> {
 	 * Retrieve an object from the cache.  IMPORTANT: this method will return
 	 * <code>null</code> if no matching element is cached OR if the cached
 	 * object has a value of <code>null</code>.  Callers should call
-	 * {@link isKeyInCache} if a <code>null</code> value is returned to
+	 * {@link #isKeyInCache} if a <code>null</code> value is returned to
 	 * determine whether a <code>null</code> was cached or if the value does
 	 * not exist in the cache.
 	 *

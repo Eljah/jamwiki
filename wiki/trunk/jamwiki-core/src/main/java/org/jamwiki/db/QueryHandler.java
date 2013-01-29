@@ -484,7 +484,8 @@ public interface QueryHandler {
 	/**
 	 * Return a map of key/value pairs containing the definde user preferences
 	 * defaults.
-	 * @return
+	 *
+	 * @return A map of user preferences (key-value) organized by group.
 	 */
 	Map<String, Map<String, String>> getUserPreferencesDefaults() throws SQLException;
 	
@@ -1191,7 +1192,8 @@ public interface QueryHandler {
 	/**
 	 * Update a topic version record in the database.
 	 *
-	 * @param topic The TopicVersion record that is to be updated in the database.
+	 * @param topicVersion The TopicVersion record that is to be updated in the
+	 *  database.
 	 * @param conn A database connection to use when connecting to the database
 	 *  from this method.
 	 * @throws SQLException Thrown if any error occurs during method execution.

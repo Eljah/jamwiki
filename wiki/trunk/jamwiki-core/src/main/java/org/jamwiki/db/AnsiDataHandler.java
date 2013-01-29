@@ -631,7 +631,8 @@ public class AnsiDataHandler {
 	/**
 	 * Retrieve the GroupMap for the user identified by login. The GroupMap contains
 	 * a list of all groups that this login belongs to.
-	 * @param login The user, whose groups must be looked up
+	 *
+	 * @param userLogin The user, whose groups must be looked up
 	 * @return The GroupMap of the user identified by login
 	 * @throws DataAccessException
 	 */
@@ -781,7 +782,7 @@ public class AnsiDataHandler {
 	 * Retrieve a list of RoleMap objects for all users and groups who
 	 * have been assigned the specified role.
 	 *
-	 * @param roleName The name of the role being queried against.
+	 * @param authority The name of the role being queried against.
 	 * @return A list of RoleMap objects containing all roles for all
 	 *  users and groups who have been assigned the specified role.  If no
 	 *  matches are found then this method returns an empty List.  This
@@ -796,7 +797,7 @@ public class AnsiDataHandler {
 	 * Retrieve a list of RoleMap objects for all users and groups who
 	 * have been assigned the specified role.
 	 *
-	 * @param roleName The name of the role being queried against.
+	 * @param authority The name of the role being queried against.
 	 * @param includeInheritedRoles Set to false return only roles that are assigned
 	 *  directly 
 	 * @return A list of RoleMap objects containing all roles for all
@@ -805,7 +806,7 @@ public class AnsiDataHandler {
 	 *  method will never return <code>null</code>.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 */
-	public List<RoleMap> getRoleMapByRole(String authority,boolean includeInheritedRoles) throws DataAccessException {
+	public List<RoleMap> getRoleMapByRole(String authority, boolean includeInheritedRoles) throws DataAccessException {
 		// first check the cache
 		List<RoleMap> roleMapList = CACHE_ROLE_MAP_GROUP.retrieveFromCache(authority + includeInheritedRoles);
 		if (roleMapList != null || CACHE_ROLE_MAP_GROUP.isKeyInCache(authority + includeInheritedRoles)) {
@@ -2321,7 +2322,8 @@ public class AnsiDataHandler {
 	 *  performed.
 	 * @param wikiFileVersion A WikiFileVersion containing the author, date, and
 	 *  other information about the version being added.
-	 * @param imageData Image data or null
+	 * @param imageData If images are stored in the database then this field holds the
+	 *  image data information, otherwise it will be <code>null</code>.
 	 * @throws DataAccessException Thrown if any error occurs during method execution.
 	 * @throws WikiException Thrown if the file information is invalid.
 	 */

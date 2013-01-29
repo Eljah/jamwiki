@@ -174,7 +174,8 @@ public abstract class LinkUtil {
 	/**
 	 * Build the HTML anchor link to a topic page for a given WikLink object.
 	 *
-	 * @param virtualWiki The virtual wiki for the link that is being created.
+	 * @param wikiLink The WikiLink object for which an HTML link is being
+	 *  generated.
 	 * @param text The text to display as the link content.
 	 * @param style The CSS class to use with the anchor HTML tag.  This value
 	 *  can be <code>null</code> or empty if no custom style is used.
@@ -224,7 +225,7 @@ public abstract class LinkUtil {
 
 	/**
 	 * Build a URL to the topic page for a given topic.  This method performs
-	 * additional processing beyond what {@link WikiLink.toRelativeUrl} does,
+	 * additional processing beyond what {@link WikiLink#toRelativeUrl} does,
 	 * including returning upload or edit URLs for non-existent images/topics,
 	 * handling minor variations in case-sensitivity, etc.
 	 *

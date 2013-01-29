@@ -50,8 +50,9 @@ public class UserPreferencesUtil {
 
 	/**
 	 * Convenience method to retrieve the UserPreferenceItem for a single preference.
+	 *
 	 * @param preferenceKey
-	 * @return
+	 * @return The user preference corresponding to the specified key.
 	 */
 	public UserPreferenceItem getPreference(String preferenceKey) {
 		Map<String, Map<String, UserPreferenceItem>> map = this.getGroups();
@@ -70,7 +71,8 @@ public class UserPreferencesUtil {
 	 * pref_group_key -> Map(pref_key -> Instance of UserPreferenceItem for pref_key)
 	 * UserPreferenceItems implements the getters necessary to automate the display of
 	 * user preferences choices in JSTL.
-	 * @return
+	 *
+	 * @return A mapping of user preferences (key-value) grouped by preference group.
 	 */
 	public Map<String, Map<String, UserPreferenceItem>> getGroups() {
 		Map<String, Map<String, UserPreferenceItem>> groups = new LinkedHashMap<String, Map<String, UserPreferenceItem>>();

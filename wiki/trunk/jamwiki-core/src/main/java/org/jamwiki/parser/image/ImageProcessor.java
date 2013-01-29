@@ -105,6 +105,8 @@ public class ImageProcessor {
 	}
 
 	/**
+	 * Method for resizing images when images are stored on the filesystem.
+	 *
 	 * Convenience method that returns a scaled instance of the provided image.
 	 * This method never resizes by more than 50% since resizing by more than that
 	 * amount causes quality issues with the BICUBIC and BILINEAR algorithms.
@@ -131,6 +133,8 @@ public class ImageProcessor {
 	}
 
 	/**
+	 * Method for resizing images when images are stored in the database.
+	 *
 	 * Convenience method that returns a scaled instance of the provided image.
 	 * This method never resizes by more than 50% since resizing by more than that
 	 * amount causes quality issues with the BICUBIC and BILINEAR algorithms.

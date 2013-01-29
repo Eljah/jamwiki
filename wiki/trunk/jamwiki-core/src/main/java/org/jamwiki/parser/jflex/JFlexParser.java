@@ -29,7 +29,7 @@ import org.jamwiki.parser.WikiLink;
 import org.jamwiki.utils.WikiLogger;
 
 /**
- * Implementation of {@link org.jamwiki.parser.AbstractParser} that uses
+ * Implementation of {@link org.jamwiki.JAMWikiParser} that uses
  * <a href="http://jflex.de/">JFlex</a> as a lexer to convert Wiki syntax into
  * HTML or other formats.
  */

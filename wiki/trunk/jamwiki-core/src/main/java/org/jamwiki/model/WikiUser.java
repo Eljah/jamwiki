@@ -222,34 +222,58 @@ public class WikiUser implements Serializable {
 		this.getPreferences().put(preferenceKey, preferenceValue);
 	}
 
+	/**
+	 * Return the challenge key used when resetting password.
+	 */
 	public String getChallengeValue() {
 		return challengeValue;
 	}
 
+	/**
+	 * Set the challenge key used when resetting password.
+	 */
 	public void setChallengeValue(String challengeValue) {
 		this.challengeValue = challengeValue;
 	}
 
+	/**
+	 * Return the date for which a password reset was last requested.
+	 */
 	public Timestamp getChallengeDate() {
 		return challengeDate;
 	}
 
+	/**
+	 * Set the date for which a password reset was last requested.
+	 */
 	public void setChallengeDate(Timestamp challengeDate) {
 		this.challengeDate = challengeDate;
 	}
 
+	/**
+	 * Return the IP address from which a password reset was last made.
+	 */
 	public String getChallengeIp() {
 		return challengeIp;
 	}
 
+	/**
+	 * Set the IP address from which a password reset was last made.
+	 */
 	public void setChallengeIp(String challengeIp) {
 		this.challengeIp = challengeIp;
 	}
 
+	/**
+	 * Return the number of password reset requests that have been recently made.
+	 */
 	public int getChallengeTries() {
 		return challengeTries;
 	}
 
+	/**
+	 * Set the number of password reset requests that have been recently made.
+	 */
 	public void setChallengeTries(int challengeTries) {
 		this.challengeTries = challengeTries;
 	}

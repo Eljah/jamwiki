@@ -55,7 +55,7 @@ public class UserBlock implements Serializable {
 	 *
 	 * @param wikiUserId The ID of the user being blocked.  Either ID or IP address
 	 *  must be specified when applying a block.
-	 * @param pAddress The IP address being blocked.  Either ID or IP address
+	 * @param ipAddress The IP address being blocked.  Either ID or IP address
 	 *  must be specified when applying a block.
 	 * @param blockEndDate The time when the block expires or <code>null</code> if
 	 *  the block is infinite.
