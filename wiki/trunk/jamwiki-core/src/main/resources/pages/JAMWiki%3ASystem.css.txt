@@ -775,6 +775,9 @@ table.wiki-admin td {
 	border-bottom: 1px solid #fff;
 	padding: 5px;
 }
+.inherited-role {
+	color: #cc0000;
+}
 .noborder {
 	border: none !important;
 }
