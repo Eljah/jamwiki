@@ -2898,6 +2898,10 @@ public class AnsiDataHandler {
 				this.addWikiUser(user, conn);
 				// add all users to the registered user group
 				this.addGroupMember(user.getUsername(), WikiBase.getGroupRegisteredUser().getGroupId(), conn);
+				// Flush cache to force reading from database for next search
+				// This should be more efficient than looping over the authorities of the
+				// group and update them individually
+				CACHE_ROLE_MAP_GROUP.removeAllFromCache();
 				// FIXME - reconsider this approach of separate entries for every virtual wiki
 				List<VirtualWiki> virtualWikis = this.getVirtualWikiList();
 				for (VirtualWiki virtualWiki : virtualWikis) {
