@@ -98,13 +98,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 			}
 			// first perform database upgrades
 			this.upgradeDatabase(true, pageInfo.getMessages());
-			if (oldVersion.before(1, 2, 0)) {
-				// old installs used the DOCROOT storage type rather than the new DEFAULT
-				Environment.setValue(Environment.PROP_FILE_UPLOAD_STORAGE, WikiBase.UPLOAD_STORAGE.DOCROOT.toString());
-				Environment.saveConfiguration();
-				// move system topics
-				this.updateSystemTopics(request, pageInfo.getMessages());
-			}
 			// upgrade the search index if required & possible
 			this.upgradeSearchIndex(true, pageInfo.getMessages());
 			// upgrade stylesheet
@@ -160,55 +153,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 	/**
 	 *
 	 */
-	private void renameSystemTopic(HttpServletRequest request, List<WikiMessage> messages, String virtualWiki, WikiUser wikiUser, String fromTopicName, String toTopicName) throws DataAccessException, WikiException {
-		String ipAddress = ServletUtil.getIpAddress(request);
-		// TODO - delete this method once the ability to upgrade to 1.2.0 has been removed.
-		Topic fromTopic = WikiBase.getDataHandler().lookupTopic(virtualWiki, fromTopicName, false);
-		WikiBase.getDataHandler().moveTopic(fromTopic, toTopicName, wikiUser, ipAddress, "Automatically moved by system upgrade");
-		// the old topic should no longer be admin-only
-		Topic topic = WikiBase.getDataHandler().lookupTopic(virtualWiki, fromTopicName, false);
-		topic.setAdminOnly(false);
-		TopicVersion topicVersion = new TopicVersion(wikiUser, ipAddress, null, topic.getTopicContent(), 0);
-		topicVersion.setEditType(TopicVersion.EDIT_PERMISSION);
-		WikiBase.getDataHandler().writeTopic(topic, topicVersion, null, null);
-		String[] params = new String[3];
-		params[0] = fromTopicName;
-		params[1] = toTopicName;
-		params[2] = virtualWiki;
-		messages.add(new WikiMessage("upgrade.message.120.topic.rename", params));
-	}
-
-	/**
-	 *
-	 */
-	private boolean updateSystemTopics(HttpServletRequest request, List<WikiMessage> messages) {
-		// TODO - delete this method once the ability to upgrade to 1.2.0 has been removed.
-		WikiUser wikiUser = ServletUtil.currentWikiUser();
-		try {
-			List<VirtualWiki> virtualWikis = WikiBase.getDataHandler().getVirtualWikiList();
-			for (VirtualWiki virtualWiki : virtualWikis) {
-				WikiDatabase.setupSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_HEADER, wikiUser, true, false);
-				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "BottomArea", WikiBase.SPECIAL_PAGE_FOOTER);
-				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "LeftMenu", WikiBase.SPECIAL_PAGE_SIDEBAR);
-				this.renameSystemTopic(request, messages, virtualWiki.getName(), wikiUser, "StyleSheet", WikiBase.SPECIAL_PAGE_SYSTEM_CSS);
-				WikiDatabase.setupSpecialPage(request.getLocale(), virtualWiki.getName(), WikiBase.SPECIAL_PAGE_CUSTOM_CSS, wikiUser, true, false);
-			}
-			return true;
-		} catch (WikiException e) {
-			logger.warn("Failure while moving system topic", e);
-			messages.add(e.getWikiMessage());
-			messages.add(new WikiMessage("upgrade.error.fatal",  e.getMessage()));
-			return false;
-		} catch (DataAccessException e) {
-			logger.warn("Failure while moving system topic", e);
-			messages.add(new WikiMessage("upgrade.error.fatal",  e.getMessage()));
-			return false;
-		}
-	}
-
-	/**
-	 *
-	 */
 	private boolean upgradeConfigXmlRequired() {
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
 		return (oldVersion.before(1, 3, 0));
@@ -220,12 +164,6 @@ public class UpgradeServlet extends JAMWikiServlet {
 	private boolean upgradeDatabase(boolean performUpgrade, List<WikiMessage> messages) throws WikiException {
 		boolean upgradeRequired = false;
 		WikiVersion oldVersion = new WikiVersion(Environment.getValue(Environment.PROP_BASE_WIKI_VERSION));
-		if (oldVersion.before(1, 2, 0)) {
-			upgradeRequired = true;
-			if (performUpgrade) {
-				DatabaseUpgrades.upgrade120(messages);
-			}
-		}
 		if (oldVersion.before(1, 3, 0)) {
 			upgradeRequired = true;
 			if (performUpgrade) {

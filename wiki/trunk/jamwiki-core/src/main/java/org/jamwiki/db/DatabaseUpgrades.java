@@ -59,35 +59,6 @@ public class DatabaseUpgrades {
 
 	/**
 	 * Perform the required database upgrade steps when upgrading from versions
-	 * older than JAMWiki 1.2.
-	 */
-	public static void upgrade120(List<WikiMessage> messages) throws WikiException {
-		TransactionStatus status = null;
-		try {
-			status = DatabaseConnection.startTransaction(getTransactionDefinition());
-			Connection conn = DatabaseConnection.getConnection();
-			// initialize sequences
-			if (WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("STATEMENT_CREATE_SEQUENCES", conn)) {
-				messages.add(new WikiMessage("upgrade.message.db.object.added", "sequences"));
-			}
-			// create ROLE_REGISTER
-			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_120_ADD_ROLE_REGISTER", conn);
-			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_role"));
-			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("UPGRADE_120_ADD_ROLE_REGISTER_TO_ANONYMOUS", conn);
-			messages.add(new WikiMessage("upgrade.message.db.data.updated", "jam_group_authorities"));
-			// add the jam_file_data table
-			WikiBase.getDataHandler().queryHandler().executeUpgradeUpdate("STATEMENT_CREATE_FILE_DATA_TABLE", conn);
-			messages.add(new WikiMessage("upgrade.message.db.table.added", "jam_file_data"));
-		} catch (SQLException e) {
-			DatabaseConnection.rollbackOnException(status, e);
-			logger.error("Database failure during upgrade", e);
-			throw new WikiException(new WikiMessage("upgrade.error.fatal", e.getMessage()));
-		}
-		DatabaseConnection.commit(status);
-	}
-
-	/**
-	 * Perform the required database upgrade steps when upgrading from versions
 	 * older than JAMWiki 1.3.
 	 */
 	public static void upgrade130(List<WikiMessage> messages) throws WikiException {

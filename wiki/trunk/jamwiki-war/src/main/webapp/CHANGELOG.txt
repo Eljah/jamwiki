@@ -3,7 +3,7 @@
 
 New Features:
 
-  * None.
+  * Remove the ability to automatically upgrade from versions prior to 1.2.
 
 Bugfixes:
 
