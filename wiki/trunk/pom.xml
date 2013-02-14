@@ -121,8 +121,8 @@
 			</dependency>
 			<dependency>
 				<groupId>org.hsqldb</groupId>
-				<artifactId>hsqldb-j5</artifactId>
-				<version>2.2.4</version>
+				<artifactId>hsqldb</artifactId>
+				<version>2.2.9</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>
@@ -551,7 +551,7 @@
 					<rulesets>
 						<ruleset>${basedir}/pmd.xml</ruleset>
 					</rulesets>
-					<targetJdk>1.5</targetJdk>
+					<targetJdk>1.6</targetJdk>
 				</configuration>
 			</plugin>
 			<plugin>
