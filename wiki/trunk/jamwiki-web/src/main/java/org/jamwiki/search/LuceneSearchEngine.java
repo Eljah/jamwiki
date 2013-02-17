@@ -29,11 +29,15 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -79,7 +83,7 @@ public class LuceneSearchEngine implements SearchEngine {
 	/** Name of the search index field that holds the un-processed topic namespace. */
 	private static final String FIELD_TOPIC_NAMESPACE = "topic_namespace";
 	/** Lucene compatibility version. */
-	protected static final Version USE_LUCENE_VERSION = Version.LUCENE_36;
+	protected static final Version USE_LUCENE_VERSION = Version.LUCENE_41;
 	/** Maximum number of results to return per search. */
 	// FIXME - make this configurable
 	protected static final int MAXIMUM_RESULTS_PER_SEARCH = 200;
@@ -89,6 +93,8 @@ public class LuceneSearchEngine implements SearchEngine {
 	private boolean disabled = false;
 	/** Store Searchers (once opened) for re-use for performance reasons. */
 	private Map<String, IndexSearcher> searchers = new HashMap<String, IndexSearcher>();
+	/** Store Readers (once opened) for re-use for performance reasons. */
+	private Map<String, IndexReader> indexReaders = new HashMap<String, IndexReader>();
 	/** Store Writers (once opened) for re-use for performance reasons. */
 	private Map<String, IndexWriter> indexWriters = new HashMap<String, IndexWriter>();
 
@@ -199,18 +205,18 @@ public class LuceneSearchEngine implements SearchEngine {
 		}
 		Document doc = new Document();
 		// store the (not analyzed) topic name to use when deleting records from the index.
-		doc.add(new Field(FIELD_TOPIC_NAME, topic.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new StringField(FIELD_TOPIC_NAME, topic.getName(), Field.Store.YES));
 		// add the topic namespace (not analyzed) topic namespace to allow retrieval by namespace.
 		// this field is used internally in searches.
-		doc.add(new Field(FIELD_TOPIC_NAMESPACE, topic.getNamespace().getId().toString(), Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new StringField(FIELD_TOPIC_NAMESPACE, topic.getNamespace().getId().toString(), Field.Store.NO));
 		// analyze the topic name so that (for example) a search for "New York" will match "New York City"
-		Field nameField = new Field(FIELD_TOPIC_NAME_ANALYZED, topic.getName(), Field.Store.NO, Field.Index.ANALYZED);
+		TextField nameField = new TextField(FIELD_TOPIC_NAME_ANALYZED, topic.getName(), Field.Store.NO);
 		// make the topic name worth 3x as much as topic content in searches
 		nameField.setBoost(3.0f);
 		doc.add(nameField);
 		// analyze & store the topic content so that it is searchable and also usable for display in
 		// search result summaries
-		doc.add(new Field(FIELD_TOPIC_CONTENT, topicContent, Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new TextField(FIELD_TOPIC_CONTENT, topicContent, Field.Store.YES));
 		return doc;
 	}
 
@@ -310,6 +316,13 @@ public class LuceneSearchEngine implements SearchEngine {
 	}
 
 	/**
+	 * Open an IndexReader, executing error handling as needed.
+	 */
+	private IndexReader openIndexReader(File searchIndexPath) throws IOException {
+		return DirectoryReader.open(FSDirectory.open(searchIndexPath));
+	}
+
+	/**
 	 * Open an IndexWriter, executing error handling as needed.
 	 */
 	private IndexWriter openIndexWriter(File searchIndexPath, boolean create) throws IOException {
@@ -389,7 +402,6 @@ public class LuceneSearchEngine implements SearchEngine {
 		IndexSearcher searcher = searchers.get(virtualWiki);
 		if (searcher != null) {
 			searchers.remove(virtualWiki);
-			searcher.close();
 		}
 	}
 
@@ -399,10 +411,23 @@ public class LuceneSearchEngine implements SearchEngine {
 	protected IndexSearcher retrieveIndexSearcher(String virtualWiki) throws IOException {
 		IndexSearcher searcher = searchers.get(virtualWiki);
 		if (searcher == null) {
-			searcher = new IndexSearcher(this.retrieveIndexWriter(virtualWiki, false).getReader());
+			searcher = new IndexSearcher(this.retrieveIndexReader(virtualWiki));
 			searchers.put(virtualWiki, searcher);
 		}
 		return searcher;
+	}
+
+	/**
+	 * For performance reasons create a cache of readers.
+	 */
+	private IndexReader retrieveIndexReader(String virtualWiki) throws IOException {
+		IndexReader indexReader = indexReaders.get(virtualWiki);
+		if (indexReader == null) {
+			File searchIndexPath = this.getSearchIndexPath(virtualWiki);
+			indexReader = this.openIndexReader(searchIndexPath);
+			indexReaders.put(virtualWiki, indexReader);
+		}
+		return indexReader;
 	}
 
 	/**
@@ -472,8 +497,8 @@ public class LuceneSearchEngine implements SearchEngine {
 	 * 
 	 */
 	public void shutdown() throws IOException {
-		for (IndexSearcher searcher : this.searchers.values()) {
-			searcher.close();
+		for (IndexReader indexReader : this.indexReaders.values()) {
+			indexReader.close();
 		}
 		for (IndexWriter indexWriter : this.indexWriters.values()) {
 			indexWriter.close();

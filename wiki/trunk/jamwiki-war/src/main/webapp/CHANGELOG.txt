@@ -5,6 +5,7 @@ New Features:
 
   * Drop support for Java 5. Java 6 or later is now required to run JAMWiki.
   * Remove the ability to automatically upgrade from versions prior to 1.2.
+  * Upgrade to Lucene Search 4.1.
   * Upgrade to HSQLDB 2.2.9.
 
 Bugfixes:

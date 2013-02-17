@@ -85,7 +85,9 @@ followed by 1.0.1.
 
   SPECIAL NOTES:
 
-  * None.
+  * The Lucene search engine has been updated in this release.  As a result
+    users should rebuild the search index using the tools on the
+    Special:Maintenance page.
 
   UPGRADE STEPS:
 
