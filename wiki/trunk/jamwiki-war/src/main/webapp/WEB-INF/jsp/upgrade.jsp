@@ -41,14 +41,10 @@ body, input, select {
 	width: 800px;
 	padding: 10px 5px;
 }
-#upgrade-table {
+#upgrade-content {
 	border: 2px solid #333333;
 	padding: 10px;
 	width: 95%;
-}
-#upgrade-messages {
-	font: verdana, helvetica, sans-serif;
-	padding: 10px 0;
 }
 .red {
 	color: #ff0000;
@@ -65,42 +61,38 @@ body, input, select {
 
 <form name="adminUpgrade" method="post">
 <input type="hidden" name="function" value="upgrade" />
-<table id="upgrade-table">
-<c:if test="${!empty successMessage || !empty pageInfo.errors || !empty pageInfo.messages}">
-	<tr>
-		<td colspan="2">
-			<div id="upgrade-messages">
-				<c:if test="${!empty successMessage}"><h4><jamwiki_t:wikiMessage message="${successMessage}" /></h4></c:if>
-				<c:if test="${!empty pageInfo.errors}">
-				<c:forEach items="${pageInfo.errors}" var="message">
-					<div class="red"><jamwiki_t:wikiMessage message="${message}" /></div>
-				</c:forEach>
-				</c:if>
-				<c:if test="${!empty pageInfo.messages}">
+<div id="upgrade-content">
+<c:choose>
+	<c:when test="${viewOnly}">
+		<h4><fmt:message key="upgrade.caption.detected" /></h4>
+		<c:if test="${!empty pageInfo.messages}">
+			<ul>
 				<c:forEach items="${pageInfo.messages}" var="message">
-					<div class="green"><jamwiki_t:wikiMessage message="${message}" /></div>
+					<li><jamwiki_t:wikiMessage message="${message}" /></li>
 				</c:forEach>
-				</c:if>
-			</div>
-		</td>
-	</tr>
-</c:if>
-<c:if test="${empty successMessage && empty failure}">
-	<tr><td colspan="2"><fmt:message key="upgrade.caption.detected" /></td></tr>
-	<c:if test="${!empty upgradeDetails}">
-		<tr>
-			<td colspan="2">
-				<ul>
-					<c:forEach items="${upgradeDetails}" var="upgradeDetail">
-						<li><jamwiki_t:wikiMessage message="${upgradeDetail}" /></li>
-					</c:forEach>
-				</ul>
-			</td>
-		</tr>
-	</c:if>
-	<tr><td colspan="2" align="center"><input type="submit" name="button" /></td></tr>
-</c:if>
-</table>
+			</ul>
+		</c:if>
+		<div align="center"><input type="submit" name="button" value="<fmt:message key="upgrade.action.upgrade" />" />
+	</c:when>
+	<c:otherwise>
+		<c:if test="${!empty successMessage}"><h4><jamwiki_t:wikiMessage message="${successMessage}" /></h4></c:if>
+		<c:if test="${!empty pageInfo.errors}">
+			<ul>
+				<c:forEach items="${pageInfo.errors}" var="message">
+					<li class="red"><jamwiki_t:wikiMessage message="${message}" /></li>
+				</c:forEach>
+			</ul>
+		</c:if>
+		<c:if test="${!empty pageInfo.messages}">
+			<ul>
+				<c:forEach items="${pageInfo.messages}" var="message">
+					<li class="green"><jamwiki_t:wikiMessage message="${message}" /></li>
+				</c:forEach>
+			</ul>
+		</c:if>
+	</c:otherwise>
+</c:choose>
+</div>
 </form>
 
 </div>

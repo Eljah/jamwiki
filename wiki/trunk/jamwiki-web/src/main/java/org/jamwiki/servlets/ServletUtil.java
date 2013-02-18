@@ -18,13 +18,11 @@ package org.jamwiki.servlets;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,7 +30,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
@@ -709,72 +706,6 @@ public class ServletUtil {
 		parserInput.setUserDisplay(ServletUtil.getIpAddress(request));
 		parserInput.setAllowSectionEdit(sectionEdit);
 		return parserInput;
-	}
-
-	/**
-	 * Validate that vital system properties, such as database connection settings,
-	 * have been specified properly.
-	 *
-	 * @param props The property object to validate against.
-	 * @return A list of WikiMessage objects containing any errors encountered,
-	 *  or an empty list if no errors are encountered.
-	 */
-	protected static List<WikiMessage> validateSystemSettings(Properties props) {
-		List<WikiMessage> errors = new ArrayList<WikiMessage>();
-		// test directory permissions & existence
-		WikiMessage baseDirError = WikiUtil.validateDirectory(props.getProperty(Environment.PROP_BASE_FILE_DIR));
-		if (baseDirError != null) {
-			errors.add(baseDirError);
-		}
-		if (props.getProperty(Environment.PROP_FILE_UPLOAD_STORAGE).equals(WikiBase.UPLOAD_STORAGE.DOCROOT.toString())) {
-			WikiMessage fullDirError = WikiUtil.validateDirectory(props.getProperty(Environment.PROP_FILE_DIR_FULL_PATH));
-			if (fullDirError != null) {
-				errors.add(fullDirError);
-			}
-		}
-		String classesDir = null;
-		try {
-			classesDir = ResourceUtil.getClassLoaderRoot().getPath();
-			WikiMessage classesDirError = WikiUtil.validateDirectory(classesDir);
-			if (classesDirError != null) {
-				errors.add(classesDirError);
-			}
-		} catch (IOException e) {
-			errors.add(new WikiMessage("error.directorywrite", classesDir, e.getMessage()));
-		}
-		// test database
-		String driver = props.getProperty(Environment.PROP_DB_DRIVER);
-		String url = props.getProperty(Environment.PROP_DB_URL);
-		String userName = props.getProperty(Environment.PROP_DB_USERNAME);
-		String password = Encryption.getEncryptedProperty(Environment.PROP_DB_PASSWORD, props);
-		try {
-			DatabaseConnection.testDatabase(driver, url, userName, password, false);
-		} catch (ClassNotFoundException e) {
-			logger.error("Invalid database settings", e);
-			errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
-		} catch (SQLException e) {
-			logger.error("Invalid database settings", e);
-			errors.add(new WikiMessage("error.databaseconnection", e.getMessage()));
-		}
-		// verify valid parser class
-		String parserClass = props.getProperty(Environment.PROP_PARSER_CLASS);
-		String abstractParserClass = JAMWikiParser.class.getName();
-		boolean validParser = (parserClass != null && !parserClass.equals(abstractParserClass));
-		if (validParser) {
-			try {
-				Class parent = ClassUtils.getClass(parserClass);
-				Class child = ClassUtils.getClass(abstractParserClass);
-				if (!child.isAssignableFrom(parent)) {
-					validParser = false;
-				}
-			} catch (ClassNotFoundException e) {
-				validParser = false;
-			}
-		}
-		if (!validParser) {
-			errors.add(new WikiMessage("error.parserclass", parserClass));
-		}
-		return errors;
 	}
 
 	/**

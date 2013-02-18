@@ -231,7 +231,7 @@ public class SetupServlet extends JAMWikiServlet {
 	 *
 	 */
 	private void validate(HttpServletRequest request, WikiPageInfo pageInfo, WikiUser user) throws Exception {
-		pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(Environment.getInstance()));
+		pageInfo.getErrors().addAll(WikiUtil.validateSystemSettings(Environment.getInstance()));
 		if (StringUtils.isBlank(user.getUsername())) {
 			pageInfo.addError(new WikiMessage("error.loginempty"));
 		}

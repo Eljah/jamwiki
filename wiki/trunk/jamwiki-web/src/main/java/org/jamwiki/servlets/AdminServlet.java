@@ -385,7 +385,7 @@ public class AdminServlet extends JAMWikiServlet {
 			// other
 			setBooleanProperty(props, request, Environment.PROP_RSS_ALLOWED);
 			setProperty(props, request, Environment.PROP_RSS_TITLE);
-			pageInfo.getErrors().addAll(ServletUtil.validateSystemSettings(props));
+			pageInfo.getErrors().addAll(WikiUtil.validateSystemSettings(props));
 			if (pageInfo.getErrors().isEmpty()) {
 				this.saveUserPreferenceDefaults(request, pageInfo);
 			}
