@@ -6,6 +6,7 @@
 				<xs:element ref="parsers" maxOccurs="1" minOccurs="1" />
 				<xs:element ref="jflex-parser-custom-tags" maxOccurs="1" minOccurs="0" />
 				<xs:element ref="query-handlers" maxOccurs="1" minOccurs="1" />
+				<xs:element ref="editors" maxOccurs="1" minOccurs="1" />
 				<xs:element ref="search-engines" maxOccurs="1" minOccurs="1" />
 				<xs:element ref="translations" maxOccurs="1" minOccurs="0" />
 				<xs:element ref="date-formats" maxOccurs="1" minOccurs="1" />
