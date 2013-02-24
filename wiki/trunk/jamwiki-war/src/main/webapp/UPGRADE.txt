@@ -95,6 +95,13 @@ followed by 1.0.1.
      "wiki-version" property to "2.0.0".
 
 
+  JAMWiki 1.3.1
+  =============
+
+  1. Update the /WEB-INF/classes/jamwiki.properties file by changing the
+     "wiki-version" property to "1.3.1".
+
+
   JAMWiki 1.3
   ===========
 
