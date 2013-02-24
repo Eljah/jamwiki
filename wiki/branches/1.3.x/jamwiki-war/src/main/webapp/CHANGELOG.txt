@@ -14,7 +14,7 @@ Bugfixes:
 
 Translation Updates:
 
-  * None.
+  * Updated Russian translations (shar).
 
 
 1.3
