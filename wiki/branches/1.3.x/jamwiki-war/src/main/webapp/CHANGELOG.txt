@@ -9,6 +9,8 @@ Bugfixes:
 
   * Fix missing "editors" element in jamwiki-configuration-1.3.xsd.  Reported
     and fixed by Thomas Koch.
+  * Remove unneeded 403.jsp page, which contained an invalid constant that
+    caused warnings in Eclipse.  Reported by Thomas Koch.
 
 Translation Updates:
 
