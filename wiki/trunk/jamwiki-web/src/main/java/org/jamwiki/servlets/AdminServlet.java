@@ -40,10 +40,10 @@ import org.jamwiki.model.VirtualWiki;
 import org.jamwiki.model.WikiConfigurationObject;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.utils.Encryption;
-import org.jamwiki.utils.SpamFilter;
 import org.jamwiki.utils.WikiCache;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
+import org.jamwiki.web.utils.SpamFilter;
 import org.jamwiki.web.utils.UserPreferencesUtil;
 import org.springframework.web.servlet.ModelAndView;
 

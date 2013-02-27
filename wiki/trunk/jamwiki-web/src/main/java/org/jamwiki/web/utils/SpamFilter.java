@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.web.utils;
 
 import java.io.File;
 import java.util.regex.PatternSyntaxException;
@@ -25,6 +25,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.DataAccessException;
 import org.jamwiki.Environment;
+import org.jamwiki.utils.ResourceUtil;
+import org.jamwiki.utils.WikiLogger;
 
 /**
  * Provide the capability for filtering content based on a predefined list of
