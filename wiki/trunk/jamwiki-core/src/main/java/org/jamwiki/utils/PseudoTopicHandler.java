@@ -64,7 +64,6 @@ public class PseudoTopicHandler {
 		PSEUDO_TOPICS.add("Special:ImageList");
 		PSEUDO_TOPICS.add("Special:Imagelist");
 		PSEUDO_TOPICS.add("Special:Import");
-		PSEUDO_TOPICS.add("Special:ImportTiddly");
 		PSEUDO_TOPICS.add("Special:LinkTo");
 		PSEUDO_TOPICS.add("Special:Linkto");
 		PSEUDO_TOPICS.add("Special:ListUsers");
