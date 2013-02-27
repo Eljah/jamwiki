@@ -19,6 +19,7 @@ package org.jamwiki.parser.jflex;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.WikiBase;
 import org.jamwiki.model.Namespace;
@@ -28,7 +29,6 @@ import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.WikiLink;
-import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -42,6 +42,148 @@ public class JFlexParserUtil {
 	 *
 	 */
 	private JFlexParserUtil() {
+	}
+
+	/**
+	 * Search through content, starting at a specific position, and search for the
+	 * first position of a matching end tag for a specified start tag.  For instance,
+	 * if called with a start tag of "<b>" and an end tag of "</b>", this method
+	 * will operate as follows:
+	 *
+	 * "01<b>567</b>23" returns 8.
+	 * "01<b>56<b>01</b>67</b>23" returns 18.
+	 *
+	 * @param content The string to be searched.
+	 * @param start The position within the string to start searching from (inclusive).
+	 *  Only characters after this position in the string will be examined.
+	 * @param startToken The opening tag to match.
+	 * @param endToken The closing tag to match.
+	 * @return -1 if no matching end tag is found, or the index within the string of the first
+	 *  character of the end tag.
+	 */
+	public static int findMatchingEndTag(CharSequence content, int start, String startToken, String endToken) {
+		// do some initial searching to make sure the tokens are available
+		if (content == null || start < 0 || start >= content.length()) {
+			return -1;
+		}
+		String contentString = content.toString();
+		int lastEndToken = contentString.lastIndexOf(endToken);
+		if (lastEndToken == -1 || lastEndToken < start) {
+			return -1;
+		}
+		int firstStartToken = contentString.indexOf(startToken, start);
+		if (firstStartToken == -1) {
+			return -1;
+		}
+		int pos = firstStartToken;
+		int count = 0;
+		int nextStart = firstStartToken;
+		int nextEnd = lastEndToken;
+		// search for matches within the area that tokens have already been found
+		while (pos >= firstStartToken && pos < (lastEndToken + endToken.length())) {
+			if (nextStart != -1 && nextStart < nextEnd) {
+				// cursor is currently at the match of a start token
+				count++;
+				pos += startToken.length();
+			} else {
+				// cursor is currently at the match of an end token
+				count--;
+				if (count == 0) {
+					// this tag closes a match, return the position of the
+					// start of the tag
+					return pos;
+				}
+				pos += endToken.length();
+			}
+			// jump to the next start or end token
+			nextEnd = contentString.indexOf(endToken, pos);
+			if (nextEnd == -1) {
+				// no more matching end patterns, no match
+				break;
+			}
+			nextStart = contentString.indexOf(startToken, pos);
+			pos = (nextStart == -1) ? nextEnd : Math.min(nextStart, nextEnd);
+		}
+		return -1;
+	}
+
+	/**
+	 * Search through content, starting at a specific position, and search backwards for the
+	 * first position of a matching start tag for a specified end tag.  For instance,
+	 * if called with an end tag of "</b>" and a start tag of "<b>", this method
+	 * will operate as follows:
+	 *
+	 * "01<b>567</b>23" returns 2.
+	 * "01234567</b>23" returns -1.
+	 *
+	 * @param content The string to be searched.
+	 * @param start The position within the string to start searching from (inclusive).
+	 *  Only characters before this position in the string will be examined.
+	 * @param startToken The opening tag to match.
+	 * @param endToken The closing tag to match.
+	 * @return -1 if no matching start tag is found, or the index within the string of the first
+	 *  character of the start tag.
+	 */
+	public static int findMatchingStartTag(CharSequence content, int start, String startToken, String endToken) {
+		// do some initial searching to make sure the tokens are available
+		if (content == null || start < 0 || start >= content.length()) {
+			return -1;
+		}
+		int firstStartToken = StringUtils.indexOf(content, startToken);
+		if (firstStartToken == -1 || firstStartToken > start) {
+			return -1;
+		}
+		int lastEndToken = StringUtils.lastIndexOf(content, endToken, start);
+		if (lastEndToken == -1) {
+			return -1;
+		}
+		int pos = start;
+		if (pos >= (lastEndToken + endToken.length())) {
+			pos = lastEndToken + endToken.length() - 1;
+		}
+		int count = 0;
+		String contentString = content.toString();
+		String substring;
+		// search for matches within the area that tokens have already been found
+		while (pos >= firstStartToken && pos < (lastEndToken + endToken.length())) {
+			substring = contentString.substring(0, pos + 1);
+			// search for matches from end-to-beginning
+			if (substring.endsWith(endToken)) {
+				count++;
+				pos -= endToken.length();
+			} else if (substring.endsWith(startToken)) {
+				count--;
+				if (count == 0) {
+					// this tag opens a match, return the position of the
+					// start of the tag
+					return (pos - startToken.length()) + 1;
+				}
+				pos -= startToken.length();
+			} else {
+				pos--;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Given a string, determine if it is a valid HTML entity (such as &trade; or
+	 * &#160;).
+	 *
+	 * @param text The text that is being examined.
+	 * @return <code>true</code> if the text is a valid HTML entity.
+	 */
+	public static boolean isHtmlEntity(String text) {
+		if (text == null) {
+			return false;
+		}
+		// see if it was successfully converted, in which case it is an entity
+		try {
+			return (!text.equals(StringEscapeUtils.unescapeHtml4(text)));
+		} catch (IllegalArgumentException e) {
+			// "&#xffffff;" seems to be throwing errors
+			return false;
+		}
 	}
 
 	/**
@@ -233,6 +375,18 @@ public class JFlexParserUtil {
 	}
 
 	/**
+	 * Strip all HTML tags from a string.  For example, "A <b>bold</b> word" will be
+	 * returned as "A bold word".  This method treats an tags that are between brackets
+	 * as HTML, whether it is valid HTML or not.
+	 *
+	 * @param value The value that will have HTML stripped from it.
+	 * @return The value submitted to this method with all HTML tags removed from it.
+	 */
+	public static String stripMarkup(String value) {
+		return StringUtils.trim(value.replaceAll("<[^>]+>", ""));
+	}
+
+	/**
 	 * Parse a template string of the form "param1|param2|param3" into tokens
 	 * (param1, param2, and param3 in the example), handling such cases as
 	 * "param1|[[foo|bar]]|param3" correctly.
@@ -255,17 +409,17 @@ public class JFlexParserUtil {
 			closeTagSize = 2;
 			if (substring.startsWith("{{{")) {
 				// template parameter
-				endPos = Utilities.findMatchingEndTag(content, pos, "{{{", "}}}");
+				endPos = JFlexParserUtil.findMatchingEndTag(content, pos, "{{{", "}}}");
 				closeTagSize = 3;
 			} else if (substring.startsWith("{{")) {
 				// template
-				endPos = Utilities.findMatchingEndTag(content, pos, "{{", "}}");
+				endPos = JFlexParserUtil.findMatchingEndTag(content, pos, "{{", "}}");
 			} else if (substring.startsWith("[[")) {
 				// link
-				endPos = Utilities.findMatchingEndTag(content, pos, "[[", "]]");
+				endPos = JFlexParserUtil.findMatchingEndTag(content, pos, "[[", "]]");
 			} else if (substring.startsWith("{|")) {
 				// table
-				endPos = Utilities.findMatchingEndTag(content, pos, "{|", "|}");
+				endPos = JFlexParserUtil.findMatchingEndTag(content, pos, "{|", "|}");
 			} else if (content.charAt(pos) == '|') {
 				// new token
 				tokens.add(value.toString());

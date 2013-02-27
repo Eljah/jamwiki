@@ -90,72 +90,6 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	 *
 	 */
 	@Test
-	public void testFindMatchingEndTag() throws Throwable {
-		int result = Utilities.findMatchingEndTag("01<b>567</b>23", 0, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #1", 8, result);
-		result = Utilities.findMatchingEndTag("01234567</b>23", 0, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #2", -1, result);
-		result = Utilities.findMatchingEndTag("01<b>567890123", 0, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #3", -1, result);
-		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 0, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #4", 15, result);
-		result = Utilities.findMatchingEndTag("01<b>5<b>901234</b>9", 0, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #5", -1, result);
-		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 5, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #6", 10, result);
-		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", -1, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #7", -1, result);
-		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #8", -1, result);
-		result = Utilities.findMatchingEndTag("01<b>5<b>9</b>4</b>", 0, "<b>", "</b>");
-		assertEquals("Failure in end tag matching test #9", 15, result);
-		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]", 0, "[[", "]]");
-		assertEquals("Failure in end tag matching test #10", 18, result);
-		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]", 2, "[[", "]]");
-		assertEquals("Failure in end tag matching test #11", 7, result);
-		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]", 6, "[[", "]]");
-		assertEquals("Failure in end tag matching test #12", -1, result);
-		result = Utilities.findMatchingEndTag("[[23[[6]]901234567]]0", 0, "[[", "]]");
-		assertEquals("Failure in end tag matching test #13", 18, result);
-		result = Utilities.findMatchingEndTag("[[[3[][[]]01]]4567]]0", 0, "[", "]");
-		assertEquals("Failure in end tag matching test #14", 18, result);
-		result = Utilities.findMatchingEndTag("[[[3[][[8901]]4567]]0", 0, "[", "]");
-		assertEquals("Failure in end tag matching test #15", -1, result);
-		result = Utilities.findMatchingEndTag("[[[[[]]]89[[]]4567]]0", 0, "[[", "]]");
-		assertEquals("Failure in end tag matching test #16", 18, result);
-		result = Utilities.findMatchingEndTag("0[[[[]]]89[[]]4567]]0", 0, "[[", "]]");
-		assertEquals("Failure in end tag matching test #17", 18, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testFindMatchingStartTag() throws Throwable {
-		int result = Utilities.findMatchingStartTag("01<b>567</b>23", 13, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #1", 2, result);
-		result = Utilities.findMatchingStartTag("01234567</b>23", 13, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #2", -1, result);
-		result = Utilities.findMatchingStartTag("01<b>567890123", 13, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #3", -1, result);
-		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 19, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #4", 2, result);
-		result = Utilities.findMatchingStartTag("01<b>5</b>901234</b>9", 19, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #5", -1, result);
-		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 14, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #6", 6, result);
-		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", -1, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #7", -1, result);
-		result = Utilities.findMatchingStartTag("01<b>5<b>9</b>4</b>9", 20, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #8", -1, result);
-		result = Utilities.findMatchingStartTag("<b>345</b>0", 10, "<b>", "</b>");
-		assertEquals("Failure in start tag matching test #9", 0, result);
-	}
-
-	/**
-	 *
-	 */
-	@Test
 	public void testIsIpAddress() throws Throwable {
 		//test ipv4 addresses
 		assertTrue("0.0.0.0", Utilities.isIpAddress("0.0.0.0"));
@@ -188,25 +122,6 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	/**
 	 *
 	 */
-	@Test
-	public void testIsHtmlEntity() throws Throwable {
-		assertFalse("Invalid HTML entity test #1", Utilities.isHtmlEntity(null));
-		assertFalse("Invalid HTML entity test #2", Utilities.isHtmlEntity(""));
-		assertTrue("Invalid HTML entity test #3", Utilities.isHtmlEntity("&amp;"));
-		assertTrue("Invalid HTML entity test #4", Utilities.isHtmlEntity("&#38;"));
-		assertTrue("Invalid HTML entity test #5", Utilities.isHtmlEntity("&#x26;"));
-		assertFalse("Invalid HTML entity test #6", Utilities.isHtmlEntity("&bogus;"));
-		assertTrue("Invalid HTML entity test #7", Utilities.isHtmlEntity("&#x2dc;"));
-		assertTrue("Invalid HTML entity test #8", Utilities.isHtmlEntity("&#x2DC;"));
-		assertFalse("Invalid HTML entity test #9", Utilities.isHtmlEntity("&#x2GG;"));
-		assertTrue("Invalid HTML entity test #10", Utilities.isHtmlEntity("&#xffff;"));
-		assertTrue("Invalid HTML entity test #11", Utilities.isHtmlEntity("&#xfffff;"));
-		assertFalse("Invalid HTML entity test #12", Utilities.isHtmlEntity("&#xffffff;"));
-	}
-
-	/**
-	 *
-	 */
 	@Test(expected=NullPointerException.class)
 	public void testFormatMessageThrowsNullPointerException() throws Throwable {
 		Utilities.formatMessage("testUtilitiesKey", null);
@@ -219,18 +134,5 @@ public class UtilitiesTest extends JAMWikiUnitTest {
 	public void testFormatMessageThrowsNullPointerException1() throws Throwable {
 		Object[] objects = new Object[2];
 		Utilities.formatMessage("testUtilitiesKey", null, objects);
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testStripMarkup() throws Throwable {
-		assertEquals("Markup not stripped", Utilities.stripMarkup("test"), "test");
-		assertEquals("Markup not stripped", Utilities.stripMarkup("<b>test</b>"), "test");
-		assertEquals("Markup not stripped", Utilities.stripMarkup("Ação"), "Ação");
-		assertEquals("Markup not stripped", Utilities.stripMarkup("<b>Ação</b>"), "Ação");
-		assertEquals("Markup not stripped", Utilities.stripMarkup("A&#65533;&#65533;o"), "A&#65533;&#65533;o");
-		assertEquals("Markup not stripped", Utilities.stripMarkup("<b>A&#65533;&#65533;o</b>"), "A&#65533;&#65533;o");
 	}
 }

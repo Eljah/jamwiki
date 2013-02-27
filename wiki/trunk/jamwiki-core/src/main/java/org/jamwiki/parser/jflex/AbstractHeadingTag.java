@@ -88,7 +88,7 @@ public abstract class AbstractHeadingTag implements JFlexParserTag {
 		// and an empty output.
 		ParserInput tmpParserInput = new ParserInput(lexer.getParserInput());
 		String tocText = this.processTocText(tmpParserInput, ParserOutput.IMMUTABLE_PARSER_OUTPUT, tagText, JFlexParser.MODE_PROCESS);
-		return Utilities.stripMarkup(tocText);
+		return JFlexParserUtil.stripMarkup(tocText);
 	}
 
 	/**

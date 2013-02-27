@@ -5,7 +5,6 @@
 package org.jamwiki.parser.jflex;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.jamwiki.utils.Utilities;
 
 %%
 
@@ -41,7 +40,7 @@ wikilink           = "[[" ({wikilinkcontent})+ "]]" [a-z]*
     {entity} {
         if (logger.isTraceEnabled()) logger.trace("entity: " + yytext() + " (" + yystate() + ")");
         String raw = yytext();
-        return (Utilities.isHtmlEntity(raw)) ? raw : StringEscapeUtils.escapeHtml4(raw);
+        return (JFlexParserUtil.isHtmlEntity(raw)) ? raw : StringEscapeUtils.escapeHtml4(raw);
     }
     {whitespace} | . {
         // no need to log this

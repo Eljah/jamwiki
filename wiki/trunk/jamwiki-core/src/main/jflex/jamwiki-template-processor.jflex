@@ -6,7 +6,6 @@
 package org.jamwiki.parser.jflex;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jamwiki.utils.Utilities;
 
 %%
 
@@ -129,7 +128,7 @@ wikisignature      = ([~]{3,5})
     {templateendchar} {
         if (logger.isTraceEnabled()) logger.trace("templateendchar: " + yytext() + " (" + yystate() + ")");
         this.templateString.append(yytext());
-        if (Utilities.findMatchingEndTag(this.templateString, 0, "{", "}") != -1) {
+        if (JFlexParserUtil.findMatchingEndTag(this.templateString, 0, "{", "}") != -1) {
             endState();
             String result = this.parse(TAG_TYPE_TEMPLATE, this.templateString.toString());
             this.templateString = new StringBuilder();

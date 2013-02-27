@@ -22,7 +22,6 @@ import org.jamwiki.parser.LinkUtil;
 import org.jamwiki.parser.ParserException;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
-import org.jamwiki.utils.Utilities;
 import org.jamwiki.utils.WikiLogger;
 
 /**
@@ -93,7 +92,7 @@ public class HtmlLinkTag implements JFlexParserTag {
 			if (c == ')' || c == ']' || c == '}') {
 				String closeChar = String.valueOf(c);
 				String openChar = (c == ')') ? "(" : ((c == ']') ? "[" : "{");
-				if (Utilities.findMatchingStartTag(text, i, openChar, closeChar) == -1) {
+				if (JFlexParserUtil.findMatchingStartTag(text, i, openChar, closeChar) == -1) {
 					buffer.append(c);
 					continue;
 				}
