@@ -30,16 +30,16 @@ import org.jamwiki.model.Topic;
 import org.jamwiki.model.TopicType;
 import org.jamwiki.model.TopicVersion;
 import org.jamwiki.model.Watchlist;
-import org.jamwiki.model.WikiDiff;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.parser.ParserInput;
 import org.jamwiki.parser.ParserOutput;
 import org.jamwiki.parser.ParserUtil;
 import org.jamwiki.parser.WikiLink;
-import org.jamwiki.utils.DiffUtil;
 import org.jamwiki.utils.WikiLogger;
 import org.jamwiki.utils.WikiUtil;
 import org.jamwiki.validator.ReCaptchaUtil;
+import org.jamwiki.web.model.WikiDiff;
+import org.jamwiki.web.utils.DiffUtil;
 import org.springframework.web.servlet.ModelAndView;
 
 /**

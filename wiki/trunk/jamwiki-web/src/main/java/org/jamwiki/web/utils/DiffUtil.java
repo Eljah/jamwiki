@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.utils;
+package org.jamwiki.web.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.incava.util.diff.Diff;
 import org.incava.util.diff.Difference;
 import org.jamwiki.DataAccessException;
-import org.jamwiki.model.WikiDiff;
+import org.jamwiki.utils.WikiCache;
+import org.jamwiki.utils.WikiLogger;
+import org.jamwiki.web.model.WikiDiff;
 
 /**
  * Utility class for processing the difference between two topics and returing a list

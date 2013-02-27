@@ -14,7 +14,7 @@
  * along with this program (LICENSE.txt); if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.jamwiki.model;
+package org.jamwiki.web.model;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provides an object representing the difference between two objects as created
- * by {@link org.jamwiki.utils.DiffUtil}.
+ * by {@link org.jamwiki.web.utils.DiffUtil}.
  */
 public class WikiDiff implements Serializable {
 
@@ -34,12 +34,6 @@ public class WikiDiff implements Serializable {
 	private int position = -1;
 	/** The diff may (optionally) contain a list of sub-diffs, such as when diffing two topics and then further showing what changed on a line. */
 	private List<WikiDiff> subDiffs;
-
-	/**
-	 *
-	 */
-	public WikiDiff() {
-	}
 
 	/**
 	 *
