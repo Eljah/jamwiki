@@ -10,6 +10,7 @@ New Features:
   * Upgrade to Lucene Search 4.1.
   * Upgrade to HSQLDB 2.2.9.
   * Upgrade to commons-io-2.4.
+  * Upgrade to slf4j 1.7.2.
 
 Bugfixes:
 
