@@ -19,6 +19,7 @@
 package org.jamwiki.utils;
 
 import java.io.FileNotFoundException;
+
 import org.jamwiki.JAMWikiUnitTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -55,5 +56,57 @@ public class ResourceUtilTest extends JAMWikiUnitTest {
 	@Test(expected=NullPointerException.class)
 	public void testReadFileThrowsNullPointerException() throws Throwable {
 		ResourceUtil.readFile(null);
+	}
+
+	/*
+	 *
+	 */
+	@Test
+	public void testReadFileClassPath() throws Throwable {
+		final String contents = ResourceUtil.readFile("StartingPoints.us-ascii.txt").trim();
+		assertNotNull("Classpath reading file returned 'null'", contents);
+		assertTrue("Read contents too short: " + contents.length(), 13 == contents.length());
+	}
+
+	/*
+	 *
+	 */
+	@Test
+	public void testReadFileFromPath() throws Throwable {
+		final String contents = ResourceUtil.readFile("src/test/resources/StartingPoints.us-ascii.txt").trim();
+		assertNotNull("File path reading file returned 'null'", contents);
+		assertTrue("Read contents too short: " + contents.length(), 13 == contents.length());
+	}
+
+	/*
+	 *
+	 */
+	@Test
+	public void testReadFileUSAscii() throws Throwable {
+		final String contents = ResourceUtil.readFile("StartingPoints.us-ascii.txt").trim();
+		assertNotNull("Classpath reading US-ASCII returned 'null'", contents);
+		assertTrue("Reading US-ASCII failed: " + contents, contents.equals("1234567890aou"));
+	}
+
+	/*
+	 *
+	 */
+	@Test
+	public void testReadFileUTF8() throws Throwable {
+		final String contents = ResourceUtil.readFile("StartingPoints.utf8.txt").trim();
+		assertNotNull("Classpath reading UTF-8 returned 'null'", contents);
+		assertTrue("Reading UTF-8 failed: " + contents, contents.equals("1234567890äöü"));
+
+	}
+
+	/*
+	 *
+	 */
+	@Test
+	public void testReadFileUTF8BOM() throws Throwable {
+		final String contents = ResourceUtil.readFile("StartingPoints.utf8-bom.txt").trim();
+		assertNotNull("Classpath reading UTF-8 returned 'null'", contents);
+		assertTrue("Reading UTF-8 failed: " + contents, contents.startsWith("1234567890äöü"));
+
 	}
 }
