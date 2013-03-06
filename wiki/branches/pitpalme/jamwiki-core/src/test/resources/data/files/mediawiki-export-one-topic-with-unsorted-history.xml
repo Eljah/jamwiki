@@ -38,6 +38,7 @@
         <username>Test User</username>
         <id>192361</id>
       </contributor>
+      <sha1/>
       <text xml:space="preserve">Newest Revision</text>
     </revision>
     <revision>
@@ -48,6 +49,7 @@
         <id>192361</id>
       </contributor>
       <comment>add additional link</comment>
+      <sha1/>
       <text xml:space="preserve">Oldest Revision</text>
     </revision>
     <revision>
@@ -57,6 +59,7 @@
         <username>Test User</username>
         <id>192361</id>
       </contributor>
+      <sha1/>
       <text xml:space="preserve">Middle Revision</text>
     </revision>
   </page>

@@ -39,6 +39,7 @@
         <id>6399575</id>
       </contributor>
       <comment>Topic Comment 1</comment>
+      <sha1/>
       <text xml:space="preserve">Topic Content 1</text>
     </revision>
     <revision>
@@ -50,6 +51,7 @@
       </contributor>
       <minor/>
       <comment>Topic Comment 2</comment>
+      <sha1/>
       <text xml:space="preserve">Topic Content 2</text>
     </revision>
   </page>
