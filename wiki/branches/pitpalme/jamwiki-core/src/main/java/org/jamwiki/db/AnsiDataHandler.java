@@ -2046,6 +2046,11 @@ public class AnsiDataHandler {
 			// database not yet set up
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt);
+			// explicitly null the variable to improve garbage collection.
+			// with very large loops this can help avoid OOM "GC overhead
+			// limit exceeded" errors.
+			stmt = null;
+			conn = null;
 		}
 		WikiDatabase.setup(locale, user, username, encryptedPassword);
 	}
