@@ -2046,6 +2046,8 @@ public class AnsiQueryHandler implements QueryHandler {
 		} finally {
 			// close only the statement and result set - leave the connection open for further use
 			DatabaseConnection.closeConnection(null, stmt, rs);
+			stmt = null;
+			rs = null;
 		}
 	}
 
@@ -3348,6 +3350,11 @@ public class AnsiQueryHandler implements QueryHandler {
 			throw e;
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt);
+			// explicitly null the variable to improve garbage collection.
+			// with very large loops this can help avoid OOM "GC overhead
+			// limit exceeded" errors.
+			stmt = null;
+			conn = null;
 		}
 	}
 
@@ -3792,6 +3799,11 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.executeUpdate();
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt);
+			// explicitly null the variable to improve garbage collection.
+			// with very large loops this can help avoid OOM "GC overhead
+			// limit exceeded" errors.
+			stmt = null;
+			conn = null;
 		}
 	}
 	/**

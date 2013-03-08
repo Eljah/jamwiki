@@ -38,6 +38,7 @@
         <username>Test User</username>
         <id>192361</id>
       </contributor>
+      <sha1/>
       <text xml:space="preserve">Test Page</text>
     </revision>
     <revision>
@@ -47,6 +48,7 @@
         <username>Test User</username>
         <id>192361</id>
       </contributor>
+      <sha1/>
       <text xml:space="preserve">Test Page
 
 Link to user page: [[User:Test User]]
@@ -62,6 +64,7 @@ Link to user talk page: [[User talk: Test User]]</text>
       </contributor>
       <minor />
       <comment>add additional link</comment>
+      <sha1/>
       <text xml:space="preserve">Test Page
 
 Link to user page: [[User:Test User]]
@@ -77,6 +80,7 @@ Link to template page: [[Template:Test Template]]</text>
         <username>Test User</username>
         <id>192361</id>
       </contributor>
+      <sha1/>
       <text xml:space="preserve">Test Page
 
 Link to user page: [[User:Test User]]
@@ -100,6 +104,7 @@ Link to template talk page: [[Template talk:Test Template]]</text>
         <id>498929</id>
       </contributor>
       <comment>New template for user pages</comment>
+      <sha1/>
       <text xml:space="preserve">This user has [[:wikitravel:User:{{{1|{{PAGENAME}}}}}|a user page]]</text>
     </revision>
     <revision>
@@ -108,6 +113,7 @@ Link to template talk page: [[Template talk:Test Template]]</text>
       <contributor>
         <ip>216.106.101.236</ip>
       </contributor>
+      <sha1/>
       <text xml:space="preserve">This user has [[:wikitravel:User:{{{1}}}|a user page]]</text>
     </revision>
     <revision>
@@ -119,6 +125,7 @@ Link to template talk page: [[Template talk:Test Template]]</text>
       </contributor>
       <minor/>
       <comment>rvv</comment>
+      <sha1/>
       <text xml:space="preserve">This user has [[:wikitravel:User:{{{1|{{PAGENAME}}}}}|a user page]]</text>
     </revision>
   </page>

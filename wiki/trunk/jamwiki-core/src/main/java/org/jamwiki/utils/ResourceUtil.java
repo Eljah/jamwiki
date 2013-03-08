@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
@@ -203,12 +204,19 @@ public abstract class ResourceUtil {
 	 */
 	public static String readFile(String filename) throws IOException {
 		File file = new File(filename);
-		if (file.exists()) {
-			// file passed in as full path
-			return FileUtils.readFileToString(file, "UTF-8");
+		if (!file.exists()) {
+			// look for file in resource directories
+			file = getClassLoaderFile(filename);
 		}
-		// look for file in resource directories
-		file = getClassLoaderFile(filename);
-		return FileUtils.readFileToString(file, "UTF-8");
+		InputStream is = null;
+		try {
+			is = new BOMInputStream(FileUtils.openInputStream(file));
+			return IOUtils.toString(is, "UTF-8");
+		} finally {
+			if (null != is) {
+				IOUtils.closeQuietly(is);
+				is = null;
+			}
+		}
 	}
 }

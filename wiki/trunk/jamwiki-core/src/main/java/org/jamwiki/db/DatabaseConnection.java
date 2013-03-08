@@ -140,10 +140,6 @@ public class DatabaseConnection {
 			try {
 				rs.close();
 			} catch (SQLException e) {}
-			// explicitly null the variable to improve garbage collection.
-			// with very large loops this can help avoid OOM "GC overhead
-			// limit exceeded" errors.
-			rs = null;
 		}
 	}
 
@@ -158,10 +154,6 @@ public class DatabaseConnection {
 			try {
 				stmt.close();
 			} catch (SQLException e) {}
-			// explicitly null the variable to improve garbage collection.
-			// with very large loops this can help avoid OOM "GC overhead
-			// limit exceeded" errors.
-			stmt = null;
 		}
 	}
 
@@ -288,6 +280,11 @@ public class DatabaseConnection {
 			}
 		} finally {
 			DatabaseConnection.closeConnection(conn, stmt);
+			// explicitly null the variable to improve garbage collection.
+			// with very large loops this can help avoid OOM "GC overhead
+			// limit exceeded" errors.
+			stmt = null;
+			conn = null;
 		}
 	}
 

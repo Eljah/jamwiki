@@ -66,10 +66,10 @@ public class ParserInput {
 		this.allowSectionEdit = parserInput.allowSectionEdit;
 		this.allowTableOfContents = parserInput.allowTableOfContents;
 		this.context = parserInput.context;
-		this.depth = depth;
-		this.infiniteLoopCount = infiniteLoopCount;
+		this.depth = parserInput.depth;
+		this.infiniteLoopCount = parserInput.infiniteLoopCount;
 		this.locale = parserInput.locale;
-		this.templateDepth = templateDepth;
+		this.templateDepth = parserInput.templateDepth;
 		this.topicName = parserInput.topicName;
 		this.userDisplay = parserInput.userDisplay;
 		this.virtualWiki = parserInput.virtualWiki;
