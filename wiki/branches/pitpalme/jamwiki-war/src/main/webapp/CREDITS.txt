@@ -18,6 +18,7 @@ JAMWiki Contributors
                             Axel Kramer (axelclk)
                             Robert Matyja (dlpa)
                             Michael Osipov (mosipov)
+                            Peter Palmreuther (pitpalme)
                             Dan Prekker (dprekker)
                             Rainer Schmitz (swift)
                             Phil Trimble (PhilTrimble)
@@ -34,7 +35,9 @@ JAMWiki Contributors
      French:                Henri Gomez (hgomez)
                             Guillaume FRANCOIS 55
      Galician:              Manuel Meixide - bagonix.net (mmeixide)
-     German:                Axel Kramer (axelclk)
+     German:                Charles Clavadetscher (cclavadetscher)
+                            Axel Kramer (axelclk)
+                            Peter Palmreuther (pitpalme)
                             Frank Reifenstahl (frareinif)
                             Rainer Schmitz (swift)
                             Samuel (justme)
