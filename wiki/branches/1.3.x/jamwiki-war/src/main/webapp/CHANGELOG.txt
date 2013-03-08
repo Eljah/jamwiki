@@ -11,9 +11,14 @@ Bugfixes:
     and fixed by Thomas Koch.
   * Remove unneeded 403.jsp page, which contained an invalid constant that
     caused warnings in Eclipse.  Reported by Thomas Koch.
+  * Fix a UTF-8 issue that caused invalid characters to appear on some of the
+    default pages in non-English languages (Peter Palmreuther / pitpalme).
+  * Fix invalid Mediawiki text data (Peter Palmreuther / pitpalme).
+  * Miscellaneous minor optimizations (Peter Palmreuther / pitpalme).
 
 Translation Updates:
 
+  * Updated German translations (pitpalme).
   * Updated Russian translations (shar).
 
 
