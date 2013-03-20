@@ -114,7 +114,7 @@ public class AdminServlet extends JAMWikiServlet {
 				throw new WikiException(new WikiMessage("admin.adduser.message.uidexists", userLogin));
 			}
 			WikiUtil.validatePassword(password, confirmPassword);
-			String encryptedPassword = Encryption.encrypt(password);
+			String encryptedPassword = Encryption.encrypt(password, Encryption.generateSalt());
 			user = new WikiUser(userLogin);
 			user.setDisplayName(displayName);
 			user.setEmail(email);
@@ -239,7 +239,7 @@ public class AdminServlet extends JAMWikiServlet {
 				throw new WikiException(new WikiMessage("admin.password.message.invalidlogin", userLogin));
 			}
 			WikiUtil.validatePassword(newPassword, confirmPassword);
-			String encryptedPassword = Encryption.encrypt(newPassword);
+			String encryptedPassword = Encryption.encrypt(newPassword, Encryption.generateSalt());
 			WikiBase.getDataHandler().writeWikiUser(user, userLogin, encryptedPassword);
 		} catch (WikiException e) {
 			pageInfo.addError(e.getWikiMessage());

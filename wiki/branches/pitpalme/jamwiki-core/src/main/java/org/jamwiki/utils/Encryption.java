@@ -16,15 +16,20 @@
  */
 package org.jamwiki.utils;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.Environment;
@@ -37,8 +42,13 @@ import org.jamwiki.WikiException;
 public class Encryption {
 
 	private static final WikiLogger logger = WikiLogger.getLogger(Encryption.class.getName());
+	private static final Charset UTF8 = Charset.forName("UTF-8");
+	private static final Random SALT_RANDOM = new Random(System.currentTimeMillis());
+	// Form at most two matching groups: 1st optional is MessageDigest name, 2nd is real salt
+	private static final Pattern PATTERN_SALT = Pattern.compile("(?:\\$([\\p{Print}&&[^\\$]]+))?(?:\\$([\\p{Digit}\\p{Alpha}&&[^\\$]]+))\\$");
 	public static final String DES_ALGORITHM = "DES";
 	public static final String ENCRYPTION_KEY = "JAMWiki Key 12345";
+	public static final int DEFAULT_SALT_LENGTH = 8;
 
 	/**
 	 * Hide the constructor by making it private.
@@ -52,7 +62,7 @@ public class Encryption {
 	 * @param unencryptedBytes The unencrypted String value that is to be encrypted.
 	 * @return An encrypted version of the String that was passed to this method.
 	 */
-	private static String encrypt64(byte[] unencryptedBytes) throws GeneralSecurityException, UnsupportedEncodingException {
+	private static String encrypt64(byte[] unencryptedBytes) throws GeneralSecurityException {
 		if (unencryptedBytes == null || unencryptedBytes.length == 0) {
 			throw new IllegalArgumentException("Cannot encrypt a null or empty byte array");
 		}
@@ -60,18 +70,57 @@ public class Encryption {
 		Cipher cipher = Cipher.getInstance(key.getAlgorithm());
 		cipher.init(Cipher.ENCRYPT_MODE, key);
 		byte[] encryptedBytes = Base64.encodeBase64(cipher.doFinal(unencryptedBytes));
-		return bytes2String(encryptedBytes);
+		return new String(encryptedBytes, UTF8);
 	}
 
 	/**
+	 * Encrypt the password after it's been hashed and 'salted' (if provided).
 	 *
+	 * @param unencryptedString The plain text password to hash and encrypt.
+	 * @param salt
+	 *            The salt to use for strengthen the hash, if not 'null' or
+	 *            an empty String.<br/>
+	 *            The format is supposed to be "'$' + salt + '$'". If
+	 *            there's an optional text in format "'$' + value" preceding
+	 *            the salt, it is considered to be the {@link MessageDigest}
+	 *            name to use. <br/>
+	 *            If format pattern cannot be found, the given String is
+	 *            trimmed and used as salt as provided.
+	 * @return The hashed and encrypted password.<br/>
+	 *             If a salt was provided the salt and used hashing algorithm
+	 *             is prepended using '$' as delimiting character.
 	 */
-	public static String encrypt(String unencryptedString) {
+	public static String encrypt(String unencryptedString, String salt) {
 		if (StringUtils.isBlank(unencryptedString)) {
 			throw new IllegalArgumentException("Cannot encrypt a null or empty string");
 		}
+		String realSalt = null;
 		MessageDigest md = null;
 		String encryptionAlgorithm = Environment.getValue(Environment.PROP_ENCRYPTION_ALGORITHM);
+		// If a salt is provided we need to extract the used 'md' and the salt itself
+		// to reproduce the same encryption in case we're called to authenticate a user 
+		// provided password
+		if (!StringUtils.isBlank(salt)) {
+			// pessimistic approach: pretend we haven't found 'our syntax' for salt storage, 
+			// consider everything provided as salt to use (e.g. initial password encryption for registration, etc.)
+			realSalt = salt.trim();
+			// test if storage pattern for MessageDigest and salt matches and overrule pessimistic assumption
+			Matcher m = PATTERN_SALT.matcher(realSalt);
+			if (m.matches()) {
+				// it might be no MD-algorithm is stored, but only the salt
+				if (null != m.group(1)) {
+					encryptionAlgorithm = m.group(1);
+					if (logger.isDebugEnabled()) {
+							logger.debug("Extracted MessageDigest name '" + encryptionAlgorithm + "'");
+					}
+				}
+				// second regexp matching group (between '$'s) is the wanted salt
+				realSalt = m.group(2);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Extracted salt '" + realSalt + "'");
+				}
+			}
+		}
 		try {
 			md = MessageDigest.getInstance(encryptionAlgorithm);
 		} catch (NoSuchAlgorithmException e) {
@@ -95,15 +144,25 @@ public class Encryption {
 			}
 		}
 		try {
-			md.update(unencryptedString.getBytes("UTF-8"));
-			byte raw[] = md.digest();
-			return encrypt64(raw);
+			// multi step result String creation done using a StringBuilder
+			StringBuilder sb = new StringBuilder((unencryptedString.length() * 2));
+			// hash the password itself
+			md.update(unencryptedString.getBytes(UTF8));
+			
+			// if a salt should be used ...
+			if (!StringUtils.isBlank(realSalt)) {
+				sb.append('$'); // indicator we're not pure hashed password
+				sb.append(md.getAlgorithm()).append('$'); // append MessageDigest name
+				md.update(realSalt.getBytes(UTF8)); // salt the password hash
+				sb.append(realSalt).append('$'); // append used salt
+			}
+			// finally, weather salt or not, encrypt the password hash and add to result
+			sb.append(encrypt64(md.digest()));
+
+			return sb.toString();
 		} catch (GeneralSecurityException e) {
 			logger.error("Encryption failure", e);
 			throw new IllegalStateException("Failure while encrypting value");
-		} catch (UnsupportedEncodingException e) {
-			// this should never happen
-			throw new IllegalStateException("Unsupporting encoding UTF-8");
 		}
 	}
 
@@ -113,30 +172,17 @@ public class Encryption {
 	 * @param encryptedString The encrypted String value that is to be unencrypted.
 	 * @return An unencrypted version of the String that was passed to this method.
 	 */
-	private static String decrypt64(String encryptedString) throws GeneralSecurityException, UnsupportedEncodingException {
+	private static String decrypt64(String encryptedString) throws GeneralSecurityException {
 		if (StringUtils.isBlank(encryptedString)) {
 			return encryptedString;
 		}
 		SecretKey key = createKey();
 		Cipher cipher = Cipher.getInstance(key.getAlgorithm());
 		cipher.init(Cipher.DECRYPT_MODE, key);
-		byte[] encryptedBytes = encryptedString.getBytes("UTF8");
+		byte[] encryptedBytes = encryptedString.getBytes(UTF8);
 		byte[] unencryptedBytes = cipher.doFinal(Base64.decodeBase64(encryptedBytes));
-		return bytes2String(unencryptedBytes);
-	}
-
-	/**
-	 * Convert a byte array to a String value.
-	 *
-	 * @param bytes The byte array that is to be converted.
-	 * @return A String value created from the byte array that was passed to this method.
-	 */
-	private static String bytes2String(byte[] bytes) {
-		StringBuilder buffer = new StringBuilder();
-		for (int i = 0; i < bytes.length; i++) {
-			buffer.append((char)bytes[i]);
-		}
-		return buffer.toString();
+		// FIXME The API needs verification; Assumption decrypted bytes form a String is very optimistic
+		return new String(unencryptedBytes, UTF8);
 	}
 
 	/**
@@ -144,8 +190,8 @@ public class Encryption {
 	 *
 	 * @return An encryption key value implementing the DES encryption algorithm.
 	 */
-	private static SecretKey createKey() throws GeneralSecurityException, UnsupportedEncodingException {
-		byte[] bytes = ENCRYPTION_KEY.getBytes("UTF8");
+	private static SecretKey createKey() throws GeneralSecurityException {
+		byte[] bytes = ENCRYPTION_KEY.getBytes(UTF8);
 		DESKeySpec spec = new DESKeySpec(bytes);
 		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(DES_ALGORITHM);
 		return keyFactory.generateSecret(spec);
@@ -181,8 +227,6 @@ public class Encryption {
 				throw new IllegalStateException("Failure while saving properties");
 			}
 			return value;
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("Unsupporting encoding UTF-8");
 		}
 	}
 
@@ -198,14 +242,11 @@ public class Encryption {
 		if (!StringUtils.isBlank(value)) {
 			byte[] unencryptedBytes = null;
 			try {
-				unencryptedBytes = value.getBytes("UTF8");
+				unencryptedBytes = value.getBytes(UTF8);
 				encrypted = Encryption.encrypt64(unencryptedBytes);
 			} catch (GeneralSecurityException e) {
 				logger.error("Encryption failure", e);
 				throw new IllegalStateException("Failure while encrypting value");
-			} catch (UnsupportedEncodingException e) {
-				// this should never happen
-				throw new IllegalStateException("Unsupporting encoding UTF-8");
 			}
 		}
 		if (props == null) {
@@ -213,5 +254,81 @@ public class Encryption {
 		} else {
 			props.setProperty(name, encrypted);
 		}
+	}
+	
+	/**
+	 * Genrates a random salt, usually used for password hashing.
+	 * 
+	 * The generated salt will have a length of {@value #DEFAULT_SALT_LENGTH} characters.
+	 * 
+	 * @return The generated salt.
+	 * @see Encryption#generateSalt(int)
+	 */
+	public static String generateSalt() {
+		return generateSalt(DEFAULT_SALT_LENGTH);
+	}
+
+	/**
+	 * Generates a random salt, usually used for password hashing.
+	 * 
+	 * @param length
+	 *            The requested salts length. If zero or a negative value is
+	 *            passed the default length of 8 characters is used.
+	 * @return The generated salt.
+	 */
+	public static String generateSalt(final int length) {
+		final int saltLen = 0 < length ? length : DEFAULT_SALT_LENGTH;
+
+		// As we filter out a lot of bytes a non-letter/digit fetch more
+		// multiplier 5 is determined empirically 
+		byte[] tmp = new byte[saltLen * 5];
+		// initialize StringBuilder with "a little more than necessary" number
+		// of characters as we might have more 'valid' bytes than needed 
+		StringBuilder sb = new StringBuilder(saltLen * 2);
+		while (sb.length() < saltLen) {
+			SALT_RANDOM.nextBytes(tmp);
+			// manually "decode" byte for valid US-ASCII letter or digit
+			for (int i = 0; i < tmp.length; ++i) {
+				if ((0x30 <= tmp[i] && 0x39 >= tmp[i]) || 
+						(0x40 <= tmp[i] && 0x5a >= tmp[i]) || 
+						(0x61 <= tmp[i] && 0x7a >= tmp[i])) {
+					sb.append((char)tmp[i]);
+				}
+			}
+		}
+		return sb.substring(0, saltLen);
+	}
+	
+	/**
+	 * Extracts the salting part of stored password.
+	 *
+	 * Everything up to the last '$' character is considered to be part of
+	 * the salt.
+	 * This can include any preceding - also '$' delimited - text, which 
+	 * might form other password hashing hints, e.g. a MessageDigest name.
+	 * @see Encryption#encrypt(String, String)
+	 *
+	 * @param encryptedPassword
+	 *            the encrypted password String, eventually containing the
+	 *            salt.
+	 * @return the extracted salt, or 'null' if non found.
+	 */
+	public static String extractSalt(final String encryptedPassword) {
+		if (StringUtils.isBlank(encryptedPassword)) {
+			return null;
+		}
+		String result = null;
+		
+		int pos = encryptedPassword.lastIndexOf('$');
+		if (-1 < pos) {
+			if (encryptedPassword.indexOf('$') != pos) {
+				result = encryptedPassword.substring(0, ++pos);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Extracted salt '" + result + "'");
+				}
+			}
+		}
+		
+		return result;
 	}
 }

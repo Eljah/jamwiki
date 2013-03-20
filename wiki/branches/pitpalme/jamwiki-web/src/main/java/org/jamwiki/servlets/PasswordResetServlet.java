@@ -202,7 +202,7 @@ public class PasswordResetServlet extends JAMWikiServlet {
 			// store new password
 			WikiUser user = WikiBase.getDataHandler().lookupWikiUser(username);
 			try {
-				WikiBase.getDataHandler().writeWikiUser(user, username, Encryption.encrypt(newPassword));
+				WikiBase.getDataHandler().writeWikiUser(user, username, Encryption.encrypt(newPassword, Encryption.generateSalt()));
 				pageInfo.addMessage(new WikiMessage("password.reset.password.success"));
 				result = true; 
 			} catch(Exception ex) {

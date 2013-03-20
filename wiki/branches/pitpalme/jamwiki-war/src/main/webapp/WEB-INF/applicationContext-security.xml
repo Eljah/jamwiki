@@ -73,7 +73,9 @@
 	-->
 	<authentication-manager alias="authenticationManager">
 		<authentication-provider user-service-ref="jamWikiAuthenticationDao">
-			<password-encoder ref="jamwikiPasswordEncoder" />
+			<password-encoder ref="jamwikiPasswordEncoder">
+				<salt-source user-property="salt" />
+			</password-encoder>
 		</authentication-provider>
 	</authentication-manager>
 	<b:bean id="jamWikiAuthenticationDao" class="org.jamwiki.authentication.JAMWikiDaoImpl" />

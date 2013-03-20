@@ -82,9 +82,15 @@ public abstract class JAMWikiUnitTest {
 		WikiDatabase.setupDefaultDatabase(Environment.getInstance());
 		Locale locale = new Locale("en-US");
 		String username = "user";
-		String password = "password";
+		String password = "$SHA-512$12345678$sxSVgcB5QVZZnPKq5dpzNcWfyxHLu33NrC0uR7vAkCIwgmvEjg/N70ZhURZPUSxy1dztdj/EaLiAkEPEbzT1NDdEvUzqWnQo";
 		WikiUser wikiUser = new WikiUser(username);
-		WikiBase.reset(locale, wikiUser, username, password);
+		try {
+			logger.info("Reseting user");
+			WikiBase.reset(locale, wikiUser, username, password);
+		} catch (Exception e) {
+			logger.error("Error reseting user", e);
+			throw e;
+		}
 		// set up a second "test" virtual wiki
 		VirtualWiki virtualWiki = new VirtualWiki("test");
 		virtualWiki.setRootTopicName("StartingPoints");

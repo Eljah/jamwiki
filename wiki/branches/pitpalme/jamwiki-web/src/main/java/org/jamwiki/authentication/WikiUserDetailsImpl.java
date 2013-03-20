@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.jamwiki.model.Role;
+import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.WikiLogger;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -42,6 +43,8 @@ public class WikiUserDetailsImpl implements UserDetails {
 	private static final long serialVersionUID = -2818435399240684581L;
 	private String username = null;
 	private String password = null;
+	private String salt = null;
+
 	/**
 	 * GrantedAuthority is used by Spring Security to support several authorities
 	 * (roles). Anonymous users are assigned ROLE_ANONYMOUS by the Spring Security
@@ -84,6 +87,7 @@ public class WikiUserDetailsImpl implements UserDetails {
 		}
 		this.username = username;
 		this.password = password;
+		salt = Encryption.extractSalt(password);
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
@@ -174,6 +178,10 @@ public class WikiUserDetailsImpl implements UserDetails {
 	 */
 	public String getUsername() {
 		return this.username;
+	}
+
+	public String getSalt() {
+		return salt;
 	}
 
 	/**

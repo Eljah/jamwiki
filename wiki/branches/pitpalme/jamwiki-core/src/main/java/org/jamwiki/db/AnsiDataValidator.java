@@ -161,8 +161,8 @@ public class AnsiDataValidator {
 	protected void validateUserDetails(WikiUserDetails userDetails) throws WikiException {
 		checkLength(userDetails.getUsername(), 100);
 		// do not throw exception containing password info
-		if (userDetails.getPassword() != null && userDetails.getPassword().length() > 100) {
-			throw new WikiException(new WikiMessage("error.fieldlength", "-", "100"));
+		if (userDetails.getPassword() != null && userDetails.getPassword().length() > 150) {
+			throw new WikiException(new WikiMessage("error.fieldlength", "-", "150"));
 		}
 	}
 

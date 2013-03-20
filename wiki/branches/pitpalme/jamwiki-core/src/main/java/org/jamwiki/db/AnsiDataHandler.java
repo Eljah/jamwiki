@@ -339,9 +339,25 @@ public class AnsiDataHandler {
 		Connection conn = null;
 		try {
 			conn = DatabaseConnection.getConnection();
-			// password is stored encrypted, so encrypt password
-			String encryptedPassword = Encryption.encrypt(password);
+			// password is stored encrypted, so get eventual salt and encrypt password
+			String salt = queryHandler().fetchSalt(username, conn);
+			String encryptedPassword = Encryption.encrypt(password, salt);
 			return this.queryHandler().authenticateUser(username, encryptedPassword, conn);
+		} catch (SQLException e) {
+			throw new DataAccessException(e);
+		} finally {
+			DatabaseConnection.closeConnection(conn);
+		}
+	}
+
+	public String fetchSalt(final String username) throws DataAccessException {
+		if (StringUtils.isBlank(username)) {
+			return null;
+		}
+		Connection conn = null;
+		try {
+			conn = DatabaseConnection.getConnection();
+			return queryHandler().fetchSalt(username, conn);
 		} catch (SQLException e) {
 			throw new DataAccessException(e);
 		} finally {

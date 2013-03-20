@@ -103,7 +103,29 @@ public class EncryptionTest extends JAMWikiUnitTest {
 	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void testEncryptThrowsNullPointerException() throws Throwable {
-		Encryption.encrypt(null);
+		Encryption.encrypt(null, null);
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testExtractSalt() {
+		String result;
+
+		result = Encryption.extractSalt("abcdefgh");
+		assertNull(result);
+
+		result = Encryption.extractSalt("$abcdefgh");
+		assertNull("Invalid salt extracted", result);
+
+		result = Encryption.extractSalt("$123$abcdefgh");
+		assertNotNull(result);
+		assertEquals("Invalid salt extracted", "$123$", result);
+
+		result = Encryption.extractSalt("$SHA-512$123$abcdefgh");
+		assertNotNull(result);
+		assertEquals("Invalid salt extracted", "$SHA-512$123$", result);
 	}
 }
 

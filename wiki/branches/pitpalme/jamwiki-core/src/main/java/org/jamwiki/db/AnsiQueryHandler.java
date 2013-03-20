@@ -54,6 +54,7 @@ import org.jamwiki.model.WikiFileVersion;
 import org.jamwiki.model.WikiGroup;
 import org.jamwiki.model.WikiUser;
 import org.jamwiki.model.WikiUserDetails;
+import org.jamwiki.utils.Encryption;
 import org.jamwiki.utils.Pagination;
 import org.jamwiki.utils.WikiLogger;
 
@@ -232,6 +233,7 @@ public class AnsiQueryHandler implements QueryHandler {
 	protected static String STATEMENT_SELECT_USER_BLOCKS = null;
 	protected static String STATEMENT_SELECT_USER_BLOCK_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_USERS_AUTHENTICATION = null;
+	protected static String STATEMENT_SELECT_USERS_ENCRYPTED_PASSWORD = null;
 	protected static String STATEMENT_SELECT_VIRTUAL_WIKIS = null;
 	protected static String STATEMENT_SELECT_VIRTUAL_WIKI_SEQUENCE = null;
 	protected static String STATEMENT_SELECT_WATCHLIST = null;
@@ -295,6 +297,35 @@ public class AnsiQueryHandler implements QueryHandler {
 			stmt.setString(1, username);
 			stmt.setString(2, encryptedPassword);
 			return (stmt.executeQuery().next());
+		} finally {
+			DatabaseConnection.closeStatement(stmt);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jamwiki.db.QueryHandler#fetchSalt(java.lang.String)
+	 */
+	public String fetchSalt(String username, Connection conn) throws SQLException {
+		String result = null;
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(STATEMENT_SELECT_USERS_ENCRYPTED_PASSWORD);
+			stmt.setString(1, username);
+			ResultSet resultSet = stmt.executeQuery();
+			if (resultSet.next()) {
+				String encryptedPassword = resultSet.getString("password");
+				if (!resultSet.next()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Found encrypted password of length " + encryptedPassword.length());
+					}
+					result = Encryption.extractSalt(encryptedPassword);
+				}
+			}
+			resultSet = null;
+			if (logger.isDebugEnabled() ) {
+				logger.debug("Returning salt value of '" + result + "'");
+			}
+			return result;
 		} finally {
 			DatabaseConnection.closeStatement(stmt);
 		}
@@ -1451,6 +1482,7 @@ public class AnsiQueryHandler implements QueryHandler {
 		STATEMENT_SELECT_USER_BLOCKS             = props.getProperty("STATEMENT_SELECT_USER_BLOCKS");
 		STATEMENT_SELECT_USER_BLOCK_SEQUENCE     = props.getProperty("STATEMENT_SELECT_USER_BLOCK_SEQUENCE");
 		STATEMENT_SELECT_USERS_AUTHENTICATION    = props.getProperty("STATEMENT_SELECT_USERS_AUTHENTICATION");
+		STATEMENT_SELECT_USERS_ENCRYPTED_PASSWORD      = props.getProperty("STATEMENT_SELECT_USERS_ENCRYPTED_PASSWORD");
 		STATEMENT_SELECT_VIRTUAL_WIKIS           = props.getProperty("STATEMENT_SELECT_VIRTUAL_WIKIS");
 		STATEMENT_SELECT_VIRTUAL_WIKI_SEQUENCE   = props.getProperty("STATEMENT_SELECT_VIRTUAL_WIKI_SEQUENCE");
 		STATEMENT_SELECT_WATCHLIST               = props.getProperty("STATEMENT_SELECT_WATCHLIST");

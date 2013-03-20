@@ -85,6 +85,16 @@ public interface QueryHandler {
 	boolean authenticateUser(String login, String encryptedPassword, Connection conn) throws SQLException;
 
 	/**
+	 * Retrieve the salt used for hashing this users password.
+	 * 
+	 * @param login The users login name.
+	 * @param conn TODO
+	 * @return The salt used to hash this users password.
+	 * @throws SQLException Thrown if any error occurs during method execution.
+	 */
+	String fetchSalt(String login, Connection conn) throws SQLException;
+
+	/**
 	 * Some databases support automatically incrementing primary key values without the
 	 * need to explicitly specify a value, thus improving performance.  This method provides
 	 * a way for the a query handler to specify whether or not auto-incrementing is supported.

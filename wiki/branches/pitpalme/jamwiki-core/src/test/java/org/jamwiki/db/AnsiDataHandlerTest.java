@@ -104,4 +104,13 @@ public class AnsiDataHandlerTest extends JAMWikiUnitTest {
 		topic = WikiBase.getDataHandler().lookupTopic("en", "HELP:Test", false);
 		assertEquals("Incorrect topic name (case-insensitive)", topic.getName(), TOPIC_NAME);
 	}
+	
+	/**
+	 * 
+	 */
+	@Test
+	public void testAuthenticate() throws DataAccessException {
+		boolean authenticated = WikiBase.getDataHandler().authenticate("user", "password");
+		assertTrue("Authenticate user failed", authenticated);
+	}
 }

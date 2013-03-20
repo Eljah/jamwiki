@@ -134,7 +134,7 @@ public class RegisterServlet extends JAMWikiServlet {
 			String newPassword = request.getParameter("newPassword");
 			String encryptedPassword = null;
 			if (!StringUtils.isBlank(newPassword)) {
-				encryptedPassword = Encryption.encrypt(newPassword);
+				encryptedPassword = Encryption.encrypt(newPassword, Encryption.generateSalt());
 			}
 			WikiBase.getDataHandler().writeWikiUser(user, username, encryptedPassword);
 			if (!StringUtils.isBlank(newPassword)) {

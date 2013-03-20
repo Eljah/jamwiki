@@ -31,14 +31,14 @@ public class JAMWikiPasswordEncoder implements PasswordEncoder {
 	 * Encode a password as specified by the Spring Security PasswordEncoder interface.
 	 *
 	 * @param rawPass the password to encode
-	 * @param salt Ignored by JAMWiki.
+	 * @param salt the salt used to encode the password
 	 * @return encoded password
 	 */
 	public String encodePassword(String rawPass, Object salt) {
 		if (StringUtils.isBlank(rawPass)) {
 			throw new IllegalArgumentException("Password cannot be empty");
 		}
-		return Encryption.encrypt(rawPass);
+		return Encryption.encrypt(rawPass, (null != salt) ? salt.toString() : null);
 	}
 
 	/**
@@ -54,6 +54,6 @@ public class JAMWikiPasswordEncoder implements PasswordEncoder {
 		if (StringUtils.isBlank(rawPass)) {
 			return false;
 		}
-		return StringUtils.equals(encPass, Encryption.encrypt(rawPass));
+		return StringUtils.equals(encPass, Encryption.encrypt(rawPass, (null != salt) ? salt.toString() : null));
 	}
 }
